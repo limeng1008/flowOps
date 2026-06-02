@@ -17,7 +17,7 @@ const nodeCategoryMap = {
     Chains: '链',
     'Chat Models': '对话模型',
     'Document Loaders': '文档加载器',
-    Embeddings: '嵌入模型',
+    Embeddings: '向量模型',
     Engine: '引擎',
     Graph: '图',
     LLMs: 'LLMs',
@@ -37,7 +37,7 @@ const nodeCategoryMap = {
     Utilities: '实用工具',
     'Vector Stores': '向量库',
     'Vector Stores Indexes': '向量库索引',
-    'Embeddings Indexes': '嵌入索引',
+    'Embeddings Indexes': '向量索引',
     DEPRECATING: '即将弃用'
 }
 
@@ -118,23 +118,27 @@ const nodeLabelMap = {
     'OpenAI Custom Model': 'OpenAI 自定义模型',
 
     // ---------- Embeddings ----------
-    'AWS Bedrock Embedding': 'AWS Bedrock 嵌入模型',
-    'Azure OpenAI Embedding': 'Azure OpenAI 嵌入模型',
-    'Azure OpenAI Embeddings': 'Azure OpenAI 嵌入模型',
-    'Baidu Qianfan Embedding': 'Baidu Qianfan 嵌入模型',
-    'Cohere Embedding': 'Cohere 嵌入模型',
-    'Google Gemini Embedding': 'Google Gemini 嵌入模型',
-    'Google VertexAI Embedding': 'Google VertexAI 嵌入模型',
-    'HuggingFace Inference Embedding': 'HuggingFace Inference 嵌入模型',
-    'IBM Watsonx Embedding': 'IBM Watsonx 嵌入模型',
-    'Jina Embedding': 'Jina 嵌入模型',
-    'LocalAI Embedding': 'LocalAI 嵌入模型',
-    'MistralAI Embedding': 'MistralAI 嵌入模型',
-    'Ollama Embedding': 'Ollama 嵌入模型',
+    'AWS Bedrock Embedding': 'AWS Bedrock 向量模型',
+    'Azure OpenAI Embedding': 'Azure OpenAI 向量模型',
+    'Azure OpenAI Embeddings': 'Azure OpenAI 向量模型',
+    'Baidu Qianfan Embedding': '百度千帆向量模型',
+    'Cohere Embedding': 'Cohere 向量模型',
+    'Google Gemini Embedding': 'Google Gemini 向量模型',
+    'Google VertexAI Embedding': 'Google VertexAI 向量模型',
+    'HuggingFace Inference Embedding': 'HuggingFace Inference 向量模型',
+    'IBM Watsonx Embedding': 'IBM Watsonx 向量模型',
+    'Jina Embedding': 'Jina 向量模型',
+    'LocalAI Embedding': 'LocalAI 向量模型',
+    'MistralAI Embedding': 'MistralAI 向量模型',
+    'Ollama Embedding': 'Ollama 向量模型',
     'OpenAI Custom Embedding': 'OpenAI 兼容向量模型',
-    'OpenAI Embedding': 'OpenAI 嵌入模型',
-    'TogetherAI Embedding': 'TogetherAI 嵌入模型',
-    'VoyageAI Embedding': 'VoyageAI 嵌入模型',
+    'OpenAI Embedding': 'OpenAI 向量模型',
+    'TogetherAI Embedding': 'TogetherAI 向量模型',
+    'VoyageAI Embedding': 'VoyageAI 向量模型',
+    '智谱 Embedding': '智谱文本向量模型',
+    '通义 Embedding': '通义文本向量模型',
+    '硅基流动 Embedding': '硅基流动文本向量模型',
+    'DeepSeek Embedding': 'DeepSeek 文本向量模型',
 
     // ---------- Vector Stores (brands kept; only generic ones translated) ----------
     'Document Store (Vector)': '文档库（向量）',
@@ -265,13 +269,13 @@ const nodeLabelMap = {
     Document: '文档',
     'Model Name': '模型名称',
     Text: '文本',
-    Temperature: '温度',
+    Temperature: '随机性',
     'Text Splitter': '文本分割器',
     'Omit Metadata Keys': '忽略的元数据键',
     'Additional Metadata': '附加元数据',
     Streaming: '流式输出',
-    'Max Tokens': '最大 Token 数',
-    Embeddings: '嵌入模型',
+    'Max Tokens': '最大生成 Token 数',
+    Embeddings: '向量模型',
     'Input Moderation': '输入审核',
     'Top Probability': 'Top Probability',
     Timeout: '超时',
@@ -279,11 +283,11 @@ const nodeLabelMap = {
     'How to use': '使用说明',
     'Chat Model': '对话模型',
     'Language Model': '语言模型',
-    'Base URL': 'Base URL',
+    'Base URL': '接口地址',
     Type: '类型',
     Model: '模型',
     'Frequency Penalty': '频率惩罚',
-    'Base Path': 'Base Path',
+    'Base Path': '接口地址',
     Key: '键',
     'Base Options': '基础选项',
     'System Message': '系统消息',
@@ -298,7 +302,7 @@ const nodeLabelMap = {
     Headers: '请求头',
     'Available Actions': '可用动作',
     'Vector Store': '向量库',
-    Region: '地区',
+    Region: '区域',
     Host: '主机',
     Description: '描述',
     'Allow Image Uploads': '允许上传图片',
@@ -330,6 +334,13 @@ const nodeLabelMap = {
     Limit: '数量上限',
     'File Upload': '文件上传',
     'Custom Model Name': '自定义模型名称',
+    'Custom Model ARN': '自定义模型 ARN',
+    'Custom Endpoint Host': '自定义端点 Host',
+    'Max Tokens to Sample': '最大生成 Token 数',
+    'Latency Optimized': '低延迟优化',
+    'Use Global Inference Endpoint': '使用全局推理端点',
+    'Base Path to load': '加载路径',
+    'Base Path to store': '存储路径',
     'Chunk Size': '块大小',
     'Chunk Overlap': '块重叠',
     'AWS Credential': 'AWS 凭证',
@@ -381,7 +392,7 @@ const nodeLabelMap = {
     Dimensions: '向量维度',
     'Encoding Format': '编码格式',
     'Tool Calling Chat Model ': '可调用工具的对话模型 ',
-    Embedding: '嵌入模型',
+    Embedding: '向量模型',
 
     // ---------- AgentflowV2 input fields ----------
     Instructions: '指令',
@@ -664,26 +675,40 @@ const nodeDescriptionMap = {
     'Wrapper around Sambanova Chat Endpoints': 'Sambanova 对话接口封装',
     'Wrapper around TogetherAI large language models': 'TogetherAI 大语言模型封装',
     'Wrapper around VertexAI large language models that use the Chat endpoint': '使用 Chat 端点的 VertexAI 大语言模型封装',
+    'Wrapper around Alibaba Tongyi Qwen large language models (DashScope OpenAI-compatible) that use the Chat endpoint':
+        '通过阿里云 DashScope 兼容模式调用通义千问对话模型',
+    'Wrapper around Doubao (Volcengine Ark) large language models that use the Chat endpoint':
+        '通过火山方舟 OpenAI 兼容接口调用豆包对话模型',
+    'Wrapper around MiniMax large language models that use the Chat endpoint': '通过 MiniMax OpenAI 兼容接口调用 MiniMax 对话模型',
+    'Wrapper around Kimi/Moonshot large language models that use the Chat endpoint': '使用 Chat 端点的 Kimi / 月之暗面大语言模型封装',
     'Wrapper around Zhipu GLM large language models that use the Chat endpoint': '使用 Chat 端点的智谱 GLM 大语言模型封装',
 
     // ---------- Embeddings ----------
-    'AWSBedrock embedding models to generate embeddings for a given text': '使用 AWS Bedrock 嵌入模型为文本生成嵌入',
-    'Azure OpenAI API embeddings specific for LlamaIndex': '专为 LlamaIndex 的 Azure OpenAI API 嵌入',
-    'Azure OpenAI API to generate embeddings for a given text': '使用 Azure OpenAI API 为文本生成嵌入',
-    'Baidu Qianfan API to generate embeddings for a given text': '使用 Baidu Qianfan API 为文本生成嵌入',
-    'Cohere API to generate embeddings for a given text': '使用 Cohere API 为文本生成嵌入',
-    'Generate embeddings for a given text using open source model on IBM Watsonx': '使用 IBM Watsonx 上的开源模型为文本生成嵌入',
-    'Generate embeddings for a given text using open source model on Ollama': '使用 Ollama 上的开源模型为文本生成嵌入',
-    'Google Generative API to generate embeddings for a given text': '使用 Google Generative API 为文本生成嵌入',
-    'Google vertexAI API to generate embeddings for a given text': '使用 Google vertexAI API 为文本生成嵌入',
-    'HuggingFace Inference API to generate embeddings for a given text': '使用 HuggingFace Inference API 为文本生成嵌入',
-    'JinaAI API to generate embeddings for a given text': '使用 JinaAI API 为文本生成嵌入',
-    'MistralAI API to generate embeddings for a given text': '使用 MistralAI API 为文本生成嵌入',
-    'OpenAI API to generate embeddings for a given text': '使用 OpenAI API 为文本生成嵌入',
-    'OpenAI Embedding specific for LlamaIndex': '专为 LlamaIndex 的 OpenAI 嵌入',
-    'TogetherAI Embedding models to generate embeddings for a given text': '使用 TogetherAI 嵌入模型为文本生成嵌入',
-    'Use local embeddings models like llama.cpp': '使用本地嵌入模型（如 llama.cpp）',
-    'Voyage AI API to generate embeddings for a given text': '使用 Voyage AI API 为文本生成嵌入',
+    'AWSBedrock embedding models to generate embeddings for a given text': '使用 AWS Bedrock 向量模型为文本生成向量',
+    'Azure OpenAI API embeddings specific for LlamaIndex': '专为 LlamaIndex 的 Azure OpenAI 文本向量模型',
+    'Azure OpenAI API to generate embeddings for a given text': '使用 Azure OpenAI API 为文本生成向量',
+    'Baidu Qianfan API to generate embeddings for a given text': '使用百度千帆 API 为文本生成向量',
+    'Cohere API to generate embeddings for a given text': '使用 Cohere API 为文本生成向量',
+    'Generate embeddings for a given text using open source model on IBM Watsonx': '使用 IBM Watsonx 上的开源模型为文本生成向量',
+    'Generate embeddings for a given text using open source model on Ollama': '使用 Ollama 上的开源模型为文本生成向量',
+    'Google Generative API to generate embeddings for a given text': '使用 Google Generative API 为文本生成向量',
+    'Google vertexAI API to generate embeddings for a given text': '使用 Google vertexAI API 为文本生成向量',
+    'HuggingFace Inference API to generate embeddings for a given text': '使用 HuggingFace Inference API 为文本生成向量',
+    'JinaAI API to generate embeddings for a given text': '使用 JinaAI API 为文本生成向量',
+    'MistralAI API to generate embeddings for a given text': '使用 MistralAI API 为文本生成向量',
+    'OpenAI API to generate embeddings for a given text': '使用 OpenAI API 为文本生成向量',
+    'OpenAI Embedding specific for LlamaIndex': '专为 LlamaIndex 的 OpenAI 文本向量模型',
+    'TogetherAI Embedding models to generate embeddings for a given text': '使用 TogetherAI 向量模型为文本生成向量',
+    'Use local embeddings models like llama.cpp': '使用本地向量模型（如 llama.cpp）',
+    'Voyage AI API to generate embeddings for a given text': '使用 Voyage AI API 为文本生成向量',
+    'Zhipu AI embedding models that use the OpenAI-compatible endpoint':
+        '通过智谱 OpenAI 兼容接口调用 embedding-3 等文本向量模型，用于知识库检索',
+    'Alibaba DashScope (Qwen) embedding models that use the OpenAI-compatible endpoint':
+        '通过阿里云 DashScope 兼容模式调用 text-embedding-v3 等文本向量模型，用于知识库检索',
+    'SiliconFlow hosted embedding models (bge, bce, etc.) that use the OpenAI-compatible endpoint':
+        '通过硅基流动 OpenAI 兼容接口调用 bge、bce 等文本向量模型，用于知识库检索',
+    'DeepSeek compatible embedding models that use the OpenAI-compatible endpoint':
+        '通过 DeepSeek 兼容接口调用 deepseek-embedding-v1 文本向量模型，用于知识库检索',
 
     // ---------- LLMs ----------
     'Use Replicate to run open source models on cloud': '使用 Replicate 在云端运行开源模型',
@@ -920,6 +945,61 @@ const nodeDescriptionMap = {
     'Retrieve all messages from the conversation': '从对话中检索所有消息'
 }
 
+const nodeTooltipMap = {
+    // ---------- Common node input help ----------
+    'Override existing prompt with Chat Prompt Template. Human Message must includes {input} variable':
+        '使用 Chat Prompt Template 覆盖默认提示词；其中 Human Message 必须包含 {input} 变量。',
+    'If Chat Prompt Template is provided, this will be ignored': '如果已提供 Chat Prompt Template，将忽略这里的系统消息。',
+    'Detect text that could generate harmful output and prevent it from being sent to the language model':
+        '检测可能产生有害输出的内容，并阻止其发送给语言模型。',
+    'If left empty, a default BufferMemory will be used': '留空时将使用默认 Buffer Memory。',
+    'Using previous chat history, rephrase question into a standalone question': '根据历史对话，将用户问题改写成可独立理解的问题。',
+    'Taking the rephrased question, search for answer from the provided context': '基于改写后的问题，从提供的上下文中检索并生成答案。',
+    'Prompt must include input variables: {chat_history} and {question}': '提示词必须包含输入变量：{chat_history} 和 {question}。',
+    'Prompt must include input variable: {context}': '提示词必须包含输入变量：{context}。',
+    'Custom model name to use. If provided, it will override the selected model.': '自定义模型名称；填写后会覆盖上方选择的模型。',
+    'Custom model name to use. If provided, it will override the model selected': '自定义模型名称；填写后会覆盖已选择的模型。',
+    'If provided, will override model selected from Model Name option': '填写后会覆盖“模型名称”下拉框中选择的模型。',
+    'Custom model name or Volcengine Ark endpoint ID (ep-xxx) to use. If provided, it will override the selected model.':
+        '自定义模型名称或火山方舟端点 ID（ep-xxx）；填写后会覆盖上方选择的模型。',
+    'For imported, fine-tuned, or provisioned-throughput models. Enter the full ARN. Imported models are auto-detected and routed to the correct API. For fine-tuned models, use the deployment ARN (custom-model-deployment/... for on-demand, or provisioned-model/... for Provisioned Throughput) — the raw custom-model/... artifact ARN is not invokable. For built-in models, use the dropdown above instead.':
+        '用于已导入、微调或预置吞吐量模型。请填写完整 ARN；导入模型会自动识别并路由到正确 API。微调模型请填写部署 ARN（按需使用 custom-model-deployment/...，预置吞吐量使用 provisioned-model/...），原始 custom-model/... 产物 ARN 不能直接调用。内置模型请使用上方下拉框。',
+    'Hostname-only override for a custom VPC endpoint or proxy (e.g. bedrock-runtime.us-east-1.amazonaws.com). Do NOT enter model ARNs or inference profile IDs here.':
+        '自定义 VPC 端点或代理只需填写主机名（例如 bedrock-runtime.us-east-1.amazonaws.com）。这里不要填写模型 ARN 或推理配置 ID。',
+    'Default headers to include with every request to the API.': '每次请求 API 时附带的默认请求头。',
+    'Additional options to pass to the Deepseek client. This should be a JSON object.':
+        '传给 DeepSeek 客户端的附加选项，请填写 JSON 对象。',
+    'Base URL for the API. Leave empty to use the default.': 'API 的 Base URL。留空时使用默认地址。',
+    'Temperature parameter may not apply to certain model. Please check available model parameters':
+        '随机性参数不一定适用于所有模型，请以模型支持的参数为准。',
+    'Max Tokens parameter may not apply to certain model. Please check available model parameters':
+        '最大生成 Token 数不一定适用于所有模型，请以模型支持的参数为准。',
+    'Enable latency optimized configuration for supported models. Refer to the supported <a href="https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html" target="_blank">latecny optimized models</a> for more details.':
+        '为支持的模型启用低延迟优化。可查看 <a href="https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html" target="_blank">低延迟优化模型</a> 了解详情。',
+    'Force the global cross-region inference profile instead of the region-specific one. Bedrock routes dynamically across regions for maximum availability.':
+        '强制使用全局跨区域推理配置，而不是当前区域专属配置。Bedrock 会在多个区域间动态路由，以提高可用性。',
+    'Region to use for the model.': '模型使用的云服务区域。',
+    'Whether or not to stream tokens as they are generated.': '是否在模型生成 Token 时实时流式返回。',
+    'Whether or not to stream tokens as they are generated': '是否在模型生成 Token 时实时流式返回。',
+    'Allow image input. Refer to the <a href="https://docs.flowiseai.com/using-flowise/uploads#image" target="_blank">docs</a> for more details.':
+        '允许图片输入。更多说明可查看 <a href="https://docs.flowiseai.com/using-flowise/uploads#image" target="_blank">文档</a>。',
+    'Number of top results to fetch. Default to 4': '要获取的结果数量，默认 4。',
+    'Number of characters in each chunk. Default is 1000.': '每个文本块的字符数，默认 1000。',
+    'Number of characters to overlap between chunks. Default is 200.': '相邻文本块之间重叠的字符数，默认 200。',
+    'Additional metadata to be added to the extracted documents': '要添加到抽取文档上的附加元数据。',
+    'Query to retrieve documents from retriever. If not specified, user question will be used':
+        '用于从检索器取回文档的查询；不填写时使用用户问题。',
+    'Allow file upload on the chat': '允许用户在对话中上传文件。',
+    'Describe to LLM when it should use this tool': '告诉 LLM 什么时候应该调用这个工具。',
+    'Name of the tool': '工具名称。',
+    'Whether to return source documents': '是否返回来源文档。',
+    'Return source documents': '返回来源文档。',
+    'Window of size k to surface the last k back-and-forth to use as memory.': '保留最近 k 轮对话作为记忆。',
+    'Uses a window of size k to surface the last k back-and-forth to use as memory': '使用大小为 k 的窗口，把最近 k 轮对话作为记忆。',
+    'Summarizes the conversation and stores the current summary in memory': '对对话进行摘要，并将当前摘要存入记忆。',
+    'Memory for agentflow to remember the state of the conversation': '让 Agentflow 记住当前对话状态。'
+}
+
 // Common input placeholders — most are example values (URLs, emails, model names) kept as-is.
 // Only generic ones are translated.
 const nodeInputPlaceholderMap = {
@@ -944,6 +1024,12 @@ export const translateNodeLabel = (text, lang) => {
 export const translateNodeDescription = (text, lang) => {
     if (!text) return text
     if (isZh(lang) && nodeDescriptionMap[text]) return nodeDescriptionMap[text]
+    return text
+}
+
+export const translateNodeTooltip = (text, lang) => {
+    if (!text || typeof text !== 'string') return text
+    if (isZh(lang)) return nodeTooltipMap[text] || nodeDescriptionMap[text] || text
     return text
 }
 

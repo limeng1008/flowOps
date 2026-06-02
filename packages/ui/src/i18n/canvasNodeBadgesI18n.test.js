@@ -35,6 +35,29 @@ describe('canvas node badge i18n coverage', () => {
         expect(translateNodeCategory('DEPRECATING', 'en')).toBe('DEPRECATING')
     })
 
+    it('translates node input tooltip descriptions globally', async () => {
+        const { translateNodeLabel, translateNodeTooltip } = await import('./nodeI18n.js')
+        const tooltip = 'Override existing prompt with Chat Prompt Template. Human Message must includes {input} variable'
+
+        expect(translateNodeTooltip(tooltip, 'zh')).toBe(
+            '使用 Chat Prompt Template 覆盖默认提示词；其中 Human Message 必须包含 {input} 变量。'
+        )
+        expect(
+            translateNodeTooltip('Temperature parameter may not apply to certain model. Please check available model parameters', 'zh')
+        ).toBe('随机性参数不一定适用于所有模型，请以模型支持的参数为准。')
+        expect(
+            translateNodeTooltip(
+                'Force the global cross-region inference profile instead of the region-specific one. Bedrock routes dynamically across regions for maximum availability.',
+                'zh'
+            )
+        ).toBe('强制使用全局跨区域推理配置，而不是当前区域专属配置。Bedrock 会在多个区域间动态路由，以提高可用性。')
+        expect(translateNodeLabel('Temperature', 'zh')).toBe('随机性')
+        expect(translateNodeLabel('Max Tokens to Sample', 'zh')).toBe('最大生成 Token 数')
+        expect(translateNodeLabel('Latency Optimized', 'zh')).toBe('低延迟优化')
+        expect(translateNodeLabel('Use Global Inference Endpoint', 'zh')).toBe('使用全局推理端点')
+        expect(translateNodeTooltip(tooltip, 'en')).toBe(tooltip)
+    })
+
     it('translates node list badges in AddNodes', () => {
         const source = fs.readFileSync(path.join(__dirname, '../views/canvas/AddNodes.jsx'), 'utf8')
 
@@ -48,5 +71,15 @@ describe('canvas node badge i18n coverage', () => {
         expect(source).toContain("import { useTranslation } from 'react-i18next'")
         expect(source).toContain('translateNodeCategory')
         expect(source).toContain('translateNodeCategory(dialogProps.data.badge, currentLang)')
+    })
+
+    it('routes shared tooltip text through node i18n', () => {
+        const tooltipSource = fs.readFileSync(path.join(__dirname, '../ui-component/tooltip/TooltipWithParser.jsx'), 'utf8')
+        const nodeInputSource = fs.readFileSync(path.join(__dirname, '../views/canvas/NodeInputHandler.jsx'), 'utf8')
+
+        expect(tooltipSource).toContain('translateNodeTooltip')
+        expect(tooltipSource).toContain('const translatedTitle = translateNodeTooltip(title, currentLang)')
+        expect(nodeInputSource).toContain('translateNodeTooltip')
+        expect(nodeInputSource).toContain('title={tT(inputParam.description)}')
     })
 })

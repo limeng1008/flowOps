@@ -3,7 +3,7 @@ import { Handle, Position, useUpdateNodeInternals } from 'reactflow'
 import { useEffect, useRef, useState, useContext } from 'react'
 import { useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { translateNodeLabel, translateNodeDescription, translateNodeInputPlaceholder } from '@/i18n/nodeI18n'
+import { translateNodeLabel, translateNodeInputPlaceholder, translateNodeTooltip } from '@/i18n/nodeI18n'
 import { useSelector, useDispatch } from 'react-redux'
 import { cloneDeep } from 'lodash'
 import showdown from 'showdown'
@@ -160,7 +160,7 @@ const NodeInputHandler = ({
         return () => i18n.off('languageChanged', onLanguageChanged)
     }, [i18n])
     const tL = (s) => translateNodeLabel(s, currentLang)
-    const tD = (s) => translateNodeDescription(s, currentLang)
+    const tT = (s) => translateNodeTooltip(s, currentLang)
     const tP = (s) => translateNodeInputPlaceholder(s, currentLang)
 
     useNotifier()
@@ -881,7 +881,7 @@ const NodeInputHandler = ({
                             {tL(inputAnchor.label)}
                             {!inputAnchor.optional && <span style={{ color: 'red' }}>&nbsp;*</span>}
                             {inputAnchor.description && (
-                                <TooltipWithParser style={{ marginLeft: 10 }} title={tD(inputAnchor.description)} />
+                                <TooltipWithParser style={{ marginLeft: 10 }} title={tT(inputAnchor.description)} />
                             )}
                         </Typography>
                     </Box>
@@ -954,7 +954,7 @@ const NodeInputHandler = ({
                                 {tL(inputParam.label)}
                                 {!inputParam.optional && <span style={{ color: 'red' }}>&nbsp;*</span>}
                                 {inputParam.description && (
-                                    <TooltipWithParser style={{ marginLeft: 10 }} title={tD(inputParam.description)} />
+                                    <TooltipWithParser style={{ marginLeft: 10 }} title={tT(inputParam.description)} />
                                 )}
                             </Typography>
                             <div style={{ flexGrow: 1 }}></div>
