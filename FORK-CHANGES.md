@@ -1,0 +1,139 @@
+# FlowOps Fork Changes
+
+本文件登记相对 `upstream/main` 的“修改既有文件”清单。新增文件不进入白名单，但会由 `scripts/fork-divergence.sh` 统计。
+
+更新规则：
+
+-   只登记 `git diff --diff-filter=M --name-only upstream/main...HEAD` 输出的既有文件修改。
+-   每个登记路径必须出现在下面的路径白名单表中，脚本会解析反引号里的路径。
+-   新增上游文件修改时，先确认是否必要，再补充路径与分类；白名单外修改会让脚本非零退出。
+
+## Category Replay Notes
+
+| Category          | Reason                                                                                                  | Upstream replay notes                                                                                                                 |
+| ----------------- | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| T1-model-loader   | 让 FlowOps 自有模型列表从 `models.flowops.json` 加载期合并，减少直接改上游 `models.json` 的冲突。       | 保留 `modelLoader.ts` 的本地/URL 加载逻辑，再叠加 FlowOps merge；跑 `cd packages/components && npx jest modelLoader`。                |
+| T4-theme-entry    | 让主题入口读取 fork-owned `_flowops-vars.module.scss`，并尽量保持上游 `_themes-vars.module.scss` 干净。 | 合并上游主题后确认 `packages/ui/src/themes/index.js` 仍导入 `_flowops-vars.module.scss`；跑 `npx jest flowopsThemeVars` 和 UI build。 |
+| Branding-shell    | FlowOps 品牌壳、Logo、HTML 元信息、PWA manifest、启动入口与认证/欢迎体验。                              | 上游更新页面壳时，先取上游结构，再重放 FlowOps Logo/产品名/入口/i18n provider。                                                       |
+| UI-i18n-hardening | 面向中文用户的全量 i18n 包裹、日期/按钮/弹窗/表格/节点文案本地化。                                      | 上游合并后以 locale 为事实源重放 codemod，随后跑 UI i18n tests 和 `pnpm --filter flowise-ui build`。                                  |
+| UI-dependencies   | UI 换皮、动画和 i18n 运行时依赖引入导致的 package/lockfile 变更。                                       | 合并上游依赖时用 pnpm 重新解锁，保留 FlowOps 所需运行时依赖并跑 UI build。                                                            |
+
+## Modified File Ledger
+
+| File                                                                          | Category          |
+| ----------------------------------------------------------------------------- | ----------------- |
+| `packages/components/src/modelLoader.ts`                                      | T1-model-loader   |
+| `packages/ui/index.html`                                                      | Branding-shell    |
+| `packages/ui/package.json`                                                    | UI-dependencies   |
+| `packages/ui/public/index.html`                                               | Branding-shell    |
+| `packages/ui/public/manifest.json`                                            | Branding-shell    |
+| `packages/ui/src/index.jsx`                                                   | Branding-shell    |
+| `packages/ui/src/layout/AuthLayout/index.jsx`                                 | UI-i18n-hardening |
+| `packages/ui/src/layout/MainLayout/Header/ProfileSection/index.jsx`           | UI-i18n-hardening |
+| `packages/ui/src/layout/MainLayout/Sidebar/MenuList/NavCollapse/index.jsx`    | UI-i18n-hardening |
+| `packages/ui/src/layout/MainLayout/Sidebar/MenuList/NavGroup/index.jsx`       | UI-i18n-hardening |
+| `packages/ui/src/layout/MainLayout/Sidebar/MenuList/NavItem/index.jsx`        | UI-i18n-hardening |
+| `packages/ui/src/menu-items/agentsettings.js`                                 | UI-i18n-hardening |
+| `packages/ui/src/menu-items/customassistant.js`                               | UI-i18n-hardening |
+| `packages/ui/src/menu-items/settings.js`                                      | UI-i18n-hardening |
+| `packages/ui/src/routes/index.jsx`                                            | UI-i18n-hardening |
+| `packages/ui/src/themes/index.js`                                             | T4-theme-entry    |
+| `packages/ui/src/ui-component/array/ArrayRenderer.jsx`                        | UI-i18n-hardening |
+| `packages/ui/src/ui-component/button/FlowListMenu.jsx`                        | UI-i18n-hardening |
+| `packages/ui/src/ui-component/cards/DocumentStoreCard.jsx`                    | UI-i18n-hardening |
+| `packages/ui/src/ui-component/cards/ItemCard.jsx`                             | UI-i18n-hardening |
+| `packages/ui/src/ui-component/dialog/AboutDialog.jsx`                         | UI-i18n-hardening |
+| `packages/ui/src/ui-component/dialog/ChatflowConfigurationDialog.jsx`         | UI-i18n-hardening |
+| `packages/ui/src/ui-component/dialog/ExportAsTemplateDialog.jsx`              | UI-i18n-hardening |
+| `packages/ui/src/ui-component/dialog/NodeInfoDialog.jsx`                      | UI-i18n-hardening |
+| `packages/ui/src/ui-component/dialog/SaveChatflowDialog.jsx`                  | UI-i18n-hardening |
+| `packages/ui/src/ui-component/dialog/ViewLeadsDialog.jsx`                     | UI-i18n-hardening |
+| `packages/ui/src/ui-component/dialog/ViewMessagesDialog.jsx`                  | UI-i18n-hardening |
+| `packages/ui/src/ui-component/dropdown/Dropdown.jsx`                          | UI-i18n-hardening |
+| `packages/ui/src/ui-component/extended/Logo.jsx`                              | Branding-shell    |
+| `packages/ui/src/ui-component/extended/TextToSpeech.jsx`                      | UI-i18n-hardening |
+| `packages/ui/src/ui-component/grid/DataGrid.jsx`                              | UI-i18n-hardening |
+| `packages/ui/src/ui-component/grid/Grid.jsx`                                  | UI-i18n-hardening |
+| `packages/ui/src/ui-component/input/suggestionOption.js`                      | UI-i18n-hardening |
+| `packages/ui/src/ui-component/json/SelectVariable.jsx`                        | UI-i18n-hardening |
+| `packages/ui/src/ui-component/pagination/TablePagination.jsx`                 | UI-i18n-hardening |
+| `packages/ui/src/ui-component/table/DocumentStoreTable.jsx`                   | UI-i18n-hardening |
+| `packages/ui/src/ui-component/table/FlowListTable.jsx`                        | UI-i18n-hardening |
+| `packages/ui/src/ui-component/table/MarketplaceTable.jsx`                     | UI-i18n-hardening |
+| `packages/ui/src/ui-component/table/Table.jsx`                                | UI-i18n-hardening |
+| `packages/ui/src/views/account/index.jsx`                                     | UI-i18n-hardening |
+| `packages/ui/src/views/agentexecutions/index.jsx`                             | UI-i18n-hardening |
+| `packages/ui/src/views/agentflows/index.jsx`                                  | UI-i18n-hardening |
+| `packages/ui/src/views/agentflowsv2/AgentFlowNode.jsx`                        | UI-i18n-hardening |
+| `packages/ui/src/views/agentflowsv2/ConfigInput.jsx`                          | UI-i18n-hardening |
+| `packages/ui/src/views/agentflowsv2/IterationNode.jsx`                        | UI-i18n-hardening |
+| `packages/ui/src/views/agentflowsv2/index.css`                                | UI-i18n-hardening |
+| `packages/ui/src/views/apikey/APIKeyDialog.jsx`                               | UI-i18n-hardening |
+| `packages/ui/src/views/apikey/index.jsx`                                      | UI-i18n-hardening |
+| `packages/ui/src/views/assistants/custom/AddCustomAssistantDialog.jsx`        | UI-i18n-hardening |
+| `packages/ui/src/views/assistants/custom/CustomAssistantConfigurePreview.jsx` | UI-i18n-hardening |
+| `packages/ui/src/views/assistants/custom/CustomAssistantLayout.jsx`           | UI-i18n-hardening |
+| `packages/ui/src/views/assistants/index.jsx`                                  | UI-i18n-hardening |
+| `packages/ui/src/views/assistants/openai/AssistantDialog.jsx`                 | UI-i18n-hardening |
+| `packages/ui/src/views/assistants/openai/AssistantVectorStoreDialog.jsx`      | UI-i18n-hardening |
+| `packages/ui/src/views/assistants/openai/DeleteConfirmDialog.jsx`             | UI-i18n-hardening |
+| `packages/ui/src/views/assistants/openai/LoadAssistantDialog.jsx`             | UI-i18n-hardening |
+| `packages/ui/src/views/assistants/openai/OpenAIAssistantLayout.jsx`           | UI-i18n-hardening |
+| `packages/ui/src/views/auth/forgotPassword.jsx`                               | UI-i18n-hardening |
+| `packages/ui/src/views/auth/loginActivity.jsx`                                | UI-i18n-hardening |
+| `packages/ui/src/views/auth/register.jsx`                                     | UI-i18n-hardening |
+| `packages/ui/src/views/auth/resetPassword.jsx`                                | UI-i18n-hardening |
+| `packages/ui/src/views/auth/signIn.jsx`                                       | UI-i18n-hardening |
+| `packages/ui/src/views/auth/ssoConfig.jsx`                                    | UI-i18n-hardening |
+| `packages/ui/src/views/auth/verify-email.jsx`                                 | UI-i18n-hardening |
+| `packages/ui/src/views/canvas/AddNodes.jsx`                                   | UI-i18n-hardening |
+| `packages/ui/src/views/canvas/CanvasHeader.jsx`                               | UI-i18n-hardening |
+| `packages/ui/src/views/canvas/CanvasNode.jsx`                                 | UI-i18n-hardening |
+| `packages/ui/src/views/canvas/NodeInputHandler.jsx`                           | UI-i18n-hardening |
+| `packages/ui/src/views/canvas/NodeOutputHandler.jsx`                          | UI-i18n-hardening |
+| `packages/ui/src/views/canvas/index.css`                                      | UI-i18n-hardening |
+| `packages/ui/src/views/canvas/index.jsx`                                      | UI-i18n-hardening |
+| `packages/ui/src/views/chatflows/APICodeDialog.jsx`                           | UI-i18n-hardening |
+| `packages/ui/src/views/chatflows/EmbedChat.jsx`                               | UI-i18n-hardening |
+| `packages/ui/src/views/chatflows/ShareChatbot.jsx`                            | UI-i18n-hardening |
+| `packages/ui/src/views/chatflows/index.jsx`                                   | UI-i18n-hardening |
+| `packages/ui/src/views/chatmessage/ChatExpandDialog.jsx`                      | UI-i18n-hardening |
+| `packages/ui/src/views/chatmessage/ChatMessage.css`                           | UI-i18n-hardening |
+| `packages/ui/src/views/chatmessage/ChatMessage.jsx`                           | UI-i18n-hardening |
+| `packages/ui/src/views/chatmessage/ChatPopUp.jsx`                             | UI-i18n-hardening |
+| `packages/ui/src/views/credentials/AddEditCredentialDialog.jsx`               | UI-i18n-hardening |
+| `packages/ui/src/views/credentials/index.jsx`                                 | UI-i18n-hardening |
+| `packages/ui/src/views/datasets/index.jsx`                                    | UI-i18n-hardening |
+| `packages/ui/src/views/docstore/AddDocStoreDialog.jsx`                        | UI-i18n-hardening |
+| `packages/ui/src/views/docstore/DocumentStoreDetail.jsx`                      | UI-i18n-hardening |
+| `packages/ui/src/views/docstore/DocumentStoreStatus.jsx`                      | UI-i18n-hardening |
+| `packages/ui/src/views/docstore/LoaderConfigPreviewChunks.jsx`                | UI-i18n-hardening |
+| `packages/ui/src/views/docstore/ShowStoredChunks.jsx`                         | UI-i18n-hardening |
+| `packages/ui/src/views/docstore/VectorStoreConfigure.jsx`                     | UI-i18n-hardening |
+| `packages/ui/src/views/docstore/VectorStoreQuery.jsx`                         | UI-i18n-hardening |
+| `packages/ui/src/views/docstore/index.jsx`                                    | UI-i18n-hardening |
+| `packages/ui/src/views/evaluations/index.jsx`                                 | UI-i18n-hardening |
+| `packages/ui/src/views/evaluators/evaluatorConstant.js`                       | UI-i18n-hardening |
+| `packages/ui/src/views/evaluators/index.jsx`                                  | UI-i18n-hardening |
+| `packages/ui/src/views/files/index.jsx`                                       | UI-i18n-hardening |
+| `packages/ui/src/views/marketplaces/MarketplaceCanvasHeader.jsx`              | UI-i18n-hardening |
+| `packages/ui/src/views/marketplaces/MarketplaceCanvasNode.jsx`                | UI-i18n-hardening |
+| `packages/ui/src/views/marketplaces/index.jsx`                                | UI-i18n-hardening |
+| `packages/ui/src/views/roles/index.jsx`                                       | UI-i18n-hardening |
+| `packages/ui/src/views/serverlogs/index.jsx`                                  | UI-i18n-hardening |
+| `packages/ui/src/views/settings/index.jsx`                                    | UI-i18n-hardening |
+| `packages/ui/src/views/tools/HowToUseFunctionDialog.jsx`                      | UI-i18n-hardening |
+| `packages/ui/src/views/tools/PasteJSONDialog.jsx`                             | UI-i18n-hardening |
+| `packages/ui/src/views/tools/ToolDialog.jsx`                                  | UI-i18n-hardening |
+| `packages/ui/src/views/tools/index.jsx`                                       | UI-i18n-hardening |
+| `packages/ui/src/views/users/index.jsx`                                       | UI-i18n-hardening |
+| `packages/ui/src/views/variables/AddEditVariableDialog.jsx`                   | UI-i18n-hardening |
+| `packages/ui/src/views/variables/HowToUseVariablesDialog.jsx`                 | UI-i18n-hardening |
+| `packages/ui/src/views/variables/index.jsx`                                   | UI-i18n-hardening |
+| `packages/ui/src/views/vectorstore/UpsertHistoryDialog.jsx`                   | UI-i18n-hardening |
+| `packages/ui/src/views/vectorstore/UpsertResultDialog.jsx`                    | UI-i18n-hardening |
+| `packages/ui/src/views/vectorstore/VectorStoreDialog.jsx`                     | UI-i18n-hardening |
+| `packages/ui/src/views/vectorstore/VectorStorePopUp.jsx`                      | UI-i18n-hardening |
+| `packages/ui/src/views/workspace/WorkspaceUsers.jsx`                          | UI-i18n-hardening |
+| `packages/ui/src/views/workspace/index.jsx`                                   | UI-i18n-hardening |
+| `pnpm-lock.yaml`                                                              | UI-dependencies   |
