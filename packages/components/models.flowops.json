@@ -49,6 +49,31 @@
                     "name": "moonshot-v1-128k"
                 }
             ]
+        },
+        {
+            "name": "chatDoubao",
+            "models": [
+                {
+                    "label": "doubao-pro-32k",
+                    "name": "doubao-pro-32k"
+                },
+                {
+                    "label": "doubao-pro-128k",
+                    "name": "doubao-pro-128k"
+                },
+                {
+                    "label": "doubao-pro-256k",
+                    "name": "doubao-pro-256k"
+                },
+                {
+                    "label": "doubao-lite-32k",
+                    "name": "doubao-lite-32k"
+                },
+                {
+                    "label": "doubao-lite-128k",
+                    "name": "doubao-lite-128k"
+                }
+            ]
         }
     ],
     "llm": [],
