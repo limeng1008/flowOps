@@ -37,10 +37,11 @@ describe('Marketing Copy Agent marketplace template', () => {
             'abTestTips'
         ])
 
-        // every {{ variable }} mentioned in the prompt must map to a declared form field
+        // every {{ $form.X }} mention in the prompt must map to a declared form field (AgentflowV2 uses $form.* for form inputs)
         const formVars = startNode.data.inputs.formInputTypes.map((input: any) => input.name)
         const userContent = llmNode.data.inputs.llmMessages.find((message: any) => message.role === 'user').content
-        const mentioned = [...userContent.matchAll(/data-id="([^"]+)"/g)].map((match: any) => match[1])
+        const mentioned = [...userContent.matchAll(/data-id="([^"]+)"/g)].map((match: any) => match[1].replace(/^\$form\./, ''))
+        expect(userContent).toContain('$form.')
         expect(mentioned.length).toBeGreaterThan(0)
         for (const variable of mentioned) {
             expect(formVars).toContain(variable)
