@@ -19,6 +19,16 @@ const getModelsJSONPath = (): string => {
     return ''
 }
 
+const getFlowOpsModelsJSONPath = (): string => {
+    const checkModelsPaths = [path.join(__dirname, '..', 'models.flowops.json'), path.join(__dirname, '..', '..', 'models.flowops.json')]
+    for (const checkPath of checkModelsPaths) {
+        if (fs.existsSync(checkPath)) {
+            return checkPath
+        }
+    }
+    return ''
+}
+
 const isValidUrl = (urlString: string) => {
     let url
     try {
@@ -27,6 +37,39 @@ const isValidUrl = (urlString: string) => {
         return false
     }
     return url.protocol === 'http:' || url.protocol === 'https:'
+}
+
+const mergeModelsByProviderName = (baseModels: any[] = [], flowopsModels: any[] = []) => {
+    const modelsByProvider = new Map<string, any>()
+
+    for (const model of baseModels) {
+        if (model?.name) modelsByProvider.set(model.name, model)
+    }
+
+    for (const model of flowopsModels) {
+        if (model?.name) modelsByProvider.set(model.name, model)
+    }
+
+    return Array.from(modelsByProvider.values())
+}
+
+const mergeFlowOpsModels = async (models: any) => {
+    const flowopsModelsPath = getFlowOpsModelsJSONPath()
+    if (!flowopsModelsPath) return models
+
+    try {
+        const flowopsModelsRaw = await fs.promises.readFile(flowopsModelsPath, 'utf8')
+        const flowopsModels = JSON.parse(flowopsModelsRaw)
+        const mergedModels = { ...models }
+
+        for (const category of Object.values(MODEL_TYPE)) {
+            mergedModels[category] = mergeModelsByProviderName(models?.[category], flowopsModels?.[category])
+        }
+
+        return mergedModels
+    } catch (e) {
+        return models
+    }
 }
 
 /**
@@ -39,21 +82,21 @@ const getRawModelFile = async () => {
         if (isValidUrl(modelFile)) {
             const resp = await axios.get(modelFile)
             if (resp.status === 200 && resp.data) {
-                return resp.data
+                return mergeFlowOpsModels(resp.data)
             } else {
                 throw new Error('Error fetching model list')
             }
         } else if (fs.existsSync(modelFile)) {
             const models = await fs.promises.readFile(modelFile, 'utf8')
             if (models) {
-                return JSON.parse(models)
+                return mergeFlowOpsModels(JSON.parse(models))
             }
         }
         throw new Error('Model file does not exist or is empty')
     } catch (e) {
         const models = await fs.promises.readFile(getModelsJSONPath(), 'utf8')
         if (models) {
-            return JSON.parse(models)
+            return mergeFlowOpsModels(JSON.parse(models))
         }
         return {}
     }

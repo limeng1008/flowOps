@@ -1,0 +1,31 @@
+{
+    "chat": [
+        {
+            "name": "chatZhipuAI",
+            "models": [
+                {
+                    "label": "glm-4.5",
+                    "name": "glm-4.5"
+                },
+                {
+                    "label": "glm-4.5-air",
+                    "name": "glm-4.5-air"
+                },
+                {
+                    "label": "glm-4-plus",
+                    "name": "glm-4-plus"
+                },
+                {
+                    "label": "glm-4-air",
+                    "name": "glm-4-air"
+                },
+                {
+                    "label": "glm-4-flash",
+                    "name": "glm-4-flash"
+                }
+            ]
+        }
+    ],
+    "llm": [],
+    "embedding": []
+}
