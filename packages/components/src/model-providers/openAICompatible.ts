@@ -4,6 +4,7 @@ import { ChatOpenAIFields } from '@langchain/openai'
 export const ZHIPU_DEFAULT_BASE_URL = 'https://open.bigmodel.cn/api/paas/v4/'
 export const MOONSHOT_DEFAULT_BASE_URL = 'https://api.moonshot.cn/v1'
 export const DOUBAO_DEFAULT_BASE_URL = 'https://ark.cn-beijing.volces.com/api/v3'
+export const QWEN_DEFAULT_BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1'
 
 type BaseOptions = string | Record<string, unknown> | undefined
 

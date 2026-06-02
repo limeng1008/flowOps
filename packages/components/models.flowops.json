@@ -74,6 +74,35 @@
                     "name": "doubao-lite-128k"
                 }
             ]
+        },
+        {
+            "name": "chatQwen",
+            "models": [
+                {
+                    "label": "qwen-max",
+                    "name": "qwen-max"
+                },
+                {
+                    "label": "qwen-plus",
+                    "name": "qwen-plus"
+                },
+                {
+                    "label": "qwen-turbo",
+                    "name": "qwen-turbo"
+                },
+                {
+                    "label": "qwen-long",
+                    "name": "qwen-long"
+                },
+                {
+                    "label": "qwen2.5-72b-instruct",
+                    "name": "qwen2.5-72b-instruct"
+                },
+                {
+                    "label": "qwen2.5-32b-instruct",
+                    "name": "qwen2.5-32b-instruct"
+                }
+            ]
         }
     ],
     "llm": [],
