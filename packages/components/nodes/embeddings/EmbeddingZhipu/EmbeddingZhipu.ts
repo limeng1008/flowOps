@@ -18,13 +18,13 @@ class EmbeddingZhipu_Embeddings implements INode {
     inputs: INodeParams[]
 
     constructor() {
-        this.label = '智谱 Embedding'
+        this.label = '智谱文本向量模型'
         this.name = 'embeddingZhipu'
         this.version = 1.0
         this.type = 'ZhipuEmbedding'
         this.icon = 'zhipu.svg'
         this.category = 'Embeddings'
-        this.description = 'Zhipu AI embedding models that use the OpenAI-compatible endpoint'
+        this.description = '通过智谱 OpenAI 兼容接口调用 embedding-3 等文本向量模型，用于知识库检索'
         this.baseClasses = [this.type, ...getBaseClasses(OpenAIEmbeddings)]
         this.credential = {
             label: 'Connect Credential',

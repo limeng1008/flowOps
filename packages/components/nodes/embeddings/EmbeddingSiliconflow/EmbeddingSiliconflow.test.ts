@@ -37,9 +37,10 @@ describe('EmbeddingSiliconflow', () => {
         const EmbeddingSiliconflow = getEmbeddingSiliconflow()
         const node = new EmbeddingSiliconflow()
 
-        expect(node.label).toBe('硅基流动 Embedding')
+        expect(node.label).toBe('硅基流动文本向量模型')
         expect(node.name).toBe('embeddingSiliconflow')
         expect(node.category).toBe('Embeddings')
+        expect(node.description).toBe('通过硅基流动 OpenAI 兼容接口调用 bge、bce 等文本向量模型，用于知识库检索')
         expect(node.credential.credentialNames).toEqual(['siliconflowApi'])
         expect(node.inputs.find((input: any) => input.name === 'modelName')).toMatchObject({
             type: 'asyncOptions',

@@ -37,9 +37,10 @@ describe('EmbeddingZhipu', () => {
         const EmbeddingZhipu = getEmbeddingZhipu()
         const node = new EmbeddingZhipu()
 
-        expect(node.label).toBe('智谱 Embedding')
+        expect(node.label).toBe('智谱文本向量模型')
         expect(node.name).toBe('embeddingZhipu')
         expect(node.category).toBe('Embeddings')
+        expect(node.description).toBe('通过智谱 OpenAI 兼容接口调用 embedding-3 等文本向量模型，用于知识库检索')
         expect(node.credential.credentialNames).toEqual(['zhipuAIApi'])
         expect(node.inputs.find((input: any) => input.name === 'modelName')).toMatchObject({
             type: 'asyncOptions',

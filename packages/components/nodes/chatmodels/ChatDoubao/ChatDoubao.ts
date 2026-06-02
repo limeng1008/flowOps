@@ -25,7 +25,7 @@ class ChatDoubao_ChatModels implements INode {
         this.type = 'ChatDoubao'
         this.icon = 'doubao.svg'
         this.category = 'Chat Models'
-        this.description = 'Wrapper around Doubao (Volcengine Ark) large language models that use the Chat endpoint'
+        this.description = '通过火山方舟 OpenAI 兼容接口调用豆包对话模型'
         this.baseClasses = [this.type, ...getBaseClasses(ChatOpenAI)]
         this.credential = {
             label: 'Connect Credential',

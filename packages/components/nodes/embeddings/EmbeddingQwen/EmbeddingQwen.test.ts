@@ -37,9 +37,10 @@ describe('EmbeddingQwen', () => {
         const EmbeddingQwen = getEmbeddingQwen()
         const node = new EmbeddingQwen()
 
-        expect(node.label).toBe('通义 Embedding')
+        expect(node.label).toBe('通义文本向量模型')
         expect(node.name).toBe('embeddingQwen')
         expect(node.category).toBe('Embeddings')
+        expect(node.description).toBe('通过阿里云 DashScope 兼容模式调用 text-embedding-v3 等文本向量模型，用于知识库检索')
         expect(node.credential.credentialNames).toEqual(['dashScopeApi'])
         expect(node.inputs.find((input: any) => input.name === 'modelName')).toMatchObject({
             type: 'asyncOptions',

@@ -18,13 +18,13 @@ class EmbeddingQwen_Embeddings implements INode {
     inputs: INodeParams[]
 
     constructor() {
-        this.label = '通义 Embedding'
+        this.label = '通义文本向量模型'
         this.name = 'embeddingQwen'
         this.version = 1.0
         this.type = 'QwenEmbedding'
         this.icon = 'qwen.svg'
         this.category = 'Embeddings'
-        this.description = 'Alibaba DashScope (Qwen) embedding models that use the OpenAI-compatible endpoint'
+        this.description = '通过阿里云 DashScope 兼容模式调用 text-embedding-v3 等文本向量模型，用于知识库检索'
         this.baseClasses = [this.type, ...getBaseClasses(OpenAIEmbeddings)]
         this.credential = {
             label: 'Connect Credential',

@@ -46,9 +46,7 @@ describe('ChatQwen', () => {
         expect(node.label).toBe('通义千问 (Qwen)')
         expect(node.name).toBe('chatQwen')
         expect(node.category).toBe('Chat Models')
-        expect(node.description).toBe(
-            'Wrapper around Alibaba Tongyi Qwen large language models (DashScope OpenAI-compatible) that use the Chat endpoint'
-        )
+        expect(node.description).toBe('通过阿里云 DashScope 兼容模式调用通义千问对话模型')
         expect(node.credential.credentialNames).toEqual(['dashScopeApi'])
         expect(node.inputs.find((input: any) => input.name === 'modelName')).toMatchObject({
             type: 'asyncOptions',

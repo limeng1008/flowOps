@@ -46,7 +46,7 @@ describe('ChatMinimax', () => {
         expect(node.label).toBe('MiniMax')
         expect(node.name).toBe('chatMinimax')
         expect(node.category).toBe('Chat Models')
-        expect(node.description).toBe('Wrapper around MiniMax large language models that use the Chat endpoint')
+        expect(node.description).toBe('通过 MiniMax OpenAI 兼容接口调用 MiniMax 对话模型')
         expect(node.credential.credentialNames).toEqual(['minimaxApi'])
         expect(node.inputs.find((input: any) => input.name === 'modelName')).toMatchObject({
             type: 'asyncOptions',

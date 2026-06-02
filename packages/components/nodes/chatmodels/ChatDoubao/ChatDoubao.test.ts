@@ -46,7 +46,7 @@ describe('ChatDoubao', () => {
         expect(node.label).toBe('豆包 (火山方舟)')
         expect(node.name).toBe('chatDoubao')
         expect(node.category).toBe('Chat Models')
-        expect(node.description).toBe('Wrapper around Doubao (Volcengine Ark) large language models that use the Chat endpoint')
+        expect(node.description).toBe('通过火山方舟 OpenAI 兼容接口调用豆包对话模型')
         expect(node.credential.credentialNames).toEqual(['volcengineArkApi'])
         expect(node.inputs.find((input: any) => input.name === 'modelName')).toMatchObject({
             type: 'asyncOptions',

@@ -25,8 +25,7 @@ class ChatQwen_ChatModels implements INode {
         this.type = 'ChatQwen'
         this.icon = 'qwen.svg'
         this.category = 'Chat Models'
-        this.description =
-            'Wrapper around Alibaba Tongyi Qwen large language models (DashScope OpenAI-compatible) that use the Chat endpoint'
+        this.description = '通过阿里云 DashScope 兼容模式调用通义千问对话模型'
         this.baseClasses = [this.type, ...getBaseClasses(ChatOpenAI)]
         this.credential = {
             label: 'Connect Credential',

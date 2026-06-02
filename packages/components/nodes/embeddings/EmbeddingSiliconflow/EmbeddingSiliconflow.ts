@@ -18,13 +18,13 @@ class EmbeddingSiliconflow_Embeddings implements INode {
     inputs: INodeParams[]
 
     constructor() {
-        this.label = '硅基流动 Embedding'
+        this.label = '硅基流动文本向量模型'
         this.name = 'embeddingSiliconflow'
         this.version = 1.0
         this.type = 'SiliconFlowEmbedding'
         this.icon = 'siliconflow.svg'
         this.category = 'Embeddings'
-        this.description = 'SiliconFlow hosted embedding models (bge, bce, etc.) that use the OpenAI-compatible endpoint'
+        this.description = '通过硅基流动 OpenAI 兼容接口调用 bge、bce 等文本向量模型，用于知识库检索'
         this.baseClasses = [this.type, ...getBaseClasses(OpenAIEmbeddings)]
         this.credential = {
             label: 'Connect Credential',

@@ -25,7 +25,7 @@ class ChatMinimax_ChatModels implements INode {
         this.type = 'ChatMinimax'
         this.icon = 'minimax.svg'
         this.category = 'Chat Models'
-        this.description = 'Wrapper around MiniMax large language models that use the Chat endpoint'
+        this.description = '通过 MiniMax OpenAI 兼容接口调用 MiniMax 对话模型'
         this.baseClasses = [this.type, ...getBaseClasses(ChatOpenAI)]
         this.credential = {
             label: 'Connect Credential',
