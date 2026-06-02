@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { cloneDeep } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import moment from 'moment/moment'
@@ -47,6 +48,7 @@ import useNotifier from '@/utils/useNotifier'
 const steps = ['Embeddings', 'Vector Store', 'Record Manager']
 
 const VectorStoreConfigure = () => {
+    const { t } = useTranslation()
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const { hasAssignedWorkspace } = useAuth()
@@ -228,7 +230,7 @@ const VectorStoreConfigure = () => {
 
         if (!canSubmit) {
             enqueueSnackbar({
-                message: 'Please fill in all mandatory fields.',
+                message: t('common.fillMandatoryFields'),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'warning',
@@ -392,7 +394,7 @@ const VectorStoreConfigure = () => {
         if (saveVectorStoreConfigApi.data) {
             setLoading(false)
             enqueueSnackbar({
-                message: 'Configuration saved successfully',
+                message: t('common.configSaved'),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'success',

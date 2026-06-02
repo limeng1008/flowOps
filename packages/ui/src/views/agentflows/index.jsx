@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import { Box, Chip, IconButton, Stack, ToggleButton, ToggleButtonGroup } from '@mui/material'
@@ -17,6 +18,7 @@ import MainCard from '@/ui-component/cards/MainCard'
 import ConfirmDialog from '@/ui-component/dialog/ConfirmDialog'
 import TablePagination, { DEFAULT_ITEMS_PER_PAGE } from '@/ui-component/pagination/TablePagination'
 import { FlowListTable } from '@/ui-component/table/FlowListTable'
+import { translateNodeLabel } from '@/i18n/nodeI18n'
 
 // API
 import chatflowsApi from '@/api/chatflows'
@@ -34,6 +36,8 @@ import { IconAlertTriangle, IconLayoutGrid, IconList, IconPlus, IconX } from '@t
 // ==============================|| AGENTS ||============================== //
 
 const Agentflows = () => {
+    const { t, i18n } = useTranslation()
+    const currentLang = i18n.resolvedLanguage || i18n.language
     const navigate = useNavigate()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
@@ -162,7 +166,7 @@ const Agentflows = () => {
                             if (!images[agentflows[i].id].some((img) => img.imageSrc === imageSrc)) {
                                 images[agentflows[i].id].push({
                                     imageSrc,
-                                    label: node.data.label
+                                    label: translateNodeLabel(node.data.label, currentLang)
                                 })
                             }
                         }
@@ -208,7 +212,7 @@ const Agentflows = () => {
                 console.error(e)
             }
         }
-    }, [getAllAgentflows.data])
+    }, [getAllAgentflows.data, currentLang])
 
     return (
         <MainCard>
@@ -219,9 +223,9 @@ const Agentflows = () => {
                     <ViewHeader
                         onSearchChange={onSearchChange}
                         search={true}
-                        searchPlaceholder='Search Name or Category'
-                        title='Agentflows'
-                        description='Multi-agent systems, workflow orchestration'
+                        searchPlaceholder={t('pages.agentflows.searchPlaceholder')}
+                        title={t('pages.agentflows.title')}
+                        description={t('pages.agentflows.description')}
                     >
                         <ToggleButtonGroup
                             sx={{ borderRadius: 2, maxHeight: 40 }}
@@ -296,7 +300,7 @@ const Agentflows = () => {
                             startIcon={<IconPlus />}
                             sx={{ borderRadius: 2, height: 40 }}
                         >
-                            Add New
+                            {t('common.addNew')}
                         </StyledPermissionButton>
                     </ViewHeader>
 
@@ -387,7 +391,7 @@ const Agentflows = () => {
                                     alt='AgentsEmptySVG'
                                 />
                             </Box>
-                            <div>No Agents Yet</div>
+                            <div>{t('common.noAgentsYet')}</div>
                         </Stack>
                     )}
                 </Stack>

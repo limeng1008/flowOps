@@ -3,6 +3,7 @@ import * as PropTypes from 'prop-types'
 import { Fragment, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import {
@@ -130,7 +131,7 @@ function ShowWorkspaceRow(props) {
                     {props.workspace.name !== 'Default Workspace' && (
                         <PermissionIconButton
                             permissionId={'workspace:update'}
-                            title='Edit'
+                            title={t('pages.workspaces.edit')}
                             color='primary'
                             onClick={() => props.onEditClick(props.workspace)}
                         >
@@ -138,19 +139,24 @@ function ShowWorkspaceRow(props) {
                         </PermissionIconButton>
                     )}
                     <Link to={`/workspace-users/${props.workspace.id}`}>
-                        <IconButton title='Workspace Users' color='primary'>
+                        <IconButton title={t('pages.workspaces.workspaceUsers')} color='primary'>
                             <IconUsers />
                         </IconButton>
                     </Link>
                     {props.workspace.name !== 'Default Workspace' &&
                         (props.workspace.userCount > 1 || props.workspace.isOrgDefault === true ? (
-                            <IconButton title='Delete' disabled={true} color='error' onClick={() => props.onDeleteClick(props.workspace)}>
+                            <IconButton
+                                title={t('pages.workspaces.delete')}
+                                disabled={true}
+                                color='error'
+                                onClick={() => props.onDeleteClick(props.workspace)}
+                            >
                                 <IconTrashOff />
                             </IconButton>
                         ) : (
                             <PermissionIconButton
                                 permissionId={'workspace:delete'}
-                                title='Delete'
+                                title={t('pages.workspaces.delete')}
                                 color='error'
                                 onClick={() => props.onDeleteClick(props.workspace)}
                             >
@@ -220,6 +226,7 @@ ShowWorkspaceRow.propTypes = {
 // ==============================|| Workspaces ||============================== //
 
 const Workspaces = () => {
+    const { t } = useTranslation()
     const navigate = useNavigate()
     const theme = useTheme()
     const { confirm } = useConfirm()
@@ -407,7 +414,7 @@ const Workspaces = () => {
                             isEditButton={false}
                             onSearchChange={onSearchChange}
                             search={true}
-                            title='Workspaces'
+                            title={t('pages.workspaces.title')}
                             searchPlaceholder='Search Workspaces'
                         >
                             <StyledPermissionButton

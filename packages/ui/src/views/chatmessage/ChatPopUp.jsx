@@ -1,6 +1,7 @@
 import { memo, useState, useRef, useEffect, useContext } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 
 import { ClickAwayListener, Paper, Popper, Button } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
@@ -28,6 +29,7 @@ import { enqueueSnackbar as enqueueSnackbarAction, closeSnackbar as closeSnackba
 import { getLocalStorageChatflow, removeLocalStorageChatHistory } from '@/utils/genericHelper'
 
 const ChatPopUp = ({ chatflowid, isAgentCanvas, onOpenChange }) => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const { confirm } = useConfirm()
     const dispatch = useDispatch()
@@ -148,7 +150,7 @@ const ChatPopUp = ({ chatflowid, isAgentCanvas, onOpenChange }) => {
                 size='small'
                 color='secondary'
                 aria-label='chat'
-                title='Chat'
+                title={t('canvas.chat')}
                 onClick={handleToggle}
             >
                 {open ? <IconX /> : <IconMessage />}
@@ -161,7 +163,7 @@ const ChatPopUp = ({ chatflowid, isAgentCanvas, onOpenChange }) => {
                     size='small'
                     color='error'
                     aria-label='clear'
-                    title='Clear Chat History'
+                    title={t('canvas.clearChatHistory')}
                 >
                     <IconEraser />
                 </StyledFab>
@@ -173,7 +175,7 @@ const ChatPopUp = ({ chatflowid, isAgentCanvas, onOpenChange }) => {
                     size='small'
                     color='primary'
                     aria-label='expand'
-                    title='Expand Chat'
+                    title={t('canvas.expandChat')}
                 >
                     <IconArrowsMaximize />
                 </StyledFab>

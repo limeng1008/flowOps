@@ -2,6 +2,8 @@ import PropTypes from 'prop-types'
 import { Handle, Position, useUpdateNodeInternals } from 'reactflow'
 import { useEffect, useRef, useState, useContext } from 'react'
 import { useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { translateNodeLabel, translateNodeDescription, translateNodeInputPlaceholder } from '@/i18n/nodeI18n'
 import { useSelector, useDispatch } from 'react-redux'
 import { cloneDeep } from 'lodash'
 import showdown from 'showdown'
@@ -148,6 +150,17 @@ const NodeInputHandler = ({
     const ref = useRef(null)
     const { reactFlowInstance, deleteEdge, onNodeDataChange } = useContext(flowContext)
     const updateNodeInternals = useUpdateNodeInternals()
+
+    const { i18n } = useTranslation()
+    const [currentLang, setCurrentLang] = useState(i18n.resolvedLanguage || i18n.language)
+    useEffect(() => {
+        const onLanguageChanged = (lng) => setCurrentLang(lng)
+        i18n.on('languageChanged', onLanguageChanged)
+        return () => i18n.off('languageChanged', onLanguageChanged)
+    }, [i18n])
+    const tL = (s) => translateNodeLabel(s, currentLang)
+    const tD = (s) => translateNodeDescription(s, currentLang)
+    const tP = (s) => translateNodeInputPlaceholder(s, currentLang)
 
     useNotifier()
     const dispatch = useDispatch()
@@ -434,7 +447,7 @@ const NodeInputHandler = ({
                                         <div>
                                             <strong>{option.value}</strong>
                                             <br />
-                                            <small>{option.label}</small>
+                                            <small>{tL(option.label)}</small>
                                         </div>
                                     </li>
                                 )}
@@ -864,9 +877,11 @@ const NodeInputHandler = ({
                     </CustomWidthTooltip>
                     <Box sx={{ p: 2 }}>
                         <Typography>
-                            {inputAnchor.label}
+                            {tL(inputAnchor.label)}
                             {!inputAnchor.optional && <span style={{ color: 'red' }}>&nbsp;*</span>}
-                            {inputAnchor.description && <TooltipWithParser style={{ marginLeft: 10 }} title={inputAnchor.description} />}
+                            {inputAnchor.description && (
+                                <TooltipWithParser style={{ marginLeft: 10 }} title={tD(inputAnchor.description)} />
+                            )}
                         </Typography>
                     </Box>
                 </>
@@ -935,9 +950,11 @@ const NodeInputHandler = ({
                         )}
                         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                             <Typography>
-                                {inputParam.label}
+                                {tL(inputParam.label)}
                                 {!inputParam.optional && <span style={{ color: 'red' }}>&nbsp;*</span>}
-                                {inputParam.description && <TooltipWithParser style={{ marginLeft: 10 }} title={inputParam.description} />}
+                                {inputParam.description && (
+                                    <TooltipWithParser style={{ marginLeft: 10 }} title={tD(inputParam.description)} />
+                                )}
                             </Typography>
                             <div style={{ flexGrow: 1 }}></div>
                             {inputParam.hint && !isAdditionalParams && (
@@ -947,7 +964,7 @@ const NodeInputHandler = ({
                                         height: 25,
                                         width: 25
                                     }}
-                                    title={inputParam.hint.label}
+                                    title={tL(inputParam.hint.label)}
                                     color='secondary'
                                     onClick={() => onInputHintDialogClicked(inputParam.hint)}
                                 >
@@ -964,7 +981,7 @@ const NodeInputHandler = ({
                                     }}
                                     startIcon={<IconBulb size={17} />}
                                 >
-                                    {inputParam.hint.label}
+                                    {tL(inputParam.hint.label)}
                                 </Button>
                             )}
                             {inputParam.acceptVariable && inputParam.type === 'string' && (
@@ -1061,7 +1078,7 @@ const NodeInputHandler = ({
                                 >
                                     <TabsList>
                                         {inputParam.tabs.map((inputChildParam, index) => (
-                                            <Tab key={index}>{inputChildParam.label}</Tab>
+                                            <Tab key={index}>{tL(inputChildParam.label)}</Tab>
                                         ))}
                                     </TabsList>
                                 </Tabs>
@@ -1135,7 +1152,7 @@ const NodeInputHandler = ({
                                         height={inputParam.rows ? '100px' : '200px'}
                                         theme={customization.isDarkMode ? 'dark' : 'light'}
                                         lang={'js'}
-                                        placeholder={inputParam.placeholder}
+                                        placeholder={tP(inputParam.placeholder)}
                                         onValueChange={(code) => (data.inputs[inputParam.name] = code)}
                                         basicSetup={{ highlightActiveLine: false, highlightActiveLineGutter: false }}
                                     />
@@ -1285,7 +1302,7 @@ const NodeInputHandler = ({
                             (window.location.href.includes('v2/agentcanvas') || window.location.href.includes('v2/marketplace')) ? (
                                 <RichInput
                                     key={data.inputs[inputParam.name]}
-                                    placeholder={inputParam.placeholder}
+                                    placeholder={tP(inputParam.placeholder)}
                                     disabled={disabled}
                                     inputParam={inputParam}
                                     onChange={(newValue) => (data.inputs[inputParam.name] = newValue)}
@@ -1297,7 +1314,7 @@ const NodeInputHandler = ({
                             ) : (
                                 <Input
                                     key={data.inputs[inputParam.name]}
-                                    placeholder={inputParam.placeholder}
+                                    placeholder={tP(inputParam.placeholder)}
                                     disabled={disabled}
                                     inputParam={inputParam}
                                     onChange={(newValue) => (data.inputs[inputParam.name] = newValue)}
@@ -1336,7 +1353,7 @@ const NodeInputHandler = ({
                                             disabled={disabled}
                                             onClick={() => onEditJSONClicked(data.inputs[inputParam.name] ?? '', inputParam)}
                                         >
-                                            {inputParam.label}
+                                            {tL(inputParam.label)}
                                         </Button>
                                         <FormatPromptValuesDialog
                                             show={showFormatPromptValuesDialog}
@@ -1419,7 +1436,7 @@ const NodeInputHandler = ({
                             <TimePicker
                                 disabled={disabled}
                                 value={data.inputs[inputParam.name] ?? inputParam.default ?? ''}
-                                placeholder={inputParam.placeholder}
+                                placeholder={tP(inputParam.placeholder)}
                                 onChange={(newValue) => handleDataChange({ inputParam, newValue })}
                             />
                         )}
@@ -1442,7 +1459,7 @@ const NodeInputHandler = ({
                             <DatePicker
                                 disabled={disabled}
                                 value={data.inputs[inputParam.name] ?? inputParam.default ?? ''}
-                                placeholder={inputParam.placeholder}
+                                placeholder={tP(inputParam.placeholder)}
                                 onChange={(newValue) => handleDataChange({ inputParam, newValue })}
                             />
                         )}
@@ -1460,7 +1477,7 @@ const NodeInputHandler = ({
                                     variant='outlined'
                                     onClick={() => onConditionDialogClicked(inputParam)}
                                 >
-                                    {inputParam.label}
+                                    {tL(inputParam.label)}
                                 </Button>
                             </>
                         )}

@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import { styled, useTheme } from '@mui/material/styles'
@@ -10,6 +11,7 @@ import MainCard from '@/ui-component/cards/MainCard'
 import NodeInputHandler from '@/views/canvas/NodeInputHandler'
 import NodeOutputHandler from '@/views/canvas/NodeOutputHandler'
 import AdditionalParamsDialog from '@/ui-component/dialog/AdditionalParamsDialog'
+import { translateNodeLabel } from '@/i18n/nodeI18n'
 
 // const
 import { baseURL } from '@/store/constant'
@@ -32,6 +34,8 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 // ===========================|| CANVAS NODE ||=========================== //
 
 const MarketplaceCanvasNode = ({ data }) => {
+    const { t, i18n } = useTranslation()
+    const currentLang = i18n.resolvedLanguage || i18n.language
     const theme = useTheme()
 
     const [showDialog, setShowDialog] = useState(false)
@@ -85,7 +89,7 @@ const MarketplaceCanvasNode = ({ data }) => {
                                     fontWeight: 500
                                 }}
                             >
-                                {data.label}
+                                {translateNodeLabel(data.label, currentLang)}
                             </Typography>
                         </Box>
                         <div style={{ flexGrow: 1 }}></div>
@@ -116,7 +120,7 @@ const MarketplaceCanvasNode = ({ data }) => {
                                         textAlign: 'center'
                                     }}
                                 >
-                                    Inputs
+                                    {t('common.inputs')}
                                 </Typography>
                             </Box>
                             <Divider />
@@ -142,7 +146,7 @@ const MarketplaceCanvasNode = ({ data }) => {
                             }}
                         >
                             <Button sx={{ borderRadius: 25, width: '90%', mb: 2 }} variant='outlined' onClick={onDialogClicked}>
-                                Additional Parameters
+                                {t('common.additionalParameters')}
                             </Button>
                         </div>
                     )}
@@ -154,7 +158,7 @@ const MarketplaceCanvasNode = ({ data }) => {
                                 textAlign: 'center'
                             }}
                         >
-                            Output
+                            {t('common.output')}
                         </Typography>
                     </Box>
                     <Divider />

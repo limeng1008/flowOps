@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { useState, useCallback } from 'react'
+import { useTranslation } from 'react-i18next'
 import { DataGrid as MUIDataGrid, GridActionsCellItem } from '@mui/x-data-grid'
 import { IconPlus } from '@tabler/icons-react'
 import { Button } from '@mui/material'
@@ -34,6 +35,7 @@ const StyledDataGrid = styled(MUIDataGrid)(({ theme }) => ({
 }))
 
 export const DataGrid = ({ columns, rows, style, disabled = false, hideFooter = false, onChange }) => {
+    const { t } = useTranslation()
     const [rowValues, setRowValues] = useState(formatDataGridRows(rows) ?? [])
 
     const deleteItem = useCallback(
@@ -59,7 +61,7 @@ export const DataGrid = ({ columns, rows, style, disabled = false, hideFooter = 
                 type: 'actions',
                 width: 80,
                 getActions: (params) => [
-                    <GridActionsCellItem key={'Delete'} icon={<DeleteIcon />} label='Delete' onClick={deleteItem(params.id)} />
+                    <GridActionsCellItem key={'Delete'} icon={<DeleteIcon />} label={t('common.delete')} onClick={deleteItem(params.id)} />
                 ]
             }
         ]
@@ -115,12 +117,13 @@ export const DataGrid = ({ columns, rows, style, disabled = false, hideFooter = 
                         onProcessRowUpdateError={(error) => console.error(error)}
                         rows={rowValues}
                         columns={colValues}
+                        localeText={{ noRowsLabel: t('common.noRows') }}
                     />
                 </div>
             )}
             {!disabled && (
                 <Button sx={{ mt: 1 }} variant='outlined' onClick={addNewRow} startIcon={<IconPlus />}>
-                    Add Item
+                    {t('common.addItemButton')}
                 </Button>
             )}
         </>

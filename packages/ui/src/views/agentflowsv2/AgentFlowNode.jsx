@@ -1,7 +1,9 @@
 import PropTypes from 'prop-types'
 import { useContext, memo, useRef, useState, useEffect } from 'react'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { Handle, Position, useUpdateNodeInternals, NodeToolbar } from 'reactflow'
+import { translateNodeLabel } from '@/i18n/nodeI18n'
 
 // material-ui
 import { styled, useTheme, alpha, darken, lighten } from '@mui/material/styles'
@@ -59,6 +61,14 @@ const StyledNodeToolbar = styled(NodeToolbar)(({ theme }) => ({
 // ===========================|| CANVAS NODE ||=========================== //
 
 const AgentFlowNode = ({ data }) => {
+    const { i18n } = useTranslation()
+    const [currentLang, setCurrentLang] = useState(i18n.resolvedLanguage || i18n.language)
+    useEffect(() => {
+        const onLanguageChanged = (lng) => setCurrentLang(lng)
+        i18n.on('languageChanged', onLanguageChanged)
+        return () => i18n.off('languageChanged', onLanguageChanged)
+    }, [i18n])
+
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const canvas = useSelector((state) => state.canvas)
@@ -399,7 +409,7 @@ const AgentFlowNode = ({ data }) => {
                                     fontWeight: 500
                                 }}
                             >
-                                {data.label}
+                                {translateNodeLabel(data.label, currentLang)}
                             </Typography>
 
                             {/* Render the icon for "Start" node to help users determine it's started by user's input or schedule */}

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import * as PropTypes from 'prop-types'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { translateNodeLabel } from '@/i18n/nodeI18n'
 
 // material-ui
 import {
@@ -125,6 +127,7 @@ const StyledMenu = styled((props) => (
 }))
 
 const DocumentStoreDetails = () => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const navigate = useNavigate()
@@ -206,7 +209,7 @@ const DocumentStoreDetails = () => {
                 setBackdropLoading(false)
                 if (deleteResp.data) {
                     enqueueSnackbar({
-                        message: 'Store, Loader and associated document chunks deleted',
+                        message: t('common.storeAndLoaderDeleted'),
                         options: {
                             key: new Date().getTime() + Math.random(),
                             variant: 'success',
@@ -247,7 +250,7 @@ const DocumentStoreDetails = () => {
                 setBackdropLoading(false)
                 if (deleteResp.data) {
                     enqueueSnackbar({
-                        message: 'Loader and associated document chunks deleted',
+                        message: t('common.loaderChunksDeleted'),
                         options: {
                             key: new Date().getTime() + Math.random(),
                             variant: 'success',
@@ -367,7 +370,7 @@ const DocumentStoreDetails = () => {
                 const resp = await documentsApi.refreshLoader(storeId)
                 if (resp.data) {
                     enqueueSnackbar({
-                        message: 'Document store refresh successfully!',
+                        message: t('common.docstoreRefreshed'),
                         options: {
                             key: new Date().getTime() + Math.random(),
                             variant: 'success',
@@ -407,10 +410,10 @@ const DocumentStoreDetails = () => {
             id: documentStore.id
         }
         const dialogProp = {
-            title: 'Edit Document Store',
+            title: t('pages.documentStores.editTitle'),
             type: 'EDIT',
-            cancelButtonName: 'Cancel',
-            confirmButtonName: 'Update',
+            cancelButtonName: t('common.cancel'),
+            confirmButtonName: t('common.update'),
             data: data
         }
         setDialogProps(dialogProp)
@@ -499,7 +502,7 @@ const DocumentStoreDetails = () => {
                                 startIcon={<IconPlus />}
                                 onClick={listLoaders}
                             >
-                                Add Document Loader
+                                {t('pages.documentStores.addDocumentLoader')}
                             </StyledPermissionButton>
                             <Button
                                 id='document-store-header-action-button'
@@ -513,7 +516,7 @@ const DocumentStoreDetails = () => {
                                 sx={{ minWidth: 150 }}
                                 endIcon={<KeyboardArrowDownIcon />}
                             >
-                                More Actions
+                                {t('pages.documentStores.moreActions')}
                             </Button>
                             <StyledMenu
                                 id='document-store-header-menu'
@@ -533,7 +536,7 @@ const DocumentStoreDetails = () => {
                                     disableRipple
                                 >
                                     <FileChunksIcon />
-                                    View & Edit Chunks
+                                    {t('pages.documentStores.viewEditChunks')}
                                 </MenuItem>
                                 <Available permission={'documentStores:upsert-config'}>
                                     <MenuItem
@@ -545,7 +548,7 @@ const DocumentStoreDetails = () => {
                                         disableRipple
                                     >
                                         <NoteAddIcon />
-                                        Upsert All Chunks
+                                        {t('pages.documentStores.upsertAllChunks')}
                                     </MenuItem>
                                 </Available>
                                 <MenuItem
@@ -557,7 +560,7 @@ const DocumentStoreDetails = () => {
                                     disableRipple
                                 >
                                     <SearchIcon />
-                                    Retrieval Query
+                                    {t('pages.documentStores.retrievalQuery')}
                                 </MenuItem>
                                 <Available permission={'documentStores:upsert-config'}>
                                     <MenuItem
@@ -567,7 +570,7 @@ const DocumentStoreDetails = () => {
                                         title='Re-process all loaders and upsert all chunks'
                                     >
                                         <RefreshIcon />
-                                        Refresh
+                                        {t('pages.documentStores.refresh')}
                                     </MenuItem>
                                 </Available>
                                 <Divider sx={{ my: 0.5 }} />
@@ -579,7 +582,7 @@ const DocumentStoreDetails = () => {
                                     disableRipple
                                 >
                                     <FileDeleteIcon />
-                                    Delete
+                                    {t('pages.documentStores.delete')}
                                 </MenuItem>
                             </StyledMenu>
                         </ViewHeader>
@@ -600,7 +603,7 @@ const DocumentStoreDetails = () => {
                                     }}
                                 >
                                     <IconVectorBezier2 style={{ marginRight: 5 }} size={17} />
-                                    Chatflows Used:
+                                    {t('pages.documentStores.chatflowsUsed')}
                                 </div>
                                 {getSpecificDocumentStore.data.whereUsed.map((chatflowUsed, index) => (
                                     <Chip
@@ -635,7 +638,7 @@ const DocumentStoreDetails = () => {
                                     startIcon={<IconPlus />}
                                     onClick={listLoaders}
                                 >
-                                    Add Document Loader
+                                    {t('pages.documentStores.addDocumentLoader')}
                                 </StyledButton>
                             </Stack>
                         ) : (
@@ -654,13 +657,13 @@ const DocumentStoreDetails = () => {
                                     >
                                         <TableRow>
                                             <StyledTableCell>&nbsp;</StyledTableCell>
-                                            <StyledTableCell>Loader</StyledTableCell>
-                                            <StyledTableCell>Splitter</StyledTableCell>
-                                            <StyledTableCell>Source(s)</StyledTableCell>
-                                            <StyledTableCell>Chunks</StyledTableCell>
-                                            <StyledTableCell>Chars</StyledTableCell>
+                                            <StyledTableCell>{t('pages.documentStores.colLoader')}</StyledTableCell>
+                                            <StyledTableCell>{t('pages.documentStores.colSplitter')}</StyledTableCell>
+                                            <StyledTableCell>{t('pages.documentStores.colSources')}</StyledTableCell>
+                                            <StyledTableCell>{t('pages.documentStores.colChunks')}</StyledTableCell>
+                                            <StyledTableCell>{t('pages.documentStores.colChars')}</StyledTableCell>
                                             <Available permission={'documentStores:preview-process,documentStores:delete-loader'}>
-                                                <StyledTableCell>Actions</StyledTableCell>
+                                                <StyledTableCell>{t('pages.documentStores.colActions')}</StyledTableCell>
                                             </Available>
                                         </TableRow>
                                     </TableHead>
@@ -800,6 +803,13 @@ const DocumentStoreDetails = () => {
 }
 
 function LoaderRow(props) {
+    const { t, i18n } = useTranslation()
+    const [currentLang, setCurrentLang] = useState(i18n.resolvedLanguage || i18n.language)
+    useEffect(() => {
+        const onLanguageChanged = (lng) => setCurrentLang(lng)
+        i18n.on('languageChanged', onLanguageChanged)
+        return () => i18n.off('languageChanged', onLanguageChanged)
+    }, [i18n])
     const [anchorEl, setAnchorEl] = useState(null)
     const open = Boolean(anchorEl)
 
@@ -850,9 +860,11 @@ function LoaderRow(props) {
                     ></div>
                 </StyledTableCell>
                 <StyledTableCell onClick={props.onViewChunksClick} scope='row'>
-                    {props.loader.loaderName}
+                    {translateNodeLabel(props.loader.loaderName, currentLang)}
                 </StyledTableCell>
-                <StyledTableCell onClick={props.onViewChunksClick}>{props.loader.splitterName ?? 'None'}</StyledTableCell>
+                <StyledTableCell onClick={props.onViewChunksClick}>
+                    {props.loader.splitterName ? translateNodeLabel(props.loader.splitterName, currentLang) : t('common.none')}
+                </StyledTableCell>
                 <StyledTableCell onClick={props.onViewChunksClick}>
                     {formatSources(props.loader.files, props.loader.source)}
                 </StyledTableCell>
@@ -874,7 +886,7 @@ function LoaderRow(props) {
                                 onClick={(e) => handleClick(e)}
                                 endIcon={<KeyboardArrowDownIcon />}
                             >
-                                Options
+                                {t('common.options')}
                             </Button>
                             <StyledMenu
                                 id='document-store-actions-customized-menu'
@@ -894,7 +906,7 @@ function LoaderRow(props) {
                                         disableRipple
                                     >
                                         <FileEditIcon />
-                                        Preview & Process
+                                        {t('pages.documentStores.previewProcess')}
                                     </MenuItem>
                                 </Available>
                                 <Available permission={'documentStores:preview-process'}>
@@ -906,7 +918,7 @@ function LoaderRow(props) {
                                         disableRipple
                                     >
                                         <FileChunksIcon />
-                                        View & Edit Chunks
+                                        {t('pages.documentStores.viewEditChunks')}
                                     </MenuItem>
                                 </Available>
                                 <Available permission={'documentStores:preview-process'}>
@@ -918,7 +930,7 @@ function LoaderRow(props) {
                                         disableRipple
                                     >
                                         <NoteAddIcon />
-                                        Upsert Chunks
+                                        {t('pages.documentStores.upsertChunks')}
                                     </MenuItem>
                                 </Available>
                                 <Available permission={'documentStores:preview-process'}>
@@ -930,7 +942,7 @@ function LoaderRow(props) {
                                         disableRipple
                                     >
                                         <CodeIcon />
-                                        View API
+                                        {t('pages.documentStores.viewApi')}
                                     </MenuItem>
                                 </Available>
                                 <Divider sx={{ my: 0.5 }} />
@@ -943,7 +955,7 @@ function LoaderRow(props) {
                                         disableRipple
                                     >
                                         <FileDeleteIcon />
-                                        Delete
+                                        {t('pages.documentStores.delete')}
                                     </MenuItem>
                                 </Available>
                             </StyledMenu>

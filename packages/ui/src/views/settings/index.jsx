@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import { useTheme } from '@mui/material/styles'
@@ -13,20 +14,25 @@ import PerfectScrollbar from 'react-perfect-scrollbar'
 // project imports
 import MainCard from '@/ui-component/cards/MainCard'
 import Transitions from '@/ui-component/extended/Transitions'
-import settings from '@/menu-items/settings'
-import agentsettings from '@/menu-items/agentsettings'
-import customAssistantSettings from '@/menu-items/customassistant'
+import buildSettings from '@/menu-items/settings'
+import buildAgentSettings from '@/menu-items/agentsettings'
+import buildCustomAssistantSettings from '@/menu-items/customassistant'
 import { useAuth } from '@/hooks/useAuth'
 
 // ==============================|| SETTINGS ||============================== //
 
 const Settings = ({ chatflow, isSettingsOpen, isCustomAssistant, anchorEl, isAgentCanvas, onSettingsItemClick, onUploadFile, onClose }) => {
     const theme = useTheme()
+    const { t } = useTranslation()
     const [settingsMenu, setSettingsMenu] = useState([])
     const customization = useSelector((state) => state.customization)
     const inputFile = useRef(null)
     const [open, setOpen] = useState(false)
     const { hasPermission } = useAuth()
+
+    const settings = useMemo(() => buildSettings(t), [t])
+    const agentsettings = useMemo(() => buildAgentSettings(t), [t])
+    const customAssistantSettings = useMemo(() => buildCustomAssistantSettings(t), [t])
 
     const handleFileUpload = (e) => {
         if (!e.target.files) return

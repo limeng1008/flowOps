@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { styled } from '@mui/material/styles'
 import { tableCellClasses } from '@mui/material/TableCell'
 import {
@@ -19,6 +20,7 @@ import {
 } from '@mui/material'
 import { IconShare, IconTrash } from '@tabler/icons-react'
 import { PermissionIconButton } from '@/ui-component/button/RBACButtons'
+import { translateMarketplaceUsecase } from '@/i18n/marketplaceI18n'
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     borderColor: theme.palette.grey[900] + 25,
@@ -53,7 +55,9 @@ export const MarketplaceTable = ({
     onShare
 }) => {
     const theme = useTheme()
+    const { i18n } = useTranslation()
     const customization = useSelector((state) => state.customization)
+    const currentLang = i18n.resolvedLanguage || i18n.language
 
     const openTemplate = (selectedTemplate) => {
         if (selectedTemplate.flowData) {
@@ -200,7 +204,7 @@ export const MarketplaceTable = ({
                                                                 variant='outlined'
                                                                 key={index}
                                                                 size='small'
-                                                                label={usecase}
+                                                                label={translateMarketplaceUsecase(usecase, currentLang)}
                                                                 style={{ marginRight: 3, marginBottom: 3 }}
                                                             />
                                                         ))}

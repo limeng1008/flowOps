@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { z } from 'zod/v3'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import { Alert, Box, Button, Divider, Icon, List, ListItemText, OutlinedInput, Stack, Typography, useTheme } from '@mui/material'
@@ -37,66 +38,72 @@ import { IconCircleCheck, IconExclamationCircle } from '@tabler/icons-react'
 
 // IMPORTANT: when updating this schema, update the schema on the server as well
 // packages/server/src/enterprise/Interface.Enterprise.ts
-const RegisterEnterpriseUserSchema = z
-    .object({
-        username: z.string().min(1, 'Name is required'),
-        email: z.string().min(1, 'Email is required').email('Invalid email address'),
-        password: passwordSchema,
-        confirmPassword: z.string().min(1, 'Confirm Password is required'),
-        token: z.string().min(1, 'Invite Code is required')
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-        message: "Passwords don't match",
-        path: ['confirmPassword']
-    })
+const buildRegisterEnterpriseUserSchema = (t) =>
+    z
+        .object({
+            username: z.string().min(1, t('auth.nameRequired')),
+            email: z.string().min(1, t('auth.emailRequired')).email(t('auth.invalidEmail')),
+            password: passwordSchema,
+            confirmPassword: z.string().min(1, t('auth.confirmPasswordRequired')),
+            token: z.string().min(1, t('auth.inviteCodeRequired'))
+        })
+        .refine((data) => data.password === data.confirmPassword, {
+            message: t('auth.passwordsDontMatch'),
+            path: ['confirmPassword']
+        })
 
-const RegisterCloudUserSchema = z
-    .object({
-        username: z.string().min(1, 'Name is required'),
-        email: z.string().min(1, 'Email is required').email('Invalid email address'),
-        password: passwordSchema,
-        confirmPassword: z.string().min(1, 'Confirm Password is required')
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-        message: "Passwords don't match",
-        path: ['confirmPassword']
-    })
+const buildRegisterCloudUserSchema = (t) =>
+    z
+        .object({
+            username: z.string().min(1, t('auth.nameRequired')),
+            email: z.string().min(1, t('auth.emailRequired')).email(t('auth.invalidEmail')),
+            password: passwordSchema,
+            confirmPassword: z.string().min(1, t('auth.confirmPasswordRequired'))
+        })
+        .refine((data) => data.password === data.confirmPassword, {
+            message: t('auth.passwordsDontMatch'),
+            path: ['confirmPassword']
+        })
 
 const RegisterPage = () => {
     const theme = useTheme()
+    const { t } = useTranslation()
     useNotifier()
     const { isEnterpriseLicensed, isCloud, isOpenSource } = useConfig()
 
+    const RegisterEnterpriseUserSchema = useMemo(() => buildRegisterEnterpriseUserSchema(t), [t])
+    const RegisterCloudUserSchema = useMemo(() => buildRegisterCloudUserSchema(t), [t])
+
     const usernameInput = {
-        label: 'Username',
+        label: t('auth.username'),
         name: 'username',
         type: 'text',
         placeholder: 'John Doe'
     }
 
     const passwordInput = {
-        label: 'Password',
+        label: t('auth.password'),
         name: 'password',
         type: 'password',
         placeholder: '********'
     }
 
     const confirmPasswordInput = {
-        label: 'Confirm Password',
+        label: t('auth.confirmPassword'),
         name: 'confirmPassword',
         type: 'password',
         placeholder: '********'
     }
 
     const emailInput = {
-        label: 'EMail',
+        label: t('auth.email'),
         name: 'email',
         type: 'email',
         placeholder: 'user@company.com'
     }
 
     const inviteCodeInput = {
-        label: 'Invite Code',
+        label: t('auth.inviteCode'),
         name: 'inviteCode',
         type: 'text'
     }
@@ -121,6 +128,22 @@ const RegisterPage = () => {
     const getDefaultProvidersApi = useApi(loginMethodApi.getDefaultLoginMethods)
     const navigate = useNavigate()
 
+    const validationMessage = (message) =>
+        ({
+            'Name is required': t('auth.nameRequired'),
+            'Email is required': t('auth.emailRequired'),
+            'Invalid email address': t('auth.invalidEmail'),
+            'Confirm Password is required': t('auth.confirmPasswordRequired'),
+            'Invite Code is required': t('auth.inviteCodeRequired'),
+            "Passwords don't match": t('auth.passwordsDontMatch'),
+            'Password must be at least 8 characters': t('auth.passwordMinLength'),
+            'Password must not be more than 128 characters': t('auth.passwordMaxLength'),
+            'Password must contain at least one lowercase letter': t('auth.passwordLowercase'),
+            'Password must contain at least one uppercase letter': t('auth.passwordUppercase'),
+            'Password must contain at least one digit': t('auth.passwordDigit'),
+            'Password must contain at least one special character': t('auth.passwordSpecial')
+        }[message] || message)
+
     const register = async (event) => {
         event.preventDefault()
         setAuthRateLimitError(null)
@@ -144,7 +167,7 @@ const RegisterPage = () => {
                 }
                 await registerApi.request(body)
             } else {
-                const errorMessages = result.error.errors.map((err) => err.message)
+                const errorMessages = result.error.errors.map((err) => validationMessage(err.message))
                 setAuthError(errorMessages.join(', '))
             }
         } else if (isCloud) {
@@ -170,7 +193,7 @@ const RegisterPage = () => {
                 }
                 await registerApi.request(body)
             } else {
-                const errorMessages = result.error.errors.map((err) => err.message)
+                const errorMessages = result.error.errors.map((err) => validationMessage(err.message))
                 setAuthError(errorMessages.join(', '))
             }
         }
@@ -184,11 +207,9 @@ const RegisterPage = () => {
     useEffect(() => {
         if (registerApi.error) {
             if (isEnterpriseLicensed) {
-                setAuthError(
-                    `Error in registering user. Please contact your administrator. (${registerApi.error?.response?.data?.message})`
-                )
+                setAuthError(t('auth.registerEnterpriseError', { message: registerApi.error?.response?.data?.message }))
             } else if (isCloud) {
-                setAuthError(`Error in registering user. Please try again.`)
+                setAuthError(t('auth.registerCloudError'))
             }
             setLoading(false)
         }
@@ -241,9 +262,9 @@ const RegisterPage = () => {
             setUsername('')
             setEmail('')
             if (isEnterpriseLicensed) {
-                setSuccessMsg('Registration Successful. You will be redirected to the sign in page shortly.')
+                setSuccessMsg(t('auth.registrationSuccessful'))
             } else if (isCloud) {
-                setSuccessMsg('To complete your registration, please click on the verification link we sent to your email address')
+                setSuccessMsg(t('auth.registrationVerifyEmail'))
             }
             setTimeout(() => {
                 navigate('/signin')
@@ -290,11 +311,11 @@ const RegisterPage = () => {
                         </Alert>
                     )}
                     <Stack sx={{ gap: 1 }}>
-                        <Typography variant='h1'>Sign Up</Typography>
+                        <Typography variant='h1'>{t('auth.signUp')}</Typography>
                         <Typography variant='body2' sx={{ color: theme.palette.grey[600] }}>
-                            Already have an account?{' '}
+                            {t('auth.alreadyHaveAccount')}{' '}
                             <Link style={{ color: theme.palette.primary.main }} to='/signin'>
-                                Sign In
+                                {t('auth.signIn')}
                             </Link>
                             .
                         </Typography>
@@ -304,25 +325,27 @@ const RegisterPage = () => {
                             <Box>
                                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                                     <Typography>
-                                        Full Name<span style={{ color: 'red' }}>&nbsp;*</span>
+                                        {t('auth.fullName')}
+                                        <span style={{ color: 'red' }}>&nbsp;*</span>
                                     </Typography>
                                     <div style={{ flexGrow: 1 }}></div>
                                 </div>
                                 <Input
                                     inputParam={usernameInput}
-                                    placeholder='Display Name'
+                                    placeholder={t('auth.displayName')}
                                     onChange={(newValue) => setUsername(newValue)}
                                     value={username}
                                     showDialog={false}
                                 />
                                 <Typography variant='caption'>
-                                    <i>Is used for display purposes only.</i>
+                                    <i>{t('auth.displayNameHint')}</i>
                                 </Typography>
                             </Box>
                             <Box>
                                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                                     <Typography>
-                                        Email<span style={{ color: 'red' }}>&nbsp;*</span>
+                                        {t('auth.email')}
+                                        <span style={{ color: 'red' }}>&nbsp;*</span>
                                     </Typography>
                                     <div style={{ flexGrow: 1 }}></div>
                                 </div>
@@ -333,50 +356,50 @@ const RegisterPage = () => {
                                     showDialog={false}
                                 />
                                 <Typography variant='caption'>
-                                    <i>Kindly use a valid email address. Will be used as login id.</i>
+                                    <i>{t('auth.emailHint')}</i>
                                 </Typography>
                             </Box>
                             {isEnterpriseLicensed && (
                                 <Box>
                                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                                         <Typography>
-                                            Invite Code<span style={{ color: 'red' }}>&nbsp;*</span>
+                                            {t('auth.inviteCode')}
+                                            <span style={{ color: 'red' }}>&nbsp;*</span>
                                         </Typography>
                                         <div style={{ flexGrow: 1 }}></div>
                                     </div>
                                     <OutlinedInput
                                         fullWidth
                                         type='string'
-                                        placeholder='Paste in the invite code.'
+                                        placeholder={t('auth.inviteCodePlaceholder')}
                                         multiline={false}
                                         inputParam={inviteCodeInput}
                                         onChange={(e) => setToken(e.target.value)}
                                         value={token}
                                     />
                                     <Typography variant='caption'>
-                                        <i>Please copy the token you would have received in your email.</i>
+                                        <i>{t('auth.inviteCodeHint')}</i>
                                     </Typography>
                                 </Box>
                             )}
                             <Box>
                                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                                     <Typography>
-                                        Password<span style={{ color: 'red' }}>&nbsp;*</span>
+                                        {t('auth.password')}
+                                        <span style={{ color: 'red' }}>&nbsp;*</span>
                                     </Typography>
                                     <div style={{ flexGrow: 1 }}></div>
                                 </div>
                                 <Input inputParam={passwordInput} onChange={(newValue) => setPassword(newValue)} value={password} />
                                 <Typography variant='caption'>
-                                    <i>
-                                        Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase
-                                        letter, one digit, and one special character.
-                                    </i>
+                                    <i>{t('auth.passwordRule')}</i>
                                 </Typography>
                             </Box>
                             <Box>
                                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                                     <Typography>
-                                        Confirm Password<span style={{ color: 'red' }}>&nbsp;*</span>
+                                        {t('auth.confirmPassword')}
+                                        <span style={{ color: 'red' }}>&nbsp;*</span>
                                     </Typography>
                                     <div style={{ flexGrow: 1 }}></div>
                                 </div>
@@ -386,13 +409,13 @@ const RegisterPage = () => {
                                     value={confirmPassword}
                                 />
                                 <Typography variant='caption'>
-                                    <i>Confirm your password. Must match the password typed above.</i>
+                                    <i>{t('auth.confirmPasswordHint')}</i>
                                 </Typography>
                             </Box>
                             <StyledButton variant='contained' style={{ borderRadius: 12, height: 40, marginRight: 5 }} type='submit'>
-                                Create Account
+                                {t('auth.createAccount')}
                             </StyledButton>
-                            {configuredSsoProviders.length > 0 && <Divider sx={{ width: '100%' }}>OR</Divider>}
+                            {configuredSsoProviders.length > 0 && <Divider sx={{ width: '100%' }}>{t('auth.or')}</Divider>}
                             {configuredSsoProviders &&
                                 configuredSsoProviders.map(
                                     (ssoProvider) =>
@@ -409,7 +432,7 @@ const RegisterPage = () => {
                                                     </Icon>
                                                 }
                                             >
-                                                Sign In With Microsoft
+                                                {t('auth.signInWithMicrosoft')}
                                             </Button>
                                         )
                                 )}
@@ -428,7 +451,7 @@ const RegisterPage = () => {
                                                     </Icon>
                                                 }
                                             >
-                                                Sign In With Google
+                                                {t('auth.signInWithGoogle')}
                                             </Button>
                                         )
                                 )}
@@ -447,7 +470,7 @@ const RegisterPage = () => {
                                                     </Icon>
                                                 }
                                             >
-                                                Sign In With Auth0 by Okta
+                                                {t('auth.signInWithAuth0')}
                                             </Button>
                                         )
                                 )}
@@ -466,7 +489,7 @@ const RegisterPage = () => {
                                                     </Icon>
                                                 }
                                             >
-                                                Sign In With Github
+                                                {t('auth.signInWithGithub')}
                                             </Button>
                                         )
                                 )}

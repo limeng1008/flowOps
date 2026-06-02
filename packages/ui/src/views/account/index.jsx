@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 // utils
 import useNotifier from '@/utils/useNotifier'
@@ -56,6 +57,7 @@ const calculatePercentage = (count, total) => {
 }
 
 const AccountSettings = () => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const dispatch = useDispatch()
     useNotifier()
@@ -255,7 +257,7 @@ const AccountSettings = () => {
             } else if (payload) {
                 store.dispatch(userProfileUpdated(payload))
                 enqueueSnackbar({
-                    message: 'Profile updated',
+                    message: t('pages.account.profileUpdated'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -335,7 +337,7 @@ const AccountSettings = () => {
                 setConfirmPassword('')
                 await logoutApi.request()
                 enqueueSnackbar({
-                    message: 'Password updated',
+                    message: t('pages.account.passwordUpdated'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -450,7 +452,7 @@ const AccountSettings = () => {
     return (
         <MainCard maxWidth='md'>
             <Stack flexDirection='column' sx={{ gap: 4 }}>
-                <ViewHeader title='Account Settings' />
+                <ViewHeader title={t('pages.account.title')} />
                 {isLoading && !getUserByIdApi.data ? (
                     <Box display='flex' flexDirection='column' gap={gridSpacing}>
                         <Skeleton width='25%' height={32} />
@@ -738,7 +740,7 @@ const AccountSettings = () => {
                                     Save
                                 </StyledButton>
                             }
-                            title='Profile'
+                            title={t('pages.account.profile')}
                         >
                             <Box
                                 sx={{
@@ -750,24 +752,24 @@ const AccountSettings = () => {
                                 }}
                             >
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                    <Typography variant='body1'>Name</Typography>
+                                    <Typography variant='body1'>{t('pages.account.name')}</Typography>
                                     <OutlinedInput
                                         id='name'
                                         type='string'
                                         fullWidth
-                                        placeholder='Your Name'
+                                        placeholder={t('pages.account.namePlaceholder')}
                                         name='name'
                                         onChange={(e) => setProfileName(e.target.value)}
                                         value={profileName}
                                     />
                                 </Box>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
-                                    <Typography variant='body1'>Email Address</Typography>
+                                    <Typography variant='body1'>{t('pages.account.emailAddress')}</Typography>
                                     <OutlinedInput
                                         id='email'
                                         type='string'
                                         fullWidth
-                                        placeholder='Email Address'
+                                        placeholder={t('pages.account.emailAddress')}
                                         name='email'
                                         onChange={(e) => setEmail(e.target.value)}
                                         value={email}
@@ -787,7 +789,7 @@ const AccountSettings = () => {
                                         Save
                                     </StyledButton>
                                 }
-                                title='Security'
+                                title={t('pages.account.security')}
                             >
                                 <Box
                                     sx={{
@@ -806,12 +808,12 @@ const AccountSettings = () => {
                                             gap: 1
                                         }}
                                     >
-                                        <Typography variant='body1'>Old Password</Typography>
+                                        <Typography variant='body1'>{t('pages.account.oldPassword')}</Typography>
                                         <OutlinedInput
                                             id='oldPassword'
                                             type='password'
                                             fullWidth
-                                            placeholder='Old Password'
+                                            placeholder={t('pages.account.oldPassword')}
                                             name='oldPassword'
                                             onChange={(e) => setOldPassword(e.target.value)}
                                             value={oldPassword}
@@ -825,12 +827,12 @@ const AccountSettings = () => {
                                             gap: 1
                                         }}
                                     >
-                                        <Typography variant='body1'>New Password</Typography>
+                                        <Typography variant='body1'>{t('pages.account.newPassword')}</Typography>
                                         <OutlinedInput
                                             id='newPassword'
                                             type='password'
                                             fullWidth
-                                            placeholder='New Password'
+                                            placeholder={t('pages.account.newPassword')}
                                             name='newPassword'
                                             onChange={(e) => setNewPassword(e.target.value)}
                                             value={newPassword}
@@ -850,12 +852,12 @@ const AccountSettings = () => {
                                             gap: 1
                                         }}
                                     >
-                                        <Typography variant='body1'>Confirm New Password</Typography>
+                                        <Typography variant='body1'>{t('pages.account.confirmNewPassword')}</Typography>
                                         <OutlinedInput
                                             id='confirmPassword'
                                             type='password'
                                             fullWidth
-                                            placeholder='Confirm New Password'
+                                            placeholder={t('pages.account.confirmNewPassword')}
                                             name='confirmPassword'
                                             onChange={(e) => setConfirmPassword(e.target.value)}
                                             value={confirmPassword}
@@ -866,7 +868,7 @@ const AccountSettings = () => {
                         )}
                         {isCloud && (
                             <>
-                                <SettingsSection title='Delete Account'>
+                                <SettingsSection title={t('pages.account.deleteAccount')}>
                                     <Box
                                         sx={{
                                             width: '100%',

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import { Chip, Skeleton, Box, Stack, TableContainer, Paper, Table, TableHead, TableRow, TableCell, TableBody, Button } from '@mui/material'
@@ -37,6 +38,7 @@ import { evaluators as evaluatorsOptions, numericOperators } from '../evaluators
 // ==============================|| Evaluators ||============================== //
 
 const Evaluators = () => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const dispatch = useDispatch()
@@ -184,7 +186,7 @@ const Evaluators = () => {
                             isEditButton={false}
                             onSearchChange={onSearchChange}
                             search={true}
-                            title='Evaluators'
+                            title={t('pages.evaluators.title')}
                             description=''
                         >
                             <StyledPermissionButton
@@ -537,7 +539,7 @@ const Evaluators = () => {
                                                                 <TableCell>
                                                                     <PermissionIconButton
                                                                         permissionId={'evaluators:delete'}
-                                                                        title='Delete'
+                                                                        title={t('pages.evaluators.delete')}
                                                                         color='error'
                                                                         onClick={() => deleteEvaluator(ds)}
                                                                     >

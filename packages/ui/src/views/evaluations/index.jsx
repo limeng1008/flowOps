@@ -3,6 +3,7 @@ import * as PropTypes from 'prop-types'
 import moment from 'moment/moment'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import {
@@ -62,6 +63,7 @@ import {
 import empty_evalSVG from '@/assets/images/empty_evals.svg'
 
 const EvalsEvaluation = () => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const { confirm } = useConfirm()
@@ -298,7 +300,13 @@ const EvalsEvaluation = () => {
                     <ErrorBoundary error={error} />
                 ) : (
                     <Stack flexDirection='column' sx={{ gap: 3 }}>
-                        <ViewHeader isBackButton={false} isEditButton={false} search={false} title={'Evaluations'} description=''>
+                        <ViewHeader
+                            isBackButton={false}
+                            isEditButton={false}
+                            search={false}
+                            title={t('pages.evaluations.title')}
+                            description=''
+                        >
                             <ToggleButton
                                 value='auto-refresh'
                                 selected={autoRefresh}

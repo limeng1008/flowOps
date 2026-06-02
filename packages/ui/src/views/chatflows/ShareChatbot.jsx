@@ -467,14 +467,8 @@ const ShareChatbot = ({ isSessionMemory, isAgentCanvas }) => {
                 <Stack sx={{ mt: 1, mb: 2, alignItems: 'center' }} direction='row' spacing={2}>
                     <Typography variant='h4'>Title Settings</Typography>
                 </Stack>
-                {textField(title, 'title', 'Title', 'string', 'Flowise Assistant')}
-                {textField(
-                    titleAvatarSrc,
-                    'titleAvatarSrc',
-                    'Title Avatar Link',
-                    'string',
-                    `https://raw.githubusercontent.com/FlowiseAI/Flowise/main/assets/FloWiseAI_dark.png`
-                )}
+                {textField(title, 'title', 'Title', 'string', 'FlowOps Assistant')}
+                {textField(titleAvatarSrc, 'titleAvatarSrc', 'Title Avatar Link', 'string', `/flowops-icon.svg`)}
                 {colorField(titleBackgroundColor, 'titleBackgroundColor', 'Title Background Color')}
                 {colorField(titleTextColor, 'titleTextColor', 'Title TextColor')}
             </Card>
@@ -543,7 +537,7 @@ const ShareChatbot = ({ isSessionMemory, isAgentCanvas }) => {
                     borderRadius: 20,
                     marginBottom: 10,
                     marginTop: 10,
-                    background: 'linear-gradient(45deg, #673ab7 30%, #1e88e5 90%)'
+                    background: 'linear-gradient(45deg, #22d3ee 30%, #1e88e5 90%)'
                 }}
                 variant='contained'
                 onClick={() => onSave()}

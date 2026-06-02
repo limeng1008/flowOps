@@ -1,4 +1,5 @@
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import PropTypes from 'prop-types'
 import { Box, List, ListItemButton, ListItem, ListItemAvatar, ListItemText, Typography, Stack } from '@mui/material'
 import PerfectScrollbar from 'react-perfect-scrollbar'
@@ -7,6 +8,7 @@ import chatPNG from '@/assets/images/chathistory.png'
 import diskPNG from '@/assets/images/floppy-disc.png'
 import fileAttachmentPNG from '@/assets/images/fileAttachment.png'
 import { baseURL } from '@/store/constant'
+import { translateNodeLabel } from '@/i18n/nodeI18n'
 
 const sequentialStateMessagesSelection = [
     {
@@ -29,6 +31,8 @@ const sequentialStateMessagesSelection = [
 
 const SelectVariable = ({ availableNodesForVariable, disabled = false, onSelectAndReturnVal, isSequentialAgent }) => {
     const customization = useSelector((state) => state.customization)
+    const { i18n } = useTranslation()
+    const currentLang = i18n.resolvedLanguage || i18n.language
 
     const onSelectOutputResponseClick = (node, prefix) => {
         let variablePath = node ? `${node.id}.data.instance` : prefix
@@ -211,7 +215,10 @@ const SelectVariable = ({ availableNodesForVariable, disabled = false, onSelectA
                                                         secondary={
                                                             node.data.name === 'ifElseFunction'
                                                                 ? `${node.data.description}`
-                                                                : `${selectedOutputAnchor?.label ?? 'output'} from ${node.data.label}`
+                                                                : `${selectedOutputAnchor?.label ?? 'output'} from ${translateNodeLabel(
+                                                                      node.data.label,
+                                                                      currentLang
+                                                                  )}`
                                                         }
                                                     />
                                                 </ListItem>

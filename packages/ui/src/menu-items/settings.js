@@ -24,37 +24,38 @@ const icons = {
     IconTemplate
 }
 
-// ==============================|| SETTINGS MENU ITEMS ||============================== //
+// ==============================|| SETTINGS MENU ITEMS (Chatflow) ||============================== //
 
-const settings = {
+// Factory: takes the i18n `t` so menu titles re-translate on language change.
+const buildSettings = (t) => ({
     id: 'settings',
     title: '',
     type: 'group',
     children: [
         {
             id: 'viewMessages',
-            title: 'View Messages',
+            title: t('canvas.viewMessages'),
             type: 'item',
             url: '',
             icon: icons.IconMessage
         },
         {
             id: 'viewLeads',
-            title: 'View Leads',
+            title: t('canvas.viewLeads'),
             type: 'item',
             url: '',
             icon: icons.IconUsers
         },
         {
             id: 'viewUpsertHistory',
-            title: 'Upsert History',
+            title: t('canvas.upsertHistory'),
             type: 'item',
             url: '',
             icon: icons.IconDatabaseExport
         },
         {
             id: 'chatflowConfiguration',
-            title: 'Configuration',
+            title: t('canvas.configuration'),
             type: 'item',
             url: '',
             permission: 'chatflows:config',
@@ -62,7 +63,7 @@ const settings = {
         },
         {
             id: 'saveAsTemplate',
-            title: 'Save As Template',
+            title: t('canvas.saveAsTemplate'),
             type: 'item',
             url: '',
             icon: icons.IconTemplate,
@@ -70,7 +71,7 @@ const settings = {
         },
         {
             id: 'duplicateChatflow',
-            title: 'Duplicate Chatflow',
+            title: t('canvas.duplicateFlow', { type: t('canvas.chatflow') }),
             type: 'item',
             url: '',
             icon: icons.IconCopy,
@@ -78,7 +79,7 @@ const settings = {
         },
         {
             id: 'loadChatflow',
-            title: 'Load Chatflow',
+            title: t('canvas.loadFlow', { type: t('canvas.chatflow') }),
             type: 'item',
             url: '',
             icon: icons.IconFileUpload,
@@ -86,7 +87,7 @@ const settings = {
         },
         {
             id: 'exportChatflow',
-            title: 'Export Chatflow',
+            title: t('canvas.exportFlow', { type: t('canvas.chatflow') }),
             type: 'item',
             url: '',
             icon: icons.IconFileExport,
@@ -94,13 +95,13 @@ const settings = {
         },
         {
             id: 'deleteChatflow',
-            title: 'Delete Chatflow',
+            title: t('canvas.deleteFlow', { type: t('canvas.chatflow') }),
             type: 'item',
             url: '',
             icon: icons.IconTrash,
             permission: 'chatflows:delete'
         }
     ]
-}
+})
 
-export default settings
+export default buildSettings

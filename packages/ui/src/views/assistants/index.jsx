@@ -1,5 +1,7 @@
+import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import { Card, CardContent, Chip, Stack } from '@mui/material'
@@ -12,20 +14,19 @@ import ViewHeader from '@/layout/MainLayout/ViewHeader'
 // icons
 import { IconRobotFace, IconBrandOpenai } from '@tabler/icons-react'
 
-const cards = [
+const buildCards = (t) => [
     {
-        title: 'Custom Assistant',
-        description: 'Create custom assistant using your choice of LLMs',
+        title: t('pages.assistants.cardCustomTitle'),
+        description: t('pages.assistants.cardCustomDesc'),
         icon: <IconRobotFace />,
-        iconText: 'Custom',
+        iconText: t('pages.assistants.cardCustomBadge'),
         gradient: 'linear-gradient(135deg, #fff8e14e 0%, #ffcc802f 100%)'
     },
     {
-        title: 'OpenAI Assistant',
-        description:
-            'Create assistant using OpenAI Assistant API. This option is being deprecated; consider using Custom Assistant instead.',
+        title: t('pages.assistants.cardOpenAITitle'),
+        description: t('pages.assistants.cardOpenAIDesc'),
         icon: <IconBrandOpenai />,
-        iconText: 'OpenAI',
+        iconText: t('pages.assistants.cardOpenAIBadge'),
         gradient: 'linear-gradient(135deg, #c9ffd85f 0%, #a0f0b567 100%)',
         deprecating: true
     }
@@ -57,6 +58,8 @@ const FeatureCards = () => {
     const navigate = useNavigate()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
+    const { t } = useTranslation()
+    const cards = useMemo(() => buildCards(t), [t])
 
     const onCardClick = (index) => {
         if (index === 0) navigate('/assistants/custom')
@@ -100,7 +103,9 @@ const FeatureCards = () => {
                                 {card.icon}
                                 <span className='text-xs uppercase'>{card.iconText}</span>
                             </FeatureIcon>
-                            {card.deprecating && <Chip label='Deprecating' size='small' color='warning' sx={{ fontWeight: 600 }} />}
+                            {card.deprecating && (
+                                <Chip label={t('pages.assistants.deprecating')} size='small' color='warning' sx={{ fontWeight: 600 }} />
+                            )}
                         </Stack>
                         <h2 className='text-2xl font-bold mb-2'>{card.title}</h2>
                         <p className='text-gray-600'>{card.description}</p>
@@ -114,14 +119,12 @@ const FeatureCards = () => {
 // ==============================|| ASSISTANTS ||============================== //
 
 const Assistants = () => {
+    const { t } = useTranslation()
     return (
         <>
             <MainCard>
                 <Stack flexDirection='column' sx={{ gap: 3 }}>
-                    <ViewHeader
-                        title='Assistants'
-                        description='Chat assistants with instructions, tools, and files to respond to user queries'
-                    />
+                    <ViewHeader title={t('pages.assistants.title')} description={t('pages.assistants.description')} />
                     <FeatureCards />
                 </Stack>
             </MainCard>

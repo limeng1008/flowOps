@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import moment from 'moment'
 import * as PropTypes from 'prop-types'
 
@@ -160,7 +161,7 @@ function ShowUserRow(props) {
                     {props.row.status.toUpperCase() === 'INVITED' && (
                         <PermissionIconButton
                             permissionId={'workspace:add-user,users:manage'}
-                            title='Edit'
+                            title={t('pages.users.edit')}
                             color='primary'
                             onClick={() => props.onEditClick(props.row)}
                         >
@@ -174,7 +175,7 @@ function ShowUserRow(props) {
                         ) : (
                             <PermissionIconButton
                                 permissionId={'workspace:unlink-user,users:manage'}
-                                title='Delete'
+                                title={t('pages.users.delete')}
                                 color='error'
                                 onClick={() => props.onDeleteClick(props.row.user)}
                             >
@@ -236,6 +237,7 @@ ShowUserRow.propTypes = {
 // ==============================|| Users ||============================== //
 
 const Users = () => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const dispatch = useDispatch()
@@ -400,7 +402,12 @@ const Users = () => {
                     <ErrorBoundary error={error} />
                 ) : (
                     <Stack flexDirection='column' sx={{ gap: 3 }}>
-                        <ViewHeader onSearchChange={onSearchChange} search={true} searchPlaceholder='Search Users' title='User Management'>
+                        <ViewHeader
+                            onSearchChange={onSearchChange}
+                            search={true}
+                            searchPlaceholder={t('pages.users.searchPlaceholder')}
+                            title={t('pages.users.title')}
+                        >
                             <StyledPermissionButton
                                 permissionId={'workspace:add-user,users:manage'}
                                 variant='contained'

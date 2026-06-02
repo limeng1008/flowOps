@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback, Fragment, useContext, memo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import { cloneDeep } from 'lodash'
 import axios from 'axios'
 import { v4 as uuidv4 } from 'uuid'
@@ -160,7 +161,7 @@ const CardWithDeleteOverlay = ({ item, disabled, customization, onDelete }) => {
                     disabled={disabled}
                     onClick={() => onDelete(item)}
                     startIcon={<IconTrash color='white' size={22} />}
-                    title='Remove attachment'
+                    title={t('canvas.removeAttachment')}
                     sx={{
                         position: 'absolute',
                         top: 0,
@@ -186,6 +187,7 @@ CardWithDeleteOverlay.propTypes = {
 }
 
 const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setPreviews }) => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
 
@@ -2423,7 +2425,7 @@ const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setP
                             sx={{
                                 mb: 2,
                                 borderRadius: 20,
-                                background: 'linear-gradient(45deg, #673ab7 30%, #1e88e5 90%)'
+                                background: 'linear-gradient(45deg, #22d3ee 30%, #1e88e5 90%)'
                             }}
                         >
                             {loading ? 'Submitting...' : 'Submit'}
@@ -2448,7 +2450,7 @@ const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setP
             {isDragActive &&
                 (getAllowChatFlowUploads.data?.isImageUploadAllowed || getAllowChatFlowUploads.data?.isRAGFileUploadAllowed) && (
                     <Box className='drop-overlay'>
-                        <Typography variant='h2'>Drop here to upload</Typography>
+                        <Typography variant='h2'>{t('canvas.dropHereToUpload')}</Typography>
                         {[
                             ...getAllowChatFlowUploads.data.imgUploadSizeAndTypes,
                             ...getAllowChatFlowUploads.data.fileUploadSizeAndTypes
@@ -2671,7 +2673,7 @@ const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setP
                                                                 id='leadName'
                                                                 type='text'
                                                                 fullWidth
-                                                                placeholder='Name'
+                                                                placeholder={t('canvas.name')}
                                                                 name='leadName'
                                                                 value={leadName}
                                                                 // eslint-disable-next-line
@@ -2684,7 +2686,7 @@ const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setP
                                                                 id='leadEmail'
                                                                 type='email'
                                                                 fullWidth
-                                                                placeholder='Email Address'
+                                                                placeholder={t('canvas.emailAddress')}
                                                                 name='leadEmail'
                                                                 value={leadEmail}
                                                                 onChange={(e) => setLeadEmail(e.target.value)}
@@ -2695,7 +2697,7 @@ const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setP
                                                                 id='leadPhone'
                                                                 type='number'
                                                                 fullWidth
-                                                                placeholder='Phone Number'
+                                                                placeholder={t('canvas.phoneNumber')}
                                                                 name='leadPhone'
                                                                 value={leadPhone}
                                                                 onChange={(e) => setLeadPhone(e.target.value)}
@@ -3208,7 +3210,7 @@ const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setP
                     setFeedback('')
                 }}
             >
-                <DialogTitle variant='h5'>Provide Feedback</DialogTitle>
+                <DialogTitle variant='h5'>{t('canvas.provideFeedback')}</DialogTitle>
                 <DialogContent>
                     <TextField
                         // eslint-disable-next-line
@@ -3223,7 +3225,7 @@ const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setP
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleSubmitFeedback}>Cancel</Button>
+                    <Button onClick={handleSubmitFeedback}>{t('common.cancel')}</Button>
                     <Button onClick={handleSubmitFeedback} variant='contained'>
                         Submit
                     </Button>

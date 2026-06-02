@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
-import { Alert, Box, Button, OutlinedInput, Stack, Typography, useTheme } from '@mui/material'
+import { Alert, Box, Button, OutlinedInput, Stack, TextField, Typography } from '@mui/material'
+import { LoadingButton } from '@mui/lab'
 
 // project imports
 import { closeSnackbar as closeSnackbarAction, enqueueSnackbar as enqueueSnackbarAction } from '@/store/actions'
-import { StyledButton } from '@/ui-component/button/StyledButton'
-import MainCard from '@/ui-component/cards/MainCard'
-import { Input } from '@/ui-component/input/Input'
 import { BackdropLoader } from '@/ui-component/loading/BackdropLoader'
 
 // API
@@ -27,40 +26,37 @@ import { IconExclamationCircle, IconX } from '@tabler/icons-react'
 
 // ==============================|| ResetPasswordPage ||============================== //
 
+const C = {
+    cyan: '#22d3ee',
+    cyanDeep: '#06b6d4',
+    text: '#e5e7eb',
+    textDim: '#9ca3af',
+    textMute: '#6b7280',
+    glow: 'rgba(34, 211, 238, 0.35)',
+    panel: 'rgba(255, 255, 255, 0.05)',
+    border: 'rgba(255, 255, 255, 0.10)'
+}
+
+const inputSx = {
+    '& .MuiOutlinedInput-root': {
+        borderRadius: '14px',
+        color: C.text,
+        backgroundColor: 'rgba(0,0,0,0.30)',
+        '& fieldset': { borderColor: C.border },
+        '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.20)' },
+        '&.Mui-focused fieldset': { borderColor: C.cyan, borderWidth: '1px' }
+    },
+    '& .MuiOutlinedInput-input': { padding: '14px 16px' },
+    '& .MuiOutlinedInput-input::placeholder': { color: C.textMute, opacity: 1 }
+}
+
 const ResetPasswordPage = () => {
-    const theme = useTheme()
+    const { t } = useTranslation()
     useNotifier()
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const enqueueSnackbar = (...args) => dispatch(enqueueSnackbarAction(...args))
     const closeSnackbar = (...args) => dispatch(closeSnackbarAction(...args))
-
-    const emailInput = {
-        label: 'Email',
-        name: 'email',
-        type: 'email',
-        placeholder: 'user@company.com'
-    }
-
-    const passwordInput = {
-        label: 'Password',
-        name: 'password',
-        type: 'password',
-        placeholder: '********'
-    }
-
-    const confirmPasswordInput = {
-        label: 'Confirm Password',
-        name: 'confirmPassword',
-        type: 'password',
-        placeholder: '********'
-    }
-
-    const resetPasswordInput = {
-        label: 'Reset Token',
-        name: 'resetToken',
-        type: 'text'
-    }
 
     const [params] = useSearchParams()
     const token = params.get('token')
@@ -75,6 +71,18 @@ const ResetPasswordPage = () => {
 
     const { authRateLimitError, setAuthRateLimitError } = useError()
 
+    const validationMessage = (message) =>
+        ({
+            'Token cannot be left blank!': t('auth.resetTokenRequired'),
+            'New Password and Confirm Password do not match.': t('auth.passwordsDontMatch'),
+            'Password must be at least 8 characters': t('auth.passwordMinLength'),
+            'Password must not be more than 128 characters': t('auth.passwordMaxLength'),
+            'Password must contain at least one lowercase letter': t('auth.passwordLowercase'),
+            'Password must contain at least one uppercase letter': t('auth.passwordUppercase'),
+            'Password must contain at least one digit': t('auth.passwordDigit'),
+            'Password must contain at least one special character': t('auth.passwordSpecial')
+        }[message] || message)
+
     const goLogin = () => {
         navigate('/signin', { replace: true })
     }
@@ -85,17 +93,17 @@ const ResetPasswordPage = () => {
         setAuthErrors([])
         setAuthRateLimitError(null)
         if (!tokenVal) {
-            validationErrors.push('Token cannot be left blank!')
+            validationErrors.push(t('auth.resetTokenRequired'))
         }
         if (newPasswordVal !== confirmPasswordVal) {
-            validationErrors.push('New Password and Confirm Password do not match.')
+            validationErrors.push(t('auth.passwordsDoNotMatch'))
         }
         const passwordErrors = validatePassword(newPasswordVal)
         if (passwordErrors.length > 0) {
             validationErrors.push(...passwordErrors)
         }
         if (validationErrors.length > 0) {
-            setAuthErrors(validationErrors)
+            setAuthErrors(validationErrors.map((msg) => validationMessage(msg)))
             return
         }
         const body = {
@@ -112,7 +120,7 @@ const ResetPasswordPage = () => {
             setLoading(false)
             if (updateResponse.data) {
                 enqueueSnackbar({
-                    message: 'Password reset successful',
+                    message: t('auth.passwordResetSuccessful'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -133,7 +141,7 @@ const ResetPasswordPage = () => {
             setLoading(false)
             setAuthErrors([typeof error.response.data === 'object' ? error.response.data.message : error.response.data])
             enqueueSnackbar({
-                message: `Failed to reset password!`,
+                message: t('auth.passwordResetFailed'),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -155,8 +163,20 @@ const ResetPasswordPage = () => {
 
     return (
         <>
-            <MainCard>
-                <Stack flexDirection='column' sx={{ maxWidth: '480px', gap: 3 }}>
+            <Box
+                sx={{
+                    width: '100%',
+                    maxWidth: 520,
+                    backgroundColor: C.panel,
+                    border: `1px solid ${C.border}`,
+                    backdropFilter: 'blur(24px)',
+                    WebkitBackdropFilter: 'blur(24px)',
+                    borderRadius: '32px',
+                    p: { xs: 3.5, md: 5 },
+                    boxShadow: '0 0 80px rgba(34,211,238,0.10)'
+                }}
+            >
+                <Stack flexDirection='column' sx={{ gap: 3 }}>
                     {authErrors && authErrors.length > 0 && (
                         <Alert icon={<IconExclamationCircle />} variant='filled' severity='error'>
                             <ul style={{ margin: 0 }}>
@@ -171,100 +191,122 @@ const ResetPasswordPage = () => {
                             {authRateLimitError}
                         </Alert>
                     )}
-                    <Stack sx={{ gap: 1 }}>
-                        <Typography variant='h1'>Reset Password</Typography>
-                        <Typography variant='body2' sx={{ color: theme.palette.grey[600] }}>
-                            <Link style={{ color: theme.palette.primary.main }} to='/signin'>
-                                Back to Login
+
+                    <Box sx={{ textAlign: 'center' }}>
+                        <Typography component='h1' sx={{ fontSize: '2rem', fontWeight: 800, color: C.text }}>
+                            {t('auth.resetPasswordTitle')}
+                        </Typography>
+                        <Typography sx={{ color: C.textDim, mt: 1, fontSize: '0.95rem' }}>
+                            <Link style={{ color: C.cyan, textDecoration: 'none' }} to='/signin'>
+                                {t('auth.backToLogin')}
                             </Link>
                             .
                         </Typography>
-                    </Stack>
+                    </Box>
+
                     <form onSubmit={validateAndSubmit}>
-                        <Stack sx={{ width: '100%', flexDirection: 'column', alignItems: 'left', justifyContent: 'center', gap: 2 }}>
+                        <Stack sx={{ width: '100%', flexDirection: 'column', alignItems: 'left', justifyContent: 'center', gap: 2.5 }}>
                             <Box>
-                                <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                    <Typography>
-                                        Email<span style={{ color: 'red' }}>&nbsp;*</span>
-                                    </Typography>
-                                    <Typography align='left'></Typography>
-                                    <div style={{ flexGrow: 1 }}></div>
-                                </div>
-                                <Input
-                                    inputParam={emailInput}
-                                    onChange={(newValue) => setEmailVal(newValue)}
+                                <Typography sx={{ color: C.textDim, mb: 1, fontSize: '0.875rem' }}>
+                                    {t('auth.email')}
+                                    <span style={{ color: '#f87171' }}>&nbsp;*</span>
+                                </Typography>
+                                <TextField
+                                    fullWidth
+                                    type='email'
+                                    placeholder='user@company.com'
                                     value={emailVal}
-                                    showDialog={false}
+                                    onChange={(e) => setEmailVal(e.target.value)}
+                                    sx={inputSx}
                                 />
                             </Box>
                             <Box>
-                                <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                    <Typography>
-                                        Reset Token<span style={{ color: 'red' }}>&nbsp;*</span>
-                                    </Typography>
-                                    <div style={{ flexGrow: 1 }}></div>
-                                </div>
+                                <Typography sx={{ color: C.textDim, mb: 1, fontSize: '0.875rem' }}>
+                                    {t('auth.resetToken')}
+                                    <span style={{ color: '#f87171' }}>&nbsp;*</span>
+                                </Typography>
                                 <OutlinedInput
                                     fullWidth
                                     type='string'
-                                    placeholder='Paste in the reset token.'
+                                    placeholder={t('auth.resetTokenPlaceholder')}
                                     multiline={true}
                                     rows={3}
-                                    inputParam={resetPasswordInput}
                                     onChange={(e) => setTokenVal(e.target.value)}
                                     value={tokenVal}
-                                    sx={{ mt: '8px' }}
+                                    sx={{
+                                        mt: '8px',
+                                        borderRadius: '14px',
+                                        color: C.text,
+                                        backgroundColor: 'rgba(0,0,0,0.30)',
+                                        '& .MuiOutlinedInput-notchedOutline': { borderColor: C.border },
+                                        '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.20)' },
+                                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: C.cyan, borderWidth: '1px' },
+                                        '& textarea::placeholder': { color: C.textMute, opacity: 1 }
+                                    }}
                                 />
-                                <Typography variant='caption'>
-                                    <i>Please copy the token you received in your email.</i>
+                                <Typography variant='caption' sx={{ color: C.textMute }}>
+                                    <i>{t('auth.resetTokenHint')}</i>
                                 </Typography>
                             </Box>
                             <Box>
-                                <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                    <Typography>
-                                        New Password<span style={{ color: 'red' }}>&nbsp;*</span>
-                                    </Typography>
-                                    <Typography align='left'></Typography>
-                                    <div style={{ flexGrow: 1 }}></div>
-                                </div>
-                                <Input
-                                    inputParam={passwordInput}
-                                    onChange={(newValue) => setNewPasswordVal(newValue)}
+                                <Typography sx={{ color: C.textDim, mb: 1, fontSize: '0.875rem' }}>
+                                    {t('auth.newPassword')}
+                                    <span style={{ color: '#f87171' }}>&nbsp;*</span>
+                                </Typography>
+                                <TextField
+                                    fullWidth
+                                    type='password'
+                                    placeholder='********'
                                     value={newPasswordVal}
-                                    showDialog={false}
+                                    onChange={(e) => setNewPasswordVal(e.target.value)}
+                                    sx={inputSx}
                                 />
-                                <Typography variant='caption'>
-                                    <i>
-                                        Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase
-                                        letter, one digit, and one special character.
-                                    </i>
+                                <Typography variant='caption' sx={{ color: C.textMute }}>
+                                    <i>{t('auth.passwordRule')}</i>
                                 </Typography>
                             </Box>
                             <Box>
-                                <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                    <Typography>
-                                        Confirm Password<span style={{ color: 'red' }}>&nbsp;*</span>
-                                    </Typography>
-                                    <div style={{ flexGrow: 1 }}></div>
-                                </div>
-                                <Input
-                                    inputParam={confirmPasswordInput}
-                                    onChange={(newValue) => setConfirmPasswordVal(newValue)}
+                                <Typography sx={{ color: C.textDim, mb: 1, fontSize: '0.875rem' }}>
+                                    {t('auth.confirmPassword')}
+                                    <span style={{ color: '#f87171' }}>&nbsp;*</span>
+                                </Typography>
+                                <TextField
+                                    fullWidth
+                                    type='password'
+                                    placeholder='********'
                                     value={confirmPasswordVal}
-                                    showDialog={false}
+                                    onChange={(e) => setConfirmPasswordVal(e.target.value)}
+                                    sx={inputSx}
                                 />
-                                <Typography variant='caption'>
-                                    <i>Confirm your new password. Must match the password typed above.</i>
+                                <Typography variant='caption' sx={{ color: C.textMute }}>
+                                    <i>{t('auth.confirmPasswordHint')}</i>
                                 </Typography>
                             </Box>
 
-                            <StyledButton variant='contained' style={{ borderRadius: 12, height: 40, marginRight: 5 }} type='submit'>
-                                Update Password
-                            </StyledButton>
+                            <LoadingButton
+                                loading={loading}
+                                variant='contained'
+                                sx={{
+                                    mt: 1,
+                                    height: 52,
+                                    borderRadius: '14px',
+                                    textTransform: 'none',
+                                    fontWeight: 700,
+                                    fontSize: '1rem',
+                                    color: '#000',
+                                    backgroundColor: C.cyan,
+                                    boxShadow: `0 0 40px ${C.glow}`,
+                                    '&:hover': { backgroundColor: C.cyanDeep },
+                                    '&.Mui-disabled': { backgroundColor: 'rgba(34,211,238,0.5)', color: '#000' }
+                                }}
+                                type='submit'
+                            >
+                                {t('auth.updatePassword')}
+                            </LoadingButton>
                         </Stack>
                     </form>
                 </Stack>
-            </MainCard>
+            </Box>
             {loading && <BackdropLoader open={loading} />}
         </>
     )

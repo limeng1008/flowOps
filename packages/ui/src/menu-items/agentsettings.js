@@ -5,7 +5,6 @@ import {
     IconFileExport,
     IconCopy,
     IconMessage,
-    IconDatabaseExport,
     IconAdjustmentsHorizontal,
     IconUsers,
     IconTemplate
@@ -18,36 +17,36 @@ const icons = {
     IconFileExport,
     IconCopy,
     IconMessage,
-    IconDatabaseExport,
     IconAdjustmentsHorizontal,
     IconUsers,
     IconTemplate
 }
 
-// ==============================|| SETTINGS MENU ITEMS ||============================== //
+// ==============================|| SETTINGS MENU ITEMS (Agentflow) ||============================== //
 
-const agent_settings = {
+// Factory: takes the i18n `t` so menu titles re-translate on language change.
+const buildAgentSettings = (t) => ({
     id: 'settings',
     title: '',
     type: 'group',
     children: [
         {
             id: 'viewMessages',
-            title: 'View Messages',
+            title: t('canvas.viewMessages'),
             type: 'item',
             url: '',
             icon: icons.IconMessage
         },
         {
             id: 'viewLeads',
-            title: 'View Leads',
+            title: t('canvas.viewLeads'),
             type: 'item',
             url: '',
             icon: icons.IconUsers
         },
         {
             id: 'chatflowConfiguration',
-            title: 'Configuration',
+            title: t('canvas.configuration'),
             type: 'item',
             url: '',
             icon: icons.IconAdjustmentsHorizontal,
@@ -55,7 +54,7 @@ const agent_settings = {
         },
         {
             id: 'saveAsTemplate',
-            title: 'Save As Template',
+            title: t('canvas.saveAsTemplate'),
             type: 'item',
             url: '',
             icon: icons.IconTemplate,
@@ -63,7 +62,7 @@ const agent_settings = {
         },
         {
             id: 'duplicateChatflow',
-            title: 'Duplicate Agents',
+            title: t('canvas.duplicateFlow', { type: t('canvas.agents') }),
             type: 'item',
             url: '',
             icon: icons.IconCopy,
@@ -71,7 +70,7 @@ const agent_settings = {
         },
         {
             id: 'loadChatflow',
-            title: 'Load Agents',
+            title: t('canvas.loadFlow', { type: t('canvas.agents') }),
             type: 'item',
             url: '',
             icon: icons.IconFileUpload,
@@ -79,7 +78,7 @@ const agent_settings = {
         },
         {
             id: 'exportChatflow',
-            title: 'Export Agents',
+            title: t('canvas.exportFlow', { type: t('canvas.agents') }),
             type: 'item',
             url: '',
             icon: icons.IconFileExport,
@@ -87,13 +86,13 @@ const agent_settings = {
         },
         {
             id: 'deleteChatflow',
-            title: 'Delete Agents',
+            title: t('canvas.deleteFlow', { type: t('canvas.agents') }),
             type: 'item',
             url: '',
             icon: icons.IconTrash,
             permission: 'agentflows:delete'
         }
     ]
-}
+})
 
-export default agent_settings
+export default buildAgentSettings

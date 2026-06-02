@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { useState, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { Box, Dialog, DialogContent, DialogTitle, Typography, IconButton } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import {
@@ -37,102 +38,103 @@ import FileUpload from '@/ui-component/extended/FileUpload'
 import PostProcessing from '@/ui-component/extended/PostProcessing'
 import McpServer from '@/ui-component/extended/McpServer'
 
-const CONFIGURATION_GROUPS = [
+// Factory: takes the i18n `t` so the dialog re-translates on language change.
+const buildConfigurationGroups = (t) => [
     {
-        label: 'General',
+        label: t('canvas.configDialog.groupGeneral'),
         sections: [
             {
-                label: 'Rate Limit',
+                label: t('canvas.configDialog.rateLimit'),
                 id: 'rateLimit',
                 icon: IconShieldLock,
-                description: 'Limit API requests per time window'
+                description: t('canvas.configDialog.rateLimitDesc')
             },
             {
-                label: 'Allowed Domains',
+                label: t('canvas.configDialog.allowedDomainsTitle'),
                 id: 'allowedDomains',
                 icon: IconWorldWww,
-                description: 'Restrict chatbot to specific domains'
+                description: t('canvas.configDialog.allowedDomainsDesc')
             },
             {
-                label: 'Leads',
+                label: t('canvas.configDialog.leads'),
                 id: 'leads',
                 icon: IconUserPlus,
-                description: 'Capture visitor contact information'
+                description: t('canvas.configDialog.leadsDesc')
             }
         ]
     },
     {
-        label: 'Chat',
+        label: t('canvas.configDialog.groupChat'),
         sections: [
             {
-                label: 'Starter Prompts',
+                label: t('canvas.configDialog.starterPromptsTitle'),
                 id: 'conversationStarters',
                 icon: IconMessageChatbot,
-                description: 'Suggested prompts for new conversations'
+                description: t('canvas.configDialog.starterPromptsDesc')
             },
             {
-                label: 'Follow-up Prompts',
+                label: t('canvas.configDialog.followUpPrompts'),
                 id: 'followUpPrompts',
                 icon: IconArrowForwardUp,
-                description: 'Auto-generate follow-up questions'
+                description: t('canvas.configDialog.followUpPromptsDesc')
             },
             {
-                label: 'Chat Feedback',
+                label: t('canvas.configDialog.chatFeedbackTitle'),
                 id: 'chatFeedback',
                 icon: IconThumbUp,
-                description: 'Allow users to rate responses'
+                description: t('canvas.configDialog.chatFeedbackDesc')
             }
         ]
     },
     {
-        label: 'Media & Files',
+        label: t('canvas.configDialog.groupMedia'),
         sections: [
             {
-                label: 'Speech to Text',
+                label: t('canvas.configDialog.speechToTextTitle'),
                 id: 'speechToText',
                 icon: IconMicrophone,
-                description: 'Voice input transcription'
+                description: t('canvas.configDialog.speechToTextDesc')
             },
             {
-                label: 'Text to Speech',
+                label: t('canvas.configDialog.textToSpeech'),
                 id: 'textToSpeech',
                 icon: IconVolume,
-                description: 'Audio response playback'
+                description: t('canvas.configDialog.textToSpeechDesc')
             },
             {
-                label: 'File Upload',
+                label: t('canvas.configDialog.fileUpload'),
                 id: 'fileUpload',
                 icon: IconUpload,
-                description: 'Allow file uploads in chat'
+                description: t('canvas.configDialog.fileUploadDesc')
             }
         ]
     },
     {
-        label: 'Advanced',
+        label: t('canvas.configDialog.groupAdvanced'),
         sections: [
             {
-                label: 'Analytics',
+                label: t('canvas.configDialog.analytics'),
                 id: 'analyseChatflow',
                 icon: IconChartBar,
-                description: 'Connect analytics providers'
+                description: t('canvas.configDialog.analyticsDesc')
             },
             {
-                label: 'Post Processing',
+                label: t('canvas.configDialog.postProcessing'),
                 id: 'postProcessing',
                 icon: IconCode,
-                description: 'Custom JavaScript post-processing'
+                description: t('canvas.configDialog.postProcessingDesc')
             },
             {
-                label: 'MCP Server',
+                label: t('canvas.configDialog.mcpServer'),
                 id: 'mcpServer',
                 icon: IconServer,
-                description: 'Model Context Protocol server'
+                description: t('canvas.configDialog.mcpServerDesc')
             },
             {
-                label: 'Override Config',
+                label: t('canvas.configDialog.overrideConfig'),
                 id: 'overrideConfig',
                 icon: IconAdjustments,
-                description: 'Override flow configuration via API'
+                description: t('canvas.configDialog.overrideConfigDesc')
             }
         ]
     }
@@ -214,14 +216,12 @@ function getSectionStatus(sectionId, chatflow) {
     }
 }
 
-// Flatten all sections for quick lookup
-const ALL_SECTIONS = CONFIGURATION_GROUPS.flatMap((g) => g.sections)
-
 const SIDEBAR_WIDTH = 220
 
 const ChatflowConfigurationDialog = ({ show, isAgentCanvas, dialogProps, onCancel }) => {
     const portalElement = document.getElementById('portal')
     const theme = useTheme()
+    const { t } = useTranslation()
     const chatflow = useSelector((state) => state.canvas.chatflow)
     const customization = useSelector((state) => state.customization)
 
@@ -229,13 +229,19 @@ const ChatflowConfigurationDialog = ({ show, isAgentCanvas, dialogProps, onCance
 
     const isDark = theme.palette.mode === 'dark' || customization?.isDarkMode
 
+    // Build groups from i18n factory (re-renders on language change)
+    const configurationGroups = useMemo(() => buildConfigurationGroups(t), [t])
+    const allSections = useMemo(() => configurationGroups.flatMap((g) => g.sections), [configurationGroups])
+
     // Filter groups/sections based on agent canvas
     const filteredGroups = useMemo(() => {
-        return CONFIGURATION_GROUPS.map((group) => ({
-            ...group,
-            sections: group.sections.filter((section) => !isAgentCanvas || !section.hideInAgentFlow)
-        })).filter((group) => group.sections.length > 0)
-    }, [isAgentCanvas])
+        return configurationGroups
+            .map((group) => ({
+                ...group,
+                sections: group.sections.filter((section) => !isAgentCanvas || !section.hideInAgentFlow)
+            }))
+            .filter((group) => group.sections.length > 0)
+    }, [isAgentCanvas, configurationGroups])
 
     // Get all section IDs for validation
     const allSectionIds = useMemo(() => {
@@ -244,7 +250,7 @@ const ChatflowConfigurationDialog = ({ show, isAgentCanvas, dialogProps, onCance
 
     // Reset activeSection if current one is filtered out
     const currentSection = allSectionIds.includes(activeSection) ? activeSection : allSectionIds[0] || 'rateLimit'
-    const currentSectionData = ALL_SECTIONS.find((s) => s.id === currentSection)
+    const currentSectionData = allSections.find((s) => s.id === currentSection)
 
     const renderContent = () => {
         const props = { dialogProps }

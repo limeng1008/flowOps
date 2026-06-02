@@ -9,30 +9,31 @@ const icons = {
     IconUsers
 }
 
-// ==============================|| SETTINGS MENU ITEMS ||============================== //
+// ==============================|| SETTINGS MENU ITEMS (Custom Assistant) ||============================== //
 
-const customAssistantSettings = {
+// Factory: takes the i18n `t` so menu titles re-translate on language change.
+const buildCustomAssistantSettings = (t) => ({
     id: 'settings',
     title: '',
     type: 'group',
     children: [
         {
             id: 'viewMessages',
-            title: 'View Messages',
+            title: t('canvas.viewMessages'),
             type: 'item',
             url: '',
             icon: icons.IconMessage
         },
         {
             id: 'viewLeads',
-            title: 'View Leads',
+            title: t('canvas.viewLeads'),
             type: 'item',
             url: '',
             icon: icons.IconUsers
         },
         {
             id: 'chatflowConfiguration',
-            title: 'Configuration',
+            title: t('canvas.configuration'),
             type: 'item',
             url: '',
             icon: icons.IconAdjustmentsHorizontal,
@@ -40,13 +41,13 @@ const customAssistantSettings = {
         },
         {
             id: 'deleteAssistant',
-            title: 'Delete Assistant',
+            title: t('canvas.deleteAssistant'),
             type: 'item',
             url: '',
             icon: icons.IconTrash,
             permission: 'assistants:delete'
         }
     ]
-}
+})
 
-export default customAssistantSettings
+export default buildCustomAssistantSettings

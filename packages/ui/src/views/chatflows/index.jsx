@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import { Box, Skeleton, Stack, ToggleButton, ToggleButtonGroup } from '@mui/material'
@@ -16,6 +17,7 @@ import MainCard from '@/ui-component/cards/MainCard'
 import ConfirmDialog from '@/ui-component/dialog/ConfirmDialog'
 import TablePagination, { DEFAULT_ITEMS_PER_PAGE } from '@/ui-component/pagination/TablePagination'
 import { FlowListTable } from '@/ui-component/table/FlowListTable'
+import { translateNodeLabel } from '@/i18n/nodeI18n'
 
 // API
 import chatflowsApi from '@/api/chatflows'
@@ -35,6 +37,8 @@ import { IconLayoutGrid, IconList, IconPlus } from '@tabler/icons-react'
 const Chatflows = () => {
     const navigate = useNavigate()
     const theme = useTheme()
+    const { t, i18n } = useTranslation()
+    const currentLang = i18n.resolvedLanguage || i18n.language
 
     const [isLoading, setLoading] = useState(true)
     const [images, setImages] = useState({})
@@ -117,7 +121,7 @@ const Chatflows = () => {
                         if (!images[chatflows[i].id].some((img) => img.imageSrc === imageSrc)) {
                             images[chatflows[i].id].push({
                                 imageSrc,
-                                label: nodes[j].data.label
+                                label: translateNodeLabel(nodes[j].data.label, currentLang)
                             })
                         }
                     }
@@ -127,7 +131,7 @@ const Chatflows = () => {
                 console.error(e)
             }
         }
-    }, [getAllChatflowsApi.data])
+    }, [getAllChatflowsApi.data, currentLang])
 
     return (
         <MainCard>
@@ -138,9 +142,9 @@ const Chatflows = () => {
                     <ViewHeader
                         onSearchChange={onSearchChange}
                         search={true}
-                        searchPlaceholder='Search Name or Category'
-                        title='Chatflows'
-                        description='Build single-agent systems, chatbots and simple LLM flows'
+                        searchPlaceholder={t('pages.chatflows.searchPlaceholder')}
+                        title={t('pages.chatflows.title')}
+                        description={t('pages.chatflows.description')}
                     >
                         <ToggleButtonGroup
                             sx={{ borderRadius: 2, maxHeight: 40 }}
@@ -182,7 +186,7 @@ const Chatflows = () => {
                             startIcon={<IconPlus />}
                             sx={{ borderRadius: 2, height: 40 }}
                         >
-                            Add New
+                            {t('common.addNew')}
                         </StyledPermissionButton>
                     </ViewHeader>
 
@@ -226,7 +230,7 @@ const Chatflows = () => {
                                     alt='WorkflowEmptySVG'
                                 />
                             </Box>
-                            <div>No Chatflows Yet</div>
+                            <div>{t('common.noChatflowsYet')}</div>
                         </Stack>
                     )}
                 </Stack>

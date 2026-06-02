@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { closeSnackbar as closeSnackbarAction, enqueueSnackbar as enqueueSnackbarAction } from '@/store/actions'
 
 // material-ui
@@ -37,6 +38,7 @@ import { gridSpacing } from '@/store/constant'
 const PLACEHOLDER_SECRET = '********'
 
 const SSOConfigPage = () => {
+    const { t } = useTranslation()
     useNotifier()
     const { error, setError } = useError()
     const theme = useTheme()
@@ -414,7 +416,7 @@ const SSOConfigPage = () => {
                     <ErrorBoundary error={error} />
                 ) : (
                     <Stack flexDirection='column' sx={{ gap: 3 }}>
-                        <ViewHeader search={false} title='Configure SSO' />
+                        <ViewHeader search={false} title={t('pages.ssoConfig.title')} />
                         {authErrors && authErrors.length > 0 && (
                             <div
                                 style={{

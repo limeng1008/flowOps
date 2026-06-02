@@ -3,6 +3,9 @@ import App from '@/App'
 import { store } from '@/store'
 import { createRoot } from 'react-dom/client'
 
+// i18n (initializes the i18next singleton before the app renders)
+import '@/i18n'
+
 // style + assets
 import '@/assets/scss/style.scss'
 

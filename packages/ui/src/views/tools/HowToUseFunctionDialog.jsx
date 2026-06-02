@@ -1,8 +1,10 @@
 import { createPortal } from 'react-dom'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import { Dialog, DialogContent, DialogTitle } from '@mui/material'
 
 const HowToUseFunctionDialog = ({ show, onCancel }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
 
     const component = show ? (
@@ -15,13 +17,13 @@ const HowToUseFunctionDialog = ({ show, onCancel }) => {
             aria-describedby='alert-dialog-description'
         >
             <DialogTitle sx={{ fontSize: '1rem' }} id='alert-dialog-title'>
-                How To Use Function
+                {t('pages.tools.howToUseFunctionDialog.title')}
             </DialogTitle>
             <DialogContent>
                 <ul>
-                    <li style={{ marginTop: 10 }}>You can use any libraries imported in Flowise</li>
+                    <li style={{ marginTop: 10 }}>{t('pages.tools.howToUseFunctionDialog.libraries')}</li>
                     <li style={{ marginTop: 10 }}>
-                        You can use properties specified in Input Schema as variables with prefix $:
+                        {t('pages.tools.howToUseFunctionDialog.schemaVariables')}
                         <ul style={{ marginTop: 10 }}>
                             <li>
                                 Property = <code>userid</code>
@@ -32,7 +34,7 @@ const HowToUseFunctionDialog = ({ show, onCancel }) => {
                         </ul>
                     </li>
                     <li style={{ marginTop: 10 }}>
-                        You can get default flow config:
+                        {t('pages.tools.howToUseFunctionDialog.flowConfig')}
                         <ul style={{ marginTop: 10 }}>
                             <li>
                                 <code>$flow.sessionId</code>
@@ -52,9 +54,9 @@ const HowToUseFunctionDialog = ({ show, onCancel }) => {
                         </ul>
                     </li>
                     <li style={{ marginTop: 10 }}>
-                        You can get custom variables:&nbsp;<code>{`$vars.<variable-name>`}</code>
+                        {t('pages.tools.howToUseFunctionDialog.customVariables')}&nbsp;<code>{`$vars.<variable-name>`}</code>
                     </li>
-                    <li style={{ marginTop: 10 }}>Must return a string value at the end of function</li>
+                    <li style={{ marginTop: 10 }}>{t('pages.tools.howToUseFunctionDialog.returnString')}</li>
                 </ul>
             </DialogContent>
         </Dialog>

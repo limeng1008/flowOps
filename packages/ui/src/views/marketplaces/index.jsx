@@ -2,6 +2,7 @@ import * as React from 'react'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import {
@@ -54,6 +55,7 @@ import { useAuth } from '@/hooks/useAuth'
 
 // Utils
 import useNotifier from '@/utils/useNotifier'
+import { translateMarketplaceUsecase } from '@/i18n/marketplaceI18n'
 
 // const
 import { baseURL, AGENTFLOW_ICONS } from '@/store/constant'
@@ -74,6 +76,7 @@ const MenuProps = {
 // ==============================|| Marketplace ||============================== //
 
 const Marketplace = () => {
+    const { t, i18n } = useTranslation()
     const navigate = useNavigate()
     const dispatch = useDispatch()
     useNotifier()
@@ -110,6 +113,8 @@ const Marketplace = () => {
     const closeSnackbar = (...args) => dispatch(closeSnackbarAction(...args))
     const { confirm } = useConfirm()
     const { hasPermission } = useAuth()
+    const currentLang = i18n.resolvedLanguage || i18n.language
+    const translateUsecase = (usecase) => translateMarketplaceUsecase(usecase, currentLang)
 
     const [showShareTemplateDialog, setShowShareTemplateDialog] = useState(false)
     const [shareTemplateDialogProps, setShareTemplateDialogProps] = useState({})
@@ -485,7 +490,7 @@ const Marketplace = () => {
                                         }}
                                     >
                                         <InputLabel size='small' id='filter-badge-label'>
-                                            Tag
+                                            {t('pages.marketplaces.filterTag')}
                                         </InputLabel>
                                         <Select
                                             labelId='filter-badge-label'
@@ -494,7 +499,7 @@ const Marketplace = () => {
                                             multiple
                                             value={badgeFilter}
                                             onChange={handleBadgeFilterChange}
-                                            input={<OutlinedInput label='Tag' />}
+                                            input={<OutlinedInput label={t('pages.marketplaces.filterTag')} />}
                                             renderValue={(selected) => selected.join(', ')}
                                             MenuProps={MenuProps}
                                             sx={getSelectStyles(theme.palette.grey[900] + 25, theme?.customization?.isDarkMode)}
@@ -521,7 +526,7 @@ const Marketplace = () => {
                                         }}
                                     >
                                         <InputLabel size='small' id='type-badge-label'>
-                                            Type
+                                            {t('pages.marketplaces.filterType')}
                                         </InputLabel>
                                         <Select
                                             size='small'
@@ -530,7 +535,7 @@ const Marketplace = () => {
                                             multiple
                                             value={typeFilter}
                                             onChange={handleTypeFilterChange}
-                                            input={<OutlinedInput label='Type' />}
+                                            input={<OutlinedInput label={t('pages.marketplaces.filterType')} />}
                                             renderValue={(selected) => selected.join(', ')}
                                             MenuProps={MenuProps}
                                             sx={getSelectStyles(theme.palette.grey[900] + 25, theme?.customization?.isDarkMode)}
@@ -542,7 +547,17 @@ const Marketplace = () => {
                                                     sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1 }}
                                                 >
                                                     <Checkbox checked={typeFilter.indexOf(name) > -1} sx={{ p: 0 }} />
-                                                    <ListItemText primary={name} />
+                                                    <ListItemText
+                                                        primary={
+                                                            name === 'Chatflow'
+                                                                ? t('pages.marketplaces.typeChatflow')
+                                                                : name === 'AgentflowV2'
+                                                                ? t('pages.marketplaces.typeAgentflowV2')
+                                                                : name === 'Tool'
+                                                                ? t('pages.marketplaces.typeTool')
+                                                                : name
+                                                        }
+                                                    />
                                                 </MenuItem>
                                             ))}
                                         </Select>
@@ -557,7 +572,7 @@ const Marketplace = () => {
                                         }}
                                     >
                                         <InputLabel size='small' id='type-fw-label'>
-                                            Framework
+                                            {t('pages.marketplaces.filterFramework')}
                                         </InputLabel>
                                         <Select
                                             size='small'
@@ -566,7 +581,7 @@ const Marketplace = () => {
                                             multiple
                                             value={frameworkFilter}
                                             onChange={handleFrameworkFilterChange}
-                                            input={<OutlinedInput label='Framework' />}
+                                            input={<OutlinedInput label={t('pages.marketplaces.filterFramework')} />}
                                             renderValue={(selected) => selected.join(', ')}
                                             MenuProps={MenuProps}
                                             sx={getSelectStyles(theme.palette.grey[900] + 25, theme?.customization?.isDarkMode)}
@@ -587,9 +602,9 @@ const Marketplace = () => {
                             }
                             onSearchChange={onSearchChange}
                             search={true}
-                            searchPlaceholder='Search Name/Description/Node'
-                            title='Marketplace'
-                            description='Explore and use pre-built templates'
+                            searchPlaceholder={t('pages.marketplaces.searchPlaceholder')}
+                            title={t('pages.marketplaces.title')}
+                            description={t('pages.marketplaces.description')}
                         >
                             <ToggleButtonGroup
                                 sx={{ borderRadius: 2, height: '100%' }}
@@ -606,7 +621,7 @@ const Marketplace = () => {
                                     }}
                                     variant='contained'
                                     value='card'
-                                    title='Card View'
+                                    title={t('pages.marketplaces.cardView')}
                                 >
                                     <IconLayoutGrid />
                                 </ToggleButton>
@@ -618,7 +633,7 @@ const Marketplace = () => {
                                     }}
                                     variant='contained'
                                     value='list'
-                                    title='List View'
+                                    title={t('pages.marketplaces.listView')}
                                 >
                                     <IconList />
                                 </ToggleButton>
@@ -627,8 +642,16 @@ const Marketplace = () => {
                         {hasPermission('templates:marketplace') && hasPermission('templates:custom') && (
                             <Stack direction='row' justifyContent='space-between' sx={{ mb: 2 }}>
                                 <Tabs value={activeTabValue} onChange={handleTabChange} textColor='primary' aria-label='tabs'>
-                                    <PermissionTab permissionId='templates:marketplace' value={0} label='Community Templates' />
-                                    <PermissionTab permissionId='templates:custom' value={1} label='My Templates' />
+                                    <PermissionTab
+                                        permissionId='templates:marketplace'
+                                        value={0}
+                                        label={t('pages.marketplaces.tabCommunity')}
+                                    />
+                                    <PermissionTab
+                                        permissionId='templates:custom'
+                                        value={1}
+                                        label={t('pages.marketplaces.tabMyTemplates')}
+                                    />
                                 </Tabs>
                                 <Autocomplete
                                     id='useCases'
@@ -638,7 +661,7 @@ const Marketplace = () => {
                                     value={selectedUsecases}
                                     onChange={(_, newValue) => setSelectedUsecases(newValue)}
                                     disableCloseOnSelect
-                                    getOptionLabel={(option) => option}
+                                    getOptionLabel={(option) => translateUsecase(option)}
                                     isOptionEqualToValue={(option, value) => option === value}
                                     renderOption={(props, option, { selected }) => {
                                         const isDisabled = eligibleUsecases.length > 0 && !eligibleUsecases.includes(option)
@@ -646,11 +669,11 @@ const Marketplace = () => {
                                         return (
                                             <li {...props} style={{ pointerEvents: isDisabled ? 'none' : 'auto' }}>
                                                 <Checkbox checked={selected} color='success' disabled={isDisabled} />
-                                                <ListItemText primary={option} />
+                                                <ListItemText primary={translateUsecase(option)} />
                                             </li>
                                         )
                                     }}
-                                    renderInput={(params) => <TextField {...params} label='Usecases' />}
+                                    renderInput={(params) => <TextField {...params} label={t('pages.marketplaces.filterUsecases')} />}
                                     sx={{
                                         width: 300
                                     }}
@@ -665,7 +688,7 @@ const Marketplace = () => {
                                                     <Chip
                                                         {...getTagProps({ index })}
                                                         key={index}
-                                                        label={option}
+                                                        label={translateUsecase(option)}
                                                         sx={{
                                                             height: 24,
                                                             '& .MuiSvgIcon-root': {
@@ -681,7 +704,7 @@ const Marketplace = () => {
                                                         title={
                                                             <ol style={{ paddingLeft: '20px' }}>
                                                                 {value.slice(limitTags).map((item, i) => (
-                                                                    <li key={i}>{item}</li>
+                                                                    <li key={i}>{translateUsecase(item)}</li>
                                                                 ))}
                                                             </ol>
                                                         }
@@ -794,7 +817,7 @@ const Marketplace = () => {
                                                     alt='WorkflowEmptySVG'
                                                 />
                                             </Box>
-                                            <div>No Marketplace Yet</div>
+                                            <div>{t('pages.marketplaces.noMarketplaceYet')}</div>
                                         </Stack>
                                     )}
                             </TabPanel>
@@ -824,7 +847,7 @@ const Marketplace = () => {
                                                     }}
                                                 />
                                             }
-                                            label={usecase}
+                                            label={translateUsecase(usecase)}
                                         />
                                     ))}
                                 </Stack>
@@ -927,7 +950,7 @@ const Marketplace = () => {
                                                 alt='WorkflowEmptySVG'
                                             />
                                         </Box>
-                                        <div>No Saved Custom Templates</div>
+                                        <div>{t('pages.marketplaces.noSavedTemplates')}</div>
                                     </Stack>
                                 )}
                             </TabPanel>

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { styled } from '@mui/material/styles'
 import {
     Box,
@@ -43,6 +44,7 @@ const StyledTableRow = styled(TableRow)(() => ({
 export const DocumentStoreTable = ({ data, isLoading, onRowClick, images, showActions, onActionMenuClick, actionButtonSx }) => {
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
+    const { t } = useTranslation()
 
     const localStorageKeyOrder = 'doc_store_order'
     const localStorageKeyOrderBy = 'doc_store_orderBy'
@@ -82,14 +84,14 @@ export const DocumentStoreTable = ({ data, isLoading, onRowClick, images, showAc
                             <StyledTableCell>&nbsp;</StyledTableCell>
                             <StyledTableCell>
                                 <TableSortLabel active={orderBy === 'name'} direction={order} onClick={() => handleRequestSort('name')}>
-                                    Name
+                                    {t('common.name')}
                                 </TableSortLabel>
                             </StyledTableCell>
-                            <StyledTableCell>Description</StyledTableCell>
-                            <StyledTableCell>Connected flows</StyledTableCell>
-                            <StyledTableCell>Total characters</StyledTableCell>
-                            <StyledTableCell>Total chunks</StyledTableCell>
-                            <StyledTableCell>Loader Types</StyledTableCell>
+                            <StyledTableCell>{t('common.description')}</StyledTableCell>
+                            <StyledTableCell>{t('pages.documentStores.colConnectedFlows')}</StyledTableCell>
+                            <StyledTableCell>{t('pages.documentStores.colTotalChars')}</StyledTableCell>
+                            <StyledTableCell>{t('pages.documentStores.colTotalChunks')}</StyledTableCell>
+                            <StyledTableCell>{t('pages.documentStores.colLoaderTypes')}</StyledTableCell>
                             {showActions && (
                                 <StyledTableCell align='right' sx={{ width: 44, pr: 1 }}>
                                     &nbsp;
@@ -235,7 +237,7 @@ export const DocumentStoreTable = ({ data, isLoading, onRowClick, images, showAc
                                                                     />
                                                                 </Box>
                                                             ))}
-                                                        {images?.length > 3 && (
+                                                        {images[row.id]?.length > 3 && (
                                                             <Typography
                                                                 sx={{
                                                                     alignItems: 'center',
@@ -244,7 +246,9 @@ export const DocumentStoreTable = ({ data, isLoading, onRowClick, images, showAc
                                                                     fontWeight: 200
                                                                 }}
                                                             >
-                                                                + {images.length - 3} More
+                                                                {t('pages.documentStores.moreLoaderTypes', {
+                                                                    count: images[row.id].length - 3
+                                                                })}
                                                             </Typography>
                                                         )}
                                                     </Box>

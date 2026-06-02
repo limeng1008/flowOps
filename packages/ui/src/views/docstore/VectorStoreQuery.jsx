@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import ReactJson from 'flowise-react-json-view'
 import { cloneDeep } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
@@ -54,6 +55,7 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 }))
 
 const VectorStoreQuery = () => {
+    const { t } = useTranslation()
     const customization = useSelector((state) => state.customization)
     const navigate = useNavigate()
     const theme = useTheme()
@@ -153,7 +155,7 @@ const VectorStoreQuery = () => {
             setLoading(false)
             if (updateResp.data) {
                 enqueueSnackbar({
-                    message: 'Vector Store Config Successfully Updated',
+                    message: t('common.vectorStoreConfigUpdated'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',

@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import { styled } from '@mui/material/styles'
@@ -9,6 +11,7 @@ import { Box, Grid, Tooltip, Typography, useTheme } from '@mui/material'
 import MainCard from '@/ui-component/cards/MainCard'
 import MoreItemsTooltip from '../tooltip/MoreItemsTooltip'
 import ScheduleStatusBadge from '@/ui-component/extended/ScheduleStatusBadge'
+import { translateTemplateName, translateTemplateDescription } from '@/i18n/marketplaceI18n'
 
 const CardWrapper = styled(MainCard)(({ theme }) => ({
     background: theme.palette.card.main,
@@ -32,6 +35,15 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 // ===========================|| CONTRACT CARD ||=========================== //
 
 const ItemCard = ({ data, images, icons, scheduleStatus, onClick }) => {
+    const { i18n } = useTranslation()
+    const [currentLang, setCurrentLang] = useState(i18n.resolvedLanguage || i18n.language)
+    useEffect(() => {
+        const onLanguageChanged = (lng) => setCurrentLang(lng)
+        i18n.on('languageChanged', onLanguageChanged)
+        return () => i18n.off('languageChanged', onLanguageChanged)
+    }, [i18n])
+    const tName = (s) => translateTemplateName(s, currentLang)
+    const tDesc = (s) => translateTemplateDescription(s, currentLang)
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
 
@@ -89,7 +101,7 @@ const ItemCard = ({ data, images, icons, scheduleStatus, onClick }) => {
                                     overflow: 'hidden'
                                 }}
                             >
-                                {data.templateName || data.name}
+                                {tName(data.templateName || data.name)}
                             </Typography>
                         </div>
                         {data.description && (
@@ -104,7 +116,7 @@ const ItemCard = ({ data, images, icons, scheduleStatus, onClick }) => {
                                     overflow: 'hidden'
                                 }}
                             >
-                                {data.description}
+                                {tDesc(data.description)}
                             </span>
                         )}
                     </Box>

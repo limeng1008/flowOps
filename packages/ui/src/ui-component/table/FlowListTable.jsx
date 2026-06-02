@@ -1,6 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
+import { translateTemplateName } from '@/i18n/marketplaceI18n'
 import moment from 'moment'
 import { styled } from '@mui/material/styles'
 import {
@@ -65,6 +67,14 @@ export const FlowListTable = ({
     currentPage,
     pageLimit
 }) => {
+    const { t, i18n } = useTranslation()
+    const [currentLang, setCurrentLang] = useState(i18n.resolvedLanguage || i18n.language)
+    useEffect(() => {
+        const onLanguageChanged = (lng) => setCurrentLang(lng)
+        i18n.on('languageChanged', onLanguageChanged)
+        return () => i18n.off('languageChanged', onLanguageChanged)
+    }, [i18n])
+    const tName = (s) => translateTemplateName(s, currentLang)
     const { hasPermission } = useAuth()
     const isActionsAvailable = isAgentCanvas
         ? hasPermission('agentflows:update,agentflows:delete,agentflows:config,agentflows:domains,templates:flowexport,agentflows:export')
@@ -121,14 +131,14 @@ export const FlowListTable = ({
                         <TableRow>
                             <StyledTableCell component='th' scope='row' style={{ width: '20%' }} key='0'>
                                 <TableSortLabel active={orderBy === 'name'} direction={order} onClick={() => handleRequestSort('name')}>
-                                    Name
+                                    {t('common.name')}
                                 </TableSortLabel>
                             </StyledTableCell>
                             <StyledTableCell style={{ width: '25%' }} key='1'>
-                                Category
+                                {t('common.category')}
                             </StyledTableCell>
                             <StyledTableCell style={{ width: '30%' }} key='2'>
-                                Nodes
+                                {t('common.nodes')}
                             </StyledTableCell>
                             <StyledTableCell style={{ width: '15%' }} key='3'>
                                 <TableSortLabel
@@ -136,12 +146,12 @@ export const FlowListTable = ({
                                     direction={order}
                                     onClick={() => handleRequestSort('updatedDate')}
                                 >
-                                    Last Modified Date
+                                    {t('common.lastModifiedDate')}
                                 </TableSortLabel>
                             </StyledTableCell>
                             {isActionsAvailable && (
                                 <StyledTableCell style={{ width: '10%' }} key='4'>
-                                    Actions
+                                    {t('common.actions')}
                                 </StyledTableCell>
                             )}
                         </TableRow>
@@ -194,7 +204,7 @@ export const FlowListTable = ({
                                     <StyledTableRow key={index}>
                                         <StyledTableCell key='0'>
                                             <Stack direction='row' spacing={1} alignItems='center' sx={{ minWidth: 0 }}>
-                                                <Tooltip title={row.templateName || row.name}>
+                                                <Tooltip title={tName(row.templateName || row.name)}>
                                                     <Typography
                                                         sx={{
                                                             display: '-webkit-box',
@@ -208,7 +218,7 @@ export const FlowListTable = ({
                                                         }}
                                                     >
                                                         <Link to={onFlowClick(row)} style={{ color: '#2196f3', textDecoration: 'none' }}>
-                                                            {row.templateName || row.name}
+                                                            {tName(row.templateName || row.name)}
                                                         </Link>
                                                     </Typography>
                                                 </Tooltip>

@@ -2,6 +2,8 @@ import { ReactRenderer } from '@tiptap/react'
 import tippy from 'tippy.js'
 import SuggestionList from './SuggestionList'
 import variablesApi from '@/api/variables'
+import i18n from '@/i18n'
+import { translateNodeLabel } from '@/i18n/nodeI18n'
 
 /**
  * Workaround for the current typing incompatibility between Tippy.js and Tiptap
@@ -188,6 +190,7 @@ export const suggestionOptions = (
 
         const nodeItems = (availableNodesForVariable || []).map((node) => {
             const selectedOutputAnchor = node.data.outputAnchors?.[0]?.options?.find((ancr) => ancr.name === node.data.outputs['output'])
+            const currentLang = i18n.resolvedLanguage || i18n.language
 
             return {
                 id: `${node.id}`,
@@ -195,7 +198,7 @@ export const suggestionOptions = (
                 description:
                     node.data.name === 'ifElseFunction'
                         ? node.data.description
-                        : `${selectedOutputAnchor?.label ?? 'Output'} from ${node.data.label}`,
+                        : `${selectedOutputAnchor?.label ?? 'Output'} from ${translateNodeLabel(node.data.label, currentLang)}`,
                 category: 'Node Outputs'
             }
         })

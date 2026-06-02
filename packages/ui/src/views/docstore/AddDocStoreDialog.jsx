@@ -2,6 +2,7 @@ import { createPortal } from 'react-dom'
 import PropTypes from 'prop-types'
 import { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import {
     HIDE_CANVAS_DIALOG,
     SHOW_CANVAS_DIALOG,
@@ -26,6 +27,7 @@ import documentStoreApi from '@/api/documentstore'
 import useNotifier from '@/utils/useNotifier'
 
 const AddDocStoreDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
 
     const dispatch = useDispatch()
@@ -74,7 +76,7 @@ const AddDocStoreDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             const createResp = await documentStoreApi.createDocumentStore(obj)
             if (createResp.data) {
                 enqueueSnackbar({
-                    message: 'New Document Store created.',
+                    message: t('common.docstoreCreated'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -121,7 +123,7 @@ const AddDocStoreDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             const saveResp = await documentStoreApi.updateDocumentStore(docStoreId, saveObj)
             if (saveResp.data) {
                 enqueueSnackbar({
-                    message: 'Document Store Updated!',
+                    message: t('common.docstoreUpdated'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -177,7 +179,8 @@ const AddDocStoreDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                 <Box sx={{ p: 2 }}>
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                         <Typography>
-                            Name<span style={{ color: 'red' }}>&nbsp;*</span>
+                            {t('common.name')}
+                            <span style={{ color: 'red' }}>&nbsp;*</span>
                         </Typography>
 
                         <div style={{ flexGrow: 1 }}></div>
@@ -194,7 +197,7 @@ const AddDocStoreDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                 </Box>
                 <Box sx={{ p: 2 }}>
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
-                        <Typography>Description</Typography>
+                        <Typography>{t('common.description')}</Typography>
 
                         <div style={{ flexGrow: 1 }}></div>
                     </div>
@@ -212,7 +215,7 @@ const AddDocStoreDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                 </Box>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => onCancel()}>Cancel</Button>
+                <Button onClick={() => onCancel()}>{dialogProps.cancelButtonName ?? t('common.cancel')}</Button>
                 <StyledButton
                     disabled={!documentStoreName}
                     variant='contained'

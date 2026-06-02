@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import DatePicker from 'react-datepicker'
+import { useTranslation } from 'react-i18next'
 import 'react-datepicker/dist/react-datepicker.css'
 
 // material-ui
@@ -47,6 +48,7 @@ import { ExecutionDetails } from './ExecutionDetails'
 // ==============================|| AGENT EXECUTIONS ||============================== //
 
 const AgentExecutions = () => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const borderColor = theme.palette.grey[900] + 25
@@ -236,18 +238,18 @@ const AgentExecutions = () => {
                 <ErrorBoundary error={error} />
             ) : (
                 <Stack flexDirection='column' sx={{ gap: 3 }}>
-                    <ViewHeader title='Agent Executions' description='Monitor and manage agentflows executions' />
+                    <ViewHeader title={t('pages.executions.title')} description={t('pages.executions.description')} />
 
                     {/* Filter Section */}
                     <Box sx={{ mb: 2, width: '100%' }}>
                         <Grid container spacing={2} alignItems='center'>
                             <Grid item xs={12} md={2}>
                                 <FormControl fullWidth size='small'>
-                                    <InputLabel id='state-select-label'>State</InputLabel>
+                                    <InputLabel id='state-select-label'>{t('pages.executions.filterState')}</InputLabel>
                                     <Select
                                         labelId='state-select-label'
                                         value={filters.state}
-                                        label='State'
+                                        label={t('pages.executions.filterState')}
                                         onChange={(e) => handleFilterChange('state', e.target.value)}
                                         size='small'
                                         sx={{
@@ -259,13 +261,13 @@ const AgentExecutions = () => {
                                             }
                                         }}
                                     >
-                                        <MenuItem value=''>All</MenuItem>
-                                        <MenuItem value='INPROGRESS'>In Progress</MenuItem>
-                                        <MenuItem value='FINISHED'>Finished</MenuItem>
-                                        <MenuItem value='ERROR'>Error</MenuItem>
-                                        <MenuItem value='TERMINATED'>Terminated</MenuItem>
-                                        <MenuItem value='TIMEOUT'>Timeout</MenuItem>
-                                        <MenuItem value='STOPPED'>Stopped</MenuItem>
+                                        <MenuItem value=''>{t('pages.executions.stateAll')}</MenuItem>
+                                        <MenuItem value='INPROGRESS'>{t('pages.executions.stateInProgress')}</MenuItem>
+                                        <MenuItem value='FINISHED'>{t('pages.executions.stateFinished')}</MenuItem>
+                                        <MenuItem value='ERROR'>{t('pages.executions.stateError')}</MenuItem>
+                                        <MenuItem value='TERMINATED'>{t('pages.executions.stateTerminated')}</MenuItem>
+                                        <MenuItem value='TIMEOUT'>{t('pages.executions.stateTimeout')}</MenuItem>
+                                        <MenuItem value='STOPPED'>{t('pages.executions.stateStopped')}</MenuItem>
                                     </Select>
                                 </FormControl>
                             </Grid>
@@ -281,7 +283,7 @@ const AgentExecutions = () => {
                                     customInput={
                                         <TextField
                                             size='small'
-                                            label='Start date'
+                                            label={t('pages.executions.filterStartDate')}
                                             fullWidth
                                             sx={{
                                                 '& .MuiOutlinedInput-notchedOutline': {
@@ -305,7 +307,7 @@ const AgentExecutions = () => {
                                     customInput={
                                         <TextField
                                             size='small'
-                                            label='End date'
+                                            label={t('pages.executions.filterEndDate')}
                                             fullWidth
                                             sx={{
                                                 '& .MuiOutlinedInput-notchedOutline': {
@@ -319,7 +321,7 @@ const AgentExecutions = () => {
                             <Grid sx={{ ml: -1 }} item xs={12} md={2}>
                                 <TextField
                                     fullWidth
-                                    label='Agentflow'
+                                    label={t('pages.executions.filterAgentflow')}
                                     value={filters.agentflowName}
                                     onChange={(e) => handleFilterChange('agentflowName', e.target.value)}
                                     size='small'
@@ -333,7 +335,7 @@ const AgentExecutions = () => {
                             <Grid sx={{ ml: -1 }} item xs={12} md={2}>
                                 <TextField
                                     fullWidth
-                                    label='Session ID'
+                                    label={t('pages.executions.filterSessionId')}
                                     value={filters.sessionId}
                                     onChange={(e) => handleFilterChange('sessionId', e.target.value)}
                                     size='small'
@@ -352,10 +354,10 @@ const AgentExecutions = () => {
                                         onClick={() => applyFilters(currentPage, pageLimit)}
                                         size='small'
                                     >
-                                        Apply
+                                        {t('pages.executions.apply')}
                                     </Button>
                                     <Button variant='outlined' onClick={resetFilters} size='small'>
-                                        Reset
+                                        {t('pages.executions.reset')}
                                     </Button>
                                     <Available permissions={['executions:delete']}>
                                         <Tooltip title='Delete selected executions'>
@@ -453,7 +455,7 @@ const AgentExecutions = () => {
                                     alt='execution_empty'
                                 />
                             </Box>
-                            <div>No Executions Yet</div>
+                            <div>{t('pages.executions.noExecutionsYet')}</div>
                         </Stack>
                     )}
                 </Stack>

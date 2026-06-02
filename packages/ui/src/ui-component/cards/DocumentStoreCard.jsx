@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import { styled } from '@mui/material/styles'
@@ -36,6 +37,8 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 const DocumentStoreCard = ({ data, images, onClick, hasActions }) => {
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
+    const { t } = useTranslation()
+    const connectedFlowCount = data.whereUsed?.length ?? 0
 
     return (
         <CardWrapper content={false} onClick={onClick} sx={{ border: 1, borderColor: theme.palette.grey[900] + 25, borderRadius: 2 }}>
@@ -103,7 +106,9 @@ const DocumentStoreCard = ({ data, images, onClick, hasActions }) => {
                             }}
                         >
                             <IconVectorBezier2 style={{ marginRight: 5 }} size={15} />
-                            {data.whereUsed?.length ?? 0} {data.whereUsed?.length <= 1 ? 'flow' : 'flows'}
+                            {connectedFlowCount === 1
+                                ? t('pages.documentStores.connectedFlowCount', { count: connectedFlowCount })
+                                : t('pages.documentStores.connectedFlowsCount', { count: connectedFlowCount })}
                         </div>
                         <div
                             style={{
@@ -124,7 +129,7 @@ const DocumentStoreCard = ({ data, images, onClick, hasActions }) => {
                             }}
                         >
                             <IconLanguage style={{ marginRight: 5 }} size={15} />
-                            {kFormatter(data.totalChars ?? 0)} chars
+                            {t('pages.documentStores.totalCharsCount', { count: kFormatter(data.totalChars ?? 0) })}
                         </div>
                         <div
                             style={{
@@ -144,7 +149,7 @@ const DocumentStoreCard = ({ data, images, onClick, hasActions }) => {
                             }}
                         >
                             <IconScissors style={{ marginRight: 5 }} size={15} />
-                            {kFormatter(data.totalChunks ?? 0)} chunks
+                            {t('pages.documentStores.totalChunksCount', { count: kFormatter(data.totalChunks ?? 0) })}
                         </div>
                     </Grid>
                     {images && images.length > 0 && (
@@ -173,7 +178,7 @@ const DocumentStoreCard = ({ data, images, onClick, hasActions }) => {
                             ))}
                             {images.length > 3 && (
                                 <Typography sx={{ alignItems: 'center', display: 'flex', fontSize: '.9rem', fontWeight: 200 }}>
-                                    + {images.length - 3} More
+                                    {t('pages.documentStores.moreLoaderTypes', { count: images.length - 3 })}
                                 </Typography>
                             )}
                         </Box>

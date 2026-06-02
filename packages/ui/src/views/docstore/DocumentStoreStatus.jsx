@@ -1,10 +1,23 @@
 import { useTheme } from '@mui/material'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import PropTypes from 'prop-types'
+
+const statusI18nKeyMap = {
+    STALE: 'pages.documentStores.status.stale',
+    EMPTY: 'pages.documentStores.status.empty',
+    SYNCING: 'pages.documentStores.status.syncing',
+    UPSERTING: 'pages.documentStores.status.upserting',
+    SYNC: 'pages.documentStores.status.sync',
+    UPSERTED: 'pages.documentStores.status.upserted',
+    NEW: 'pages.documentStores.status.new'
+}
 
 const DocumentStoreStatus = ({ status, isTableView }) => {
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
+    const { t } = useTranslation()
+    const statusLabel = statusI18nKeyMap[status] ? t(statusI18nKeyMap[status], { defaultValue: status }) : status
 
     const getColor = (status) => {
         switch (status) {
@@ -14,8 +27,8 @@ const DocumentStoreStatus = ({ status, isTableView }) => {
                     : [theme.palette.grey[300], theme.palette.grey[500], theme.palette.grey[700]]
             case 'EMPTY':
                 return customization.isDarkMode
-                    ? ['#4a148c', '#6a1b9a', '#ffffff'] // Deep Purple
-                    : ['#d1c4e9', '#9575cd', '#673ab7']
+                    ? ['#0e7490', '#0891b2', '#ffffff'] // Cyan
+                    : ['#e0f7fa', '#67e8f9', '#0891b2']
             case 'SYNCING':
                 return customization.isDarkMode
                     ? ['#ff6f00', '#ff8f00', '#ffffff'] // Amber
@@ -73,7 +86,7 @@ const DocumentStoreStatus = ({ status, isTableView }) => {
                             borderColor: status === 'EMPTY' ? getColor(status)[1] : 'transparent'
                         }}
                     />
-                    <span style={{ fontSize: '0.7rem', color: getColor(status)[2], marginLeft: 5 }}>{status}</span>
+                    <span style={{ fontSize: '0.7rem', color: getColor(status)[2], marginLeft: 5 }}>{statusLabel}</span>
                 </div>
             )}
             {isTableView && (
@@ -87,7 +100,7 @@ const DocumentStoreStatus = ({ status, isTableView }) => {
                         border: status === 'EMPTY' ? '3px solid' : 'none',
                         borderColor: status === 'EMPTY' ? getColor(status)[1] : 'transparent'
                     }}
-                    title={status}
+                    title={statusLabel}
                 ></div>
             )}
         </>

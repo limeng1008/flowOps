@@ -1,8 +1,17 @@
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import { TableContainer, Table, TableHead, TableCell, TableRow, TableBody, Paper, Chip, Stack, Typography } from '@mui/material'
 import { TooltipWithParser } from '@/ui-component/tooltip/TooltipWithParser'
 
+const COLUMN_HEADER_KEY_MAP = {
+    label: 'common.label',
+    name: 'common.name',
+    type: 'common.type',
+    value: 'common.value'
+}
+
 export const TableViewOnly = ({ columns, rows, sx }) => {
+    const { t } = useTranslation()
     // Helper function to safely render cell content
     const renderCellContent = (key, row) => {
         if (row[key] === null || row[key] === undefined) {
@@ -68,6 +77,8 @@ export const TableViewOnly = ({ columns, rows, sx }) => {
                                                 }
                                             />
                                         </>
+                                    ) : COLUMN_HEADER_KEY_MAP[col] ? (
+                                        t(COLUMN_HEADER_KEY_MAP[col])
                                     ) : (
                                         col.charAt(0).toUpperCase() + col.slice(1)
                                     )}

@@ -1,6 +1,7 @@
 import { createPortal } from 'react-dom'
 import { useDispatch } from 'react-redux'
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import PropTypes from 'prop-types'
 
 // Material
@@ -16,11 +17,14 @@ import { baseURL, AGENTFLOW_ICONS } from '@/store/constant'
 // API
 import configApi from '@/api/config'
 import useApi from '@/hooks/useApi'
+import { translateNodeCategory, translateNodeLabel } from '@/i18n/nodeI18n'
 
 const NodeInfoDialog = ({ show, dialogProps, onCancel }) => {
     const portalElement = document.getElementById('portal')
     const dispatch = useDispatch()
     const theme = useTheme()
+    const { i18n } = useTranslation()
+    const currentLang = i18n.resolvedLanguage || i18n.language
 
     const getNodeConfigApi = useApi(configApi.getNodeConfig)
 
@@ -102,7 +106,7 @@ const NodeInfoDialog = ({ show, dialogProps, onCancel }) => {
                             </div>
                         )}
                         <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 10 }}>
-                            {dialogProps.data.label}
+                            {translateNodeLabel(dialogProps.data.label, currentLang)}
                             <div style={{ display: 'flex', flexDirection: 'row' }}>
                                 <div
                                     style={{
@@ -161,7 +165,7 @@ const NodeInfoDialog = ({ show, dialogProps, onCancel }) => {
                                                 fontSize: '0.825rem'
                                             }}
                                         >
-                                            {dialogProps.data.badge}
+                                            {translateNodeCategory(dialogProps.data.badge, currentLang)}
                                         </span>
                                     </div>
                                 )}

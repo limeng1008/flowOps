@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect, memo } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import PropTypes from 'prop-types'
+import { translateNodeCategory, translateNodeLabel, translateNodeDescription } from '@/i18n/nodeI18n'
 
 // material-ui
 import { useTheme } from '@mui/material/styles'
@@ -74,6 +76,13 @@ const AddNodes = ({ nodesData, node, isAgentCanvas, isAgentflowv2, onFlowGenerat
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const dispatch = useDispatch()
+    const { t, i18n } = useTranslation()
+    const [currentLang, setCurrentLang] = useState(i18n.resolvedLanguage || i18n.language)
+    useEffect(() => {
+        const onLanguageChanged = (lng) => setCurrentLang(lng)
+        i18n.on('languageChanged', onLanguageChanged)
+        return () => i18n.off('languageChanged', onLanguageChanged)
+    }, [i18n])
 
     const [searchValue, setSearchValue] = useState('')
     const [nodes, setNodes] = useState({})
@@ -472,7 +481,7 @@ const AddNodes = ({ nodesData, node, isAgentCanvas, isAgentflowv2, onFlowGenerat
                                 <MainCard border={false} elevation={16} content={false} boxShadow shadow={theme.shadows[16]}>
                                     <Box sx={{ p: 2 }}>
                                         <Stack>
-                                            <Typography variant='h4'>Add Nodes</Typography>
+                                            <Typography variant='h4'>{t('canvas.addNodes')}</Typography>
                                         </Stack>
                                         <OutlinedInput
                                             // eslint-disable-next-line
@@ -481,7 +490,7 @@ const AddNodes = ({ nodesData, node, isAgentCanvas, isAgentflowv2, onFlowGenerat
                                             id='input-search-node'
                                             value={searchValue}
                                             onChange={(e) => filterSearch(e.target.value)}
-                                            placeholder='Search nodes'
+                                            placeholder={t('canvas.searchNodes')}
                                             startAdornment={
                                                 <InputAdornment position='start'>
                                                     <IconSearch stroke={1.5} size='1rem' color={theme.palette.grey[500]} />
@@ -522,55 +531,62 @@ const AddNodes = ({ nodesData, node, isAgentCanvas, isAgentflowv2, onFlowGenerat
                                                 onChange={handleTabChange}
                                                 aria-label='tabs'
                                             >
-                                                {['LangChain', 'LlamaIndex', 'Utilities'].map((item, index) => (
-                                                    <Tab
-                                                        icon={
-                                                            <div
-                                                                style={{
-                                                                    borderRadius: '50%',
-                                                                    position: 'relative'
-                                                                }}
-                                                            >
-                                                                <img
+                                                {[
+                                                    { key: 'LangChain', label: 'LangChain' },
+                                                    { key: 'LlamaIndex', label: 'LlamaIndex' },
+                                                    { key: 'Utilities', label: t('canvas.tabUtilities') }
+                                                ].map((it, index) => {
+                                                    const item = it.key
+                                                    return (
+                                                        <Tab
+                                                            icon={
+                                                                <div
                                                                     style={{
-                                                                        width: '20px',
-                                                                        height: '20px',
                                                                         borderRadius: '50%',
-                                                                        objectFit: 'contain'
+                                                                        position: 'relative'
                                                                     }}
-                                                                    src={getImage(index)}
-                                                                    alt={item}
-                                                                />
-                                                                {item === 'LlamaIndex' && (
-                                                                    <span
+                                                                >
+                                                                    <img
                                                                         style={{
-                                                                            position: 'absolute',
-                                                                            top: '-4px',
-                                                                            right: '-6px',
-                                                                            backgroundColor: '#ff9800',
-                                                                            color: 'white',
+                                                                            width: '20px',
+                                                                            height: '20px',
                                                                             borderRadius: '50%',
-                                                                            width: '12px',
-                                                                            height: '12px',
-                                                                            fontSize: '10px',
-                                                                            fontWeight: 'bold',
-                                                                            display: 'flex',
-                                                                            alignItems: 'center',
-                                                                            justifyContent: 'center'
+                                                                            objectFit: 'contain'
                                                                         }}
-                                                                    >
-                                                                        !
-                                                                    </span>
-                                                                )}
-                                                            </div>
-                                                        }
-                                                        iconPosition='start'
-                                                        sx={{ minHeight: '50px', height: '50px' }}
-                                                        key={index}
-                                                        label={item}
-                                                        {...a11yProps(index)}
-                                                    ></Tab>
-                                                ))}
+                                                                        src={getImage(index)}
+                                                                        alt={item}
+                                                                    />
+                                                                    {item === 'LlamaIndex' && (
+                                                                        <span
+                                                                            style={{
+                                                                                position: 'absolute',
+                                                                                top: '-4px',
+                                                                                right: '-6px',
+                                                                                backgroundColor: '#ff9800',
+                                                                                color: 'white',
+                                                                                borderRadius: '50%',
+                                                                                width: '12px',
+                                                                                height: '12px',
+                                                                                fontSize: '10px',
+                                                                                fontWeight: 'bold',
+                                                                                display: 'flex',
+                                                                                alignItems: 'center',
+                                                                                justifyContent: 'center'
+                                                                            }}
+                                                                        >
+                                                                            !
+                                                                        </span>
+                                                                    )}
+                                                                </div>
+                                                            }
+                                                            iconPosition='start'
+                                                            sx={{ minHeight: '50px', height: '50px' }}
+                                                            key={index}
+                                                            label={it.label}
+                                                            {...a11yProps(index)}
+                                                        ></Tab>
+                                                    )
+                                                })}
                                             </Tabs>
                                         )}
 
@@ -629,7 +645,9 @@ const AddNodes = ({ nodesData, node, isAgentCanvas, isAgentflowv2, onFlowGenerat
                                                                             alignItems: 'center'
                                                                         }}
                                                                     >
-                                                                        <Typography variant='h5'>{category.split(';')[0]}</Typography>
+                                                                        <Typography variant='h5'>
+                                                                            {translateNodeCategory(category.split(';')[0], currentLang)}
+                                                                        </Typography>
                                                                         &nbsp;
                                                                         <Chip
                                                                             sx={{
@@ -646,11 +664,16 @@ const AddNodes = ({ nodesData, node, isAgentCanvas, isAgentflowv2, onFlowGenerat
                                                                                         : 'inherit'
                                                                             }}
                                                                             size='small'
-                                                                            label={category.split(';')[1]}
+                                                                            label={translateNodeCategory(
+                                                                                category.split(';')[1],
+                                                                                currentLang
+                                                                            )}
                                                                         />
                                                                     </div>
                                                                 ) : (
-                                                                    <Typography variant='h5'>{category}</Typography>
+                                                                    <Typography variant='h5'>
+                                                                        {translateNodeCategory(category, currentLang)}
+                                                                    </Typography>
                                                                 )}
                                                             </AccordionSummary>
                                                             <AccordionDetails>
@@ -716,7 +739,12 @@ const AddNodes = ({ nodesData, node, isAgentCanvas, isAgentflowv2, onFlowGenerat
                                                                                                     alignItems: 'center'
                                                                                                 }}
                                                                                             >
-                                                                                                <span>{node.label}</span>
+                                                                                                <span>
+                                                                                                    {translateNodeLabel(
+                                                                                                        node.label,
+                                                                                                        currentLang
+                                                                                                    )}
+                                                                                                </span>
                                                                                                 &nbsp;
                                                                                                 {node.badge && (
                                                                                                     <Chip
@@ -736,7 +764,10 @@ const AddNodes = ({ nodesData, node, isAgentCanvas, isAgentflowv2, onFlowGenerat
                                                                                                                     : 'inherit'
                                                                                                         }}
                                                                                                         size='small'
-                                                                                                        label={node.badge}
+                                                                                                        label={translateNodeCategory(
+                                                                                                            node.badge,
+                                                                                                            currentLang
+                                                                                                        )}
                                                                                                     />
                                                                                                 )}
                                                                                             </div>
@@ -752,7 +783,10 @@ const AddNodes = ({ nodesData, node, isAgentCanvas, isAgentflowv2, onFlowGenerat
                                                                                             )}
                                                                                         </>
                                                                                     }
-                                                                                    secondary={node.description}
+                                                                                    secondary={translateNodeDescription(
+                                                                                        node.description,
+                                                                                        currentLang
+                                                                                    )}
                                                                                 />
                                                                             </ListItem>
                                                                         </ListItemButton>

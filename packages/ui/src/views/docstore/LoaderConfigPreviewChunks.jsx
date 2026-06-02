@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { validate as uuidValidate, v4 as uuidv4 } from 'uuid'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import ReactJson from 'flowise-react-json-view'
 
 // Hooks
@@ -60,6 +61,7 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 // ===========================|| DOCUMENT LOADER CHUNKS ||=========================== //
 
 const LoaderConfigPreviewChunks = () => {
+    const { t } = useTranslation()
     const customization = useSelector((state) => state.customization)
     const navigate = useNavigate()
     const theme = useTheme()
@@ -216,7 +218,7 @@ const LoaderConfigPreviewChunks = () => {
                 setLoading(false)
                 if (saveResp.data) {
                     enqueueSnackbar({
-                        message: 'File submitted for processing. Redirecting to Document Store..',
+                        message: t('common.fileSubmitted'),
                         options: {
                             key: new Date().getTime() + Math.random(),
                             variant: 'success',

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import moment from 'moment/moment'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import {
@@ -52,6 +53,7 @@ import { useError } from '@/store/context/ErrorContext'
 // ==============================|| Datasets ||============================== //
 
 const EvalDatasets = () => {
+    const { t } = useTranslation()
     const navigate = useNavigate()
     const theme = useTheme()
     const { confirm } = useConfirm()
@@ -205,7 +207,7 @@ const EvalDatasets = () => {
                             isEditButton={false}
                             onSearchChange={onSearchChange}
                             search={true}
-                            title='Datasets'
+                            title={t('pages.datasets.title')}
                             description=''
                         >
                             <StyledPermissionButton
@@ -227,7 +229,7 @@ const EvalDatasets = () => {
                                         alt='empty_datasetSVG'
                                     />
                                 </Box>
-                                <div>No Datasets Yet</div>
+                                <div>{t('common.noDatasetsYet')}</div>
                             </Stack>
                         ) : (
                             <>

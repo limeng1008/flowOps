@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types'
 import { Handle, Position, useUpdateNodeInternals } from 'reactflow'
 import { useEffect, useRef, useState, useContext } from 'react'
+import { useTranslation } from 'react-i18next'
+import { translateNodeLabel } from '@/i18n/nodeI18n'
 
 // material-ui
 import { useTheme, styled } from '@mui/material/styles'
@@ -19,6 +21,13 @@ const CustomWidthTooltip = styled(({ className, ...props }) => <Tooltip {...prop
 // ===========================|| NodeOutputHandler ||=========================== //
 
 const NodeOutputHandler = ({ outputAnchor, data, disabled = false }) => {
+    const { t, i18n } = useTranslation()
+    const [currentLang, setCurrentLang] = useState(i18n.resolvedLanguage || i18n.language)
+    useEffect(() => {
+        const onLanguageChanged = (lng) => setCurrentLang(lng)
+        i18n.on('languageChanged', onLanguageChanged)
+        return () => i18n.off('languageChanged', onLanguageChanged)
+    }, [i18n])
     const theme = useTheme()
     const ref = useRef(null)
     const updateNodeInternals = useUpdateNodeInternals()
@@ -115,7 +124,7 @@ const NodeOutputHandler = ({ outputAnchor, data, disabled = false }) => {
                                     </CustomWidthTooltip>
                                     <div style={{ flex: 1 }}></div>
                                     <Box sx={{ p: 2, textAlign: 'end' }}>
-                                        <Typography>{option.label}</Typography>
+                                        <Typography>{translateNodeLabel(option.label, currentLang)}</Typography>
                                     </Box>
                                 </div>
                             )
@@ -148,7 +157,7 @@ const NodeOutputHandler = ({ outputAnchor, data, disabled = false }) => {
                         </CustomWidthTooltip>
                         <div style={{ flex: 1 }}></div>
                         <Box sx={{ p: 2, textAlign: 'end' }}>
-                            <Typography>True</Typography>
+                            <Typography>{t('common.true')}</Typography>
                         </Box>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
@@ -175,7 +184,7 @@ const NodeOutputHandler = ({ outputAnchor, data, disabled = false }) => {
                         </CustomWidthTooltip>
                         <div style={{ flex: 1 }}></div>
                         <Box sx={{ p: 2, textAlign: 'end' }}>
-                            <Typography>False</Typography>
+                            <Typography>{t('common.false')}</Typography>
                         </Box>
                     </div>
                 </div>

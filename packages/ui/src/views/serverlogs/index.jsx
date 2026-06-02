@@ -1,5 +1,6 @@
 import { useState, useEffect, forwardRef } from 'react'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 
 // project imports
 import MainCard from '@/ui-component/cards/MainCard'
@@ -99,6 +100,7 @@ const subtractTime = (months, days, hours) => {
 }
 
 const Logs = () => {
+    const { t } = useTranslation()
     const colorTheme = useTheme()
 
     const customStyle = EditorView.baseTheme({
@@ -207,7 +209,7 @@ const Logs = () => {
                 <ErrorBoundary error={error} />
             ) : (
                 <Stack flexDirection='column' sx={{ gap: 2 }}>
-                    <ViewHeader title='Logs' />
+                    <ViewHeader title={t('pages.logs.title')} />
                     {isLoading ? (
                         <Box display='flex' flexDirection='column' gap={gridSpacing}>
                             <Skeleton width='25%' height={32} />

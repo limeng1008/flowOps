@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import { useState } from 'react'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import { useTheme } from '@mui/material/styles'
@@ -17,6 +18,7 @@ import { IconChevronDown, IconChevronUp } from '@tabler/icons-react'
 
 const NavCollapse = ({ menu, level }) => {
     const theme = useTheme()
+    const { t } = useTranslation()
     const customization = useSelector((state) => state.customization)
 
     const [open, setOpen] = useState(false)
@@ -74,7 +76,7 @@ const NavCollapse = ({ menu, level }) => {
                 <ListItemText
                     primary={
                         <Typography variant={selected === menu.id ? 'h5' : 'body1'} color='inherit' sx={{ my: 'auto' }}>
-                            {menu.title}
+                            {t(`menu.${menu.id}`, menu.title)}
                         </Typography>
                     }
                     secondary={

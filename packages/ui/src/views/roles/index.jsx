@@ -1,6 +1,7 @@
 import React from 'react'
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { enqueueSnackbar as enqueueSnackbarAction, closeSnackbar as closeSnackbarAction } from '@/store/actions'
 import * as PropTypes from 'prop-types'
 
@@ -278,7 +279,7 @@ function ShowRoleRow(props) {
                         </Typography>
                         <PermissionIconButton
                             permissionId={'roles:manage'}
-                            title='View'
+                            title={t('pages.roles.view')}
                             color='primary'
                             onClick={() => setOpenViewPermissionsDrawer(!openViewPermissionsDrawer)}
                         >
@@ -303,7 +304,7 @@ function ShowRoleRow(props) {
                 <StyledTableCell>
                     <PermissionIconButton
                         permissionId={'roles:manage'}
-                        title='Edit'
+                        title={t('pages.roles.edit')}
                         color='primary'
                         onClick={() => props.onEditClick(props.role)}
                     >
@@ -388,6 +389,7 @@ ShowRoleRow.propTypes = {
 // ==============================|| Roles ||============================== //
 
 const Roles = () => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const dispatch = useDispatch()
@@ -538,7 +540,12 @@ const Roles = () => {
                     <ErrorBoundary error={error} />
                 ) : (
                     <Stack flexDirection='column' sx={{ gap: 3 }}>
-                        <ViewHeader onSearchChange={onSearchChange} search={true} searchPlaceholder='Search Roles' title='Roles'>
+                        <ViewHeader
+                            onSearchChange={onSearchChange}
+                            search={true}
+                            searchPlaceholder={t('pages.roles.searchPlaceholder')}
+                            title={t('pages.roles.title')}
+                        >
                             <StyledPermissionButton
                                 permissionId={'roles:manage'}
                                 variant='contained'

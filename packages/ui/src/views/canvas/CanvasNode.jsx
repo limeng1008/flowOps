@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types'
 import { useContext, useState, useEffect, memo } from 'react'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
+import { translateNodeLabel } from '@/i18n/nodeI18n'
 
 // material-ui
 import { useTheme } from '@mui/material/styles'
@@ -24,6 +26,14 @@ import LlamaindexPNG from '@/assets/images/llamaindex.png'
 // ===========================|| CANVAS NODE ||=========================== //
 
 const CanvasNode = ({ data }) => {
+    const { t, i18n } = useTranslation()
+    const [currentLang, setCurrentLang] = useState(i18n.resolvedLanguage || i18n.language)
+    useEffect(() => {
+        const onLanguageChanged = (lng) => setCurrentLang(lng)
+        i18n.on('languageChanged', onLanguageChanged)
+        return () => i18n.off('languageChanged', onLanguageChanged)
+    }, [i18n])
+
     const theme = useTheme()
     const canvas = useSelector((state) => state.canvas)
     const { deleteNode, duplicateNode } = useContext(flowContext)
@@ -177,7 +187,7 @@ const CanvasNode = ({ data }) => {
                                         mr: 2
                                     }}
                                 >
-                                    {data.label}
+                                    {translateNodeLabel(data.label, currentLang)}
                                 </Typography>
                             </Box>
                             <div style={{ flexGrow: 1 }}></div>
@@ -217,7 +227,7 @@ const CanvasNode = ({ data }) => {
                                             textAlign: 'center'
                                         }}
                                     >
-                                        Inputs
+                                        {t('common.inputs')}
                                     </Typography>
                                 </Box>
                                 <Divider />
@@ -255,7 +265,7 @@ const CanvasNode = ({ data }) => {
                                 }}
                             >
                                 <Button sx={{ borderRadius: 25, width: '90%', mb: 2 }} variant='outlined' onClick={onDialogClicked}>
-                                    Additional Parameters
+                                    {t('common.additionalParameters')}
                                 </Button>
                             </div>
                         )}
@@ -268,7 +278,7 @@ const CanvasNode = ({ data }) => {
                                         textAlign: 'center'
                                     }}
                                 >
-                                    Output
+                                    {t('common.output')}
                                 </Typography>
                             </Box>
                         )}

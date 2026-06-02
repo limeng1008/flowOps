@@ -2,6 +2,7 @@ import { createPortal } from 'react-dom'
 import PropTypes from 'prop-types'
 import { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { enqueueSnackbar as enqueueSnackbarAction, closeSnackbar as closeSnackbarAction } from '@/store/actions'
 
 // Material
@@ -26,20 +27,8 @@ import useNotifier from '@/utils/useNotifier'
 import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
 import { Dropdown } from '@/ui-component/dropdown/Dropdown'
 
-const variableTypes = [
-    {
-        label: 'Static',
-        name: 'static',
-        description: 'Variable value will be read from the value entered below'
-    },
-    {
-        label: 'Runtime',
-        name: 'runtime',
-        description: 'Variable value will be read from .env file'
-    }
-]
-
 const AddEditVariableDialog = ({ show, dialogProps, onCancel, onConfirm, setError }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
 
     const dispatch = useDispatch()
@@ -56,6 +45,19 @@ const AddEditVariableDialog = ({ show, dialogProps, onCancel, onConfirm, setErro
     const [variableType, setVariableType] = useState('static')
     const [dialogType, setDialogType] = useState('ADD')
     const [variable, setVariable] = useState({})
+
+    const variableTypes = [
+        {
+            label: t('pages.variables.staticType'),
+            name: 'static',
+            description: t('pages.variables.staticDescription')
+        },
+        {
+            label: t('pages.variables.runtimeType'),
+            name: 'runtime',
+            description: t('pages.variables.runtimeDescription')
+        }
+    ]
 
     useEffect(() => {
         if (dialogProps.type === 'EDIT' && dialogProps.data) {
@@ -97,7 +99,7 @@ const AddEditVariableDialog = ({ show, dialogProps, onCancel, onConfirm, setErro
             const createResp = await variablesApi.createVariable(obj)
             if (createResp.data) {
                 enqueueSnackbar({
-                    message: 'New Variable added',
+                    message: t('common.variableAdded'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -142,7 +144,7 @@ const AddEditVariableDialog = ({ show, dialogProps, onCancel, onConfirm, setErro
             const saveResp = await variablesApi.updateVariable(variable.id, saveObj)
             if (saveResp.data) {
                 enqueueSnackbar({
-                    message: 'Variable saved',
+                    message: t('common.variableSaved'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -188,14 +190,15 @@ const AddEditVariableDialog = ({ show, dialogProps, onCancel, onConfirm, setErro
             <DialogTitle sx={{ fontSize: '1rem' }} id='alert-dialog-title'>
                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                     <IconVariable style={{ marginRight: '10px' }} />
-                    {dialogProps.type === 'ADD' ? 'Add Variable' : 'Edit Variable'}
+                    {dialogProps.type === 'ADD' ? t('pages.variables.addTitle') : t('pages.variables.editTitle')}
                 </div>
             </DialogTitle>
             <DialogContent>
                 <Box sx={{ p: 2 }}>
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                         <Typography>
-                            Variable Name<span style={{ color: 'red' }}>&nbsp;*</span>
+                            {t('pages.variables.variableName')}
+                            <span style={{ color: 'red' }}>&nbsp;*</span>
                         </Typography>
 
                         <div style={{ flexGrow: 1 }}></div>
@@ -214,7 +217,8 @@ const AddEditVariableDialog = ({ show, dialogProps, onCancel, onConfirm, setErro
                 <Box sx={{ p: 2 }}>
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                         <Typography>
-                            Type<span style={{ color: 'red' }}>&nbsp;*</span>
+                            {t('pages.variables.type')}
+                            <span style={{ color: 'red' }}>&nbsp;*</span>
                         </Typography>
                         <div style={{ flexGrow: 1 }}></div>
                     </div>
@@ -231,7 +235,8 @@ const AddEditVariableDialog = ({ show, dialogProps, onCancel, onConfirm, setErro
                     <Box sx={{ p: 2 }}>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
                             <Typography>
-                                Value<span style={{ color: 'red' }}>&nbsp;*</span>
+                                {t('pages.variables.value')}
+                                <span style={{ color: 'red' }}>&nbsp;*</span>
                             </Typography>
                             <div style={{ flexGrow: 1 }}></div>
                         </div>

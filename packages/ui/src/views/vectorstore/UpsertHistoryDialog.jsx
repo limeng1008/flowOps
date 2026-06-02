@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useEffect, useState, forwardRef } from 'react'
 import DatePicker from 'react-datepicker'
 import moment from 'moment/moment'
+import { useTranslation } from 'react-i18next'
 
 // MUI
 import {
@@ -63,8 +64,10 @@ DatePickerCustomInput.propTypes = {
 }
 
 function UpsertHistoryRow(props) {
+    const { i18n } = useTranslation()
     const [open, setOpen] = useState(false)
     const [nodeConfigExpanded, setNodeConfigExpanded] = useState({})
+    const dateTimeFormat = i18n.language?.startsWith('zh') ? 'YYYY年M月D日 HH:mm:ss' : 'MMMM Do YYYY, h:mm:ss a'
 
     const handleAccordionChange = (nodeLabel) => (event, isExpanded) => {
         const accordianNodes = { ...nodeConfigExpanded }
@@ -87,7 +90,7 @@ function UpsertHistoryRow(props) {
                         }}
                     />
                 </TableCell>
-                <TableCell>{moment(props.upsertHistory.date).format('MMMM Do YYYY, h:mm:ss a')}</TableCell>
+                <TableCell>{moment(props.upsertHistory.date).format(dateTimeFormat)}</TableCell>
                 <TableCell>{props.upsertHistory.result?.numAdded ?? '0'}</TableCell>
                 <TableCell>{props.upsertHistory.result?.numUpdated ?? '0'}</TableCell>
                 <TableCell>{props.upsertHistory.result?.numSkipped ?? '0'}</TableCell>
@@ -190,7 +193,9 @@ const UpsertHistoryDialog = ({ show, dialogProps, onCancel }) => {
     const dispatch = useDispatch()
     const customization = useSelector((state) => state.customization)
     const theme = useTheme()
+    const { t, i18n } = useTranslation()
     const getUpsertHistoryApi = useApi(vectorstoreApi.getUpsertHistory)
+    const datePickerFormat = i18n.language?.startsWith('zh') ? 'yyyy年M月d日' : 'MMMM d, yyyy'
 
     useNotifier()
     const enqueueSnackbar = (...args) => dispatch(enqueueSnackbarAction(...args))
@@ -250,7 +255,7 @@ const UpsertHistoryDialog = ({ show, dialogProps, onCancel }) => {
         try {
             await vectorstoreApi.deleteUpsertHistory(selected)
             enqueueSnackbar({
-                message: 'Successfully deleted upsert history',
+                message: t('canvas.dialogs.upsertDeleteSuccess'),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'success',
@@ -264,10 +269,9 @@ const UpsertHistoryDialog = ({ show, dialogProps, onCancel }) => {
             setChatflowUpsertHistory(chatflowUpsertHistory.filter((hist) => !selected.includes(hist.id)))
             setSelected([])
         } catch (error) {
+            const message = typeof error.response?.data === 'object' ? error.response.data.message : error.response?.data || error.message
             enqueueSnackbar({
-                message: `Failed to delete Upsert History: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('canvas.dialogs.upsertDeleteFail', { message }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -327,18 +331,19 @@ const UpsertHistoryDialog = ({ show, dialogProps, onCancel }) => {
                 <>
                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', width: '100%', marginBottom: 10 }}>
                         <div style={{ marginRight: 10 }}>
-                            <b style={{ marginRight: 10 }}>From Date</b>
+                            <b style={{ marginRight: 10 }}>{t('canvas.dialogs.fromDate')}</b>
                             <DatePicker
                                 selected={startDate}
                                 onChange={(date) => onStartDateSelected(date)}
                                 selectsStart
                                 startDate={startDate}
                                 endDate={endDate}
+                                dateFormat={datePickerFormat}
                                 customInput={<DatePickerCustomInput />}
                             />
                         </div>
                         <div style={{ marginRight: 10 }}>
-                            <b style={{ marginRight: 10 }}>To Date</b>
+                            <b style={{ marginRight: 10 }}>{t('canvas.dialogs.toDate')}</b>
                             <DatePicker
                                 selected={endDate}
                                 onChange={(date) => onEndDateSelected(date)}
@@ -347,6 +352,7 @@ const UpsertHistoryDialog = ({ show, dialogProps, onCancel }) => {
                                 endDate={endDate}
                                 minDate={startDate}
                                 maxDate={new Date()}
+                                dateFormat={datePickerFormat}
                                 customInput={<DatePickerCustomInput />}
                             />
                         </div>
@@ -359,7 +365,10 @@ const UpsertHistoryDialog = ({ show, dialogProps, onCancel }) => {
                             color='error'
                             startIcon={<IconTrash />}
                         >
-                            Delete {selected.length} {selected.length === 1 ? 'row' : 'rows'}
+                            {t('canvas.dialogs.deleteRows', {
+                                count: selected.length,
+                                rowLabel: selected.length === 1 ? t('canvas.dialogs.row') : t('canvas.dialogs.rows')
+                            })}
                         </Button>
                     )}
                     {chatflowUpsertHistory.length <= 0 && (
@@ -371,7 +380,7 @@ const UpsertHistoryDialog = ({ show, dialogProps, onCancel }) => {
                                     alt='HistoryEmptySVG'
                                 />
                             </Box>
-                            <div>No Upsert History Yet</div>
+                            <div>{t('canvas.dialogs.noUpsertHistory')}</div>
                         </Stack>
                     )}
                     {chatflowUpsertHistory.length > 0 && (
@@ -385,46 +394,40 @@ const UpsertHistoryDialog = ({ show, dialogProps, onCancel }) => {
                                                 checked={selected.length === chatflowUpsertHistory.length}
                                                 onChange={onSelectAllClick}
                                                 inputProps={{
-                                                    'aria-label': 'select all'
+                                                    'aria-label': t('common.selectAll')
                                                 }}
                                             />
                                         </TableCell>
-                                        <TableCell>Date</TableCell>
+                                        <TableCell>{t('common.date')}</TableCell>
                                         <TableCell>
-                                            Added{' '}
+                                            {t('canvas.dialogs.added')}{' '}
                                             <TooltipWithParser
                                                 style={{ marginBottom: 2, marginLeft: 10 }}
-                                                title={'Number of vector embeddings added to Vector Store'}
+                                                title={t('canvas.dialogs.addedTooltip')}
                                             />
                                         </TableCell>
                                         <TableCell>
-                                            Updated{' '}
+                                            {t('canvas.dialogs.updated')}{' '}
                                             <TooltipWithParser
                                                 style={{ marginBottom: 2, marginLeft: 10 }}
-                                                title={
-                                                    'Updated existing vector embeddings. Only works when a Record Manager is connected to the Vector Store'
-                                                }
+                                                title={t('canvas.dialogs.updatedTooltip')}
                                             />
                                         </TableCell>
                                         <TableCell>
-                                            Skipped{' '}
+                                            {t('canvas.dialogs.skipped')}{' '}
                                             <TooltipWithParser
                                                 style={{ marginBottom: 2, marginLeft: 10 }}
-                                                title={
-                                                    'Number of same vector embeddings that exists, and were skipped re-upserting again. Only works when a Record Manager is connected to the Vector Store'
-                                                }
+                                                title={t('canvas.dialogs.skippedTooltip')}
                                             />
                                         </TableCell>
                                         <TableCell>
-                                            Deleted{' '}
+                                            {t('canvas.dialogs.deleted')}{' '}
                                             <TooltipWithParser
                                                 style={{ marginBottom: 2, marginLeft: 10 }}
-                                                title={
-                                                    'Deleted vector embeddings. Only works when a Record Manager with a Cleanup method is connected to the Vector Store'
-                                                }
+                                                title={t('canvas.dialogs.deletedTooltip')}
                                             />
                                         </TableCell>
-                                        <TableCell>Details</TableCell>
+                                        <TableCell>{t('canvas.dialogs.details')}</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -445,7 +448,7 @@ const UpsertHistoryDialog = ({ show, dialogProps, onCancel }) => {
                 </>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onCancel}>Close</Button>
+                <Button onClick={onCancel}>{t('common.close')}</Button>
             </DialogActions>
         </Dialog>
     ) : null

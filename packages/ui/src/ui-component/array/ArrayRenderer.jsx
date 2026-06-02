@@ -1,16 +1,25 @@
 import { useState, useEffect, useContext } from 'react'
 import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import { Chip, Box, Button, IconButton } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import { IconTrash, IconPlus } from '@tabler/icons-react'
 import NodeInputHandler from '@/views/canvas/NodeInputHandler'
 import DocStoreInputHandler from '@/views/docstore/DocStoreInputHandler'
+import { translateNodeLabel } from '@/i18n/nodeI18n'
 import { showHideInputs } from '@/utils/genericHelper'
 import { cloneDeep } from 'lodash'
 import { flowContext } from '@/store/context/ReactFlowContext'
 
 export const ArrayRenderer = ({ inputParam, data, disabled, isDocStore = false }) => {
+    const { t, i18n } = useTranslation()
+    const [currentLang, setCurrentLang] = useState(i18n.resolvedLanguage || i18n.language)
+    useEffect(() => {
+        const onLanguageChanged = (lng) => setCurrentLang(lng)
+        i18n.on('languageChanged', onLanguageChanged)
+        return () => i18n.off('languageChanged', onLanguageChanged)
+    }, [i18n])
     const [arrayItems, setArrayItems] = useState([]) // these are the actual values. Ex: [{name: 'John', age: 30}, {name: 'Jane', age: 25}]
     const [itemParameters, setItemParameters] = useState([]) // these are the input parameters for each array item. Ex: [{label: 'Name', type: 'string', display: true}, {label: 'age', type: 'number', display: false}]
     const theme = useTheme()
@@ -268,7 +277,7 @@ export const ArrayRenderer = ({ inputParam, data, disabled, isDocStore = false }
                 startIcon={<IconPlus />}
                 onClick={handleAddItem}
             >
-                Add {inputParam.label}
+                {t('common.addItem', { label: translateNodeLabel(inputParam.label, currentLang) })}
             </Button>
         </>
     )

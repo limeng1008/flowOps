@@ -2,6 +2,7 @@ import { createPortal } from 'react-dom'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useContext, useState, useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import PerfectScrollbar from 'react-perfect-scrollbar'
 import { CopyBlock, atomOneDark } from 'react-code-blocks'
 
@@ -43,6 +44,7 @@ import {
     getConfigExamplesForCurl
 } from '@/utils/genericHelper'
 import useNotifier from '@/utils/useNotifier'
+import { translateNodeLabel } from '@/i18n/nodeI18n'
 
 // Store
 import { flowContext } from '@/store/context/ReactFlowContext'
@@ -79,6 +81,8 @@ function a11yProps(index) {
 }
 
 const VectorStoreDialog = ({ show, dialogProps, onCancel, onIndexResult }) => {
+    const { t, i18n } = useTranslation()
+    const currentLang = i18n.resolvedLanguage || i18n.language
     const portalElement = document.getElementById('portal')
     const { reactFlowInstance } = useContext(flowContext)
     const dispatch = useDispatch()
@@ -458,7 +462,9 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                                                                     src={`${baseURL}/api/v1/node-icon/${node.data.name}`}
                                                                 />
                                                             </div>
-                                                            <Typography variant='h5'>{node.data.label}</Typography>
+                                                            <Typography variant='h5'>
+                                                                {translateNodeLabel(node.data.label, currentLang)}
+                                                            </Typography>
                                                             <div
                                                                 style={{
                                                                     display: 'flex',
@@ -491,7 +497,7 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                                     <Box sx={{ p: 2 }}>
                                         <CheckboxInput
                                             key={JSON.stringify(nodeCheckboxExpanded)}
-                                            label='Show API'
+                                            label={t('common.showApi')}
                                             value={nodeCheckboxExpanded[data.vectorNode.data.id]}
                                             onChange={() => onCheckBoxChanged(data.vectorNode.data.id)}
                                         />
@@ -571,18 +577,16 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                                                                                 fontWeight: 500
                                                                             }}
                                                                         >
-                                                                            {
-                                                                                'For security reason, override config is disabled by default. You can change this by going into Chatflow Configuration -> Security tab, and enable the property you want to override.'
-                                                                            }
-                                                                            &nbsp;Refer{' '}
+                                                                            {t('common.overrideSecurityWarn')}
+                                                                            &nbsp;{t('common.referText')}{' '}
                                                                             <a
                                                                                 rel='noreferrer'
                                                                                 target='_blank'
                                                                                 href='https://docs.flowiseai.com/using-flowise/prediction#configuration-override'
                                                                             >
-                                                                                here
+                                                                                {t('common.here')}
                                                                             </a>{' '}
-                                                                            for more details
+                                                                            {t('common.forMoreDetails')}
                                                                         </span>
                                                                     </div>
                                                                 </div>
@@ -606,8 +610,7 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                                                                     >
                                                                         <IconBulb size={30} color='#2d6a4f' />
                                                                         <span style={{ color: '#2d6a4f', marginLeft: 10, fontWeight: 500 }}>
-                                                                            You can also specify multiple values for a config parameter by
-                                                                            specifying the node id
+                                                                            {t('common.specifyMultipleValues')}
                                                                         </span>
                                                                     </div>
                                                                     <div style={{ padding: 10 }}>
@@ -638,10 +641,10 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                                                 fullWidth
                                                 variant='contained'
                                                 color='teal'
-                                                title='Upsert'
+                                                title={t('common.upsert')}
                                                 onClick={() => onUpsertClicked(data.vectorNode)}
                                             >
-                                                Upsert
+                                                {t('common.upsert')}
                                             </Button>
                                         )}
                                     </div>

@@ -4,6 +4,7 @@ import 'reactflow/dist/style.css'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
     REMOVE_DIRTY,
     SET_DIRTY,
@@ -63,6 +64,7 @@ const edgeTypes = { buttonedge: ButtonEdge }
 const Canvas = () => {
     const theme = useTheme()
     const navigate = useNavigate()
+    const { t } = useTranslation()
     const { hasAssignedWorkspace } = useAuth()
 
     const { state } = useLocation()
@@ -73,6 +75,7 @@ const Canvas = () => {
         URLpath[URLpath.length - 1] === 'canvas' || URLpath[URLpath.length - 1] === 'agentcanvas' ? '' : URLpath[URLpath.length - 1]
     const isAgentCanvas = URLpath.includes('agentcanvas') ? true : false
     const canvasTitle = URLpath.includes('agentcanvas') ? 'Agent' : 'Chatflow'
+    const canvasTypeLabel = isAgentCanvas ? t('canvas.agents') : t('canvas.chatflow')
 
     const { confirm } = useConfirm()
 
@@ -178,10 +181,10 @@ const Canvas = () => {
 
     const handleDeleteFlow = async () => {
         const confirmPayload = {
-            title: `Delete`,
-            description: `Delete ${canvasTitle} ${chatflow.name}?`,
-            confirmButtonName: 'Delete',
-            cancelButtonName: 'Cancel'
+            title: t('canvas.deleteConfirmTitle'),
+            description: t('canvas.deleteConfirmDesc', { type: canvasTypeLabel, name: chatflow.name }),
+            confirmButtonName: t('common.delete'),
+            cancelButtonName: t('common.cancel')
         }
         const isConfirmed = await confirm(confirmPayload)
 

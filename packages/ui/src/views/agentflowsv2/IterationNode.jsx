@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import { useContext, memo, useRef, useState, useEffect, useCallback } from 'react'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { Background, Handle, Position, useUpdateNodeInternals, NodeToolbar, NodeResizer } from 'reactflow'
 
 // material-ui
@@ -11,6 +12,7 @@ import { ButtonGroup, Avatar, Box, Typography, IconButton, Tooltip } from '@mui/
 import MainCard from '@/ui-component/cards/MainCard'
 import { flowContext } from '@/store/context/ReactFlowContext'
 import NodeInfoDialog from '@/ui-component/dialog/NodeInfoDialog'
+import { translateNodeLabel } from '@/i18n/nodeI18n'
 
 // icons
 import {
@@ -50,6 +52,8 @@ const StyledNodeToolbar = styled(NodeToolbar)(({ theme }) => ({
 
 const IterationNode = ({ data }) => {
     const theme = useTheme()
+    const { i18n } = useTranslation()
+    const currentLang = i18n.resolvedLanguage || i18n.language
     const customization = useSelector((state) => state.customization)
     const ref = useRef(null)
     const reactFlowWrapper = useRef(null)
@@ -209,7 +213,7 @@ const IterationNode = ({ data }) => {
                             ml: 1
                         }}
                     >
-                        {data.label}
+                        {translateNodeLabel(data.label, currentLang)}
                     </Typography>
                 </Box>
             </NodeToolbar>

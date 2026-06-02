@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect, memo } from 'react'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 
 import { IconDatabaseImport, IconX } from '@tabler/icons-react'
 
@@ -9,6 +10,7 @@ import VectorStoreDialog from './VectorStoreDialog'
 import UpsertResultDialog from './UpsertResultDialog'
 
 const VectorStorePopUp = ({ chatflowid }) => {
+    const { t } = useTranslation()
     const [open, setOpen] = useState(false)
     const [showExpandDialog, setShowExpandDialog] = useState(false)
     const [expandDialogProps, setExpandDialogProps] = useState({})
@@ -22,7 +24,7 @@ const VectorStorePopUp = ({ chatflowid }) => {
         setOpen((prevopen) => !prevopen)
         const props = {
             open: true,
-            title: 'Upsert Vector Store',
+            title: t('common.upsertVectorStore'),
             chatflowid
         }
         setExpandDialogProps(props)

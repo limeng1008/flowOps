@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import { useTheme } from '@mui/material/styles'
@@ -13,6 +14,7 @@ import { Available } from '@/ui-component/rbac/available'
 // ==============================|| CANVAS HEADER ||============================== //
 
 const MarketplaceCanvasHeader = ({ flowName, flowData, onChatflowCopy }) => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const navigate = useNavigate()
 
@@ -62,7 +64,7 @@ const MarketplaceCanvasHeader = ({ flowName, flowData, onChatflowCopy }) => {
                         onClick={() => onChatflowCopy(flowData)}
                         startIcon={<IconCopy />}
                     >
-                        Use Template
+                        {t('common.useTemplate')}
                     </StyledButton>
                 </Box>
             </Available>

@@ -2,6 +2,7 @@ import moment from 'moment/moment'
 import PropTypes from 'prop-types'
 import { forwardRef, useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import {
@@ -86,6 +87,7 @@ DatePickerCustomInput.propTypes = {
     onClick: PropTypes.func
 }
 const LoginActivity = () => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     useNotifier()
@@ -217,7 +219,7 @@ const LoginActivity = () => {
                     <ErrorBoundary error={error} />
                 ) : (
                     <Stack flexDirection='column' sx={{ gap: 3 }}>
-                        <ViewHeader search={false} title='Login Activity'></ViewHeader>
+                        <ViewHeader search={false} title={t('pages.loginActivity.title')}></ViewHeader>
                         <Stack flexDirection='row'>
                             <Box sx={{ p: 2, height: 'auto', width: '100%' }}>
                                 <div

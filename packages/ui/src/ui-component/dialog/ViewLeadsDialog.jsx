@@ -2,6 +2,7 @@ import { createPortal } from 'react-dom'
 import { useDispatch } from 'react-redux'
 import { useState, useEffect, forwardRef } from 'react'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import moment from 'moment'
 
 // material-ui
@@ -50,6 +51,7 @@ DatePickerCustomInput.propTypes = {
 }
 
 const ViewLeadsDialog = ({ show, dialogProps, onCancel }) => {
+    const { t, i18n } = useTranslation()
     const portalElement = document.getElementById('portal')
     const dispatch = useDispatch()
     const theme = useTheme()
@@ -57,6 +59,7 @@ const ViewLeadsDialog = ({ show, dialogProps, onCancel }) => {
     const [leads, setLeads] = useState([])
     const [search, setSearch] = useState('')
     const getLeadsApi = useApi(leadsApi.getLeads)
+    const dateFormat = i18n.language?.startsWith('zh') ? 'YYYY年M月D日' : 'MMMM Do, YYYY'
 
     const onSearchChange = (event) => {
         setSearch(event.target.value)
@@ -136,7 +139,7 @@ const ViewLeadsDialog = ({ show, dialogProps, onCancel }) => {
                             }
                         }}
                         variant='outlined'
-                        placeholder='Search Name or Email or Phone'
+                        placeholder={t('common.leadsSearchPlaceholder')}
                         onChange={onSearchChange}
                         startAdornment={
                             <Box
@@ -156,7 +159,7 @@ const ViewLeadsDialog = ({ show, dialogProps, onCancel }) => {
                     <div style={{ flex: 1 }} />
                     {leads && leads.length > 0 && (
                         <Button variant='outlined' onClick={() => exportMessages()} startIcon={<IconFileExport />}>
-                            Export
+                            {t('common.export')}
                         </Button>
                     )}
                 </div>
@@ -167,7 +170,7 @@ const ViewLeadsDialog = ({ show, dialogProps, onCancel }) => {
                         <Box sx={{ p: 5, height: 'auto' }}>
                             <img style={{ objectFit: 'cover', height: '20vh', width: 'auto' }} src={leadsEmptySVG} alt='msgEmptySVG' />
                         </Box>
-                        <div>No Leads</div>
+                        <div>{t('common.noLeads')}</div>
                     </Stack>
                 )}
                 {leads && leads.length > 0 && (
@@ -175,10 +178,10 @@ const ViewLeadsDialog = ({ show, dialogProps, onCancel }) => {
                         <Table sx={{ minWidth: 650 }} aria-label='simple table'>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Name</TableCell>
-                                    <TableCell>Email Address</TableCell>
-                                    <TableCell>Phone</TableCell>
-                                    <TableCell>Created Date</TableCell>
+                                    <TableCell>{t('common.name')}</TableCell>
+                                    <TableCell>{t('common.colEmailAddress')}</TableCell>
+                                    <TableCell>{t('common.colPhone')}</TableCell>
+                                    <TableCell>{t('common.colCreatedDate')}</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -187,7 +190,7 @@ const ViewLeadsDialog = ({ show, dialogProps, onCancel }) => {
                                         <TableCell>{lead.name}</TableCell>
                                         <TableCell>{lead.email}</TableCell>
                                         <TableCell>{lead.phone}</TableCell>
-                                        <TableCell>{moment(lead.createdDate).format('MMMM Do, YYYY')}</TableCell>
+                                        <TableCell>{moment(lead.createdDate).format(dateFormat)}</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>

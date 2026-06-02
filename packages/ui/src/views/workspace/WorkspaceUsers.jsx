@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import moment from 'moment'
 import { useNavigate } from 'react-router-dom'
 
@@ -49,6 +50,7 @@ import { useError } from '@/store/context/ErrorContext'
 import { closeSnackbar as closeSnackbarAction, enqueueSnackbar as enqueueSnackbarAction } from '@/store/actions'
 
 const WorkspaceDetails = () => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const currentUser = useSelector((state) => state.auth.user)
@@ -503,7 +505,7 @@ const WorkspaceDetails = () => {
                                                             <StyledTableCell>
                                                                 {!item.isOrgOwner && item.status.toUpperCase() === 'INVITED' && (
                                                                     <IconButton
-                                                                        title='Edit'
+                                                                        title={t('pages.workspaces.edit')}
                                                                         color='primary'
                                                                         onClick={() => onEditClick(item)}
                                                                     >
@@ -512,7 +514,7 @@ const WorkspaceDetails = () => {
                                                                 )}
                                                                 {!item.isOrgOwner && item.status.toUpperCase() === 'ACTIVE' && (
                                                                     <IconButton
-                                                                        title='Change Role'
+                                                                        title={t('pages.workspaces.changeRole')}
                                                                         color='primary'
                                                                         onClick={() => onEditClick(item)}
                                                                     >

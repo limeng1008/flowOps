@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { enqueueSnackbar as enqueueSnackbarAction, closeSnackbar as closeSnackbarAction } from '@/store/actions'
 import moment from 'moment'
 
@@ -74,6 +75,7 @@ const StyledTableRow = styled(TableRow)(() => ({
 // ==============================|| Credentials ||============================== //
 
 const Credentials = () => {
+    const { t, i18n } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const dispatch = useDispatch()
@@ -98,6 +100,7 @@ const Credentials = () => {
 
     const getAllCredentialsApi = useApi(credentialsApi.getAllCredentials)
     const getAllComponentsCredentialsApi = useApi(credentialsApi.getAllComponentsCredentials)
+    const dateFormat = i18n.language?.startsWith('zh') ? 'YYYY年M月D日 HH:mm:ss' : 'MMMM Do, YYYY HH:mm:ss'
 
     const [search, setSearch] = useState('')
     const onSearchChange = (event) => {
@@ -109,7 +112,7 @@ const Credentials = () => {
 
     const listCredential = () => {
         const dialogProp = {
-            title: 'Add New Credential',
+            title: t('pages.credentials.addNewTitle'),
             componentsCredentials
         }
         setCredentialListDialogProps(dialogProp)
@@ -168,7 +171,7 @@ const Credentials = () => {
                 const deleteResp = await credentialsApi.deleteCredential(credential.id)
                 if (deleteResp.data) {
                     enqueueSnackbar({
-                        message: 'Credential deleted',
+                        message: t('common.credentialDeleted'),
                         options: {
                             key: new Date().getTime() + Math.random(),
                             variant: 'success',
@@ -245,9 +248,9 @@ const Credentials = () => {
                         <ViewHeader
                             onSearchChange={onSearchChange}
                             search={true}
-                            searchPlaceholder='Search Credentials'
-                            title='Credentials'
-                            description='API keys, tokens, and secrets for 3rd party integrations'
+                            searchPlaceholder={t('pages.credentials.searchPlaceholder')}
+                            title={t('pages.credentials.title')}
+                            description={t('pages.credentials.description')}
                         >
                             <StyledPermissionButton
                                 permissionId='credentials:create'
@@ -256,7 +259,7 @@ const Credentials = () => {
                                 onClick={listCredential}
                                 startIcon={<IconPlus />}
                             >
-                                Add Credential
+                                {t('pages.credentials.addButton')}
                             </StyledPermissionButton>
                         </ViewHeader>
                         {!isLoading && credentials.length <= 0 ? (
@@ -268,7 +271,7 @@ const Credentials = () => {
                                         alt='CredentialEmptySVG'
                                     />
                                 </Box>
-                                <div>No Credentials Yet</div>
+                                <div>{t('common.noCredentialsYet')}</div>
                             </Stack>
                         ) : (
                             <TableContainer
@@ -285,9 +288,9 @@ const Credentials = () => {
                                         }}
                                     >
                                         <TableRow>
-                                            <StyledTableCell>Name</StyledTableCell>
-                                            <StyledTableCell>Last Updated</StyledTableCell>
-                                            <StyledTableCell>Created</StyledTableCell>
+                                            <StyledTableCell>{t('pages.credentials.colName')}</StyledTableCell>
+                                            <StyledTableCell>{t('pages.credentials.colLastUpdated')}</StyledTableCell>
+                                            <StyledTableCell>{t('pages.credentials.colCreated')}</StyledTableCell>
                                             <StyledTableCell style={{ width: '5%' }}> </StyledTableCell>
                                             <StyledTableCell style={{ width: '5%' }}> </StyledTableCell>
                                             <StyledTableCell style={{ width: '5%' }}> </StyledTableCell>
@@ -380,10 +383,10 @@ const Credentials = () => {
                                                             </Box>
                                                         </StyledTableCell>
                                                         <StyledTableCell>
-                                                            {moment(credential.updatedDate).format('MMMM Do, YYYY HH:mm:ss')}
+                                                            {moment(credential.updatedDate).format(dateFormat)}
                                                         </StyledTableCell>
                                                         <StyledTableCell>
-                                                            {moment(credential.createdDate).format('MMMM Do, YYYY HH:mm:ss')}
+                                                            {moment(credential.createdDate).format(dateFormat)}
                                                         </StyledTableCell>
                                                         {!credential.shared && (
                                                             <>

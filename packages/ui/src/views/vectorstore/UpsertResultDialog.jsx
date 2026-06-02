@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useEffect } from 'react'
+import { useTranslation } from 'react-i18next'
 import ReactJson from 'flowise-react-json-view'
 import { Typography, Card, CardContent, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material'
 import StatsCard from '@/ui-component/cards/StatsCard'
@@ -9,6 +10,7 @@ import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
 import { IconZoomScan } from '@tabler/icons-react'
 
 const UpsertResultDialog = ({ show, dialogProps, onCancel, onGoToRetrievalQuery }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const dispatch = useDispatch()
     const customization = useSelector((state) => state.customization)
@@ -101,7 +103,7 @@ const UpsertResultDialog = ({ show, dialogProps, onCancel, onGoToRetrievalQuery 
                         </Button>
                     </div>
                 )}
-                {!dialogProps.goToRetrievalQuery && <Button onClick={onCancel}>Close</Button>}
+                {!dialogProps.goToRetrievalQuery && <Button onClick={onCancel}>{t('common.close')}</Button>}
             </DialogActions>
         </Dialog>
     ) : null

@@ -1,6 +1,8 @@
 import { useContext, useState, useEffect, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { cloneDeep } from 'lodash'
+import { useTranslation } from 'react-i18next'
+import { translateNodeLabel } from '@/i18n/nodeI18n'
 
 // Material
 import { Accordion, AccordionSummary, AccordionDetails, Box, Typography, Tooltip, IconButton } from '@mui/material'
@@ -20,6 +22,13 @@ import { flowContext } from '@/store/context/ReactFlowContext'
 import { FLOWISE_CREDENTIAL_ID } from '@/store/constant'
 
 export const ConfigInput = ({ data, inputParam, disabled = false, arrayIndex = null, parentParamForArray = null }) => {
+    const { t, i18n } = useTranslation()
+    const [currentLang, setCurrentLang] = useState(i18n.resolvedLanguage || i18n.language)
+    useEffect(() => {
+        const onLanguageChanged = (lng) => setCurrentLang(lng)
+        i18n.on('languageChanged', onLanguageChanged)
+        return () => i18n.off('languageChanged', onLanguageChanged)
+    }, [i18n])
     const theme = useTheme()
     const { reactFlowInstance } = useContext(flowContext)
 
@@ -294,7 +303,9 @@ export const ConfigInput = ({ data, inputParam, disabled = false, arrayIndex = n
                     <AccordionSummary expandIcon={<ExpandMoreIcon />} sx={{ background: 'transparent' }}>
                         <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
                             <IconSettings stroke={1.5} size='1.3rem' />
-                            <Typography sx={{ ml: 1 }}>{selectedComponentNodeData?.label} Parameters</Typography>
+                            <Typography sx={{ ml: 1 }}>
+                                {t('common.parametersOf', { label: translateNodeLabel(selectedComponentNodeData?.label, currentLang) })}
+                            </Typography>
                             <div style={{ flexGrow: 1 }}></div>
                             {selectedComponentNodeData?.warning && (
                                 <Tooltip

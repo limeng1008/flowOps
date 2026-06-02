@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { enqueueSnackbar as enqueueSnackbarAction, closeSnackbar as closeSnackbarAction } from '@/store/actions'
 import moment from 'moment'
 
@@ -74,6 +75,7 @@ const StyledTableRow = styled(TableRow)(() => ({
 // ==============================|| Credentials ||============================== //
 
 const Variables = () => {
+    const { t, i18n } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const dispatch = useDispatch()
@@ -98,6 +100,7 @@ const Variables = () => {
     const [currentPage, setCurrentPage] = useState(1)
     const [pageLimit, setPageLimit] = useState(DEFAULT_ITEMS_PER_PAGE)
     const [total, setTotal] = useState(0)
+    const dateFormat = i18n.language?.startsWith('zh') ? 'YYYY年M月D日 HH:mm:ss' : 'MMMM Do, YYYY HH:mm:ss'
 
     const onChange = (page, pageLimit) => {
         setCurrentPage(page)
@@ -120,11 +123,17 @@ const Variables = () => {
         return data.name.toLowerCase().indexOf(search.toLowerCase()) > -1
     }
 
+    const getVariableTypeLabel = (type) => {
+        if (type === 'runtime') return t('pages.variables.runtimeType')
+        if (type === 'static') return t('pages.variables.staticType')
+        return type
+    }
+
     const addNew = () => {
         const dialogProp = {
             type: 'ADD',
-            cancelButtonName: 'Cancel',
-            confirmButtonName: 'Add',
+            cancelButtonName: t('common.cancel'),
+            confirmButtonName: t('common.add'),
             customBtnId: 'btn_confirmAddingVariable',
             data: {}
         }
@@ -135,8 +144,8 @@ const Variables = () => {
     const edit = (variable) => {
         const dialogProp = {
             type: 'EDIT',
-            cancelButtonName: 'Cancel',
-            confirmButtonName: 'Save',
+            cancelButtonName: t('common.cancel'),
+            confirmButtonName: t('common.save'),
             data: variable
         }
         setVariableDialogProps(dialogProp)
@@ -145,10 +154,10 @@ const Variables = () => {
 
     const deleteVariable = async (variable) => {
         const confirmPayload = {
-            title: `Delete`,
-            description: `Delete variable ${variable.name}?`,
-            confirmButtonName: 'Delete',
-            cancelButtonName: 'Cancel'
+            title: t('pages.variables.deleteTitle'),
+            description: t('pages.variables.deleteConfirm', { name: variable.name }),
+            confirmButtonName: t('common.delete'),
+            cancelButtonName: t('common.cancel')
         }
         const isConfirmed = await confirm(confirmPayload)
 
@@ -157,7 +166,7 @@ const Variables = () => {
                 const deleteResp = await variablesApi.deleteVariable(variable.id)
                 if (deleteResp.data) {
                     enqueueSnackbar({
-                        message: 'Variable deleted',
+                        message: t('common.variableDeleted'),
                         options: {
                             key: new Date().getTime() + Math.random(),
                             variant: 'success',
@@ -222,12 +231,12 @@ const Variables = () => {
                         <ViewHeader
                             onSearchChange={onSearchChange}
                             search={true}
-                            searchPlaceholder='Search Variables'
-                            title='Variables'
-                            description='Create and manage global variables'
+                            searchPlaceholder={t('pages.variables.searchPlaceholder')}
+                            title={t('pages.variables.title')}
+                            description={t('pages.variables.description')}
                         >
                             <Button variant='outlined' sx={{ borderRadius: 2, height: '100%' }} onClick={() => setShowHowToDialog(true)}>
-                                How To Use
+                                {t('pages.variables.howToUseButton')}
                             </Button>
                             <StyledPermissionButton
                                 permissionId={'variables:create'}
@@ -237,7 +246,7 @@ const Variables = () => {
                                 startIcon={<IconPlus />}
                                 id='btn_createVariable'
                             >
-                                Add Variable
+                                {t('pages.variables.addButton')}
                             </StyledPermissionButton>
                         </ViewHeader>
                         {!isLoading && variables.length === 0 ? (
@@ -249,7 +258,7 @@ const Variables = () => {
                                         alt='VariablesEmptySVG'
                                     />
                                 </Box>
-                                <div>No Variables Yet</div>
+                                <div>{t('common.noVariablesYet')}</div>
                             </Stack>
                         ) : (
                             <>
@@ -267,11 +276,11 @@ const Variables = () => {
                                             }}
                                         >
                                             <TableRow>
-                                                <StyledTableCell>Name</StyledTableCell>
-                                                <StyledTableCell>Value</StyledTableCell>
-                                                <StyledTableCell>Type</StyledTableCell>
-                                                <StyledTableCell>Last Updated</StyledTableCell>
-                                                <StyledTableCell>Created</StyledTableCell>
+                                                <StyledTableCell>{t('pages.variables.colName')}</StyledTableCell>
+                                                <StyledTableCell>{t('pages.variables.colValue')}</StyledTableCell>
+                                                <StyledTableCell>{t('pages.variables.colType')}</StyledTableCell>
+                                                <StyledTableCell>{t('pages.variables.colLastUpdated')}</StyledTableCell>
+                                                <StyledTableCell>{t('pages.variables.colCreated')}</StyledTableCell>
                                                 <Available permissionId={'variables:update'}>
                                                     <StyledTableCell> </StyledTableCell>
                                                 </Available>
@@ -378,18 +387,22 @@ const Variables = () => {
                                                                 <Chip
                                                                     color={variable.type === 'static' ? 'info' : 'secondary'}
                                                                     size='small'
-                                                                    label={variable.type}
+                                                                    label={getVariableTypeLabel(variable.type)}
                                                                 />
                                                             </StyledTableCell>
                                                             <StyledTableCell>
-                                                                {moment(variable.updatedDate).format('MMMM Do, YYYY HH:mm:ss')}
+                                                                {moment(variable.updatedDate).format(dateFormat)}
                                                             </StyledTableCell>
                                                             <StyledTableCell>
-                                                                {moment(variable.createdDate).format('MMMM Do, YYYY HH:mm:ss')}
+                                                                {moment(variable.createdDate).format(dateFormat)}
                                                             </StyledTableCell>
                                                             <Available permission={'variables:create,variables:update'}>
                                                                 <StyledTableCell>
-                                                                    <IconButton title='Edit' color='primary' onClick={() => edit(variable)}>
+                                                                    <IconButton
+                                                                        title={t('common.edit')}
+                                                                        color='primary'
+                                                                        onClick={() => edit(variable)}
+                                                                    >
                                                                         <IconEdit />
                                                                     </IconButton>
                                                                 </StyledTableCell>
@@ -397,7 +410,7 @@ const Variables = () => {
                                                             <Available permission={'variables:delete'}>
                                                                 <StyledTableCell>
                                                                     <IconButton
-                                                                        title='Delete'
+                                                                        title={t('common.delete')}
                                                                         color='error'
                                                                         onClick={() => deleteVariable(variable)}
                                                                     >

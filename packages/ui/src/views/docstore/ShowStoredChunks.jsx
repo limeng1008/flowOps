@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { translateNodeLabel } from '@/i18n/nodeI18n'
 import ReactJson from 'flowise-react-json-view'
 
 // material-ui
@@ -52,6 +54,7 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
 }))
 
 const ShowStoredChunks = () => {
+    const { t, i18n } = useTranslation()
     const customization = useSelector((state) => state.customization)
     const navigate = useNavigate()
     const dispatch = useDispatch()
@@ -77,7 +80,14 @@ const ShowStoredChunks = () => {
     const [showExpandedChunkDialog, setShowExpandedChunkDialog] = useState(false)
     const [expandedChunkDialogProps, setExpandedChunkDialogProps] = useState({})
     const [fileNames, setFileNames] = useState([])
-    const [loaderDisplayName, setLoaderDisplayName] = useState('')
+    const [loaderName, setLoaderName] = useState('')
+    const [loaderSourceName, setLoaderSourceName] = useState('')
+    const currentLang = i18n.resolvedLanguage || i18n.language
+    const translatedLoaderName = translateNodeLabel(loaderName, currentLang)
+    const loaderDisplayName = loaderSourceName ? `${translatedLoaderName} (${loaderSourceName})` : translatedLoaderName
+    const splitterDescription = getChunksApi.data?.file?.splitterName
+        ? translateNodeLabel(getChunksApi.data?.file?.splitterName, currentLang)
+        : getChunksApi.data?.description
 
     const chunkSelected = (chunkId) => {
         const selectedChunk = documentChunks.find((chunk) => chunk.id === chunkId)
@@ -105,7 +115,7 @@ const ShowStoredChunks = () => {
             )
             if (editResp.data) {
                 enqueueSnackbar({
-                    message: 'Document chunk successfully edited!',
+                    message: t('common.chunkEdited'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -140,10 +150,10 @@ const ShowStoredChunks = () => {
 
     const onDeleteChunk = async (chunk) => {
         const confirmPayload = {
-            title: `Delete`,
-            description: `Delete chunk ${chunk.id} ? This action cannot be undone.`,
-            confirmButtonName: 'Delete',
-            cancelButtonName: 'Cancel'
+            title: t('pages.documentStores.deleteChunkTitle'),
+            description: t('pages.documentStores.deleteChunkConfirm', { id: chunk.id }),
+            confirmButtonName: t('pages.documentStores.delete'),
+            cancelButtonName: t('common.cancel')
         }
         const isConfirmed = await confirm(confirmPayload)
 
@@ -154,7 +164,7 @@ const ShowStoredChunks = () => {
                 const delResp = await documentsApi.deleteChunkFromStore(chunk.storeId, chunk.docId, chunk.id)
                 if (delResp.data) {
                     enqueueSnackbar({
-                        message: 'Document chunk successfully deleted!',
+                        message: t('common.chunkDeleted'),
                         options: {
                             key: new Date().getTime() + Math.random(),
                             variant: 'success',
@@ -216,17 +226,18 @@ const ShowStoredChunks = () => {
             setEnd(data.currentPage * 50 > data.count ? data.count : data.currentPage * 50)
 
             // Build the loader display name in format "LoaderName (sourceName)"
-            const loaderName = data.file?.loaderName || data.storeName || ''
+            const nextLoaderName = data.file?.loaderName || data.storeName || ''
             let sourceName = ''
 
             if (data.file?.files && data.file.files.length > 0) {
-                const fileNames = []
+                const nextFileNames = []
                 for (const attachedFile of data.file.files) {
-                    fileNames.push(attachedFile.name)
+                    nextFileNames.push(attachedFile.name)
                 }
-                setFileNames(fileNames)
-                sourceName = fileNames.join(', ')
+                setFileNames(nextFileNames)
+                sourceName = nextFileNames.join(', ')
             } else if (data.file?.source) {
+                setFileNames([])
                 const source = data.file.source
                 if (typeof source === 'string' && source.includes('base64')) {
                     sourceName = getFileName(source)
@@ -235,11 +246,12 @@ const ShowStoredChunks = () => {
                 } else if (typeof source === 'string') {
                     sourceName = source
                 }
+            } else {
+                setFileNames([])
             }
 
-            // Set display name in format "LoaderName (sourceName)" or just "LoaderName"
-            const displayName = sourceName ? `${loaderName} (${sourceName})` : loaderName
-            setLoaderDisplayName(displayName)
+            setLoaderName(nextLoaderName)
+            setLoaderSourceName(sourceName)
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -256,7 +268,7 @@ const ShowStoredChunks = () => {
                             isBackButton={true}
                             search={false}
                             title={loaderDisplayName}
-                            description={getChunksApi.data?.file?.splitterName || getChunksApi.data?.description}
+                            description={splitterDescription}
                             onBack={() => navigate(-1)}
                         ></ViewHeader>
                         <div style={{ width: '100%' }}>
@@ -319,7 +331,11 @@ const ShowStoredChunks = () => {
                                             }
                                         />
                                     </IconButton>
-                                    Showing {Math.min(start, totalChunks)}-{end} of {totalChunks} chunks
+                                    {t('pages.documentStores.showingChunks', {
+                                        start: Math.min(start, totalChunks),
+                                        end,
+                                        total: totalChunks
+                                    })}
                                     <IconButton
                                         size='small'
                                         onClick={() => changePage(currentPage + 1)}
@@ -342,7 +358,9 @@ const ShowStoredChunks = () => {
                                 </div>
                                 <div style={{ marginRight: 20, display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                     <IconLanguage style={{ marginRight: 10 }} size={20} />
-                                    {getChunksApi.data?.characters?.toLocaleString()} characters
+                                    {t('pages.documentStores.charactersCount', {
+                                        count: getChunksApi.data?.characters?.toLocaleString() || 0
+                                    })}
                                 </div>
                             </div>
                         </div>
@@ -364,7 +382,7 @@ const ShowStoredChunks = () => {
                                                 alt='chunks_emptySVG'
                                             />
                                         </Box>
-                                        <div>No Chunks</div>
+                                        <div>{t('pages.documentStores.noChunks')}</div>
                                     </div>
                                 )}
                                 {documentChunks.length > 0 &&
@@ -378,7 +396,10 @@ const ShowStoredChunks = () => {
                                                 <Card>
                                                     <CardContent sx={{ p: 2 }}>
                                                         <Typography sx={{ wordWrap: 'break-word', mb: 1 }} variant='h5'>
-                                                            {`#${row.chunkNo}. Characters: ${row.pageContent.length}`}
+                                                            {t('pages.documentStores.chunkCharacters', {
+                                                                number: row.chunkNo,
+                                                                count: row.pageContent.length
+                                                            })}
                                                         </Typography>
                                                         <Typography sx={{ wordWrap: 'break-word' }} variant='body2'>
                                                             {row.pageContent}

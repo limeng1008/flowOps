@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState, useEffect, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 
 import {
     Tabs,
@@ -85,6 +86,7 @@ function a11yProps(index) {
 }
 
 const APICodeDialog = ({ show, dialogProps, onCancel }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const navigate = useNavigate()
     const dispatch = useDispatch()
@@ -914,18 +916,16 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                                                     >
                                                         <IconExclamationCircle size={30} color='rgb(116,66,16)' />
                                                         <span style={{ color: 'rgb(116,66,16)', marginLeft: 10, fontWeight: 500 }}>
-                                                            {
-                                                                'For security reason, override config is disabled by default. You can change this by going into Chatflow Configuration -> Security tab, and enable the property you want to override.'
-                                                            }
-                                                            &nbsp;Refer{' '}
+                                                            {t('common.overrideSecurityWarn')}
+                                                            &nbsp;{t('common.referText')}{' '}
                                                             <a
                                                                 rel='noreferrer'
                                                                 target='_blank'
                                                                 href='https://docs.flowiseai.com/using-flowise/prediction#configuration-override'
                                                             >
-                                                                here
+                                                                {t('common.here')}
                                                             </a>{' '}
-                                                            for more details
+                                                            {t('common.forMoreDetails')}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -1047,8 +1047,7 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                                                     >
                                                         <IconBulb size={30} color='#2d6a4f' />
                                                         <span style={{ color: '#2d6a4f', marginLeft: 10, fontWeight: 500 }}>
-                                                            You can also specify multiple values for a config parameter by specifying the
-                                                            node id
+                                                            {t('common.specifyMultipleValues')}
                                                         </span>
                                                     </div>
                                                     <div style={{ padding: 10 }}>

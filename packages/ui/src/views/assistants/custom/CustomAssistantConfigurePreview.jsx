@@ -2,6 +2,7 @@ import { cloneDeep, set } from 'lodash'
 import { memo, useEffect, useState, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { FullPageChat } from 'flowise-embed-react'
 import PropTypes from 'prop-types'
 
@@ -81,6 +82,7 @@ const CustomAssistantConfigurePreview = () => {
     const settingsRef = useRef()
     const canvas = useSelector((state) => state.canvas)
     const customization = useSelector((state) => state.customization)
+    const { t } = useTranslation()
 
     const getSpecificAssistantApi = useApi(assistantsApi.getSpecificAssistant)
     const getChatModelsApi = useApi(assistantsApi.getChatModels)
@@ -94,7 +96,7 @@ const CustomAssistantConfigurePreview = () => {
     const [chatModelsOptions, setChatModelsOptions] = useState([])
     const [selectedChatModel, setSelectedChatModel] = useState({})
     const [selectedCustomAssistant, setSelectedCustomAssistant] = useState({})
-    const [customAssistantInstruction, setCustomAssistantInstruction] = useState('You are helpful assistant')
+    const [customAssistantInstruction, setCustomAssistantInstruction] = useState(t('pages.assistants.custom.defaultInstruction'))
     const [customAssistantFlowId, setCustomAssistantFlowId] = useState()
     const [documentStoreOptions, setDocumentStoreOptions] = useState([])
     const [selectedDocumentStores, setSelectedDocumentStores] = useState([])
@@ -152,7 +154,7 @@ const CustomAssistantConfigurePreview = () => {
 
     const displayWarning = () => {
         enqueueSnackbar({
-            message: 'Please fill in all mandatory fields.',
+            message: t('pages.assistants.custom.mandatoryFields'),
             options: {
                 key: new Date().getTime() + Math.random(),
                 variant: 'warning',
@@ -269,7 +271,7 @@ const CustomAssistantConfigurePreview = () => {
                     if (saveAssistantResp.data) {
                         setLoading(false)
                         enqueueSnackbar({
-                            message: 'Assistant saved successfully',
+                            message: t('pages.assistants.custom.saveSuccess'),
                             options: {
                                 key: new Date().getTime() + Math.random(),
                                 variant: 'success',
@@ -285,9 +287,9 @@ const CustomAssistantConfigurePreview = () => {
             } catch (error) {
                 setLoading(false)
                 enqueueSnackbar({
-                    message: `Failed to save assistant: ${
-                        typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                    }`,
+                    message: t('pages.assistants.custom.saveFailed', {
+                        message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                    }),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'error',
@@ -488,9 +490,9 @@ const CustomAssistantConfigurePreview = () => {
         } catch (error) {
             console.error('Error preparing config', error)
             enqueueSnackbar({
-                message: `Failed to save assistant: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('pages.assistants.custom.saveFailed', {
+                    message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -512,20 +514,20 @@ const CustomAssistantConfigurePreview = () => {
             handleDeleteFlow()
         } else if (setting === 'viewMessages') {
             setViewMessagesDialogProps({
-                title: 'View Messages',
+                title: t('pages.assistants.custom.viewMessages'),
                 chatflow: canvas.chatflow,
                 isChatflow: false
             })
             setViewMessagesDialogOpen(true)
         } else if (setting === 'viewLeads') {
             setViewLeadsDialogProps({
-                title: 'View Leads',
+                title: t('pages.assistants.custom.viewLeads'),
                 chatflow: canvas.chatflow
             })
             setViewLeadsDialogOpen(true)
         } else if (setting === 'chatflowConfiguration') {
             setChatflowConfigurationDialogProps({
-                title: `Assistant Configuration`,
+                title: t('pages.assistants.custom.configuration'),
                 chatflow: canvas.chatflow
             })
             setChatflowConfigurationDialogOpen(true)
@@ -534,10 +536,10 @@ const CustomAssistantConfigurePreview = () => {
 
     const handleDeleteFlow = async () => {
         const confirmPayload = {
-            title: `Delete`,
-            description: `Delete ${selectedCustomAssistant.name}?`,
-            confirmButtonName: 'Delete',
-            cancelButtonName: 'Cancel'
+            title: t('pages.assistants.custom.deleteTitle'),
+            description: t('pages.assistants.custom.deleteDescription', { name: selectedCustomAssistant.name }),
+            confirmButtonName: t('common.delete'),
+            cancelButtonName: t('common.cancel')
         }
         const isConfirmed = await confirm(confirmPayload)
 
@@ -570,12 +572,12 @@ const CustomAssistantConfigurePreview = () => {
         const dialogProps = {
             value,
             inputParam: {
-                label: 'Instructions',
+                label: t('pages.assistants.custom.instructions'),
                 name: 'instructions',
                 type: 'string'
             },
-            confirmButtonName: 'Save',
-            cancelButtonName: 'Cancel'
+            confirmButtonName: t('common.save'),
+            cancelButtonName: t('common.cancel')
         }
         setExpandDialogProps(dialogProps)
         setShowExpandDialog(true)
@@ -611,7 +613,7 @@ const CustomAssistantConfigurePreview = () => {
                 })
                 setSelectedDocumentStores(newSelectedDocumentStores)
                 enqueueSnackbar({
-                    message: 'Document Store Tool Description generated successfully',
+                    message: t('pages.assistants.custom.docStoreDescriptionGenerated'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -650,8 +652,8 @@ const CustomAssistantConfigurePreview = () => {
         }
 
         setAssistantPromptGeneratorDialogProps({
-            title: 'Generate Instructions',
-            description: 'You can generate a prompt template by sharing basic details about your task.',
+            title: t('pages.assistants.custom.generateInstructions'),
+            description: t('pages.assistants.custom.generateInstructionsDescription'),
             data: { selectedChatModel }
         })
         setAssistantPromptGeneratorDialogOpen(true)
@@ -659,7 +661,7 @@ const CustomAssistantConfigurePreview = () => {
 
     const onAPIDialogClick = () => {
         setAPIDialogProps({
-            title: 'Embed in website or use as API',
+            title: t('pages.assistants.custom.embedApiTitle'),
             chatflowid: customAssistantFlowId,
             chatflowApiKeyId: canvas.chatflow.apikeyid,
             isSessionMemory: true
@@ -790,7 +792,7 @@ const CustomAssistantConfigurePreview = () => {
             const chatflow = getSpecificChatflowApi.data
             dispatch({ type: SET_CHATFLOW, chatflow })
         } else if (getSpecificChatflowApi.error) {
-            setError(`Failed to retrieve: ${getSpecificChatflowApi.error.response.data.message}`)
+            setError(t('pages.assistants.custom.retrieveFailed', { message: getSpecificChatflowApi.error.response.data.message }))
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -864,7 +866,7 @@ const CustomAssistantConfigurePreview = () => {
                                                         size='small'
                                                         color='secondary'
                                                         aria-label='back'
-                                                        title='Back'
+                                                        title={t('common.back')}
                                                         onClick={() => navigate(-1)}
                                                     >
                                                         <IconArrowLeft />
@@ -875,7 +877,10 @@ const CustomAssistantConfigurePreview = () => {
                                                 </Box>
                                                 <div style={{ flex: 1 }}></div>
                                                 {customAssistantFlowId && !loadingAssistant && (
-                                                    <ButtonBase title='API Endpoint' sx={{ borderRadius: '50%', mr: 2 }}>
+                                                    <ButtonBase
+                                                        title={t('pages.assistants.custom.apiEndpoint')}
+                                                        sx={{ borderRadius: '50%', mr: 2 }}
+                                                    >
                                                         <Avatar
                                                             variant='rounded'
                                                             sx={{
@@ -897,7 +902,7 @@ const CustomAssistantConfigurePreview = () => {
                                                     </ButtonBase>
                                                 )}
                                                 <Available permission={'assistants:create'}>
-                                                    <ButtonBase title={`Save`} sx={{ borderRadius: '50%', mr: 2 }}>
+                                                    <ButtonBase title={t('common.save')} sx={{ borderRadius: '50%', mr: 2 }}>
                                                         <Avatar
                                                             variant='rounded'
                                                             sx={{
@@ -919,7 +924,11 @@ const CustomAssistantConfigurePreview = () => {
                                                     </ButtonBase>
                                                 </Available>
                                                 {customAssistantFlowId && !loadingAssistant && (
-                                                    <ButtonBase ref={settingsRef} title='Settings' sx={{ borderRadius: '50%' }}>
+                                                    <ButtonBase
+                                                        ref={settingsRef}
+                                                        title={t('pages.assistants.custom.settings')}
+                                                        sx={{ borderRadius: '50%' }}
+                                                    >
                                                         <Avatar
                                                             variant='rounded'
                                                             sx={{
@@ -941,7 +950,11 @@ const CustomAssistantConfigurePreview = () => {
                                                 )}
                                                 {!customAssistantFlowId && !loadingAssistant && (
                                                     <Available permission={'assistants:delete'}>
-                                                        <ButtonBase ref={settingsRef} title='Delete Assistant' sx={{ borderRadius: '50%' }}>
+                                                        <ButtonBase
+                                                            ref={settingsRef}
+                                                            title={t('pages.assistants.deleteAssistantTitle')}
+                                                            sx={{ borderRadius: '50%' }}
+                                                        >
                                                             <Avatar
                                                                 variant='rounded'
                                                                 sx={{
@@ -976,7 +989,8 @@ const CustomAssistantConfigurePreview = () => {
                                         >
                                             <div style={{ display: 'flex', flexDirection: 'row' }}>
                                                 <Typography>
-                                                    Select Model<span style={{ color: 'red' }}>&nbsp;*</span>
+                                                    {t('pages.assistants.custom.selectModel')}
+                                                    <span style={{ color: 'red' }}>&nbsp;*</span>
                                                 </Typography>
                                             </div>
                                             <Dropdown
@@ -998,7 +1012,7 @@ const CustomAssistantConfigurePreview = () => {
                                                         }
                                                     }
                                                 }}
-                                                value={selectedChatModel ? selectedChatModel?.name : 'choose an option'}
+                                                value={selectedChatModel ? selectedChatModel?.name : t('pages.assistants.chooseOption')}
                                             />
                                         </Box>
                                         <Box
@@ -1013,7 +1027,8 @@ const CustomAssistantConfigurePreview = () => {
                                         >
                                             <Stack sx={{ position: 'relative', alignItems: 'center' }} direction='row'>
                                                 <Typography>
-                                                    Instructions<span style={{ color: 'red' }}>&nbsp;*</span>
+                                                    {t('pages.assistants.custom.instructions')}
+                                                    <span style={{ color: 'red' }}>&nbsp;*</span>
                                                 </Typography>
                                                 <div style={{ flex: 1 }}></div>
                                                 <IconButton
@@ -1022,7 +1037,7 @@ const CustomAssistantConfigurePreview = () => {
                                                         height: 25,
                                                         width: 25
                                                     }}
-                                                    title='Expand'
+                                                    title={t('pages.assistants.custom.expand')}
                                                     color='secondary'
                                                     onClick={() => onExpandDialogClicked(customAssistantInstruction)}
                                                 >
@@ -1030,14 +1045,14 @@ const CustomAssistantConfigurePreview = () => {
                                                 </IconButton>
                                                 {selectedChatModel?.name && (
                                                     <Button
-                                                        title='Generate instructions using model'
+                                                        title={t('pages.assistants.custom.generateInstructionsTooltip')}
                                                         sx={{ borderRadius: 20 }}
                                                         size='small'
                                                         variant='text'
                                                         onClick={() => generateInstruction()}
                                                         startIcon={<IconWand size={20} />}
                                                     >
-                                                        Generate
+                                                        {t('pages.assistants.custom.generate')}
                                                     </Button>
                                                 )}
                                             </Stack>
@@ -1061,8 +1076,8 @@ const CustomAssistantConfigurePreview = () => {
                                             }}
                                         >
                                             <Stack sx={{ position: 'relative', alignItems: 'center' }} direction='row'>
-                                                <Typography>Knowledge (Document Stores)</Typography>
-                                                <TooltipWithParser title='Give your assistant context about different document sources. Document stores must be upserted in advance.' />
+                                                <Typography>{t('pages.assistants.custom.knowledgeDocumentStores')}</Typography>
+                                                <TooltipWithParser title={t('pages.assistants.custom.knowledgeDocumentStoresHelp')} />
                                             </Stack>
                                             <MultiDropdown
                                                 key={JSON.stringify(selectedDocumentStores)}
@@ -1075,14 +1090,15 @@ const CustomAssistantConfigurePreview = () => {
                                                         onDocStoreItemSelected(newValue)
                                                     }
                                                 }}
-                                                value={selectedDocumentStores.map((ds) => ds.id) ?? 'choose an option'}
+                                                value={selectedDocumentStores.map((ds) => ds.id) ?? t('pages.assistants.chooseOption')}
                                             />
                                             {selectedDocumentStores.length > 0 && (
                                                 <Stack sx={{ mt: 3, position: 'relative', alignItems: 'center' }} direction='row'>
                                                     <Typography>
-                                                        Describe Knowledge<span style={{ color: 'red' }}>&nbsp;*</span>
+                                                        {t('pages.assistants.custom.describeKnowledge')}
+                                                        <span style={{ color: 'red' }}>&nbsp;*</span>
                                                     </Typography>
-                                                    <TooltipWithParser title='Describe what the knowledge base is about, this is useful for the AI to know when and how to search for correct information' />
+                                                    <TooltipWithParser title={t('pages.assistants.custom.describeKnowledgeHelp')} />
                                                 </Stack>
                                             )}
                                             {selectedDocumentStores.map((ds, index) => {
@@ -1117,14 +1133,14 @@ const CustomAssistantConfigurePreview = () => {
                                                             <div style={{ flex: 1 }}></div>
                                                             {selectedChatModel?.name && (
                                                                 <Button
-                                                                    title='Generate description using model'
+                                                                    title={t('pages.assistants.custom.generateDescriptionTooltip')}
                                                                     sx={{ borderRadius: 20 }}
                                                                     size='small'
                                                                     variant='text'
                                                                     onClick={() => generateDocStoreToolDesc(ds.id)}
                                                                     startIcon={<IconWand size={20} />}
                                                                 >
-                                                                    Generate
+                                                                    {t('pages.assistants.custom.generate')}
                                                                 </Button>
                                                             )}
                                                         </Stack>
@@ -1141,8 +1157,10 @@ const CustomAssistantConfigurePreview = () => {
                                                             }}
                                                         />
                                                         <Stack sx={{ mt: 2, position: 'relative', alignItems: 'center' }} direction='row'>
-                                                            <Typography>Return Source Documents</Typography>
-                                                            <TooltipWithParser title='Return the actual source documents that were used to answer the question' />
+                                                            <Typography>{t('pages.assistants.custom.returnSourceDocuments')}</Typography>
+                                                            <TooltipWithParser
+                                                                title={t('pages.assistants.custom.returnSourceDocumentsHelp')}
+                                                            />
                                                         </Stack>
                                                         <SwitchInput
                                                             value={ds.returnSourceDocuments ?? false}
@@ -1190,8 +1208,8 @@ const CustomAssistantConfigurePreview = () => {
                                             }}
                                         >
                                             <Stack sx={{ position: 'relative', alignItems: 'center' }} direction='row'>
-                                                <Typography>Tools</Typography>
-                                                <TooltipWithParser title='Tools are actions that your assistant can perform' />
+                                                <Typography>{t('pages.assistants.custom.tools')}</Typography>
+                                                <TooltipWithParser title={t('pages.assistants.custom.toolsHelp')} />
                                             </Stack>
                                             {selectedTools.map((tool, index) => {
                                                 return (
@@ -1208,7 +1226,8 @@ const CustomAssistantConfigurePreview = () => {
                                                         <Box sx={{ pl: 2, pr: 2, pt: 2, pb: 0 }}>
                                                             <div style={{ display: 'flex', flexDirection: 'row' }}>
                                                                 <Typography>
-                                                                    Tool<span style={{ color: 'red' }}>&nbsp;*</span>
+                                                                    {t('pages.assistants.custom.tool')}
+                                                                    <span style={{ color: 'red' }}>&nbsp;*</span>
                                                                 </Typography>
                                                                 <div style={{ flex: 1 }}></div>
                                                                 <IconButton
@@ -1245,7 +1264,7 @@ const CustomAssistantConfigurePreview = () => {
                                                                         }
                                                                     }
                                                                 }}
-                                                                value={tool?.name || 'choose an option'}
+                                                                value={tool?.name || t('pages.assistants.chooseOption')}
                                                             />
                                                         </Box>
                                                         {tool && Object.keys(tool).length === 0 && (
@@ -1278,29 +1297,29 @@ const CustomAssistantConfigurePreview = () => {
                                             })}
                                             <Button
                                                 fullWidth
-                                                title='Add Tool'
+                                                title={t('pages.assistants.custom.addTool')}
                                                 sx={{ mt: 1, mb: 1, borderRadius: 20 }}
                                                 variant='outlined'
                                                 onClick={() => setSelectedTools([...selectedTools, {}])}
                                             >
-                                                Add Tool
+                                                {t('pages.assistants.custom.addTool')}
                                             </Button>
                                         </Box>
                                         {selectedChatModel && Object.keys(selectedChatModel).length > 0 && (
                                             <Available permission={'assistants:create'}>
                                                 <Button
                                                     fullWidth
-                                                    title='Save Assistant'
+                                                    title={t('pages.assistants.custom.saveAssistant')}
                                                     sx={{
                                                         mt: 1,
                                                         mb: 1,
                                                         borderRadius: 20,
-                                                        background: 'linear-gradient(45deg, #673ab7 30%, #1e88e5 90%)'
+                                                        background: 'linear-gradient(45deg, #22d3ee 30%, #1e88e5 90%)'
                                                     }}
                                                     variant='contained'
                                                     onClick={onSaveAndProcess}
                                                 >
-                                                    Save Assistant
+                                                    {t('pages.assistants.custom.saveAssistant')}
                                                 </Button>
                                             </Available>
                                         )}
@@ -1324,7 +1343,7 @@ const CustomAssistantConfigurePreview = () => {
                                                             height: pageHeight(),
                                                             showTitle: true,
                                                             backgroundColor: '#23262c',
-                                                            title: '  Preview',
+                                                            title: `  ${t('pages.assistants.custom.preview')}`,
                                                             botMessage: {
                                                                 backgroundColor: '#32353b',
                                                                 textColor: '#ffffff'
@@ -1359,7 +1378,7 @@ const CustomAssistantConfigurePreview = () => {
                                                             height: pageHeight(),
                                                             showTitle: true,
                                                             backgroundColor: '#fafafa',
-                                                            title: '  Preview',
+                                                            title: `  ${t('pages.assistants.custom.preview')}`,
                                                             botMessage: {
                                                                 backgroundColor: '#ffffff',
                                                                 textColor: '#303235'

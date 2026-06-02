@@ -2,6 +2,7 @@ import { createPortal } from 'react-dom'
 import PropTypes from 'prop-types'
 import { useState, useEffect } from 'react'
 import { useDispatch } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import {
     HIDE_CANVAS_DIALOG,
     SHOW_CANVAS_DIALOG,
@@ -30,6 +31,7 @@ const AddCustomAssistantDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
     const portalElement = document.getElementById('portal')
 
     const dispatch = useDispatch()
+    const { t } = useTranslation()
 
     // ==============================|| Snackbar ||============================== //
 
@@ -39,6 +41,12 @@ const AddCustomAssistantDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
     const closeSnackbar = (...args) => dispatch(closeSnackbarAction(...args))
 
     const [customAssistantName, setCustomAssistantName] = useState('')
+
+    const getErrorMessage = (err) => {
+        const responseData = err?.response?.data
+        if (typeof responseData === 'object') return responseData.message
+        return responseData || err.message || t('pages.assistants.unknownError')
+    }
 
     useEffect(() => {
         if (show) dispatch({ type: SHOW_CANVAS_DIALOG })
@@ -58,7 +66,7 @@ const AddCustomAssistantDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
             const createResp = await assistantsApi.createNewAssistant(obj)
             if (createResp.data) {
                 enqueueSnackbar({
-                    message: 'New Custom Assistant created.',
+                    message: t('pages.assistants.customAssistantCreated'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -73,9 +81,7 @@ const AddCustomAssistantDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
             }
         } catch (err) {
             enqueueSnackbar({
-                message: `Failed to add new Custom Assistant: ${
-                    typeof err.response.data === 'object' ? err.response.data.message : err.response.data
-                }`,
+                message: t('pages.assistants.customAssistantCreateFailed', { message: getErrorMessage(err) }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -110,7 +116,8 @@ const AddCustomAssistantDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
                 <Box sx={{ p: 2 }}>
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                         <Typography>
-                            Name<span style={{ color: 'red' }}>&nbsp;*</span>
+                            {t('pages.assistants.assistantName')}
+                            <span style={{ color: 'red' }}>&nbsp;*</span>
                         </Typography>
 
                         <div style={{ flexGrow: 1 }}></div>
@@ -127,9 +134,9 @@ const AddCustomAssistantDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
                 </Box>
             </DialogContent>
             <DialogActions>
-                <Button onClick={() => onCancel()}>Cancel</Button>
+                <Button onClick={() => onCancel()}>{dialogProps.cancelButtonName || t('common.cancel')}</Button>
                 <StyledButton disabled={!customAssistantName} variant='contained' onClick={() => createCustomAssistant()}>
-                    {dialogProps.confirmButtonName}
+                    {dialogProps.confirmButtonName || t('common.add')}
                 </StyledButton>
             </DialogActions>
             <ConfirmDialog />

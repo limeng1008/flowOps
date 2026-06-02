@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 import { Stack, Typography, Dialog, DialogContent, DialogTitle, DialogActions, Box } from '@mui/material'
 import CredentialInputHandler from '@/views/canvas/CredentialInputHandler'
 import { Dropdown } from '@/ui-component/dropdown/Dropdown'
@@ -10,6 +11,7 @@ import useApi from '@/hooks/useApi'
 
 const LoadAssistantDialog = ({ show, dialogProps, onCancel, onAssistantSelected, setError }) => {
     const portalElement = document.getElementById('portal')
+    const { t } = useTranslation()
 
     const getAllAvailableAssistantsApi = useApi(assistantsApi.getAllAvailableAssistants)
 
@@ -56,13 +58,13 @@ const LoadAssistantDialog = ({ show, dialogProps, onCancel, onAssistantSelected,
             aria-describedby='alert-dialog-description'
         >
             <DialogTitle sx={{ fontSize: '1rem' }} id='alert-dialog-title'>
-                {dialogProps.title}
+                {dialogProps.title || t('pages.assistants.loadExistingTitle')}
             </DialogTitle>
             <DialogContent>
                 <Box sx={{ p: 2 }}>
                     <Stack sx={{ position: 'relative' }} direction='row'>
                         <Typography variant='overline'>
-                            OpenAI Credential
+                            {t('pages.assistants.openAICredential')}
                             <span style={{ color: 'red' }}>&nbsp;*</span>
                         </Typography>
                     </Stack>
@@ -70,7 +72,7 @@ const LoadAssistantDialog = ({ show, dialogProps, onCancel, onAssistantSelected,
                         key={credentialId}
                         data={credentialId ? { credential: credentialId } : {}}
                         inputParam={{
-                            label: 'Connect Credential',
+                            label: t('pages.assistants.connectCredential'),
                             name: 'credential',
                             type: 'credential',
                             credentialNames: ['openAIApi']
@@ -85,7 +87,7 @@ const LoadAssistantDialog = ({ show, dialogProps, onCancel, onAssistantSelected,
                     <Box sx={{ p: 2 }}>
                         <Stack sx={{ position: 'relative' }} direction='row'>
                             <Typography variant='overline'>
-                                Assistants
+                                {t('pages.assistants.availableAssistants')}
                                 <span style={{ color: 'red' }}>&nbsp;*</span>
                             </Typography>
                         </Stack>
@@ -93,7 +95,7 @@ const LoadAssistantDialog = ({ show, dialogProps, onCancel, onAssistantSelected,
                             name={selectedOpenAIAssistantId}
                             options={availableAssistantsOptions}
                             onSelect={(newValue) => setSelectedOpenAIAssistantId(newValue)}
-                            value={selectedOpenAIAssistantId ?? 'choose an option'}
+                            value={selectedOpenAIAssistantId ?? t('pages.assistants.chooseOption')}
                         />
                     </Box>
                 )}
@@ -101,7 +103,7 @@ const LoadAssistantDialog = ({ show, dialogProps, onCancel, onAssistantSelected,
             {selectedOpenAIAssistantId && (
                 <DialogActions>
                     <StyledButton variant='contained' onClick={() => onAssistantSelected(selectedOpenAIAssistantId, credentialId)}>
-                        Load
+                        {t('pages.assistants.load')}
                     </StyledButton>
                 </DialogActions>
             )}

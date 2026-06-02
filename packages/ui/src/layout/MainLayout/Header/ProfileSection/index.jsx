@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 import { closeSnackbar as closeSnackbarAction, enqueueSnackbar as enqueueSnackbarAction, REMOVE_DIRTY } from '@/store/actions'
 import { exportData, stringify } from '@/utils/exportImport'
@@ -44,8 +45,21 @@ import Transitions from '@/ui-component/extended/Transitions'
 
 // assets
 import ExportingGIF from '@/assets/images/Exporting.gif'
-import { IconFileExport, IconFileUpload, IconInfoCircle, IconLogout, IconSettings, IconUserEdit, IconX } from '@tabler/icons-react'
+import {
+    IconCheck,
+    IconFileExport,
+    IconFileUpload,
+    IconInfoCircle,
+    IconLanguage,
+    IconLogout,
+    IconSettings,
+    IconUserEdit,
+    IconX
+} from '@tabler/icons-react'
 import './index.css'
+
+// i18n
+import { SUPPORTED_LANGUAGES } from '@/i18n'
 
 // API
 import exportImportApi from '@/api/exportimport'
@@ -212,8 +226,14 @@ ImportDialog.propTypes = {
 
 const ProfileSection = ({ handleLogout }) => {
     const theme = useTheme()
+    const { t, i18n } = useTranslation()
 
     const customization = useSelector((state) => state.customization)
+
+    const handleChangeLanguage = (lng) => {
+        i18n.changeLanguage(lng)
+        localStorage.setItem('language', lng)
+    }
 
     const [open, setOpen] = useState(false)
     const [aboutDialogOpen, setAboutDialogOpen] = useState(false)
@@ -438,7 +458,7 @@ const ProfileSection = ({ handleLogout }) => {
                                     ) : (
                                         <Box sx={{ p: 2 }}>
                                             <Typography component='span' variant='h4'>
-                                                User
+                                                {t('profile.user')}
                                             </Typography>
                                         </Box>
                                     )}
@@ -471,7 +491,9 @@ const ProfileSection = ({ handleLogout }) => {
                                                     <ListItemIcon>
                                                         <IconFileExport stroke={1.5} size='1.3rem' />
                                                     </ListItemIcon>
-                                                    <ListItemText primary={<Typography variant='body2'>Export</Typography>} />
+                                                    <ListItemText
+                                                        primary={<Typography variant='body2'>{t('profile.export')}</Typography>}
+                                                    />
                                                 </PermissionListItemButton>
                                                 <PermissionListItemButton
                                                     permissionId='workspace:import'
@@ -483,7 +505,9 @@ const ProfileSection = ({ handleLogout }) => {
                                                     <ListItemIcon>
                                                         <IconFileUpload stroke={1.5} size='1.3rem' />
                                                     </ListItemIcon>
-                                                    <ListItemText primary={<Typography variant='body2'>Import</Typography>} />
+                                                    <ListItemText
+                                                        primary={<Typography variant='body2'>{t('profile.import')}</Typography>}
+                                                    />
                                                 </PermissionListItemButton>
                                                 <input ref={inputRef} type='file' hidden onChange={fileChange} accept='.json' />
                                                 <ListItemButton
@@ -496,7 +520,9 @@ const ProfileSection = ({ handleLogout }) => {
                                                     <ListItemIcon>
                                                         <IconInfoCircle stroke={1.5} size='1.3rem' />
                                                     </ListItemIcon>
-                                                    <ListItemText primary={<Typography variant='body2'>Version</Typography>} />
+                                                    <ListItemText
+                                                        primary={<Typography variant='body2'>{t('profile.version')}</Typography>}
+                                                    />
                                                 </ListItemButton>
                                                 {isAuthenticated && !currentUser.isSSO && (
                                                     <ListItemButton
@@ -509,9 +535,46 @@ const ProfileSection = ({ handleLogout }) => {
                                                         <ListItemIcon>
                                                             <IconUserEdit stroke={1.5} size='1.3rem' />
                                                         </ListItemIcon>
-                                                        <ListItemText primary={<Typography variant='body2'>Account Settings</Typography>} />
+                                                        <ListItemText
+                                                            primary={
+                                                                <Typography variant='body2'>{t('profile.accountSettings')}</Typography>
+                                                            }
+                                                        />
                                                     </ListItemButton>
                                                 )}
+                                                <Divider sx={{ my: 1 }} />
+                                                <Box sx={{ px: 2, pb: 0.5 }}>
+                                                    <Typography
+                                                        variant='caption'
+                                                        sx={{
+                                                            display: 'flex',
+                                                            alignItems: 'center',
+                                                            gap: 0.5,
+                                                            color: theme.palette.text.secondary
+                                                        }}
+                                                    >
+                                                        <IconLanguage stroke={1.5} size='1rem' />
+                                                        {t('profile.language')}
+                                                    </Typography>
+                                                </Box>
+                                                {SUPPORTED_LANGUAGES.map((lng) => (
+                                                    <ListItemButton
+                                                        key={lng.code}
+                                                        sx={{ borderRadius: `${customization.borderRadius}px` }}
+                                                        selected={i18n.language === lng.code}
+                                                        onClick={() => handleChangeLanguage(lng.code)}
+                                                    >
+                                                        <ListItemIcon>
+                                                            {i18n.language === lng.code ? (
+                                                                <IconCheck stroke={1.5} size='1.3rem' />
+                                                            ) : (
+                                                                <span style={{ display: 'inline-block', width: '1.3rem' }} />
+                                                            )}
+                                                        </ListItemIcon>
+                                                        <ListItemText primary={<Typography variant='body2'>{lng.label}</Typography>} />
+                                                    </ListItemButton>
+                                                ))}
+                                                <Divider sx={{ my: 1 }} />
                                                 <ListItemButton
                                                     sx={{ borderRadius: `${customization.borderRadius}px` }}
                                                     onClick={handleLogout}
@@ -519,7 +582,9 @@ const ProfileSection = ({ handleLogout }) => {
                                                     <ListItemIcon>
                                                         <IconLogout stroke={1.5} size='1.3rem' />
                                                     </ListItemIcon>
-                                                    <ListItemText primary={<Typography variant='body2'>Logout</Typography>} />
+                                                    <ListItemText
+                                                        primary={<Typography variant='body2'>{t('profile.logout')}</Typography>}
+                                                    />
                                                 </ListItemButton>
                                             </List>
                                         </Box>
