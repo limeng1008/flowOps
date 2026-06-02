@@ -28,3 +28,15 @@
 -   产出可持续升级 / 上游合并策略 `upstream-merge-strategy.md`：实测 divergence（116 改 / 31 新增），定位 i18n 内联污染 92 个 view/组件为头号债；给出 git 拓扑、T1/T2/T3 法则、各层加法化、i18n codemod + FORK-CHANGES 账本 + CI 护栏、升级 runbook。
 -   落地 fork git 拓扑：建私有库 `limeng1008/flowOps`，`origin` 指它、`upstream` 指 FlowiseAI（只 fetch、禁推）；二开改动按层提交为 3 个 commit（components / ui / planning）叠在上游基线 `bc22bf8b` 之上，推送成功，`main` 跟踪 `origin/main`。
 -   过程修复：`nodeI18n.js` 3 处重复键（被 husky/eslint 门禁拦截），删除冗余重复项。
+
+### Codex 执行计划 T1–T6 落地（接入层国产化 + fork 可维护性）
+
+-   工作分支 `feat/cn-localization`（不碰 main，逐任务 commit + tsc/jest 门禁）；T1–T3 本人实现，T4–T6 由 Codex 执行。
+-   T1：`models.json` 还原为上游 pristine（0 diff），我方模型条目迁入 `models.flowops.json`，`modelLoader` 加载期按 provider 合并。
+-   T2：新增国产 chat 节点 Kimi(月之暗面)/豆包(火山方舟)/通义千问(DashScope 兼容)/MiniMax，复用 `openAICompatible` + `ChatZhipuAI` 范式（OpenAI 兼容端点 + credential + live 拉模型 + 兜底 + 测试）。
+-   T3：新增中文 embedding 节点 智谱/通义/硅基流动（共享 `openAICompatibleEmbedding`）；本地 TEI/Xinference/Ollama 沿用现成 `OpenAIEmbeddingCustom`。
+-   T4：FlowOps 主题色抽离为 `_flowops-vars.module.scss` 覆盖层，缩小对上游 `_themes-vars` 的内联改动。
+-   T5：新增 `FORK-CHANGES.md` 改动账本 + `scripts/fork-divergence.sh` 门禁（相对 upstream/main：174 改全部登记 / 83 新增，check passed）。
+-   T6：i18n 重放 codemod + 残留英文审计补齐；并把节点描述与输入 tooltip 翻译解耦（`translateNodeTooltip`）。
+-   Polish：国产节点中文化（label/description）+ lobe-icons 官方品牌图标（MIT）替换占位图（name/type 不变，DISABLED_NODES/models.flowops key 安全）。
+-   Review 拦截：剔除 Codex 误造的假 provider `EmbeddingDeepseek`（DeepSeek 无 embedding 接口）；早前「隐藏 Base Path」伪需求 + 混入的零散 i18n 已回退。组件 tsc 0 / jest 42、UI i18n 测试、divergence 门禁全绿。
