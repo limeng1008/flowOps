@@ -103,6 +103,23 @@
                     "name": "qwen2.5-32b-instruct"
                 }
             ]
+        },
+        {
+            "name": "chatMinimax",
+            "models": [
+                {
+                    "label": "MiniMax-Text-01",
+                    "name": "MiniMax-Text-01"
+                },
+                {
+                    "label": "abab6.5s-chat",
+                    "name": "abab6.5s-chat"
+                },
+                {
+                    "label": "abab6.5g-chat",
+                    "name": "abab6.5g-chat"
+                }
+            ]
         }
     ],
     "llm": [],
