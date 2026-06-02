@@ -14,6 +14,7 @@ import MainCard from '@/ui-component/cards/MainCard'
 
 // const
 import { flowContext } from '@/store/context/ReactFlowContext'
+import { useTranslation } from 'react-i18next'
 
 const CardWrapper = styled(MainCard)(({ theme }) => ({
     background: theme.palette.card.main,
@@ -34,6 +35,7 @@ const StyledNodeToolbar = styled(NodeToolbar)(({ theme }) => ({
 }))
 
 const StickyNote = ({ data }) => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const ref = useRef(null)
@@ -65,7 +67,7 @@ const StickyNote = ({ data }) => {
                 <ButtonGroup sx={{ gap: 1 }} variant='outlined' aria-label='Basic button group'>
                     <IconButton
                         size={'small'}
-                        title='Duplicate'
+                        title={t('permissions.actions.duplicate')}
                         onClick={() => {
                             duplicateNode(data.id)
                         }}
@@ -80,7 +82,7 @@ const StickyNote = ({ data }) => {
                     </IconButton>
                     <IconButton
                         size={'small'}
-                        title='Delete'
+                        title={t('common.delete')}
                         onClick={() => {
                             deleteNode(data.id)
                         }}

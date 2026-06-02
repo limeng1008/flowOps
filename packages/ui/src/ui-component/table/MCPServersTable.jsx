@@ -19,6 +19,7 @@ import {
 } from '@mui/material'
 import { IconTool } from '@tabler/icons-react'
 import { MCP_SERVER_STATUS } from '@/store/constant'
+import { useTranslation } from 'react-i18next'
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     borderColor: theme.palette.grey[900] + 25,
@@ -81,6 +82,7 @@ StatusBadge.propTypes = {
 }
 
 export const MCPServersTable = ({ data, isLoading, onSelect }) => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
 
@@ -94,10 +96,10 @@ export const MCPServersTable = ({ data, isLoading, onSelect }) => {
                     }}
                 >
                     <TableRow>
-                        <StyledTableCell>Name</StyledTableCell>
+                        <StyledTableCell>{t('common.name')}</StyledTableCell>
                         <StyledTableCell>Server URL</StyledTableCell>
                         <StyledTableCell>Status</StyledTableCell>
-                        <StyledTableCell>Tools</StyledTableCell>
+                        <StyledTableCell>{t('menu.tools')}</StyledTableCell>
                         <StyledTableCell>&nbsp;</StyledTableCell>
                     </TableRow>
                 </TableHead>

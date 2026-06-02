@@ -26,6 +26,7 @@ import { flowContext } from '@/store/context/ReactFlowContext'
 import webhookListenerApi from '@/api/webhooklistener'
 import { MemoizedReactMarkdown } from '@/ui-component/markdown/MemoizedReactMarkdown'
 import AgentExecutedDataCard from '@/views/chatmessage/AgentExecutedDataCard'
+import { useTranslation } from 'react-i18next'
 
 // ─── Geometry ─────────────────────────────────────────────────────────────────
 const MIN_W = 380
@@ -303,6 +304,7 @@ EndpointBlock.propTypes = {
 // ─── Drawer ───────────────────────────────────────────────────────────────────
 
 const WebhookListenerDrawer = ({ open, chatflowid, onClose, onStatusChange }) => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const isDark = customization?.isDarkMode
@@ -775,7 +777,7 @@ const WebhookListenerDrawer = ({ open, chatflowid, onClose, onStatusChange }) =>
                     <>
                         <Divider sx={{ my: 2.5, opacity: 0.6 }} />
                         <Box>
-                            <Caption>Error</Caption>
+                            <Caption>{t('pages.executions.stateError')}</Caption>
                             <Box
                                 sx={{
                                     border: `1px solid ${alpha(theme.palette.error.main, 0.4)}`,

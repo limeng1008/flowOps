@@ -12,8 +12,10 @@ import { IconEdit, IconTrash, IconX, IconLanguage } from '@tabler/icons-react'
 // Project imports
 import { CodeEditor } from '@/ui-component/editor/CodeEditor'
 import { PermissionButton, PermissionIconButton } from '@/ui-component/button/RBACButtons'
+import { useTranslation } from 'react-i18next'
 
 const ExpandedChunkDialog = ({ show, dialogProps, onCancel, onChunkEdit, onDeleteChunk, isReadOnly }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
 
     const customization = useSelector((state) => state.customization)
@@ -100,8 +102,8 @@ const ExpandedChunkDialog = ({ show, dialogProps, onCancel, onChunkEdit, onDelet
                             </PermissionIconButton>
                         )}
                         {isEdit && !isReadOnly && (
-                            <Button onClick={() => onEditCancel()} color='primary' title='Cancel' sx={{ ml: 2 }}>
-                                Cancel
+                            <Button onClick={() => onEditCancel()} color='primary' title={t('common.cancel')} sx={{ ml: 2 }}>
+                                {t('common.cancel')}
                             </Button>
                         )}
                         {isEdit && !isReadOnly && (
@@ -109,11 +111,11 @@ const ExpandedChunkDialog = ({ show, dialogProps, onCancel, onChunkEdit, onDelet
                                 permissionId={'documentStores:preview-process'}
                                 onClick={() => onEditSaved(true)}
                                 color='primary'
-                                title='Save'
+                                title={t('common.save')}
                                 variant='contained'
                                 sx={{ ml: 2, mr: 1 }}
                             >
-                                Save
+                                {t('common.save')}
                             </PermissionButton>
                         )}
                         {!isEdit && !isReadOnly && (
@@ -128,7 +130,7 @@ const ExpandedChunkDialog = ({ show, dialogProps, onCancel, onChunkEdit, onDelet
                                 <IconTrash />
                             </PermissionIconButton>
                         )}
-                        <IconButton onClick={onCancel} size='small' color='inherit' title='Close' sx={{ ml: 1 }}>
+                        <IconButton onClick={onCancel} size='small' color='inherit' title={t('common.close')} sx={{ ml: 1 }}>
                             <IconX />
                         </IconButton>
                     </div>

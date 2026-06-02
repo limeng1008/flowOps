@@ -38,6 +38,7 @@ import useNotifier from '@/utils/useNotifier'
 // API
 import chatflowsApi from '@/api/chatflows'
 import ttsApi from '@/api/tts'
+import { useTranslation } from 'react-i18next'
 
 const TextToSpeechType = {
     OPENAI_TTS: 'openai',
@@ -93,6 +94,7 @@ const textToSpeechProviders = {
 }
 
 const TextToSpeech = ({ dialogProps }) => {
+    const { t } = useTranslation()
     const dispatch = useDispatch()
 
     useNotifier()
@@ -431,7 +433,7 @@ const TextToSpeech = ({ dialogProps }) => {
                             }
                         }}
                     >
-                        <MenuItem value='none'>None</MenuItem>
+                        <MenuItem value='none'>{t('common.none')}</MenuItem>
                         {Object.values(textToSpeechProviders).map((provider) => (
                             <MenuItem key={provider.name} value={provider.name}>
                                 {provider.label}
@@ -648,7 +650,7 @@ const TextToSpeech = ({ dialogProps }) => {
                     onClick={onSave}
                     sx={{ minWidth: 100 }}
                 >
-                    Save
+                    {t('common.save')}
                 </StyledButton>
             </Box>
         </>

@@ -4,10 +4,12 @@ import unauthorizedSVG from '@/assets/images/unauthorized.svg'
 import { StyledButton } from '@/ui-component/button/StyledButton'
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 // ==============================|| UnauthorizedPage ||============================== //
 
 const UnauthorizedPage = () => {
+    const { t } = useTranslation()
     const currentUser = useSelector((state) => state.auth.user)
 
     return (
@@ -47,7 +49,7 @@ const UnauthorizedPage = () => {
                             </Link>
                         ) : (
                             <Link to='/login'>
-                                <StyledButton sx={{ px: 2, py: 1 }}>Back to Login</StyledButton>
+                                <StyledButton sx={{ px: 2, py: 1 }}>{t('auth.backToLogin')}</StyledButton>
                             </Link>
                         )}
                     </Stack>

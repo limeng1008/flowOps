@@ -16,6 +16,7 @@ import useNotifier from '@/utils/useNotifier'
 
 // API
 import chatflowsApi from '@/api/chatflows'
+import { useTranslation } from 'react-i18next'
 
 const formTitle = `Hey 👋 thanks for your interest!
 Let us know where we can reach you`
@@ -24,6 +25,7 @@ const endTitle = `Thank you!
 What can I do for you?`
 
 const Leads = ({ dialogProps }) => {
+    const { t } = useTranslation()
     const dispatch = useDispatch()
 
     useNotifier()
@@ -148,13 +150,21 @@ const Leads = ({ dialogProps }) => {
                         <Typography variant='h4'>Form fields</Typography>
                         <Box sx={{ width: '100%' }}>
                             <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
-                                <SwitchInput label='Name' onChange={(value) => handleChange('name', value)} value={leadsConfig.name} />
                                 <SwitchInput
-                                    label='Email Address'
+                                    label={t('common.name')}
+                                    onChange={(value) => handleChange('name', value)}
+                                    value={leadsConfig.name}
+                                />
+                                <SwitchInput
+                                    label={t('common.colEmailAddress')}
                                     onChange={(value) => handleChange('email', value)}
                                     value={leadsConfig.email}
                                 />
-                                <SwitchInput label='Phone' onChange={(value) => handleChange('phone', value)} value={leadsConfig.phone} />
+                                <SwitchInput
+                                    label={t('common.colPhone')}
+                                    onChange={(value) => handleChange('phone', value)}
+                                    value={leadsConfig.phone}
+                                />
                             </Box>
                         </Box>
                     </>
@@ -167,7 +177,7 @@ const Leads = ({ dialogProps }) => {
                     onClick={onSave}
                     sx={{ minWidth: 100 }}
                 >
-                    Save
+                    {t('common.save')}
                 </StyledButton>
             </Box>
         </>

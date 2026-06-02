@@ -25,6 +25,7 @@ import { AsyncDropdown } from '@/ui-component/dropdown/AsyncDropdown'
 // Icons
 import { IconX } from '@tabler/icons-react'
 import { Dropdown } from '@/ui-component/dropdown/Dropdown'
+import { useTranslation } from 'react-i18next'
 
 const promptDescription =
     'Prompt to generate questions based on the conversation history. You can use variable {history} to refer to the conversation history.'
@@ -302,6 +303,7 @@ const followUpPromptsOptions = {
 }
 
 const FollowUpPrompts = ({ dialogProps }) => {
+    const { t } = useTranslation()
     const dispatch = useDispatch()
 
     useNotifier()
@@ -615,7 +617,7 @@ const FollowUpPrompts = ({ dialogProps }) => {
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', mt: 2 }}>
                 <StyledButton disabled={checkDisabled()} variant='contained' onClick={onSave} sx={{ minWidth: 100 }}>
-                    Save
+                    {t('common.save')}
                 </StyledButton>
             </Box>
         </>

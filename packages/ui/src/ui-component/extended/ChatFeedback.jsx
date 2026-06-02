@@ -16,8 +16,10 @@ import useNotifier from '@/utils/useNotifier'
 
 // API
 import chatflowsApi from '@/api/chatflows'
+import { useTranslation } from 'react-i18next'
 
 const ChatFeedback = ({ dialogProps, onConfirm }) => {
+    const { t } = useTranslation()
     const dispatch = useDispatch()
 
     useNotifier()
@@ -95,7 +97,7 @@ const ChatFeedback = ({ dialogProps, onConfirm }) => {
             <SwitchInput label='Enable chat feedback' onChange={handleChange} value={chatFeedbackStatus} />
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', mt: 2 }}>
                 <StyledButton variant='contained' onClick={onSave} sx={{ minWidth: 100 }}>
-                    Save
+                    {t('common.save')}
                 </StyledButton>
             </Box>
         </Stack>

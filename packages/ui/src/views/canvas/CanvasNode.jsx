@@ -124,7 +124,7 @@ const CanvasNode = ({ data }) => {
                             }}
                         >
                             <IconButton
-                                title='Duplicate'
+                                title={t('permissions.actions.duplicate')}
                                 onClick={() => {
                                     duplicateNode(data.id)
                                 }}
@@ -134,7 +134,7 @@ const CanvasNode = ({ data }) => {
                                 <IconCopy />
                             </IconButton>
                             <IconButton
-                                title='Delete'
+                                title={t('common.delete')}
                                 onClick={() => {
                                     deleteNode(data.id)
                                 }}

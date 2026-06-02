@@ -9,6 +9,7 @@ import { closeSnackbar as closeSnackbarAction, enqueueSnackbar as enqueueSnackba
 import { IconX, IconWand, IconArrowLeft, IconNotebook, IconLanguage, IconMail, IconCode, IconReport, IconWorld } from '@tabler/icons-react'
 import useNotifier from '@/utils/useNotifier'
 import { LoadingButton } from '@mui/lab'
+import { useTranslation } from 'react-i18next'
 
 const defaultInstructions = [
     {
@@ -38,6 +39,7 @@ const defaultInstructions = [
 ]
 
 const AssistantPromptGenerator = ({ show, dialogProps, onCancel, onConfirm }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const [customAssistantInstruction, setCustomAssistantInstruction] = useState('')
     const [generatedInstruction, setGeneratedInstruction] = useState('')
@@ -168,7 +170,7 @@ const AssistantPromptGenerator = ({ show, dialogProps, onCancel, onConfirm }) =>
                             }}
                             startIcon={<IconWand size={20} />}
                         >
-                            Generate
+                            {t('pages.assistants.custom.generate')}
                         </LoadingButton>
                     )}
                     {generatedInstruction && (
@@ -179,12 +181,12 @@ const AssistantPromptGenerator = ({ show, dialogProps, onCancel, onConfirm }) =>
                                 setGeneratedInstruction('')
                             }}
                         >
-                            Back
+                            {t('canvas.back')}
                         </Button>
                     )}
                     {generatedInstruction && (
                         <StyledButton variant='contained' onClick={() => onConfirm(generatedInstruction)}>
-                            Apply
+                            {t('common.apply')}
                         </StyledButton>
                     )}
                 </DialogActions>

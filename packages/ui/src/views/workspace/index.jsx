@@ -61,6 +61,7 @@ import { workspaceSwitchSuccess } from '@/store/reducers/authSlice'
 import { Link } from 'react-router-dom'
 
 function ShowWorkspaceRow(props) {
+    const { t } = useTranslation()
     const customization = useSelector((state) => state.customization)
     const currentUser = useSelector((state) => state.auth.user)
     const [open, setOpen] = useState(false)
@@ -168,7 +169,7 @@ function ShowWorkspaceRow(props) {
             <Drawer anchor='right' open={open} onClose={() => setOpen(false)} sx={{ minWidth: 320 }}>
                 <Box sx={{ p: 4, height: 'auto', width: 650 }}>
                     <Typography sx={{ textAlign: 'left', mb: 2 }} variant='h2'>
-                        Users
+                        {t('menu.users')}
                     </Typography>
                     <TableContainer
                         style={{ display: 'flex', flexDirection: 'row' }}
@@ -183,7 +184,7 @@ function ShowWorkspaceRow(props) {
                                 }}
                             >
                                 <TableRow>
-                                    <StyledTableCell sx={{ width: '60%' }}>User</StyledTableCell>
+                                    <StyledTableCell sx={{ width: '60%' }}>{t('profile.user')}</StyledTableCell>
                                     <StyledTableCell sx={{ width: '40%' }}>Role</StyledTableCell>
                                 </TableRow>
                             </TableHead>
@@ -424,7 +425,7 @@ const Workspaces = () => {
                                 onClick={addNew}
                                 startIcon={<IconPlus />}
                             >
-                                Add New
+                                {t('common.addNew')}
                             </StyledPermissionButton>
                         </ViewHeader>
                         {!isLoading && workspaces.length <= 0 ? (
@@ -453,10 +454,10 @@ const Workspaces = () => {
                                         }}
                                     >
                                         <TableRow>
-                                            <TableCell>Name</TableCell>
-                                            <TableCell>Description</TableCell>
-                                            <TableCell>Users</TableCell>
-                                            <TableCell>Last Updated</TableCell>
+                                            <TableCell>{t('common.name')}</TableCell>
+                                            <TableCell>{t('common.description')}</TableCell>
+                                            <TableCell>{t('menu.users')}</TableCell>
+                                            <TableCell>{t('pages.credentials.colLastUpdated')}</TableCell>
                                             <TableCell> </TableCell>
                                         </TableRow>
                                     </TableHead>

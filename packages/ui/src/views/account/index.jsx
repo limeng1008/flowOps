@@ -658,7 +658,7 @@ const AccountSettings = () => {
                                         </Box>
                                     </Box>
                                 </SettingsSection>
-                                <SettingsSection title='Usage'>
+                                <SettingsSection title={t('pages.apikey.usage')}>
                                     <Box
                                         sx={{
                                             width: '100%',
@@ -737,7 +737,7 @@ const AccountSettings = () => {
                         <SettingsSection
                             action={
                                 <StyledButton onClick={saveProfileData} sx={{ borderRadius: 2, height: 40 }} variant='contained'>
-                                    Save
+                                    {t('common.save')}
                                 </StyledButton>
                             }
                             title={t('pages.account.profile')}
@@ -786,7 +786,7 @@ const AccountSettings = () => {
                                         sx={{ borderRadius: 2, height: 40 }}
                                         variant='contained'
                                     >
-                                        Save
+                                        {t('common.save')}
                                     </StyledButton>
                                 }
                                 title={t('pages.account.security')}
@@ -838,10 +838,7 @@ const AccountSettings = () => {
                                             value={newPassword}
                                         />
                                         <Typography variant='caption'>
-                                            <i>
-                                                Password must be at least 8 characters long and contain at least one lowercase letter, one
-                                                uppercase letter, one digit, and one special character.
-                                            </i>
+                                            <i>{t('auth.passwordRule')}</i>
                                         </Typography>
                                     </Box>
                                     <Box
@@ -1198,7 +1195,7 @@ const AccountSettings = () => {
                 {getCustomerDefaultSourceApi.data?.invoice_settings?.default_payment_method && (
                     <DialogActions>
                         <Button onClick={handleRemoveSeatsDialogClose} disabled={isUpdatingSeats}>
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             variant='outlined'
@@ -1452,7 +1449,7 @@ const AccountSettings = () => {
                 {getCustomerDefaultSourceApi.data?.invoice_settings?.default_payment_method && (
                     <DialogActions>
                         <Button onClick={handleAddSeatsDialogClose} disabled={isUpdatingSeats}>
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             variant='contained'
@@ -1489,7 +1486,7 @@ const AccountSettings = () => {
                     }
                 }}
             >
-                <DialogTitle>Delete Account</DialogTitle>
+                <DialogTitle>{t('pages.account.deleteAccount')}</DialogTitle>
                 <DialogContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
                         <Typography>
@@ -1520,7 +1517,7 @@ const AccountSettings = () => {
                         }}
                         disabled={deleteAccountApi.loading}
                     >
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                     <Button
                         variant='contained'

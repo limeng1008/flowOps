@@ -29,6 +29,7 @@ import useNotifier from '@/utils/useNotifier'
 
 // API
 import chatflowsApi from '@/api/chatflows'
+import { useTranslation } from 'react-i18next'
 
 const message = `The full contents of uploaded files will be converted to text and sent to the Agent.
 <br />
@@ -52,6 +53,7 @@ const availableFileTypes = [
 ]
 
 const FileUpload = ({ dialogProps }) => {
+    const { t } = useTranslation()
     const dispatch = useDispatch()
     const customization = useSelector((state) => state.customization)
 
@@ -276,7 +278,7 @@ const FileUpload = ({ dialogProps }) => {
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', mt: 2 }}>
                 <StyledButton variant='contained' onClick={onSave} sx={{ minWidth: 100 }}>
-                    Save
+                    {t('common.save')}
                 </StyledButton>
             </Box>
         </>

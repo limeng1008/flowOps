@@ -14,8 +14,10 @@ import { Input } from '@/ui-component/input/Input'
 
 // const
 import { flowContext } from '@/store/context/ReactFlowContext'
+import { useTranslation } from 'react-i18next'
 
 const StickyNote = ({ data }) => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const canvas = useSelector((state) => state.canvas)
     const customization = useSelector((state) => state.customization)
@@ -74,7 +76,7 @@ const StickyNote = ({ data }) => {
                             }}
                         >
                             <IconButton
-                                title='Duplicate'
+                                title={t('permissions.actions.duplicate')}
                                 onClick={() => {
                                     duplicateNode(data.id)
                                 }}
@@ -88,7 +90,7 @@ const StickyNote = ({ data }) => {
                                 <IconCopy />
                             </IconButton>
                             <IconButton
-                                title='Delete'
+                                title={t('common.delete')}
                                 onClick={() => {
                                     deleteNode(data.id)
                                 }}

@@ -24,8 +24,10 @@ import { useSnackbar } from 'notistack'
 import PropTypes from 'prop-types'
 import { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 const PricingDialog = ({ open, onClose }) => {
+    const { t } = useTranslation()
     const customization = useSelector((state) => state.customization)
     const currentUser = useSelector((state) => state.auth.user)
     const theme = useTheme()
@@ -664,7 +666,7 @@ const PricingDialog = ({ open, onClose }) => {
                 {getCustomerDefaultSourceApi.data?.invoice_settings?.default_payment_method && (
                     <DialogActions>
                         <Button onClick={handlePlanDialogClose} disabled={isUpdatingPlan}>
-                            Cancel
+                            {t('common.cancel')}
                         </Button>
                         <Button
                             variant='contained'

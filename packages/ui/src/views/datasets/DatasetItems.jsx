@@ -46,10 +46,12 @@ import { useAuth } from '@/hooks/useAuth'
 import empty_datasetSVG from '@/assets/images/empty_datasets.svg'
 import { IconTrash, IconPlus, IconX, IconUpload, IconArrowsDownUp } from '@tabler/icons-react'
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator'
+import { useTranslation } from 'react-i18next'
 
 // ==============================|| Dataset Items ||============================== //
 
 const EvalDatasetRows = () => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const dispatch = useDispatch()
@@ -327,7 +329,7 @@ const EvalDatasetRows = () => {
                                 color='error'
                                 startIcon={<IconTrash />}
                             >
-                                Delete {selected.length} {selected.length === 1 ? 'item' : 'items'}
+                                {t('common.delete')} {selected.length} {selected.length === 1 ? 'item' : 'items'}
                             </PermissionButton>
                         )}
                         {!isLoading && dataset?.rows?.length <= 0 ? (
@@ -339,7 +341,7 @@ const EvalDatasetRows = () => {
                                         alt='empty_datasetSVG'
                                     />
                                 </Box>
-                                <div>No Dataset Items Yet</div>
+                                <div>{t('common.noDatasetItemsYet')}</div>
                                 <StyledPermissionButton
                                     permissionId={'datasets:create,datasets:update'}
                                     variant='contained'

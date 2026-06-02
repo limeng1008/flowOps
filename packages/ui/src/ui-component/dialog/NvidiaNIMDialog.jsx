@@ -18,8 +18,10 @@ import axios from 'axios'
 import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useTranslation } from 'react-i18next'
 
 const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
 
     const modelOptions = {
@@ -389,7 +391,7 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
                                             value={nimRelaxMemConstraints}
                                             onChange={(e) => setNimRelaxMemConstraints(e.target.value)}
                                         >
-                                            <MenuItem value='1'>Yes</MenuItem>
+                                            <MenuItem value='1'>{t('common.yes')}</MenuItem>
                                             <MenuItem value='0'>No</MenuItem>
                                         </Select>
                                     </FormControl>
@@ -410,7 +412,7 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={onClose} variant='outline'>
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                     {activeStep === 0 && (
                         <Button onClick={handleNext} variant='outline' color='secondary'>
@@ -450,7 +452,7 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
                             setExistingContainer(null)
                         }}
                     >
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                     <Button
                         onClick={() => {

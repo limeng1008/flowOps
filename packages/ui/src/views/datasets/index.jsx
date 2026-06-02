@@ -217,7 +217,7 @@ const EvalDatasets = () => {
                                 onClick={addNew}
                                 startIcon={<IconPlus />}
                             >
-                                Add New
+                                {t('common.addNew')}
                             </StyledPermissionButton>
                         </ViewHeader>
                         {!isLoading && datasets.length <= 0 ? (
@@ -247,10 +247,10 @@ const EvalDatasets = () => {
                                             }}
                                         >
                                             <TableRow>
-                                                <TableCell>Name</TableCell>
-                                                <TableCell>Description</TableCell>
+                                                <TableCell>{t('common.name')}</TableCell>
+                                                <TableCell>{t('common.description')}</TableCell>
                                                 <TableCell>Rows</TableCell>
-                                                <TableCell>Last Updated</TableCell>
+                                                <TableCell>{t('pages.credentials.colLastUpdated')}</TableCell>
                                                 <Available permission={'datasets:update,datasets:create'}>
                                                     <TableCell> </TableCell>
                                                 </Available>
@@ -326,7 +326,11 @@ const EvalDatasets = () => {
                                                             </TableCell>
                                                             <Available permission={'datasets:update,datasets:create'}>
                                                                 <TableCell>
-                                                                    <IconButton title='Edit' color='primary' onClick={() => edit(ds)}>
+                                                                    <IconButton
+                                                                        title={t('common.edit')}
+                                                                        color='primary'
+                                                                        onClick={() => edit(ds)}
+                                                                    >
                                                                         <IconEdit />
                                                                     </IconButton>
                                                                 </TableCell>
@@ -334,7 +338,7 @@ const EvalDatasets = () => {
                                                             <Available permission={'datasets:delete'}>
                                                                 <TableCell>
                                                                     <IconButton
-                                                                        title='Delete'
+                                                                        title={t('common.delete')}
                                                                         color='error'
                                                                         onClick={() => deleteDataset(ds)}
                                                                     >

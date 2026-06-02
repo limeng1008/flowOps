@@ -60,6 +60,7 @@ import useNotifier from '@/utils/useNotifier'
 import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
 import { MCP_SERVER_STATUS, MCP_AUTH_TYPE } from '@/store/constant'
 import { generateRandomGradient } from '@/utils/genericHelper'
+import { useTranslation } from 'react-i18next'
 
 // Server-side masking placeholder. Must match REDACTED_VALUE in the service.
 const MASK_TOKEN = '************'
@@ -388,6 +389,7 @@ DiscoveredToolRow.propTypes = {
 }
 
 const CustomMcpServerDialog = ({ show, dialogProps, onCancel, onConfirm, onAuthorize, onCreated }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const dispatch = useDispatch()
     const theme = useTheme()
@@ -757,7 +759,7 @@ const CustomMcpServerDialog = ({ show, dialogProps, onCancel, onConfirm, onAutho
                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                         {dialogProps.type === 'EDIT' && !isEditing && (
                             <StyledButton variant='outlined' size='small' startIcon={<IconEdit size={16} />} onClick={startEditing}>
-                                Edit
+                                {t('common.edit')}
                             </StyledButton>
                         )}
                     </Box>
@@ -1047,7 +1049,7 @@ const CustomMcpServerDialog = ({ show, dialogProps, onCancel, onConfirm, onAutho
                 <Box>
                     {dialogProps.type === 'EDIT' && (
                         <StyledPermissionButton permissionId={'tools:delete'} color='error' variant='contained' onClick={deleteServer}>
-                            Delete
+                            {t('common.delete')}
                         </StyledPermissionButton>
                     )}
                 </Box>
@@ -1066,7 +1068,7 @@ const CustomMcpServerDialog = ({ show, dialogProps, onCancel, onConfirm, onAutho
                         <>
                             {dialogProps.type === 'EDIT' && (
                                 <Button variant='outlined' onClick={cancelEditing}>
-                                    Cancel
+                                    {t('common.cancel')}
                                 </Button>
                             )}
                             <StyledPermissionButton

@@ -16,8 +16,10 @@ import useNotifier from '@/utils/useNotifier'
 
 // API
 import chatflowsApi from '@/api/chatflows'
+import { useTranslation } from 'react-i18next'
 
 const AllowedDomains = ({ dialogProps, onConfirm, hideTitle = false }) => {
+    const { t } = useTranslation()
     const dispatch = useDispatch()
 
     useNotifier()
@@ -122,7 +124,7 @@ const AllowedDomains = ({ dialogProps, onConfirm, hideTitle = false }) => {
         <Stack direction='column' spacing={2} sx={{ width: '100%' }}>
             {!hideTitle && (
                 <Typography variant='h3'>
-                    Allowed Domains
+                    {t('permissions.actions.domains')}
                     <TooltipWithParser
                         style={{ mb: 1, mt: 2, marginLeft: 10 }}
                         title={'Your chatbot will only work when used from the following domains.'}
@@ -197,7 +199,7 @@ const AllowedDomains = ({ dialogProps, onConfirm, hideTitle = false }) => {
             </Stack>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', mt: 2 }}>
                 <StyledButton variant='contained' onClick={onSave} sx={{ minWidth: 100 }}>
-                    Save
+                    {t('common.save')}
                 </StyledButton>
             </Box>
         </Stack>

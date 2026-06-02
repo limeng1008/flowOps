@@ -29,8 +29,10 @@ import useNotifier from '@/utils/useNotifier'
 import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
 
 import './CreateEditRoleDialog.css'
+import { useTranslation } from 'react-i18next'
 
 const CreateEditRoleDialog = ({ show, dialogProps, onCancel, onConfirm, setError }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
 
     const dispatch = useDispatch()
@@ -348,7 +350,7 @@ const CreateEditRoleDialog = ({ show, dialogProps, onCancel, onConfirm, setError
                         />
                     </Box>
                     <div className='permissions-container'>
-                        <p>Permissions</p>
+                        <p>{t('pages.apikey.permissions')}</p>
                         <div className='permissions-list-wrapper'>
                             {permissions &&
                                 Object.keys(permissions).map((category) => (
@@ -365,7 +367,7 @@ const CreateEditRoleDialog = ({ show, dialogProps, onCancel, onConfirm, setError
                                                 hidden={dialogProps.type === 'VIEW'}
                                                 onClick={() => handleSelectAll(category)}
                                             >
-                                                Select All
+                                                {t('pages.apikey.selectAll')}
                                             </button>
                                         </div>
                                         <div className='permissions-list'>

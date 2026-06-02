@@ -11,8 +11,10 @@ import { StyledButton } from '@/ui-component/button/StyledButton'
 
 // store
 import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
+import { useTranslation } from 'react-i18next'
 
 const ChatFeedbackContentDialog = ({ show, onCancel, onConfirm }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const dispatch = useDispatch()
 
@@ -62,7 +64,7 @@ const ChatFeedbackContentDialog = ({ show, onCancel, onConfirm }) => {
                 </Box>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onCancel}>Cancel</Button>
+                <Button onClick={onCancel}>{t('common.cancel')}</Button>
                 <StyledButton variant='contained' onClick={onSave}>
                     Submit Feedback
                 </StyledButton>

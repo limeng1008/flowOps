@@ -37,6 +37,7 @@ import useNotifier from '@/utils/useNotifier'
 
 // API
 import chatflowsApi from '@/api/chatflows'
+import { useTranslation } from 'react-i18next'
 
 const sampleFunction = `// Access chat history as a string
 const chatHistory = JSON.stringify($flow.chatHistory, null, 2); 
@@ -45,6 +46,7 @@ const chatHistory = JSON.stringify($flow.chatHistory, null, 2);
 return $flow.rawOutput + " This is a post processed response!";`
 
 const PostProcessing = ({ dialogProps }) => {
+    const { t } = useTranslation()
     const dispatch = useDispatch()
 
     useNotifier()
@@ -158,7 +160,7 @@ const PostProcessing = ({ dialogProps }) => {
                             setPostProcessingFunction(sampleFunction)
                         }}
                     >
-                        See Example
+                        {t('pages.tools.seeExample')}
                     </Button>
                     <div style={{ flex: 1 }} />
                     <IconButton
@@ -167,7 +169,7 @@ const PostProcessing = ({ dialogProps }) => {
                             height: 25,
                             width: 25
                         }}
-                        title='Expand'
+                        title={t('pages.assistants.custom.expand')}
                         color='primary'
                         onClick={() => onExpandDialogClicked(postProcessingFunction)}
                     >
@@ -244,7 +246,7 @@ const PostProcessing = ({ dialogProps }) => {
                                                 borderColor: customization.isDarkMode ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)'
                                             }}
                                         >
-                                            Type
+                                            {t('common.type')}
                                         </TableCell>
                                         <TableCell
                                             sx={{
@@ -256,7 +258,7 @@ const PostProcessing = ({ dialogProps }) => {
                                                 borderColor: customization.isDarkMode ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)'
                                             }}
                                         >
-                                            Description
+                                            {t('common.description')}
                                         </TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -353,7 +355,7 @@ const PostProcessing = ({ dialogProps }) => {
                     onClick={onSave}
                     sx={{ minWidth: 100 }}
                 >
-                    Save
+                    {t('common.save')}
                 </StyledButton>
             </Box>
             <ExpandTextDialog

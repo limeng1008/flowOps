@@ -22,6 +22,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle'
 import StopCircleIcon from '@mui/icons-material/StopCircle'
 import ErrorIcon from '@mui/icons-material/Error'
 import { IconLoader, IconCircleXFilled } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     borderColor: theme.palette.grey[900] + 25,
@@ -87,6 +88,7 @@ const getIconColor = (state) => {
 }
 
 export const ExecutionsListTable = ({ data, isLoading, onExecutionRowClick, onSelectionChange }) => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
 
@@ -180,12 +182,12 @@ export const ExecutionsListTable = ({ data, isLoading, onExecutionRowClick, onSe
                                     direction={order}
                                     onClick={() => handleRequestSort('updatedDate')}
                                 >
-                                    Last Updated
+                                    {t('pages.credentials.colLastUpdated')}
                                 </TableSortLabel>
                             </StyledTableCell>
                             <StyledTableCell component='th' scope='row'>
                                 <TableSortLabel active={orderBy === 'name'} direction={order} onClick={() => handleRequestSort('name')}>
-                                    Agentflow
+                                    {t('pages.executions.filterAgentflow')}
                                 </TableSortLabel>
                             </StyledTableCell>
                             <StyledTableCell>Session</StyledTableCell>
@@ -195,7 +197,7 @@ export const ExecutionsListTable = ({ data, isLoading, onExecutionRowClick, onSe
                                     direction={order}
                                     onClick={() => handleRequestSort('createdDate')}
                                 >
-                                    Created
+                                    {t('pages.credentials.colCreated')}
                                 </TableSortLabel>
                             </StyledTableCell>
                         </TableRow>

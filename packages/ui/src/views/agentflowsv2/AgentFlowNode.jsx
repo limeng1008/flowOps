@@ -61,6 +61,7 @@ const StyledNodeToolbar = styled(NodeToolbar)(({ theme }) => ({
 // ===========================|| CANVAS NODE ||=========================== //
 
 const AgentFlowNode = ({ data }) => {
+    const { t } = useTranslation()
     const { i18n } = useTranslation()
     const [currentLang, setCurrentLang] = useState(i18n.resolvedLanguage || i18n.language)
     useEffect(() => {
@@ -222,7 +223,7 @@ const AgentFlowNode = ({ data }) => {
                     {data.name !== 'startAgentflow' && (
                         <IconButton
                             size={'small'}
-                            title='Duplicate'
+                            title={t('permissions.actions.duplicate')}
                             onClick={() => {
                                 duplicateNode(data.id)
                             }}
@@ -238,7 +239,7 @@ const AgentFlowNode = ({ data }) => {
                     )}
                     <IconButton
                         size={'small'}
-                        title='Delete'
+                        title={t('common.delete')}
                         onClick={() => {
                             deleteNode(data.id)
                         }}

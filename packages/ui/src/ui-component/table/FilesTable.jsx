@@ -17,6 +17,7 @@ import {
 } from '@mui/material'
 import { tableCellClasses } from '@mui/material/TableCell'
 import { IconTrash } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     borderColor: theme.palette.grey[900] + 25,
@@ -38,6 +39,7 @@ const StyledTableRow = styled(TableRow)(() => ({
 }))
 
 export const FilesTable = ({ data, isLoading, filterFunction, handleDelete }) => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
 
@@ -53,7 +55,7 @@ export const FilesTable = ({ data, isLoading, filterFunction, handleDelete }) =>
                     >
                         <TableRow>
                             <StyledTableCell component='th' scope='row' style={{ width: '25%' }} key='0'>
-                                Name
+                                {t('common.name')}
                             </StyledTableCell>
                             <StyledTableCell style={{ width: '40%' }} key='1'>
                                 Path
@@ -62,7 +64,7 @@ export const FilesTable = ({ data, isLoading, filterFunction, handleDelete }) =>
                                 Size
                             </StyledTableCell>
                             <StyledTableCell style={{ width: '10%' }} key='3'>
-                                Actions
+                                {t('common.actions')}
                             </StyledTableCell>
                         </TableRow>
                     </TableHead>

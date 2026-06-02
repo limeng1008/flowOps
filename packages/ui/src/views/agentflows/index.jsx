@@ -276,7 +276,7 @@ const Agentflows = () => {
                                 }}
                                 variant='contained'
                                 value='card'
-                                title='Card View'
+                                title={t('pages.marketplaces.cardView')}
                             >
                                 <IconLayoutGrid />
                             </ToggleButton>
@@ -288,7 +288,7 @@ const Agentflows = () => {
                                 }}
                                 variant='contained'
                                 value='list'
-                                title='List View'
+                                title={t('pages.marketplaces.listView')}
                             >
                                 <IconList />
                             </ToggleButton>

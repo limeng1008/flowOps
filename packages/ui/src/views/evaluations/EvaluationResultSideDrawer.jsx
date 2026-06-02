@@ -20,8 +20,10 @@ import { useSelector } from 'react-redux'
 import { evaluators as evaluatorsOptions, numericOperators } from '../evaluators/evaluatorConstant'
 import TableCell from '@mui/material/TableCell'
 import { Close } from '@mui/icons-material'
+import { useTranslation } from 'react-i18next'
 
 const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
+    const { t } = useTranslation()
     const onOpen = () => {}
     const customization = useSelector((state) => state.customization)
 
@@ -214,7 +216,7 @@ const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
                                                         Input
                                                     </TableCell>
                                                     <TableCell align='right' style={{ fontSize: '11px', fontWeight: 'bold', width: '15%' }}>
-                                                        Output
+                                                        {t('common.output')}
                                                     </TableCell>
                                                     <TableCell align='right' style={{ fontSize: '11px', fontWeight: 'bold', width: '15%' }}>
                                                         Total
@@ -323,7 +325,7 @@ const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
                                                         Input
                                                     </TableCell>
                                                     <TableCell align='right' style={{ fontSize: '11px', width: '15%', fontWeight: 'bold' }}>
-                                                        Output
+                                                        {t('common.output')}
                                                     </TableCell>
                                                     <TableCell align='right' style={{ fontSize: '11px', width: '15%', fontWeight: 'bold' }}>
                                                         Total

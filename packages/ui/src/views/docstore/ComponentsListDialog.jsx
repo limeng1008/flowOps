@@ -12,8 +12,10 @@ import { IconSearch, IconX } from '@tabler/icons-react'
 import { baseURL } from '@/store/constant'
 import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
 import useApi from '@/hooks/useApi'
+import { useTranslation } from 'react-i18next'
 
 const ComponentsListDialog = ({ show, dialogProps, onCancel, apiCall, onSelected }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const customization = useSelector((state) => state.customization)
     const dispatch = useDispatch()
@@ -83,7 +85,7 @@ const ComponentsListDialog = ({ show, dialogProps, onCancel, apiCall, onSelected
                         id='input-search-credential'
                         value={searchValue}
                         onChange={(e) => onSearchChange(e.target.value)}
-                        placeholder='Search'
+                        placeholder={t('common.search')}
                         startAdornment={
                             <InputAdornment position='start'>
                                 <IconSearch stroke={1.5} size='1rem' color={theme.palette.grey[500]} />

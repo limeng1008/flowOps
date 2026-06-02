@@ -23,8 +23,10 @@ import StatsCard from '@/ui-component/cards/StatsCard'
 
 // const
 import { baseURL } from '@/store/constant'
+import { useTranslation } from 'react-i18next'
 
 const UpsertHistoryDetailsDialog = ({ show, dialogProps, onCancel }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const [nodeConfigExpanded, setNodeConfigExpanded] = useState({})
 
@@ -54,10 +56,10 @@ const UpsertHistoryDetailsDialog = ({ show, dialogProps, onCancel }) => {
                         marginTop: '10px'
                     }}
                 >
-                    <StatsCard title='Added' stat={dialogProps.numAdded ?? 0} />
-                    <StatsCard title='Updated' stat={dialogProps.numUpdated ?? 0} />
-                    <StatsCard title='Skipped' stat={dialogProps.numSkipped ?? 0} />
-                    <StatsCard title='Deleted' stat={dialogProps.numDeleted ?? 0} />
+                    <StatsCard title={t('canvas.dialogs.added')} stat={dialogProps.numAdded ?? 0} />
+                    <StatsCard title={t('canvas.dialogs.updated')} stat={dialogProps.numUpdated ?? 0} />
+                    <StatsCard title={t('canvas.dialogs.skipped')} stat={dialogProps.numSkipped ?? 0} />
+                    <StatsCard title={t('canvas.dialogs.deleted')} stat={dialogProps.numDeleted ?? 0} />
                 </div>
                 <div>
                     <TableContainer component={Paper}>

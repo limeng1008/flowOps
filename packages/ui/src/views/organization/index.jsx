@@ -30,6 +30,7 @@ import GoogleSSOLoginIcon from '@/assets/images/google.svg'
 import AzureSSOLoginIcon from '@/assets/images/microsoft-azure.svg'
 import { useConfig } from '@/store/context/ConfigContext'
 import { IconCircleCheck, IconExclamationCircle } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 
 // ==============================|| Organization & Admin User Setup ||============================== //
 
@@ -48,6 +49,7 @@ const OrgSetupSchema = z
     })
 
 const OrganizationSetupPage = () => {
+    const { t } = useTranslation()
     useNotifier()
     const { isEnterpriseLicensed, isOpenSource } = useConfig()
 
@@ -278,13 +280,13 @@ const OrganizationSetupPage = () => {
                                 </div>
                                 <Input
                                     inputParam={usernameInput}
-                                    placeholder='Display Name'
+                                    placeholder={t('auth.displayName')}
                                     onChange={(newValue) => setUsername(newValue)}
                                     value={username}
                                     showDialog={false}
                                 />
                                 <Typography variant='caption'>
-                                    <i>Is used for display purposes only.</i>
+                                    <i>{t('auth.displayNameHint')}</i>
                                 </Typography>
                             </Box>
                             <Box>
@@ -302,28 +304,27 @@ const OrganizationSetupPage = () => {
                                     showDialog={false}
                                 />
                                 <Typography variant='caption'>
-                                    <i>Kindly use a valid email address. Will be used as login id.</i>
+                                    <i>{t('auth.emailHint')}</i>
                                 </Typography>
                             </Box>
                             <Box>
                                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                                     <Typography>
-                                        Password<span style={{ color: 'red' }}>&nbsp;*</span>
+                                        {t('auth.password')}
+                                        <span style={{ color: 'red' }}>&nbsp;*</span>
                                     </Typography>
                                     <div style={{ flexGrow: 1 }}></div>
                                 </div>
                                 <Input inputParam={passwordInput} onChange={(newValue) => setPassword(newValue)} value={password} />
                                 <Typography variant='caption'>
-                                    <i>
-                                        Password must be at least 8 characters long and contain at least one lowercase letter, one uppercase
-                                        letter, one digit, and one special character.
-                                    </i>
+                                    <i>{t('auth.passwordRule')}</i>
                                 </Typography>
                             </Box>
                             <Box>
                                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                                     <Typography>
-                                        Confirm Password<span style={{ color: 'red' }}>&nbsp;*</span>
+                                        {t('auth.confirmPassword')}
+                                        <span style={{ color: 'red' }}>&nbsp;*</span>
                                     </Typography>
                                     <div style={{ flexGrow: 1 }}></div>
                                 </div>
@@ -337,7 +338,7 @@ const OrganizationSetupPage = () => {
                                 </Typography>
                             </Box>
                             <StyledButton variant='contained' style={{ borderRadius: 12, height: 40, marginRight: 5 }} type='submit'>
-                                Sign Up
+                                {t('auth.signUp')}
                             </StyledButton>
                             {configuredSsoProviders && configuredSsoProviders.length > 0 && <Divider sx={{ width: '100%' }}>OR</Divider>}
                             {configuredSsoProviders &&

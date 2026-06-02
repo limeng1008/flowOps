@@ -1004,7 +1004,7 @@ const SSOConfigPage = () => {
                                 variant='contained'
                                 onClick={() => validateAndSubmit()}
                             >
-                                Save
+                                {t('common.save')}
                             </StyledPermissionButton>
                         </Box>
                     </Stack>
@@ -1025,7 +1025,7 @@ const SSOConfigPage = () => {
                 }}
             >
                 <Typography variant='h6' sx={{ pl: 1, pr: 1, color: 'white', background: theme.palette.success.dark }}>
-                    Copied!
+                    {t('pages.apikey.copied')}
                 </Typography>
             </Popover>
         </>

@@ -35,6 +35,7 @@ import useApi from '@/hooks/useApi'
 import chatflowsApi from '@/api/chatflows'
 import configApi from '@/api/config'
 import variablesApi from '@/api/variables'
+import { useTranslation } from 'react-i18next'
 
 // utils
 
@@ -154,6 +155,7 @@ OverrideConfigTable.propTypes = {
 }
 
 const OverrideConfig = ({ dialogProps, hideTitle = false }) => {
+    const { t } = useTranslation()
     const dispatch = useDispatch()
     const customization = useSelector((state) => state.customization)
     const chatflow = useSelector((state) => state.canvas.chatflow)
@@ -423,7 +425,7 @@ const OverrideConfig = ({ dialogProps, hideTitle = false }) => {
                             >
                                 <Stack sx={{ mt: 1, mb: 2, ml: 1, alignItems: 'center' }} direction='row' spacing={2}>
                                     <IconBox />
-                                    <Typography variant='h4'>Nodes</Typography>
+                                    <Typography variant='h4'>{t('landing.statTools')}</Typography>
                                 </Stack>
                                 <Stack direction='column'>
                                     {Object.keys(nodeOverrides)
@@ -506,7 +508,7 @@ const OverrideConfig = ({ dialogProps, hideTitle = false }) => {
                             >
                                 <Stack sx={{ mt: 1, mb: 2, ml: 1, alignItems: 'center' }} direction='row' spacing={2}>
                                     <IconVariable />
-                                    <Typography variant='h4'>Variables</Typography>
+                                    <Typography variant='h4'>{t('menu.variables')}</Typography>
                                 </Stack>
                                 <OverrideConfigTable
                                     rows={variableOverrides}
@@ -520,7 +522,7 @@ const OverrideConfig = ({ dialogProps, hideTitle = false }) => {
             </Stack>
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', mt: 2 }}>
                 <StyledButton variant='contained' onClick={onOverrideConfigSave} sx={{ minWidth: 100 }}>
-                    Save
+                    {t('common.save')}
                 </StyledButton>
             </Box>
         </Stack>

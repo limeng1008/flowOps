@@ -6,8 +6,10 @@ import TextField from '@mui/material/TextField'
 import Chip from '@mui/material/Chip'
 import PropTypes from 'prop-types'
 import { DialogActions, DialogContent, DialogTitle, Typography } from '@mui/material'
+import { useTranslation } from 'react-i18next'
 
 const TagDialog = ({ isOpen, dialogProps, onClose, onSubmit }) => {
+    const { t } = useTranslation()
     const [inputValue, setInputValue] = useState('')
     const [categoryValues, setCategoryValues] = useState([])
 
@@ -91,9 +93,9 @@ const TagDialog = ({ isOpen, dialogProps, onClose, onSubmit }) => {
                 </Box>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button onClick={onClose}>{t('common.cancel')}</Button>
                 <Button variant='contained' onClick={handleSubmit}>
-                    Submit
+                    {t('common.submit')}
                 </Button>
             </DialogActions>
         </Dialog>

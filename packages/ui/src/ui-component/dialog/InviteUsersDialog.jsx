@@ -49,6 +49,7 @@ import {
     HIDE_CANVAS_DIALOG,
     SHOW_CANVAS_DIALOG
 } from '@/store/actions'
+import { useTranslation } from 'react-i18next'
 
 const StyledChip = styled(Chip)(({ theme, chiptype }) => {
     let backgroundColor, color
@@ -91,6 +92,7 @@ const StyledPopper = styled(Popper)({
 })
 
 const InviteUsersDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
 
     const dispatch = useDispatch()
@@ -671,7 +673,8 @@ const InviteUsersDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                 <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 2 }}>
                     <Box sx={{ gridColumn: 'span 1' }}>
                         <Typography>
-                            Workspace<span style={{ color: 'red' }}>&nbsp;*</span>
+                            {t('permissions.categories.workspace')}
+                            <span style={{ color: 'red' }}>&nbsp;*</span>
                         </Typography>
                         <Autocomplete
                             disabled={checkWorkspaceDisabled()}

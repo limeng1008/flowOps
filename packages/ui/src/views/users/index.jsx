@@ -52,6 +52,7 @@ import { useError } from '@/store/context/ErrorContext'
 import { enqueueSnackbar as enqueueSnackbarAction, closeSnackbar as closeSnackbarAction } from '@/store/actions'
 
 function ShowUserRow(props) {
+    const { t } = useTranslation()
     const customization = useSelector((state) => state.customization)
 
     const [open, setOpen] = useState(false)
@@ -203,7 +204,7 @@ function ShowUserRow(props) {
                             >
                                 <TableRow>
                                     <StyledTableCell sx={{ width: '50%' }}>Role</StyledTableCell>
-                                    <StyledTableCell sx={{ width: '50%' }}>Workspace</StyledTableCell>
+                                    <StyledTableCell sx={{ width: '50%' }}>{t('permissions.categories.workspace')}</StyledTableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>

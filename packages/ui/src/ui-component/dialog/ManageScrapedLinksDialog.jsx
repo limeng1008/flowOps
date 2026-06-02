@@ -32,8 +32,10 @@ import {
     closeSnackbar as closeSnackbarAction,
     enqueueSnackbar as enqueueSnackbarAction
 } from '@/store/actions'
+import { useTranslation } from 'react-i18next'
 
 const ManageScrapedLinksDialog = ({ show, dialogProps, onCancel, onSave }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const dispatch = useDispatch()
 
@@ -235,9 +237,9 @@ const ManageScrapedLinksDialog = ({ show, dialogProps, onCancel, onSave }) => {
                 </>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onCancel}>Cancel</Button>
+                <Button onClick={onCancel}>{t('common.cancel')}</Button>
                 <StyledButton variant='contained' onClick={handleSaveLinks}>
-                    Save
+                    {t('common.save')}
                 </StyledButton>
             </DialogActions>
         </Dialog>

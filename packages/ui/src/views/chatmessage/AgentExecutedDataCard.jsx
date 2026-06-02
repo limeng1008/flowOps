@@ -46,6 +46,7 @@ import {
 import { useTheme } from '@mui/material/styles'
 import { FLOWISE_CREDENTIAL_ID, AGENTFLOW_ICONS } from '@/store/constant'
 import { NodeExecutionDetails } from '@/views/agentexecutions/NodeExecutionDetails'
+import { useTranslation } from 'react-i18next'
 
 const getIconColor = (status) => {
     switch (status) {
@@ -116,6 +117,7 @@ const StyledTreeItemLabelText = styled(Typography)(({ theme }) => ({
 }))
 
 function CustomLabel({ icon: Icon, itemStatus, children, name, label, data, metadata, ...other }) {
+    const { t } = useTranslation()
     const [openDialog, setOpenDialog] = useState(false)
 
     const handleOpenDialog = (event) => {
@@ -198,7 +200,7 @@ function CustomLabel({ icon: Icon, itemStatus, children, name, label, data, meta
                     )}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleCloseDialog}>Close</Button>
+                    <Button onClick={handleCloseDialog}>{t('common.close')}</Button>
                 </DialogActions>
             </Dialog>
         </TreeItem2Label>

@@ -42,10 +42,10 @@ const UpsertResultDialog = ({ show, dialogProps, onCancel, onGoToRetrievalQuery 
                             gap: 5
                         }}
                     >
-                        <StatsCard title='Added' stat={dialogProps.numAdded ?? 0} />
-                        <StatsCard title='Updated' stat={dialogProps.numUpdated ?? 0} />
-                        <StatsCard title='Skipped' stat={dialogProps.numSkipped ?? 0} />
-                        <StatsCard title='Deleted' stat={dialogProps.numDeleted ?? 0} />
+                        <StatsCard title={t('canvas.dialogs.added')} stat={dialogProps.numAdded ?? 0} />
+                        <StatsCard title={t('canvas.dialogs.updated')} stat={dialogProps.numUpdated ?? 0} />
+                        <StatsCard title={t('canvas.dialogs.skipped')} stat={dialogProps.numSkipped ?? 0} />
+                        <StatsCard title={t('canvas.dialogs.deleted')} stat={dialogProps.numDeleted ?? 0} />
                     </div>
                     {dialogProps.addedDocs && dialogProps.addedDocs.length > 0 && (
                         <Typography sx={{ mt: 2, mb: 2, fontWeight: 500 }}>{dialogProps.numAdded} Added Documents</Typography>
@@ -99,7 +99,7 @@ const UpsertResultDialog = ({ show, dialogProps, onCancel, onGoToRetrievalQuery 
                             Test Retrieval
                         </Button>
                         <Button fullWidth onClick={onCancel}>
-                            Close
+                            {t('common.close')}
                         </Button>
                     </div>
                 )}

@@ -23,6 +23,7 @@ import useNotifier from '@/utils/useNotifier'
 
 // Const
 import { baseURL } from '@/store/constant'
+import { useTranslation } from 'react-i18next'
 
 const defaultConfig = {
     backgroundColor: '#ffffff',
@@ -46,6 +47,7 @@ const defaultConfig = {
 }
 
 const ShareChatbot = ({ isSessionMemory, isAgentCanvas }) => {
+    const { t } = useTranslation()
     const dispatch = useDispatch()
     const theme = useTheme()
     const chatflow = useSelector((state) => state.canvas.chatflow)
@@ -573,7 +575,7 @@ const ShareChatbot = ({ isSessionMemory, isAgentCanvas }) => {
                 }}
             >
                 <Typography variant='h6' sx={{ pl: 1, pr: 1, color: 'white', background: theme.palette.success.dark }}>
-                    Copied!
+                    {t('pages.apikey.copied')}
                 </Typography>
             </Popover>
         </>

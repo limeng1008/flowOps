@@ -38,8 +38,10 @@ import { CodeEditor } from '@/ui-component/editor/CodeEditor'
 import SourceDocDialog from '@/ui-component/dialog/SourceDocDialog'
 
 import predictionApi from '@/api/prediction'
+import { useTranslation } from 'react-i18next'
 
 export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, onProceedSuccess }) => {
+    const { t } = useTranslation()
     const [dataView, setDataView] = useState('rendered')
     const [openFeedbackDialog, setOpenFeedbackDialog] = useState(false)
     const [feedback, setFeedback] = useState('')
@@ -386,7 +388,7 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                     {data.output && data.output.availableTools && data.output.availableTools.length > 0 && (
                         <Box>
                             <Typography sx={{ mt: 2 }} variant='h5' gutterBottom>
-                                Tools
+                                {t('menu.tools')}
                             </Typography>
                             {(showAllTools ? data.output.availableTools : data.output.availableTools.slice(0, 5)).map((tool, index) => {
                                 // Check if this tool is in the usedTools array
@@ -961,7 +963,7 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                         </Box>
                     )}
                     <Typography sx={{ mt: 2 }} variant='h5' gutterBottom>
-                        Output
+                        {t('common.output')}
                     </Typography>
                     {data?.output?.form || data?.output?.http ? (
                         <JSONViewer data={data.output.form || data.output.http} />
@@ -1135,7 +1137,7 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                     {data.error && (
                         <>
                             <Typography sx={{ mt: 2 }} variant='h5' gutterBottom color='error'>
-                                Error
+                                {t('pages.executions.stateError')}
                             </Typography>
                             <Box
                                 sx={{
@@ -1160,7 +1162,7 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                     {data.state && Object.keys(data.state).length > 0 && (
                         <>
                             <Typography sx={{ mt: 2 }} variant='h5' gutterBottom>
-                                State
+                                {t('canvas.dialogs.state')}
                             </Typography>
                             <JSONViewer data={data.state} />
                         </>
@@ -1220,13 +1222,13 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                     </Box>
 
                     <Dialog maxWidth='md' fullWidth open={openFeedbackDialog} onClose={() => !isLoading && setOpenFeedbackDialog(false)}>
-                        <DialogTitle variant='h5'>Provide Feedback</DialogTitle>
+                        <DialogTitle variant='h5'>{t('canvas.provideFeedback')}</DialogTitle>
                         <DialogContent>
                             <TextField
                                 //eslint-disable-next-line jsx-a11y/no-autofocus
                                 autoFocus
                                 margin='dense'
-                                label='Feedback'
+                                label={t('canvas.dialogs.feedback')}
                                 fullWidth
                                 multiline
                                 rows={4}
@@ -1237,10 +1239,10 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                         </DialogContent>
                         <DialogActions>
                             <Button onClick={() => setOpenFeedbackDialog(false)} disabled={isLoading}>
-                                Cancel
+                                {t('common.cancel')}
                             </Button>
                             <Button onClick={handleSubmitFeedback} variant='contained' disabled={isLoading}>
-                                Submit
+                                {t('common.submit')}
                             </Button>
                         </DialogActions>
                     </Dialog>

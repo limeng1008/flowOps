@@ -445,7 +445,7 @@ const VectorStoreQuery = () => {
                                                     alt='chunks_emptySVG'
                                                 />
                                             </Box>
-                                            <div>No Documents Retrieved</div>
+                                            <div>{t('common.noDocumentsRetrieved')}</div>
                                         </div>
                                     )}
                                     <Grid container spacing={2}>

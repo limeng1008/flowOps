@@ -14,8 +14,10 @@ import { enqueueSnackbar as enqueueSnackbarAction, closeSnackbar as closeSnackba
 // API
 import executionsApi from '@/api/executions'
 import useApi from '@/hooks/useApi'
+import { useTranslation } from 'react-i18next'
 
 const ShareExecutionDialog = ({ show, executionId, onClose, onUnshare }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const theme = useTheme()
     const dispatch = useDispatch()
@@ -97,7 +99,7 @@ const ShareExecutionDialog = ({ show, executionId, onClose, onUnshare }) => {
                     </Typography>
                     <Tooltip title={copied ? 'Copied!' : 'Copy link'}>
                         <Button variant='text' color='primary' onClick={copyToClipboard} startIcon={<IconCopy size={18} />}>
-                            Copy
+                            {t('pages.apikey.copy')}
                         </Button>
                     </Tooltip>
                 </Box>
@@ -107,7 +109,7 @@ const ShareExecutionDialog = ({ show, executionId, onClose, onUnshare }) => {
                     <Button color='error' onClick={handleUnshare} sx={{ mr: 1 }}>
                         Unshare
                     </Button>
-                    <Button onClick={onClose}>Close</Button>
+                    <Button onClick={onClose}>{t('common.close')}</Button>
                 </Box>
             </DialogContent>
         </Dialog>

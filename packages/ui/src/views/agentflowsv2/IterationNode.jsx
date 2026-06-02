@@ -51,6 +51,7 @@ const StyledNodeToolbar = styled(NodeToolbar)(({ theme }) => ({
 // ===========================|| ITERATION NODE ||=========================== //
 
 const IterationNode = ({ data }) => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const { i18n } = useTranslation()
     const currentLang = i18n.resolvedLanguage || i18n.language
@@ -221,7 +222,7 @@ const IterationNode = ({ data }) => {
                 <ButtonGroup sx={{ gap: 1 }} variant='outlined' aria-label='Basic button group'>
                     <IconButton
                         size={'small'}
-                        title='Duplicate'
+                        title={t('permissions.actions.duplicate')}
                         onClick={() => {
                             duplicateNode(data.id)
                         }}
@@ -236,7 +237,7 @@ const IterationNode = ({ data }) => {
                     </IconButton>
                     <IconButton
                         size={'small'}
-                        title='Delete'
+                        title={t('common.delete')}
                         onClick={() => {
                             deleteNode(data.id)
                         }}

@@ -43,6 +43,7 @@ import promptEmptySVG from '@/assets/images/prompt_empty.svg'
 import useApi from '@/hooks/useApi'
 import promptApi from '@/api/prompt'
 import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
+import { useTranslation } from 'react-i18next'
 
 const NewLineToBr = ({ children = '' }) => {
     return children.split('\n').reduce(function (arr, line) {
@@ -79,6 +80,7 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 }))
 
 const PromptLangsmithHubDialog = ({ promptType, show, onCancel, onSubmit }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const dispatch = useDispatch()
     const customization = useSelector((state) => state.customization)
@@ -335,7 +337,7 @@ const PromptLangsmithHubDialog = ({ promptType, show, onCancel, onSubmit }) => {
                     </FormControl>
                     <FormControl sx={{ mr: 1, width: '30%' }}>
                         <InputLabel size='small' id='language-checkbox-label'>
-                            Language
+                            {t('profile.language')}
                         </InputLabel>
                         <Select
                             labelId='language-checkbox-label'
@@ -372,7 +374,7 @@ const PromptLangsmithHubDialog = ({ promptType, show, onCancel, onSubmit }) => {
                     </FormControl>
                     <FormControl sx={{ width: '10%' }}>
                         <Button disableElevation variant='outlined' onClick={fetchPrompts}>
-                            Search
+                            {t('common.search')}
                         </Button>
                     </FormControl>
                 </Box>
@@ -488,7 +490,7 @@ const PromptLangsmithHubDialog = ({ promptType, show, onCancel, onSubmit }) => {
                                                         expandIcon={<ExpandMoreIcon />}
                                                         id='panel1d-header'
                                                     >
-                                                        <Typography>Description</Typography>
+                                                        <Typography>{t('common.description')}</Typography>
                                                     </AccordionSummary>
                                                     <AccordionDetails>
                                                         <Typography
@@ -544,13 +546,13 @@ const PromptLangsmithHubDialog = ({ promptType, show, onCancel, onSubmit }) => {
             </DialogContent>
             {availablePrompNameList && availablePrompNameList.length > 0 && (
                 <DialogActions>
-                    <Button onClick={onCancel}>Cancel</Button>
+                    <Button onClick={onCancel}>{t('common.cancel')}</Button>
                     <StyledButton
                         disabled={!selectedPrompt?.detailed}
                         onClick={() => onSubmit(selectedPrompt.detailed)}
                         variant='contained'
                     >
-                        Load
+                        {t('pages.assistants.load')}
                     </StyledButton>
                 </DialogActions>
             )}

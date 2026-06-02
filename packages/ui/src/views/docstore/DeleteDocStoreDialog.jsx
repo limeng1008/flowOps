@@ -37,8 +37,10 @@ import nodesApi from '@/api/nodes'
 // Hooks
 import useApi from '@/hooks/useApi'
 import { initNode } from '@/utils/genericHelper'
+import { useTranslation } from 'react-i18next'
 
 const DeleteDocStoreDialog = ({ show, dialogProps, onCancel, onDelete }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const theme = useTheme()
     const [nodeConfigExpanded, setNodeConfigExpanded] = useState({})
@@ -217,7 +219,7 @@ const DeleteDocStoreDialog = ({ show, dialogProps, onCancel, onDelete }) => {
                     <Card sx={{ borderColor: theme.palette.primary[200] + 75, p: 2 }} variant='outlined'>
                         <Stack sx={{ mt: 1, mb: 2, ml: 1, alignItems: 'center' }} direction='row' spacing={2}>
                             <SettingsIcon />
-                            <Typography variant='h4'>Configuration</Typography>
+                            <Typography variant='h4'>{t('canvas.configuration')}</Typography>
                         </Stack>
                         <Stack direction='column'>
                             <TableContainer component={Paper} sx={{ maxHeight: '400px', overflow: 'auto' }}>
@@ -294,10 +296,10 @@ const DeleteDocStoreDialog = ({ show, dialogProps, onCancel, onDelete }) => {
             </DialogContent>
             <DialogActions sx={{ pr: 3, pb: 3 }}>
                 <Button onClick={onCancel} color='primary'>
-                    Cancel
+                    {t('common.cancel')}
                 </Button>
                 <Button variant='contained' onClick={() => onDelete(dialogProps.type, dialogProps.file)} color='error'>
-                    Delete
+                    {t('common.delete')}
                 </Button>
             </DialogActions>
         </Dialog>

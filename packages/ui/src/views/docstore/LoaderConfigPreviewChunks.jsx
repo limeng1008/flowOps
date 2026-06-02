@@ -399,7 +399,13 @@ const LoaderConfigPreviewChunks = () => {
                                 }}
                             >
                                 <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
-                                    <StyledFab size='small' color='secondary' aria-label='back' title='Back' onClick={() => navigate(-1)}>
+                                    <StyledFab
+                                        size='small'
+                                        color='secondary'
+                                        aria-label='back'
+                                        title={t('canvas.back')}
+                                        onClick={() => navigate(-1)}
+                                    >
                                         <IconArrowLeft />
                                     </StyledFab>
                                     <Typography sx={{ ml: 2, mr: 2 }} variant='h3'>
@@ -520,7 +526,7 @@ const LoaderConfigPreviewChunks = () => {
                                                     </div>
                                                 </Box>
                                                 <Box sx={{ p: 2 }}>
-                                                    <Typography>Splitter</Typography>
+                                                    <Typography>{t('pages.documentStores.colSplitter')}</Typography>
                                                     <Dropdown
                                                         key={JSON.stringify(selectedTextSplitter)}
                                                         name='textSplitter'
@@ -603,7 +609,7 @@ const LoaderConfigPreviewChunks = () => {
                                                     <StyledFab
                                                         color='secondary'
                                                         aria-label='preview'
-                                                        title='Preview'
+                                                        title={t('pages.assistants.custom.preview')}
                                                         variant='extended'
                                                         onClick={onPreviewChunks}
                                                     >
@@ -616,7 +622,7 @@ const LoaderConfigPreviewChunks = () => {
                                     {documentChunks && documentChunks.length > 0 && (
                                         <>
                                             <Typography sx={{ wordWrap: 'break-word', textAlign: 'left', mb: 2 }} variant='h3'>
-                                                {currentPreviewCount} of {totalChunks} Chunks
+                                                {currentPreviewCount} of {totalChunks} {t('pages.documentStores.colChunks')}
                                             </Typography>
                                             <Box sx={{ mb: 3 }}>
                                                 <Typography>Show Chunks in Preview</Typography>
@@ -633,12 +639,12 @@ const LoaderConfigPreviewChunks = () => {
                                                     <StyledFab
                                                         color='secondary'
                                                         aria-label='preview'
-                                                        title='Preview'
+                                                        title={t('pages.assistants.custom.preview')}
                                                         variant='extended'
                                                         onClick={onPreviewChunks}
                                                     >
                                                         <IconEye style={{ marginRight: '5px' }} />
-                                                        Preview
+                                                        {t('pages.assistants.custom.preview')}
                                                     </StyledFab>
                                                 </div>
                                             </Box>

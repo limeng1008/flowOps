@@ -24,6 +24,7 @@ import useNotifier from '@/utils/useNotifier'
 // store
 import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
 import { enqueueSnackbar as enqueueSnackbarAction, closeSnackbar as closeSnackbarAction } from '@/store/actions'
+import { useTranslation } from 'react-i18next'
 
 const statuses = [
     {
@@ -37,6 +38,7 @@ const statuses = [
 ]
 
 const EditUserDialog = ({ show, dialogProps, onCancel, onConfirm, setError }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const currentUser = useSelector((state) => state.auth.user)
 
@@ -139,7 +141,8 @@ const EditUserDialog = ({ show, dialogProps, onCancel, onConfirm, setError }) =>
                 <Box sx={{ p: 1 }}>
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                         <Typography>
-                            Email<span style={{ color: 'red' }}>&nbsp;*</span>
+                            {t('auth.email')}
+                            <span style={{ color: 'red' }}>&nbsp;*</span>
                         </Typography>
 
                         <div style={{ flexGrow: 1 }}></div>
@@ -157,7 +160,7 @@ const EditUserDialog = ({ show, dialogProps, onCancel, onConfirm, setError }) =>
                 </Box>
                 <Box sx={{ p: 1 }}>
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
-                        <Typography>Name</Typography>
+                        <Typography>{t('common.name')}</Typography>
 
                         <div style={{ flexGrow: 1 }}></div>
                     </div>

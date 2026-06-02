@@ -342,7 +342,7 @@ const WorkspaceDetails = () => {
                                         onClick={addUser}
                                         startIcon={<IconUserPlus />}
                                     >
-                                        Add User
+                                        {t('permissions.full.workspace.add_user')}
                                     </StyledPermissionButton>
                                 </>
                             )}
@@ -364,7 +364,7 @@ const WorkspaceDetails = () => {
                                     startIcon={<IconUserPlus />}
                                     onClick={addUser}
                                 >
-                                    Add User
+                                    {t('permissions.full.workspace.add_user')}
                                 </StyledPermissionButton>
                             </Stack>
                         ) : (

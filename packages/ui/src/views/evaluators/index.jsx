@@ -226,10 +226,10 @@ const Evaluators = () => {
                                             }}
                                         >
                                             <TableRow>
-                                                <TableCell>Type</TableCell>
-                                                <TableCell>Name</TableCell>
-                                                <TableCell>Details</TableCell>
-                                                <TableCell>Last Updated</TableCell>
+                                                <TableCell>{t('common.type')}</TableCell>
+                                                <TableCell>{t('common.name')}</TableCell>
+                                                <TableCell>{t('canvas.dialogs.details')}</TableCell>
+                                                <TableCell>{t('pages.credentials.colLastUpdated')}</TableCell>
                                                 <TableCell> </TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -395,7 +395,7 @@ const Evaluators = () => {
                                                                                 }}
                                                                                 label={
                                                                                     <span>
-                                                                                        <b>Value</b>: {ds?.value}
+                                                                                        <b>{t('common.value')}</b>: {ds?.value}
                                                                                     </span>
                                                                                 }
                                                                             />
@@ -446,7 +446,7 @@ const Evaluators = () => {
                                                                                 }}
                                                                                 label={
                                                                                     <span>
-                                                                                        <b>Value</b>: {ds?.value}
+                                                                                        <b>{t('common.value')}</b>: {ds?.value}
                                                                                     </span>
                                                                                 }
                                                                             />

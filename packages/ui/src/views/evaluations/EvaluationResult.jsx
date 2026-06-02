@@ -69,10 +69,12 @@ import {
 
 //const
 import { useError } from '@/store/context/ErrorContext'
+import { useTranslation } from 'react-i18next'
 
 // ==============================|| EvaluationResults ||============================== //
 
 const EvalEvaluationRows = () => {
+    const { t } = useTranslation()
     const navigate = useNavigate()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
@@ -653,7 +655,7 @@ const EvalEvaluationRows = () => {
                                 startIcon={<IconMaximize />}
                                 onClick={() => openTableDialog()}
                             >
-                                Expand
+                                {t('pages.assistants.custom.expand')}
                             </Button>
                         </Stack>
                         <TableContainer sx={{ border: 1, borderColor: theme.palette.grey[900] + 25, borderRadius: 2 }} component={Paper}>

@@ -18,6 +18,7 @@ import { baseURL, FLOWISE_CREDENTIAL_ID } from '@/store/constant'
 import { initNode, showHideInputParams } from '@/utils/genericHelper'
 import DocStoreInputHandler from '@/views/docstore/DocStoreInputHandler'
 import useApi from '@/hooks/useApi'
+import { useTranslation } from 'react-i18next'
 
 const defaultInstructions = [
     {
@@ -35,6 +36,7 @@ const defaultInstructions = [
 ]
 
 const AgentflowGeneratorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const [customAssistantInstruction, setCustomAssistantInstruction] = useState('')
     const [generatedInstruction, setGeneratedInstruction] = useState('')
@@ -432,7 +434,7 @@ const AgentflowGeneratorDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
                                         !checkMandatoryFields().isValid
                                     }
                                 >
-                                    Generate
+                                    {t('pages.assistants.custom.generate')}
                                 </LoadingButton>
                             )}
                             {generatedInstruction && (
@@ -443,7 +445,7 @@ const AgentflowGeneratorDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
                                         setGeneratedInstruction('')
                                     }}
                                 >
-                                    Back
+                                    {t('canvas.back')}
                                 </Button>
                             )}
                         </>

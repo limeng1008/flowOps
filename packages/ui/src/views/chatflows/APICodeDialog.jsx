@@ -937,7 +937,7 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                                                             spacing={2}
                                                         >
                                                             <IconBox />
-                                                            <Typography variant='h4'>Nodes</Typography>
+                                                            <Typography variant='h4'>{t('landing.statTools')}</Typography>
                                                         </Stack>
                                                         {Object.keys(nodeConfig)
                                                             .sort()
@@ -1007,7 +1007,7 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                                                             spacing={2}
                                                         >
                                                             <IconVariable />
-                                                            <Typography variant='h4'>Variables</Typography>
+                                                            <Typography variant='h4'>{t('menu.variables')}</Typography>
                                                         </Stack>
                                                         <TableViewOnly rows={variableOverrides} columns={['name', 'type', 'enabled']} />
                                                     </Card>
@@ -1074,7 +1074,7 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                                                     target='_blank'
                                                     href='https://docs.flowiseai.com/using-flowise/streaming'
                                                 >
-                                                    here
+                                                    {t('common.here')}
                                                 </a>
                                                 &nbsp;on how to stream response back to application
                                             </p>

@@ -244,7 +244,7 @@ const Logs = () => {
                                 {selectedTimeSearch === 'Custom' && (
                                     <>
                                         <Stack sx={{ alignItems: 'center', justifyContent: 'flex-start', gap: 2 }} flexDirection='row'>
-                                            <b>From</b>
+                                            <b>{t('canvas.dialogs.fromDate')}</b>
                                             <DatePicker
                                                 selected={startDate}
                                                 onChange={(date) => onStartDateSelected(date)}

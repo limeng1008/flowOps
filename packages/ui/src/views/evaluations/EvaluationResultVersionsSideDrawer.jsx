@@ -17,8 +17,10 @@ import {
 
 import evaluationApi from '@/api/evaluations'
 import useApi from '@/hooks/useApi'
+import { useTranslation } from 'react-i18next'
 
 const EvaluationResultVersionsSideDrawer = ({ show, dialogProps, onClickFunction, onSelectVersion }) => {
+    const { t } = useTranslation()
     const onOpen = () => {}
     const [versions, setVersions] = useState([])
 
@@ -43,7 +45,7 @@ const EvaluationResultVersionsSideDrawer = ({ show, dialogProps, onClickFunction
     return (
         <SwipeableDrawer anchor='right' open={show} onClose={() => onClickFunction()} onOpen={onOpen}>
             <Button startIcon={<IconSquareRoundedChevronsRight />} onClick={() => onClickFunction()}>
-                Close
+                {t('common.close')}
             </Button>
             <Box style={{ width: 350, margin: 10 }} role='presentation' onClick={onClickFunction}>
                 <Timeline
@@ -64,7 +66,9 @@ const EvaluationResultVersionsSideDrawer = ({ show, dialogProps, onClickFunction
                                     {index !== versions.length - 1 && <TimelineConnector />}
                                 </TimelineSeparator>
                                 <TimelineContent>
-                                    <Button onClick={() => navigateToEvaluationResult(`${version.id}`)}>Version {version.version}</Button>
+                                    <Button onClick={() => navigateToEvaluationResult(`${version.id}`)}>
+                                        {t('profile.version')} {version.version}
+                                    </Button>
                                 </TimelineContent>
                             </TimelineItem>
                         ))}

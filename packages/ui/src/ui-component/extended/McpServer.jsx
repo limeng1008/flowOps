@@ -22,8 +22,10 @@ import useNotifier from '@/utils/useNotifier'
 // API
 import mcpServerApi from '@/api/mcpserver'
 import chatflowsApi from '@/api/chatflows'
+import { useTranslation } from 'react-i18next'
 
 const McpServer = ({ dialogProps, onStatusChange }) => {
+    const { t } = useTranslation()
     const dispatch = useDispatch()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
@@ -247,7 +249,7 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
                     {/* Tool Name (required) */}
                     <Box>
                         <Typography sx={{ mb: 1 }}>
-                            Tool Name <span style={{ color: theme.palette.error.main }}>*</span>
+                            {t('pages.tools.toolName')} <span style={{ color: theme.palette.error.main }}>*</span>
                         </Typography>
                         <OutlinedInput
                             fullWidth
@@ -274,7 +276,7 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
                     {/* Description (required) */}
                     <Box>
                         <Typography sx={{ mb: 1 }}>
-                            Description <span style={{ color: theme.palette.error.main }}>*</span>
+                            {t('common.description')} <span style={{ color: theme.palette.error.main }}>*</span>
                         </Typography>
                         <OutlinedInput
                             fullWidth

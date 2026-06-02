@@ -72,6 +72,7 @@ const StyledTableRow = styled(TableRow)(() => ({
 }))
 
 function ViewPermissionsDrawer(props) {
+    const { t } = useTranslation()
     const theme = useTheme()
     const [permissions, setPermissions] = useState({})
     const [selectedPermissions, setSelectedPermissions] = useState({})
@@ -134,7 +135,7 @@ function ViewPermissionsDrawer(props) {
                 )}
                 <Box sx={{ overflowY: 'auto' }}>
                     <Typography sx={{ mb: 1 }} variant='h3'>
-                        Permissions
+                        {t('pages.apikey.permissions')}
                     </Typography>
                     <Box>
                         {permissions &&
@@ -183,6 +184,7 @@ ViewPermissionsDrawer.propTypes = {
 }
 
 function ShowRoleRow(props) {
+    const { t } = useTranslation()
     const [openAssignedUsersDrawer, setOpenAssignedUsersDrawer] = useState(false)
     const [openViewPermissionsDrawer, setOpenViewPermissionsDrawer] = useState(false)
     const [selectedRoleId, setSelectedRoleId] = useState('')
@@ -345,7 +347,7 @@ function ShowRoleRow(props) {
                                             direction={orderBy === 'user' ? order : 'asc'}
                                             onClick={() => handleRequestSort('user')}
                                         >
-                                            User
+                                            {t('profile.user')}
                                         </TableSortLabel>
                                     </StyledTableCell>
                                     <StyledTableCell sx={{ width: '50%' }}>
@@ -354,7 +356,7 @@ function ShowRoleRow(props) {
                                             direction={orderBy === 'workspace' ? order : 'asc'}
                                             onClick={() => handleRequestSort('workspace')}
                                         >
-                                            Workspace
+                                            {t('permissions.categories.workspace')}
                                         </TableSortLabel>
                                     </StyledTableCell>
                                 </TableRow>
@@ -587,9 +589,9 @@ const Roles = () => {
                                                     }}
                                                 >
                                                     <TableRow>
-                                                        <StyledTableCell>Name</StyledTableCell>
-                                                        <StyledTableCell>Description</StyledTableCell>
-                                                        <StyledTableCell>Permissions</StyledTableCell>
+                                                        <StyledTableCell>{t('common.name')}</StyledTableCell>
+                                                        <StyledTableCell>{t('common.description')}</StyledTableCell>
+                                                        <StyledTableCell>{t('pages.apikey.permissions')}</StyledTableCell>
                                                         <StyledTableCell>Assigned Users</StyledTableCell>
                                                         <StyledTableCell> </StyledTableCell>
                                                     </TableRow>

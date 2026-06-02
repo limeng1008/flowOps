@@ -1417,7 +1417,9 @@ const ViewMessagesDialog = ({ show, dialogProps, onCancel }) => {
                                                                                         )}
                                                                                         {agent.instructions && <p>{agent.instructions}</p>}
                                                                                         {agent.messages.length === 0 &&
-                                                                                            !agent.instructions && <p>Finished</p>}
+                                                                                            !agent.instructions && (
+                                                                                                <p>{t('pages.executions.stateFinished')}</p>
+                                                                                            )}
                                                                                         {agent.sourceDocuments &&
                                                                                             agent.sourceDocuments.length > 0 && (
                                                                                                 <div

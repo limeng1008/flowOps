@@ -284,7 +284,7 @@ const LoginActivity = () => {
                                                     value={typeFilter}
                                                     onChange={handleTypeFilterChange}
                                                     id='type-checkbox'
-                                                    input={<OutlinedInput label='Badge' />}
+                                                    input={<OutlinedInput label={t('common.badge')} />}
                                                     renderValue={(selected) => selected.join(', ')}
                                                     MenuProps={MenuProps}
                                                     sx={SelectStyles}
@@ -375,8 +375,8 @@ const LoginActivity = () => {
                                         >
                                             <TableRow>
                                                 <StyledTableCell>Activity</StyledTableCell>
-                                                <StyledTableCell>User</StyledTableCell>
-                                                <StyledTableCell>Date</StyledTableCell>
+                                                <StyledTableCell>{t('profile.user')}</StyledTableCell>
+                                                <StyledTableCell>{t('common.date')}</StyledTableCell>
                                                 <StyledTableCell>Method</StyledTableCell>
                                                 <StyledTableCell>Message</StyledTableCell>
                                             </TableRow>

@@ -13,10 +13,12 @@ import { SensitiveInput } from '@/ui-component/input/SensitiveInput'
 import { SwitchInput } from '@/ui-component/switch/Switch'
 import { JsonEditorInput } from '@/ui-component/json/JsonEditor'
 import { TooltipWithParser } from '@/ui-component/tooltip/TooltipWithParser'
+import { useTranslation } from 'react-i18next'
 
 // ===========================|| NodeInputHandler ||=========================== //
 
 const CredentialInputHandler = ({ inputParam, data, disabled = false, onReveal }) => {
+    const { t } = useTranslation()
     const customization = useSelector((state) => state.customization)
     const ref = useRef(null)
 
@@ -59,7 +61,7 @@ const CredentialInputHandler = ({ inputParam, data, disabled = false, onReveal }
                                         height: 25,
                                         width: 25
                                     }}
-                                    title='Expand'
+                                    title={t('pages.assistants.custom.expand')}
                                     color='primary'
                                     onClick={() => onExpandDialogClicked(data[inputParam.name] ?? inputParam.default ?? '', inputParam)}
                                 >

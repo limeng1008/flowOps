@@ -25,10 +25,12 @@ import { flowContext } from '@/store/context/ReactFlowContext'
 
 // const
 import { FLOWISE_CREDENTIAL_ID } from '@/store/constant'
+import { useTranslation } from 'react-i18next'
 
 // ===========================|| DocStoreInputHandler ||=========================== //
 
 const DocStoreInputHandler = ({ inputParam, data, disabled = false, onNodeDataChange }) => {
+    const { t } = useTranslation()
     const customization = useSelector((state) => state.customization)
     const flowContextValue = useContext(flowContext)
     const nodeDataChangeHandler = onNodeDataChange || flowContextValue?.onNodeDataChange
@@ -109,7 +111,7 @@ const DocStoreInputHandler = ({ inputParam, data, disabled = false, onNodeDataCh
                                         height: 25,
                                         width: 25
                                     }}
-                                    title='Expand'
+                                    title={t('pages.assistants.custom.expand')}
                                     color='primary'
                                     onClick={() =>
                                         onExpandDialogClicked(data.inputs[inputParam.name] ?? inputParam.default ?? '', inputParam)
@@ -252,7 +254,7 @@ const DocStoreInputHandler = ({ inputParam, data, disabled = false, onNodeDataCh
                                     </div>
                                     {inputParam.refresh && (
                                         <IconButton
-                                            title='Refresh'
+                                            title={t('pages.documentStores.refresh')}
                                             color='primary'
                                             size='small'
                                             onClick={() => setReloadTimestamp(Date.now().toString())}

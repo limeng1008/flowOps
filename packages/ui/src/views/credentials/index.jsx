@@ -394,7 +394,7 @@ const Credentials = () => {
                                                                     <PermissionIconButton
                                                                         permissionId={'credentials:share'}
                                                                         display={'feat:workspaces'}
-                                                                        title='Share'
+                                                                        title={t('permissions.actions.share')}
                                                                         color='primary'
                                                                         onClick={() => share(credential)}
                                                                     >
@@ -404,7 +404,7 @@ const Credentials = () => {
                                                                 <StyledTableCell>
                                                                     <PermissionIconButton
                                                                         permissionId={'credentials:create,credentials:update'}
-                                                                        title='Edit'
+                                                                        title={t('common.edit')}
                                                                         color='primary'
                                                                         onClick={() => edit(credential)}
                                                                     >
@@ -414,7 +414,7 @@ const Credentials = () => {
                                                                 <StyledTableCell>
                                                                     <PermissionIconButton
                                                                         permissionId={'credentials:delete'}
-                                                                        title='Delete'
+                                                                        title={t('common.delete')}
                                                                         color='error'
                                                                         onClick={() => deleteCredential(credential)}
                                                                     >

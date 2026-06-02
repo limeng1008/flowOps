@@ -18,8 +18,10 @@ import chatflowsApi from '@/api/chatflows'
 
 // utils
 import useNotifier from '@/utils/useNotifier'
+import { useTranslation } from 'react-i18next'
 
 const RateLimit = ({ dialogProps, hideTitle = false }) => {
+    const { t } = useTranslation()
     const dispatch = useDispatch()
     const chatflow = useSelector((state) => state.canvas.chatflow)
     const chatflowid = chatflow.id
@@ -150,7 +152,7 @@ const RateLimit = ({ dialogProps, hideTitle = false }) => {
         <Stack direction='column' spacing={2} sx={{ width: '100%' }}>
             {!hideTitle && (
                 <Typography variant='h3'>
-                    Rate Limit{' '}
+                    {t('canvas.configDialog.rateLimit')}{' '}
                     <TooltipWithParser
                         style={{ marginLeft: 10 }}
                         title={
@@ -169,7 +171,7 @@ const RateLimit = ({ dialogProps, hideTitle = false }) => {
             )}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', mt: 2 }}>
                 <StyledButton disabled={checkDisabled()} variant='contained' onClick={() => onSave()} sx={{ minWidth: 100 }}>
-                    Save
+                    {t('common.save')}
                 </StyledButton>
             </Box>
         </Stack>

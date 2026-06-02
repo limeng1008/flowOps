@@ -50,10 +50,12 @@ import useNotifier from '@/utils/useNotifier'
 
 // const
 import { evaluators as evaluatorsOptions } from '../evaluators/evaluatorConstant'
+import { useTranslation } from 'react-i18next'
 
 const steps = ['Datasets', 'Evaluators', 'LLM Graded Metrics']
 
 const CreateEvaluationDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const theme = useTheme()
     useNotifier()
@@ -491,7 +493,8 @@ const CreateEvaluationDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                         <>
                             <Box>
                                 <Typography variant='overline'>
-                                    Name<span style={{ color: 'red' }}>&nbsp;*</span>
+                                    {t('common.name')}
+                                    <span style={{ color: 'red' }}>&nbsp;*</span>
                                 </Typography>
                                 <TooltipWithParser style={{ marginLeft: 10 }} title={'Friendly name to tag this run.'} />
                                 <OutlinedInput
@@ -535,12 +538,18 @@ const CreateEvaluationDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                                         <span style={{ color: 'red' }}>&nbsp;*</span>
                                     </Typography>
                                     <Typography variant='overline'>
-                                        <Checkbox defaultChecked size='small' label='All' value='Chatflow' onChange={onChangeFlowType} />{' '}
-                                        Chatflows
                                         <Checkbox
                                             defaultChecked
                                             size='small'
-                                            label='All'
+                                            label={t('pages.executions.stateAll')}
+                                            value='Chatflow'
+                                            onChange={onChangeFlowType}
+                                        />{' '}
+                                        {t('menu.chatflows')}
+                                        <Checkbox
+                                            defaultChecked
+                                            size='small'
+                                            label={t('pages.executions.stateAll')}
                                             value='Agentflow v2'
                                             onChange={onChangeFlowType}
                                         />{' '}
@@ -548,7 +557,7 @@ const CreateEvaluationDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                                         <Checkbox
                                             defaultChecked
                                             size='small'
-                                            label='All'
+                                            label={t('pages.executions.stateAll')}
                                             value='Custom Assistant'
                                             onChange={onChangeFlowType}
                                         />{' '}
@@ -593,7 +602,7 @@ const CreateEvaluationDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                             </Box>
                             {useLLM && availableModels.length > 0 && (
                                 <Box>
-                                    <Typography variant='overline'>Select Model</Typography>
+                                    <Typography variant='overline'>{t('pages.assistants.custom.selectModel')}</Typography>
                                     <Dropdown
                                         name='selectedModel'
                                         defaultOption=''

@@ -48,6 +48,7 @@ import { useDispatch } from 'react-redux'
 import { enqueueSnackbar as enqueueSnackbarAction, closeSnackbar as closeSnackbarAction } from '@/store/actions'
 import TablePagination, { DEFAULT_ITEMS_PER_PAGE } from '@/ui-component/pagination/TablePagination'
 import { ExecutionDetails } from '@/views/agentexecutions/ExecutionDetails'
+import { useTranslation } from 'react-i18next'
 
 const PAGE_SIZE_STORAGE_KEY = 'scheduleHistoryPageSize'
 
@@ -187,6 +188,7 @@ const cronHumanize = (cron, timezone) => {
 // ─── Main drawer ─────────────────────────────────────────────────────────────
 
 const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
 
@@ -569,7 +571,7 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
                     </Stack>
 
                     <Stack direction='row' alignItems='center' spacing={1} sx={{ mt: 2 }}>
-                        <Tooltip title='Refresh'>
+                        <Tooltip title={t('pages.documentStores.refresh')}>
                             <IconButton size='small' onClick={fetchAll} disabled={logsApi.loading}>
                                 <IconRefresh size={16} color={customization?.isDarkMode ? 'white' : undefined} />
                             </IconButton>
@@ -649,7 +651,7 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
                                         <StyledTableCell>Status</StyledTableCell>
                                         <StyledTableCell>Scheduled At</StyledTableCell>
                                         <StyledTableCell>Duration</StyledTableCell>
-                                        <StyledTableCell>Error</StyledTableCell>
+                                        <StyledTableCell>{t('pages.executions.stateError')}</StyledTableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -733,7 +735,7 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
             {/* Bulk-delete confirmation */}
             <Dialog open={deleteDialogOpen} onClose={() => !deleting && setDeleteDialogOpen(false)} maxWidth='sm' fullWidth>
                 <DialogTitle>
-                    Delete {selectedIds.length} log{selectedIds.length === 1 ? '' : 's'}?
+                    {t('common.delete')} {selectedIds.length} log{selectedIds.length === 1 ? '' : 's'}?
                 </DialogTitle>
                 <DialogContent>
                     <DialogContentText>
@@ -744,7 +746,7 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setDeleteDialogOpen(false)} disabled={deleting}>
-                        Cancel
+                        {t('common.cancel')}
                     </Button>
                     <Button onClick={handleConfirmDelete} color='error' disabled={deleting} variant='contained'>
                         {deleting ? 'Deleting…' : 'Delete'}

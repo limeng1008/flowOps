@@ -3216,7 +3216,7 @@ const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setP
                         // eslint-disable-next-line
                         autoFocus
                         margin='dense'
-                        label='Feedback'
+                        label={t('canvas.dialogs.feedback')}
                         fullWidth
                         multiline
                         rows={4}
@@ -3227,7 +3227,7 @@ const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setP
                 <DialogActions>
                     <Button onClick={handleSubmitFeedback}>{t('common.cancel')}</Button>
                     <Button onClick={handleSubmitFeedback} variant='contained'>
-                        Submit
+                        {t('common.submit')}
                     </Button>
                 </DialogActions>
             </Dialog>

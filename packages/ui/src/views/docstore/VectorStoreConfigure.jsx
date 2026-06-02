@@ -535,7 +535,7 @@ const VectorStoreConfigure = () => {
                                             startIcon={<IconRefresh />}
                                             onClick={() => resetVectorStoreConfig()}
                                         >
-                                            Reset
+                                            {t('common.reset')}
                                         </Button>
                                     )}
                                     {(Object.keys(selectedEmbeddingsProvider).length > 0 ||
@@ -568,10 +568,15 @@ const VectorStoreConfigure = () => {
                                                 startIcon={<IconRowInsertTop />}
                                                 onClick={() => tryAndInsertIntoStore()}
                                             >
-                                                Upsert
+                                                {t('common.upsert')}
                                             </Button>
                                         )}
-                                    <IconButton onClick={showUpsertHistoryDrawer} size='small' color='inherit' title='Upsert History'>
+                                    <IconButton
+                                        onClick={showUpsertHistoryDrawer}
+                                        size='small'
+                                        color='inherit'
+                                        title={t('canvas.upsertHistory')}
+                                    >
                                         <IconClock />
                                     </IconButton>
                                 </ViewHeader>
@@ -714,7 +719,7 @@ const VectorStoreConfigure = () => {
                                                 }}
                                                 disabled={isVectorStoreDisabled()}
                                             >
-                                                Select Vector Store
+                                                {t('pages.assistants.selectVectorStore')}
                                             </Button>
                                         ) : (
                                             <Box>

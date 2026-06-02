@@ -31,8 +31,10 @@ import useNotifier from '@/utils/useNotifier'
 // const
 import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
 import { evaluators, evaluatorTypes, numericOperators } from './evaluatorConstant'
+import { useTranslation } from 'react-i18next'
 
 const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
 
     const dispatch = useDispatch()
@@ -150,7 +152,7 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                 type: 'actions',
                 width: 80,
                 getActions: (params) => [
-                    <GridActionsCellItem key={'Delete'} icon={<DeleteIcon />} label='Delete' onClick={deleteItem(params.id)} />
+                    <GridActionsCellItem key={'Delete'} icon={<DeleteIcon />} label={t('common.delete')} onClick={deleteItem(params.id)} />
                 ]
             }
         ],
@@ -348,7 +350,7 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             </DialogTitle>
             <DialogContent>
                 <Box sx={{ pb: 2 }}>
-                    <Typography variant='overline'>Name</Typography>
+                    <Typography variant='overline'>{t('common.name')}</Typography>
                     <OutlinedInput
                         size='small'
                         multiline={false}
@@ -397,7 +399,7 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                             />
                         </Box>
                         <Box sx={{ pb: 2 }}>
-                            <Typography variant='overline'>Value</Typography>
+                            <Typography variant='overline'>{t('common.value')}</Typography>
                             <OutlinedInput
                                 size='small'
                                 type='number'
@@ -415,7 +417,7 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                 {evaluatorType === 'text' && selectedEvaluator && (
                     <>
                         <Box sx={{ pb: 2 }}>
-                            <Typography variant='overline'>Value</Typography>
+                            <Typography variant='overline'>{t('common.value')}</Typography>
                             <OutlinedInput
                                 size='small'
                                 multiline={true}
@@ -446,7 +448,7 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                                         Load from Pre defined Samples
                                     </Button>
                                     <Button variant='outlined' onClick={addNewRow} startIcon={<IconPlus />}>
-                                        Add Item
+                                        {t('common.addItemButton')}
                                     </Button>
                                 </Stack>
                             </Stack>
@@ -463,7 +465,7 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                                             height: 25,
                                             width: 25
                                         }}
-                                        title='Expand'
+                                        title={t('pages.assistants.custom.expand')}
                                         color='primary'
                                         onClick={() =>
                                             onExpandDialogClicked({

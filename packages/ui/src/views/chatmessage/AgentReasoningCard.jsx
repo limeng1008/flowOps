@@ -3,6 +3,7 @@ import { IconTool, IconDeviceSdCard } from '@tabler/icons-react'
 import { MemoizedReactMarkdown } from '@/ui-component/markdown/MemoizedReactMarkdown'
 import nextAgentGIF from '@/assets/images/next-agent.gif'
 import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
 
 const AgentReasoningCard = ({
     agent,
@@ -19,6 +20,7 @@ const AgentReasoningCard = ({
     onURLClick,
     getLabel
 }) => {
+    const { t } = useTranslation()
     if (agent.nextAgent) {
         return (
             <Card
@@ -137,7 +139,7 @@ const AgentReasoningCard = ({
                     </MemoizedReactMarkdown>
                 )}
                 {agent.instructions && <p>{agent.instructions}</p>}
-                {agent.messages.length === 0 && !agent.instructions && <p>Finished</p>}
+                {agent.messages.length === 0 && !agent.instructions && <p>{t('pages.executions.stateFinished')}</p>}
                 {agent.sourceDocuments && agent.sourceDocuments.length > 0 && (
                     <div style={{ display: 'block', flexDirection: 'row', width: '100%' }}>
                         {removeDuplicateURL(agent).map((source, index) => {

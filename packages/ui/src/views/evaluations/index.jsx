@@ -349,7 +349,7 @@ const EvalsEvaluation = () => {
                                     }
                                 }}
                                 onClick={onRefresh}
-                                title='Refresh'
+                                title={t('pages.documentStores.refresh')}
                             >
                                 <IconRefresh />
                             </IconButton>
@@ -371,7 +371,7 @@ const EvalsEvaluation = () => {
                                 color='error'
                                 startIcon={<IconTrash />}
                             >
-                                Delete {selected.length} {selected.length === 1 ? 'evaluation' : 'evaluations'}
+                                {t('common.delete')} {selected.length} {selected.length === 1 ? 'evaluation' : 'evaluations'}
                             </StyledPermissionButton>
                         )}
                         {!isTableLoading && rows.length <= 0 ? (
@@ -412,7 +412,7 @@ const EvalsEvaluation = () => {
                                                     />
                                                 </TableCell>
                                                 <TableCell width={10}> </TableCell>
-                                                <TableCell>Name</TableCell>
+                                                <TableCell>{t('common.name')}</TableCell>
                                                 <TableCell>Latest Version</TableCell>
                                                 <TableCell>Average Metrics</TableCell>
                                                 <TableCell>Last Evaluated</TableCell>
@@ -514,6 +514,7 @@ const EvalsEvaluation = () => {
 }
 
 function EvaluationRunRow(props) {
+    const { t } = useTranslation()
     const enqueueSnackbar = (...args) => dispatch(enqueueSnackbarAction(...args))
     const closeSnackbar = (...args) => dispatch(closeSnackbarAction(...args))
 
@@ -753,7 +754,7 @@ function EvaluationRunRow(props) {
                             color='error'
                             startIcon={<IconTrash />}
                         >
-                            Delete {childSelected.length} {childSelected.length === 1 ? 'evaluation' : 'evaluations'}
+                            {t('common.delete')} {childSelected.length} {childSelected.length === 1 ? 'evaluation' : 'evaluations'}
                         </Button>
                     </StyledTableCell>
                 </TableRow>
@@ -774,7 +775,7 @@ function EvaluationRunRow(props) {
                                                         onChange={onSelectAllChildClick}
                                                     />
                                                 </TableCell>
-                                                <TableCell>Version</TableCell>
+                                                <TableCell>{t('profile.version')}</TableCell>
                                                 <TableCell>Last Run</TableCell>
                                                 <TableCell>Average Metrics</TableCell>
                                                 <TableCell>Status</TableCell>
