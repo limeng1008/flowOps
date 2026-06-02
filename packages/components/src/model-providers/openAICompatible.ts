@@ -6,6 +6,7 @@ export const MOONSHOT_DEFAULT_BASE_URL = 'https://api.moonshot.cn/v1'
 export const DOUBAO_DEFAULT_BASE_URL = 'https://ark.cn-beijing.volces.com/api/v3'
 export const QWEN_DEFAULT_BASE_URL = 'https://dashscope.aliyuncs.com/compatible-mode/v1'
 export const MINIMAX_DEFAULT_BASE_URL = 'https://api.minimaxi.com/v1'
+export const SILICONFLOW_DEFAULT_BASE_URL = 'https://api.siliconflow.cn/v1'
 
 type BaseOptions = string | Record<string, unknown> | undefined
 
