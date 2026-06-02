@@ -61,6 +61,7 @@
 | `packages/ui/src/ui-component/table/FlowListTable.jsx`                        | UI-i18n-hardening |
 | `packages/ui/src/ui-component/table/MarketplaceTable.jsx`                     | UI-i18n-hardening |
 | `packages/ui/src/ui-component/table/Table.jsx`                                | UI-i18n-hardening |
+| `packages/ui/src/ui-component/tooltip/TooltipWithParser.jsx`                  | UI-i18n-hardening |
 | `packages/ui/src/views/account/index.jsx`                                     | UI-i18n-hardening |
 | `packages/ui/src/views/agentexecutions/index.jsx`                             | UI-i18n-hardening |
 | `packages/ui/src/views/agentflows/index.jsx`                                  | UI-i18n-hardening |
