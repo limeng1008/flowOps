@@ -17,7 +17,7 @@ import {
 import { IconHierarchy, IconUsersGroup, IconRobot } from '@tabler/icons-react'
 
 import { useSelector } from 'react-redux'
-import { evaluators as evaluatorsOptions, numericOperators } from '../evaluators/evaluatorConstant'
+import { evaluators as evaluatorsOptions, getEvaluatorOptionLabel, numericOperators } from '../evaluators/evaluatorConstant'
 import TableCell from '@mui/material/TableCell'
 import { Close } from '@mui/icons-material'
 import { useTranslation } from 'react-i18next'
@@ -453,15 +453,17 @@ const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
                                                                 sx={{ width: 'max-content' }}
                                                                 variant='outlined'
                                                                 size='small'
-                                                                label={`${
-                                                                    [...evaluatorsOptions, ...numericOperators].find(
-                                                                        (opt) => opt.name === evaluator.measure
-                                                                    )?.label || 'Actual Output'
-                                                                } ${
-                                                                    [...evaluatorsOptions, ...numericOperators]
-                                                                        .find((opt) => opt.name === evaluator.operator)
-                                                                        ?.label.toLowerCase() || '<empty>'
-                                                                } ${getEvaluatorValue(evaluator)}`}
+                                                                label={`${getEvaluatorOptionLabel(
+                                                                    [...evaluatorsOptions, ...numericOperators],
+                                                                    evaluator.measure,
+                                                                    t,
+                                                                    t('pages.evaluators.actualOutput')
+                                                                )} ${getEvaluatorOptionLabel(
+                                                                    [...evaluatorsOptions, ...numericOperators],
+                                                                    evaluator.operator,
+                                                                    t,
+                                                                    t('pages.evaluators.none')
+                                                                ).toLowerCase()} ${getEvaluatorValue(evaluator)}`}
                                                             ></Chip>
                                                         </Stack>
                                                     ))}

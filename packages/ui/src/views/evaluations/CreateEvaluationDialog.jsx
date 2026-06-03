@@ -49,7 +49,7 @@ import assistantsApi from '@/api/assistants'
 import useNotifier from '@/utils/useNotifier'
 
 // const
-import { evaluators as evaluatorsOptions } from '../evaluators/evaluatorConstant'
+import { evaluators as evaluatorsOptions, getEvaluatorOptionLabel } from '../evaluators/evaluatorConstant'
 import { useTranslation } from 'react-i18next'
 
 const steps = ['Datasets', 'Evaluators', 'LLM Graded Metrics']
@@ -454,7 +454,11 @@ const CreateEvaluationDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                                     {evaluatorsOptions
                                         .filter((opt) => opt.type === 'numeric' && opt.name !== 'chain')
                                         .map((evaluator, index) => (
-                                            <Chip key={index} variant='outlined' label={evaluator.label} />
+                                            <Chip
+                                                key={index}
+                                                variant='outlined'
+                                                label={getEvaluatorOptionLabel(evaluatorsOptions, evaluator.name, t)}
+                                            />
                                         ))}
                                 </Stack>
                             </>

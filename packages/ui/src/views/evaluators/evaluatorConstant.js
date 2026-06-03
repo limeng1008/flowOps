@@ -3,141 +3,159 @@ export const evaluators = [
     {
         type: 'text',
         name: 'ContainsAny',
-        label: 'Contains Any',
-        description: 'Returns true if any of the specified comma separated values are present in the response.'
+        labelKey: 'pages.evaluators.optionLabels.containsAny',
+        descriptionKey: 'pages.evaluators.optionDescriptions.containsAny'
     },
     {
         type: 'text',
         name: 'ContainsAll',
-        label: 'Contains All',
-        description: 'Returns true if ALL of the specified comma separated values are present in the response.'
+        labelKey: 'pages.evaluators.optionLabels.containsAll',
+        descriptionKey: 'pages.evaluators.optionDescriptions.containsAll'
     },
     {
         type: 'text',
         name: 'DoesNotContainAny',
-        label: 'Does Not Contains Any',
-        description: 'Returns true if any of the specified comma separated values are present in the response.'
+        labelKey: 'pages.evaluators.optionLabels.doesNotContainAny',
+        descriptionKey: 'pages.evaluators.optionDescriptions.doesNotContainAny'
     },
     {
         type: 'text',
         name: 'DoesNotContainAll',
-        label: 'Does Not Contains All',
-        description: 'Returns true if ALL of the specified comma separated values are present in the response.'
+        labelKey: 'pages.evaluators.optionLabels.doesNotContainAll',
+        descriptionKey: 'pages.evaluators.optionDescriptions.doesNotContainAll'
     },
     {
         type: 'text',
         name: 'StartsWith',
-        label: 'Starts With',
-        description: 'Returns true if the response starts with the specified value.'
+        labelKey: 'pages.evaluators.optionLabels.startsWith',
+        descriptionKey: 'pages.evaluators.optionDescriptions.startsWith'
     },
     {
         type: 'text',
         name: 'NotStartsWith',
-        label: 'Does Not Start With',
-        description: 'Returns true if the response does not start with the specified value.'
+        labelKey: 'pages.evaluators.optionLabels.notStartsWith',
+        descriptionKey: 'pages.evaluators.optionDescriptions.notStartsWith'
     },
     {
         type: 'json',
         name: 'IsValidJSON',
-        label: 'Is Valid JSON',
-        description: 'Returns true if the response is a valid JSON.'
+        labelKey: 'pages.evaluators.optionLabels.isValidJson',
+        descriptionKey: 'pages.evaluators.optionDescriptions.isValidJson'
     },
     {
         type: 'json',
         name: 'IsNotValidJSON',
-        label: 'Is Not a Valid JSON',
-        description: 'Returns true if the response is a not a valid JSON.'
+        labelKey: 'pages.evaluators.optionLabels.isNotValidJson',
+        descriptionKey: 'pages.evaluators.optionDescriptions.isNotValidJson'
     },
     {
         type: 'numeric',
         name: 'totalTokens',
-        label: 'Total Tokens',
-        description: 'Sum of Prompt Tokens and Completion Tokens.'
+        labelKey: 'pages.evaluators.optionLabels.totalTokens',
+        descriptionKey: 'pages.evaluators.optionDescriptions.totalTokens'
     },
     {
         type: 'numeric',
-        label: 'Prompt Tokens',
         name: 'promptTokens',
-        description: 'This is the number of tokens in your prompt.'
+        labelKey: 'pages.evaluators.optionLabels.promptTokens',
+        descriptionKey: 'pages.evaluators.optionDescriptions.promptTokens'
     },
     {
         type: 'numeric',
-        label: 'Completion Tokens',
         name: 'completionTokens',
-        description: 'Completion tokens are any tokens that the model generates in response to your input.'
+        labelKey: 'pages.evaluators.optionLabels.completionTokens',
+        descriptionKey: 'pages.evaluators.optionDescriptions.completionTokens'
     },
     {
         type: 'numeric',
-        label: 'Total API Latency',
         name: 'apiLatency',
-        description: 'Total time taken for the FlowOps Prediction API call (milliseconds).'
+        labelKey: 'pages.evaluators.optionLabels.apiLatency',
+        descriptionKey: 'pages.evaluators.optionDescriptions.apiLatency'
     },
     {
         type: 'numeric',
-        label: 'LLM Latency',
         name: 'llm',
-        description: 'Actual LLM invocation time (milliseconds).'
+        labelKey: 'pages.evaluators.optionLabels.llmLatency',
+        descriptionKey: 'pages.evaluators.optionDescriptions.llmLatency'
     },
     {
         type: 'numeric',
-        label: 'Chatflow Latency',
         name: 'chain',
-        description: 'Actual time spent in executing the chatflow (milliseconds).'
+        labelKey: 'pages.evaluators.optionLabels.chatflowLatency',
+        descriptionKey: 'pages.evaluators.optionDescriptions.chatflowLatency'
     },
     {
         type: 'numeric',
-        label: 'Output Chars Length',
         name: 'responseLength',
-        description: 'Number of characters in the response.'
+        labelKey: 'pages.evaluators.optionLabels.responseLength',
+        descriptionKey: 'pages.evaluators.optionDescriptions.responseLength'
     }
 ]
 
 export const evaluatorTypes = [
     {
-        label: 'Evaluate Result (Text Based)',
         name: 'text',
-        description: 'Set of Evaluators to evaluate the result of a Chatflow.'
+        labelKey: 'pages.evaluators.optionLabels.evaluateText',
+        descriptionKey: 'pages.evaluators.optionDescriptions.evaluateText'
     },
     {
-        label: 'Evaluate Result (JSON)',
         name: 'json',
-        description: 'Set of Evaluators to evaluate the JSON response of a Chatflow.'
+        labelKey: 'pages.evaluators.optionLabels.evaluateJson',
+        descriptionKey: 'pages.evaluators.optionDescriptions.evaluateJson'
     },
     {
-        label: 'Evaluate Metrics (Numeric)',
         name: 'numeric',
-        description: 'Set of Evaluators that evaluate the metrics (latency, tokens, cost, length of response) of a Chatflow.'
+        labelKey: 'pages.evaluators.optionLabels.evaluateNumeric',
+        descriptionKey: 'pages.evaluators.optionDescriptions.evaluateNumeric'
     },
     {
-        label: 'LLM based Grading (JSON)',
         name: 'llm',
-        description: 'Post execution, grades the answers by using an LLM.'
+        labelKey: 'pages.evaluators.optionLabels.llmGrading',
+        descriptionKey: 'pages.evaluators.optionDescriptions.llmGrading'
     }
 ]
 
 export const numericOperators = [
     {
-        label: 'Equals',
-        name: 'equals'
+        name: 'equals',
+        labelKey: 'pages.evaluators.optionLabels.equals'
     },
     {
-        label: 'Not Equals',
-        name: 'notEquals'
+        name: 'notEquals',
+        labelKey: 'pages.evaluators.optionLabels.notEquals'
     },
     {
-        label: 'Greater Than',
-        name: 'greaterThan'
+        name: 'greaterThan',
+        labelKey: 'pages.evaluators.optionLabels.greaterThan'
     },
     {
-        label: 'Less Than',
-        name: 'lessThan'
+        name: 'lessThan',
+        labelKey: 'pages.evaluators.optionLabels.lessThan'
     },
     {
-        label: 'Greater Than or Equals',
-        name: 'greaterThanOrEquals'
+        name: 'greaterThanOrEquals',
+        labelKey: 'pages.evaluators.optionLabels.greaterThanOrEquals'
     },
     {
-        label: 'Less Than or Equals',
-        name: 'lessThanOrEquals'
+        name: 'lessThanOrEquals',
+        labelKey: 'pages.evaluators.optionLabels.lessThanOrEquals'
     }
 ]
+
+export const getEvaluatorOptionLabel = (options, name, t, fallback = '') => {
+    const option = options.find((item) => item.name === name)
+    if (!option) return fallback
+    return option.labelKey ? t(option.labelKey) : option.label || fallback
+}
+
+export const getEvaluatorOptionDescription = (option, t) => {
+    if (!option) return ''
+    return option.descriptionKey ? t(option.descriptionKey) : option.description || ''
+}
+
+export const localizeEvaluatorOptions = (options, t) =>
+    options.map((option) => ({
+        ...option,
+        label: option.labelKey ? t(option.labelKey) : option.label,
+        description: option.descriptionKey ? t(option.descriptionKey) : option.description
+    }))

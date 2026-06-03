@@ -30,7 +30,7 @@ import useNotifier from '@/utils/useNotifier'
 
 // const
 import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
-import { evaluators, evaluatorTypes, numericOperators } from './evaluatorConstant'
+import { evaluators, evaluatorTypes, getEvaluatorOptionDescription, localizeEvaluatorOptions, numericOperators } from './evaluatorConstant'
 import { useTranslation } from 'react-i18next'
 
 const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
@@ -63,6 +63,10 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
     const [outputSchema, setOutputSchema] = useState([])
     const [prompt, setPrompt] = useState('')
 
+    const localizedEvaluatorTypes = useMemo(() => localizeEvaluatorOptions(evaluatorTypes, t), [t])
+    const localizedAvailableEvaluators = useMemo(() => localizeEvaluatorOptions(availableEvaluators, t), [availableEvaluators, t])
+    const localizedNumericOperators = useMemo(() => localizeEvaluatorOptions(numericOperators, t), [t])
+
     const deleteItem = useCallback(
         (id) => () => {
             setTimeout(() => {
@@ -82,8 +86,8 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
         const dialogProps = {
             value: prompt,
             inputParam,
-            confirmButtonName: 'Save',
-            cancelButtonName: 'Cancel'
+            confirmButtonName: t('common.save'),
+            cancelButtonName: t('common.cancel')
         }
         setSamplePromptDialogProps(dialogProps)
         setShowSamplePromptDialog(true)
@@ -92,8 +96,8 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
         const dialogProps = {
             value: prompt,
             inputParam,
-            confirmButtonName: 'Save',
-            cancelButtonName: 'Cancel'
+            confirmButtonName: t('common.save'),
+            cancelButtonName: t('common.cancel')
         }
         setExpandDialogProps(dialogProps)
         setShowExpandDialog(true)
@@ -136,17 +140,17 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
 
     const columns = useMemo(
         () => [
-            { field: 'property', headerName: 'Property', editable: true, flex: 1 },
+            { field: 'property', headerName: t('pages.evaluators.property'), editable: true, flex: 1 },
             {
                 field: 'type',
-                headerName: 'Type',
+                headerName: t('common.type'),
                 type: 'singleSelect',
                 valueOptions: ['string', 'number', 'boolean'],
                 editable: true,
                 width: 120
             },
-            { field: 'description', headerName: 'Description', editable: true, flex: 1 },
-            { field: 'required', headerName: 'Required', type: 'boolean', editable: true, width: 80 },
+            { field: 'description', headerName: t('pages.evaluators.description'), editable: true, flex: 1 },
+            { field: 'required', headerName: t('pages.evaluators.required'), type: 'boolean', editable: true, width: 80 },
             {
                 field: 'actions',
                 type: 'actions',
@@ -156,7 +160,7 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                 ]
             }
         ],
-        [deleteItem]
+        [deleteItem, t]
     )
 
     const onEvaluatorTypeChange = (type) => {
@@ -171,7 +175,7 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             // return the description of the selected evaluator
             const e = availableEvaluators.find((item) => item.name === selectedEvaluator)
             if (e) {
-                return e.description
+                return getEvaluatorOptionDescription(e, t)
             }
         }
         return ''
@@ -197,7 +201,7 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             const updateResp = await evaluatorsApi.updateEvaluator(dialogProps.data.id, data)
             if (updateResp.data) {
                 enqueueSnackbar({
-                    message: `Evaluator ${name} updated`,
+                    message: t('pages.evaluators.updated', { name }),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -212,9 +216,10 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to update Evaluator ${name}: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('pages.evaluators.updateFailed', {
+                    name,
+                    message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -256,7 +261,7 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             const createResp = await evaluatorsApi.createEvaluator(data)
             if (createResp.data) {
                 enqueueSnackbar({
-                    message: 'New Evaluator added',
+                    message: t('pages.evaluators.added'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -271,9 +276,9 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to add new Evaluator: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('pages.evaluators.addFailed', {
+                    message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -345,7 +350,7 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             <DialogTitle sx={{ fontSize: '1rem' }} id='alert-dialog-title'>
                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                     <IconPuzzle style={{ marginRight: '10px' }} />
-                    {dialogProps.type === 'ADD' ? 'Add Evaluator' : 'Edit Evaluator'}
+                    {dialogProps.type === 'ADD' ? t('pages.evaluators.addTitle') : t('pages.evaluators.editTitle')}
                 </div>
             </DialogTitle>
             <DialogContent>
@@ -362,24 +367,24 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                     />
                 </Box>
                 <Box sx={{ pb: 2 }}>
-                    <Typography variant='overline'>Evaluator Type</Typography>
+                    <Typography variant='overline'>{t('pages.evaluators.evaluatorType')}</Typography>
                     <Dropdown
                         key={evaluatorType}
                         name='evaluatorType'
-                        defaultOption='Select Type'
-                        options={evaluatorTypes}
+                        defaultOption={t('pages.evaluators.selectType')}
+                        options={localizedEvaluatorTypes}
                         onSelect={(newValue) => onEvaluatorTypeChange(newValue)}
                         value={evaluatorType}
                     />
                 </Box>
                 {evaluatorType && evaluatorType !== 'llm' && (
                     <Box sx={{ pb: 2 }}>
-                        <Typography variant='overline'>Available Evaluators</Typography>
+                        <Typography variant='overline'>{t('pages.evaluators.availableEvaluators')}</Typography>
                         <Dropdown
                             key={selectedEvaluator}
                             name='availableEvaluators'
-                            defaultOption='Select Dataset'
-                            options={availableEvaluators}
+                            defaultOption={t('pages.evaluators.selectEvaluator')}
+                            options={localizedAvailableEvaluators}
                             onSelect={(e) => setSelectedEvaluator(e)}
                             value={selectedEvaluator}
                         />
@@ -388,12 +393,12 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                 {evaluatorType === 'numeric' && selectedEvaluator && (
                     <>
                         <Box sx={{ pb: 2 }}>
-                            <Typography variant='overline'>Select Operator</Typography>
+                            <Typography variant='overline'>{t('pages.evaluators.selectOperator')}</Typography>
                             <Dropdown
                                 key={selectedMetricOperator}
                                 name='metric'
                                 defaultOption='equals'
-                                options={numericOperators}
+                                options={localizedNumericOperators}
                                 onSelect={(e) => setSelectedMetricOperator(e)}
                                 value={selectedMetricOperator}
                             />
@@ -440,12 +445,12 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                         <Box sx={{ pb: 2 }}>
                             <Stack style={{ position: 'relative', justifyContent: 'space-between' }} direction='row'>
                                 <Stack style={{ position: 'relative', alignItems: 'center' }} direction='row'>
-                                    <Typography variant='overline'>Output Schema</Typography>
-                                    <TooltipWithParser title={'What is the output format in JSON?'} />
+                                    <Typography variant='overline'>{t('pages.evaluators.outputSchema')}</Typography>
+                                    <TooltipWithParser title={t('pages.evaluators.outputSchemaHelp')} />
                                 </Stack>
                                 <Stack style={{ position: 'relative', alignItems: 'right' }} direction='row'>
                                     <Button variant='outlined' onClick={onShowPromptDialogClicked} startIcon={<IconNotes />} sx={{ mr: 1 }}>
-                                        Load from Pre defined Samples
+                                        {t('pages.evaluators.loadSamples')}
                                     </Button>
                                     <Button variant='outlined' onClick={addNewRow} startIcon={<IconPlus />}>
                                         {t('common.addItemButton')}
@@ -456,7 +461,7 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                         </Box>
                         <Box sx={{ pb: 2 }}>
                             <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                <Typography variant='overline'>Prompt</Typography>
+                                <Typography variant='overline'>{t('pages.evaluators.prompt')}</Typography>
                                 <div style={{ flexGrow: 1 }}></div>
                                 {prompt && (
                                     <IconButton
@@ -469,7 +474,7 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                                         color='primary'
                                         onClick={() =>
                                             onExpandDialogClicked({
-                                                label: 'Evaluation Prompt',
+                                                label: t('pages.evaluators.evaluationPrompt'),
                                                 name: 'evaluationPrompt',
                                                 type: 'string'
                                             })
@@ -509,8 +514,11 @@ const AddEditEvaluatorDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                                 >
                                     <IconBulb size={25} color='#2d6a4f' />
                                     <span style={{ color: '#2d6a4f', marginLeft: 10, fontWeight: 400 }}>
-                                        You can use <strong>&#123;question&#125;</strong> <strong>&#123;actualOutput&#125;</strong>{' '}
-                                        <strong>&#123;expectedOutput&#125;</strong> to inject runtime values into your prompt.
+                                        {t('pages.evaluators.promptRuntimeValues', {
+                                            question: '{question}',
+                                            actualOutput: '{actualOutput}',
+                                            expectedOutput: '{expectedOutput}'
+                                        })}
                                     </span>
                                 </div>
                             </div>

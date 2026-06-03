@@ -142,7 +142,92 @@ const requiredKeys = [
     'pages.webhookListener.statusRunning',
     'pages.webhookListener.statusCompleted',
     'pages.webhookListener.statusStopped',
-    'pages.webhookListener.statusError'
+    'pages.webhookListener.statusError',
+    'pages.evaluators.newEvaluator',
+    'pages.evaluators.noEvaluators',
+    'pages.evaluators.deleteTitle',
+    'pages.evaluators.deleteConfirm',
+    'pages.evaluators.deleted',
+    'pages.evaluators.deleteFailed',
+    'pages.evaluators.addTitle',
+    'pages.evaluators.editTitle',
+    'pages.evaluators.evaluatorType',
+    'pages.evaluators.selectType',
+    'pages.evaluators.availableEvaluators',
+    'pages.evaluators.selectEvaluator',
+    'pages.evaluators.selectOperator',
+    'pages.evaluators.outputSchema',
+    'pages.evaluators.outputSchemaHelp',
+    'pages.evaluators.prompt',
+    'pages.evaluators.loadSamples',
+    'pages.evaluators.promptRuntimeValues',
+    'pages.evaluators.evaluationPrompt',
+    'pages.evaluators.updated',
+    'pages.evaluators.updateFailed',
+    'pages.evaluators.added',
+    'pages.evaluators.addFailed',
+    'pages.evaluators.typeNumeric',
+    'pages.evaluators.typeText',
+    'pages.evaluators.typeJson',
+    'pages.evaluators.typeLlm',
+    'pages.evaluators.measure',
+    'pages.evaluators.operator',
+    'pages.evaluators.outputSchemaElements',
+    'pages.evaluators.none',
+    'pages.evaluators.actualOutput',
+    'pages.evaluators.samplePrompts',
+    'pages.evaluators.availablePrompts',
+    'pages.evaluators.selectPrompt',
+    'pages.evaluators.llmJsonOutputHelp',
+    'pages.evaluators.property',
+    'pages.evaluators.description',
+    'pages.evaluators.required',
+    'pages.evaluators.optionLabels.containsAny',
+    'pages.evaluators.optionLabels.containsAll',
+    'pages.evaluators.optionLabels.doesNotContainAny',
+    'pages.evaluators.optionLabels.doesNotContainAll',
+    'pages.evaluators.optionLabels.startsWith',
+    'pages.evaluators.optionLabels.notStartsWith',
+    'pages.evaluators.optionLabels.isValidJson',
+    'pages.evaluators.optionLabels.isNotValidJson',
+    'pages.evaluators.optionLabels.totalTokens',
+    'pages.evaluators.optionLabels.promptTokens',
+    'pages.evaluators.optionLabels.completionTokens',
+    'pages.evaluators.optionLabels.apiLatency',
+    'pages.evaluators.optionLabels.llmLatency',
+    'pages.evaluators.optionLabels.chatflowLatency',
+    'pages.evaluators.optionLabels.responseLength',
+    'pages.evaluators.optionLabels.evaluateText',
+    'pages.evaluators.optionLabels.evaluateJson',
+    'pages.evaluators.optionLabels.evaluateNumeric',
+    'pages.evaluators.optionLabels.llmGrading',
+    'pages.evaluators.optionLabels.equals',
+    'pages.evaluators.optionLabels.notEquals',
+    'pages.evaluators.optionLabels.greaterThan',
+    'pages.evaluators.optionLabels.lessThan',
+    'pages.evaluators.optionLabels.greaterThanOrEquals',
+    'pages.evaluators.optionLabels.lessThanOrEquals',
+    'pages.evaluators.optionLabels.correctness',
+    'pages.evaluators.optionLabels.hallucination',
+    'pages.evaluators.optionDescriptions.containsAny',
+    'pages.evaluators.optionDescriptions.containsAll',
+    'pages.evaluators.optionDescriptions.doesNotContainAny',
+    'pages.evaluators.optionDescriptions.doesNotContainAll',
+    'pages.evaluators.optionDescriptions.startsWith',
+    'pages.evaluators.optionDescriptions.notStartsWith',
+    'pages.evaluators.optionDescriptions.isValidJson',
+    'pages.evaluators.optionDescriptions.isNotValidJson',
+    'pages.evaluators.optionDescriptions.totalTokens',
+    'pages.evaluators.optionDescriptions.promptTokens',
+    'pages.evaluators.optionDescriptions.completionTokens',
+    'pages.evaluators.optionDescriptions.apiLatency',
+    'pages.evaluators.optionDescriptions.llmLatency',
+    'pages.evaluators.optionDescriptions.chatflowLatency',
+    'pages.evaluators.optionDescriptions.responseLength',
+    'pages.evaluators.optionDescriptions.evaluateText',
+    'pages.evaluators.optionDescriptions.evaluateJson',
+    'pages.evaluators.optionDescriptions.evaluateNumeric',
+    'pages.evaluators.optionDescriptions.llmGrading'
 ]
 
 const get = (obj, key) => key.split('.').reduce((acc, part) => acc?.[part], obj)
@@ -375,5 +460,95 @@ describe('views long-tail i18n coverage', () => {
         expect(webhookDrawerSource).not.toContain('Opening event stream')
         expect(webhookDrawerSource).not.toContain('Flow started')
         expect(webhookDrawerSource).not.toContain('Flow completed without a text response.')
+    })
+
+    it('localizes evaluator list, dialogs, sample prompts, and reusable evaluator option labels', () => {
+        const evaluatorsSource = read('views/evaluators/index.jsx')
+        const evaluatorDialogSource = read('views/evaluators/AddEditEvaluatorDialog.jsx')
+        const samplePromptSource = read('views/evaluators/SamplePromptDialog.jsx')
+        const constantsSource = read('views/evaluators/evaluatorConstant.js')
+        const promptConstantsSource = read('views/evaluators/evaluationPrompts.js')
+        const createEvalSource = read('views/evaluations/CreateEvaluationDialog.jsx')
+        const resultDrawerSource = read('views/evaluations/EvaluationResultSideDrawer.jsx')
+
+        expect(evaluatorsSource).toContain('const { t, i18n } = useTranslation()')
+        expect(evaluatorsSource).toContain("t('pages.evaluators.newEvaluator')")
+        expect(evaluatorsSource).toContain("t('pages.evaluators.noEvaluators')")
+        expect(evaluatorsSource).toContain("t('pages.evaluators.deleteTitle')")
+        expect(evaluatorsSource).toContain("t('pages.evaluators.deleteConfirm'")
+        expect(evaluatorsSource).toContain("message: t('pages.evaluators.deleted')")
+        expect(evaluatorsSource).toContain("t('pages.evaluators.deleteFailed'")
+        expect(evaluatorsSource).toContain("label={t('pages.evaluators.typeNumeric')}")
+        expect(evaluatorsSource).toContain("label={t('pages.evaluators.typeText')}")
+        expect(evaluatorsSource).toContain("label={t('pages.evaluators.typeJson')}")
+        expect(evaluatorsSource).toContain("label={t('pages.evaluators.typeLlm')}")
+        expect(evaluatorsSource).toContain("t('pages.evaluators.measure')")
+        expect(evaluatorsSource).toContain("t('pages.evaluators.operator')")
+        expect(evaluatorsSource).toContain("t('pages.evaluators.prompt')")
+        expect(evaluatorsSource).toContain("t('pages.evaluators.outputSchemaElements')")
+        expect(evaluatorsSource).toContain("t('pages.evaluators.none')")
+        expect(evaluatorsSource).toContain('dateTimeFormat')
+        expect(evaluatorsSource).toContain('getEvaluatorOptionLabel')
+        expect(evaluatorsSource).not.toContain('New Evaluator')
+        expect(evaluatorsSource).not.toContain('No Evaluators Yet')
+        expect(evaluatorsSource).not.toContain('Evaluator deleted')
+        expect(evaluatorsSource).not.toContain("label='Numeric'")
+        expect(evaluatorsSource).not.toContain('Output Schema Elements')
+        expect(evaluatorsSource).not.toContain("format('MMMM Do YYYY, hh:mm A')")
+
+        expect(evaluatorDialogSource).toContain("t('pages.evaluators.addTitle')")
+        expect(evaluatorDialogSource).toContain("t('pages.evaluators.editTitle')")
+        expect(evaluatorDialogSource).toContain("t('pages.evaluators.evaluatorType')")
+        expect(evaluatorDialogSource).toContain("defaultOption={t('pages.evaluators.selectType')}")
+        expect(evaluatorDialogSource).toContain("t('pages.evaluators.availableEvaluators')")
+        expect(evaluatorDialogSource).toContain("defaultOption={t('pages.evaluators.selectEvaluator')}")
+        expect(evaluatorDialogSource).toContain("t('pages.evaluators.selectOperator')")
+        expect(evaluatorDialogSource).toContain("t('pages.evaluators.outputSchema')")
+        expect(evaluatorDialogSource).toContain("title={t('pages.evaluators.outputSchemaHelp')}")
+        expect(evaluatorDialogSource).toContain("t('pages.evaluators.loadSamples')")
+        expect(evaluatorDialogSource).toContain("t('pages.evaluators.prompt')")
+        expect(evaluatorDialogSource).toContain("t('pages.evaluators.promptRuntimeValues',")
+        expect(evaluatorDialogSource).toContain("label: t('pages.evaluators.evaluationPrompt')")
+        expect(evaluatorDialogSource).toContain("message: t('pages.evaluators.updated'")
+        expect(evaluatorDialogSource).toContain("t('pages.evaluators.updateFailed'")
+        expect(evaluatorDialogSource).toContain("message: t('pages.evaluators.added')")
+        expect(evaluatorDialogSource).toContain("t('pages.evaluators.addFailed'")
+        expect(evaluatorDialogSource).toContain("headerName: t('pages.evaluators.property')")
+        expect(evaluatorDialogSource).toContain("headerName: t('common.type')")
+        expect(evaluatorDialogSource).toContain("headerName: t('pages.evaluators.description')")
+        expect(evaluatorDialogSource).toContain("headerName: t('pages.evaluators.required')")
+        expect(evaluatorDialogSource).toContain('localizeEvaluatorOptions')
+        expect(evaluatorDialogSource).not.toContain('Add Evaluator')
+        expect(evaluatorDialogSource).not.toContain('Evaluator Type')
+        expect(evaluatorDialogSource).not.toContain('Select Type')
+        expect(evaluatorDialogSource).not.toContain('Load from Pre defined Samples')
+        expect(evaluatorDialogSource).not.toContain('You can use')
+        expect(evaluatorDialogSource).not.toContain('New Evaluator added')
+
+        expect(samplePromptSource).toContain('const { t } = useTranslation()')
+        expect(samplePromptSource).toContain('getLocalizedEvaluationPrompts')
+        expect(samplePromptSource).toContain("t('pages.evaluators.samplePrompts')")
+        expect(samplePromptSource).toContain("t('pages.evaluators.availablePrompts')")
+        expect(samplePromptSource).toContain("defaultOption={t('pages.evaluators.selectPrompt')}")
+        expect(samplePromptSource).toContain("t('pages.evaluators.outputSchema')")
+        expect(samplePromptSource).toContain("title={t('pages.evaluators.llmJsonOutputHelp')}")
+        expect(samplePromptSource).toContain("t('pages.evaluators.prompt')")
+        expect(samplePromptSource).toContain("t('pages.evaluators.selectPrompt')")
+        expect(samplePromptSource).not.toContain('Sample Prompts')
+        expect(samplePromptSource).not.toContain('Available Prompts')
+        expect(samplePromptSource).not.toContain('Instruct the LLM to give formatted JSON output')
+
+        expect(constantsSource).toContain('labelKey')
+        expect(constantsSource).toContain('descriptionKey')
+        expect(constantsSource).not.toContain("label: 'Contains Any'")
+        expect(constantsSource).not.toContain("description: 'Returns true")
+        expect(promptConstantsSource).toContain('labelKey')
+        expect(promptConstantsSource).not.toContain("label: 'Correctness'")
+        expect(promptConstantsSource).not.toContain("label: 'Hallucination'")
+
+        expect(createEvalSource).toContain('getEvaluatorOptionLabel')
+        expect(createEvalSource).toContain('getEvaluatorOptionLabel(evaluatorsOptions, evaluator.name, t)')
+        expect(resultDrawerSource).toContain('getEvaluatorOptionLabel')
+        expect(resultDrawerSource).toContain("t('pages.evaluators.actualOutput')")
     })
 })
