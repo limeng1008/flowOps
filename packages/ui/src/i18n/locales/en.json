@@ -30,7 +30,52 @@
         "version": "Version",
         "accountSettings": "Account Settings",
         "logout": "Logout",
-        "language": "Language"
+        "language": "Language",
+        "exportDialogTitle": "Select Data to Export",
+        "exporting": "Exporting...",
+        "exportingWait": "Exporting data may take a while",
+        "importing": "Importing...",
+        "importingWait": "Importing data may take a while",
+        "importAllSuccess": "Import All successful",
+        "invalidImportedFile": "Invalid Imported File",
+        "importFailed": "Failed to import: {{message}}",
+        "exportAllFailed": "Failed to export all: {{message}}",
+        "exportFailed": "Failed to export: {{message}}",
+        "exportData": {
+            "agentflows": "Agentflows",
+            "agentflowsV2": "Agentflows V2",
+            "assistantsCustom": "Assistants Custom",
+            "assistantsOpenAI": "Assistants OpenAI",
+            "assistantsAzure": "Assistants Azure",
+            "chatflows": "Chatflows",
+            "chatMessages": "Chat Messages",
+            "chatFeedbacks": "Chat Feedbacks",
+            "customTemplates": "Custom Templates",
+            "documentStores": "Document Stores",
+            "executions": "Executions",
+            "tools": "Tools",
+            "variables": "Variables"
+        }
+    },
+    "layout": {
+        "githubStar": "Star",
+        "upgrade": "Upgrade",
+        "loggingOut": "Logging out...",
+        "documentation": "Documentation",
+        "menuItemsError": "Menu Items Error",
+        "switchingWorkspace": "Switching workspace...",
+        "switchingOrganization": "Switching organization...",
+        "workspaceUnavailable": "Workspace Unavailable",
+        "workspaceUnavailableDescription": "Your current workspace is no longer available. Please select another workspace to continue.",
+        "workspaceUnavailableOrgDescription": "Workspace is no longer available. Please select a different organization/workspace to continue.",
+        "selectWorkspace": "Select Workspace",
+        "selectOrganization": "Select Organization",
+        "workspaceSwitchError": "Workspace Switch Error",
+        "contactAdministrator": "Please contact your administrator for assistance.",
+        "failedSwitchWorkspace": "Failed to switch workspace",
+        "organization": "Organization",
+        "workspace": "Workspace",
+        "organizationName": "{{name}}'s Organization"
     },
     "auth": {
         "welcomeBack": "Welcome Back",
@@ -177,7 +222,9 @@
         "save": "Save",
         "delete": "Delete",
         "export": "Export",
+        "import": "Import",
         "edit": "Edit",
+        "back": "Back",
         "rename": "Rename",
         "cancel": "Cancel",
         "confirm": "Confirm",
@@ -268,7 +315,8 @@
         "here": "here",
         "forMoreDetails": "for more details",
         "specifyMultipleValues": "You can also specify multiple values for a config parameter by specifying the node id",
-        "parametersOf": "{{label}} Parameters"
+        "parametersOf": "{{label}} Parameters",
+        "beta": "Beta"
     },
     "permissions": {
         "categories": {

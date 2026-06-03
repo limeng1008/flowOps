@@ -39,7 +39,7 @@ const NavCollapse = ({ menu, level }) => {
             default:
                 return (
                     <Typography key={item.id} variant='h6' color='error' align='center'>
-                        Menu Items Error
+                        {t('layout.menuItemsError')}
                     </Typography>
                 )
         }

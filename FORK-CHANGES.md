@@ -31,10 +31,16 @@
 | `packages/ui/public/manifest.json`                                            | Branding-shell    |
 | `packages/ui/src/index.jsx`                                                   | Branding-shell    |
 | `packages/ui/src/layout/AuthLayout/index.jsx`                                 | UI-i18n-hardening |
+| `packages/ui/src/layout/MainLayout/Header/OrgWorkspaceBreadcrumbs/index.jsx`  | UI-i18n-hardening |
 | `packages/ui/src/layout/MainLayout/Header/ProfileSection/index.jsx`           | UI-i18n-hardening |
+| `packages/ui/src/layout/MainLayout/Header/WorkspaceSwitcher/index.jsx`        | UI-i18n-hardening |
+| `packages/ui/src/layout/MainLayout/Header/index.jsx`                          | UI-i18n-hardening |
+| `packages/ui/src/layout/MainLayout/Sidebar/CloudMenuList.jsx`                 | UI-i18n-hardening |
 | `packages/ui/src/layout/MainLayout/Sidebar/MenuList/NavCollapse/index.jsx`    | UI-i18n-hardening |
 | `packages/ui/src/layout/MainLayout/Sidebar/MenuList/NavGroup/index.jsx`       | UI-i18n-hardening |
 | `packages/ui/src/layout/MainLayout/Sidebar/MenuList/NavItem/index.jsx`        | UI-i18n-hardening |
+| `packages/ui/src/layout/MainLayout/Sidebar/MenuList/index.jsx`                | UI-i18n-hardening |
+| `packages/ui/src/layout/MainLayout/ViewHeader.jsx`                            | UI-i18n-hardening |
 | `packages/ui/src/menu-items/agentsettings.js`                                 | UI-i18n-hardening |
 | `packages/ui/src/menu-items/customassistant.js`                               | UI-i18n-hardening |
 | `packages/ui/src/menu-items/settings.js`                                      | UI-i18n-hardening |

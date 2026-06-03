@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import { Check } from '@mui/icons-material'
@@ -74,6 +75,7 @@ const StyledMenu = styled((props) => (
 
 const WorkspaceSwitcher = () => {
     const navigate = useNavigate()
+    const { t } = useTranslation()
 
     const user = useSelector((state) => state.auth.user)
     const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
@@ -200,10 +202,10 @@ const WorkspaceSwitcher = () => {
             setShowWorkspaceUnavailableDialog(false)
 
             // Set error message and show error dialog
-            setErrorMessage(switchWorkspaceApi.error.message || 'Failed to switch workspace')
+            setErrorMessage(switchWorkspaceApi.error.message || t('layout.failedSwitchWorkspace'))
             setShowErrorDialog(true)
         }
-    }, [switchWorkspaceApi.error])
+    }, [switchWorkspaceApi.error, t])
 
     useEffect(() => {
         try {
@@ -299,7 +301,7 @@ const WorkspaceSwitcher = () => {
                     <Stack spacing={2} alignItems='center'>
                         <CircularProgress />
                         <Typography variant='body1' style={{ color: 'white' }}>
-                            Switching workspace...
+                            {t('layout.switchingWorkspace')}
                         </Typography>
                     </Stack>
                 </DialogContent>
@@ -318,10 +320,8 @@ const WorkspaceSwitcher = () => {
             >
                 <DialogContent>
                     <Stack spacing={3}>
-                        <Typography variant='h5'>Workspace Unavailable</Typography>
-                        <Typography variant='body1'>
-                            Your current workspace is no longer available. Please select another workspace to continue.
-                        </Typography>
+                        <Typography variant='h5'>{t('layout.workspaceUnavailable')}</Typography>
+                        <Typography variant='body1'>{t('layout.workspaceUnavailableDescription')}</Typography>
                         <Select
                             fullWidth
                             value=''
@@ -332,7 +332,7 @@ const WorkspaceSwitcher = () => {
                             displayEmpty
                         >
                             <MenuItem disabled value=''>
-                                <em>Select Workspace</em>
+                                <em>{t('layout.selectWorkspace')}</em>
                             </MenuItem>
                             {assignedWorkspaces.map((workspace, index) => (
                                 <MenuItem key={index} value={workspace.id}>
@@ -345,7 +345,7 @@ const WorkspaceSwitcher = () => {
                 {assignedWorkspaces.length === 0 && (
                     <DialogActions>
                         <Button onClick={handleLogout} variant='contained' color='primary'>
-                            Logout
+                            {t('profile.logout')}
                         </Button>
                     </DialogActions>
                 )}
@@ -365,18 +365,18 @@ const WorkspaceSwitcher = () => {
             >
                 <DialogContent>
                     <Stack spacing={3}>
-                        <Typography variant='h5'>Workspace Switch Error</Typography>
+                        <Typography variant='h5'>{t('layout.workspaceSwitchError')}</Typography>
                         <Typography variant='body1'>{errorMessage}</Typography>
                         {isEnterpriseLicensed && (
                             <Typography variant='body2' color='text.secondary'>
-                                Please contact your administrator for assistance.
+                                {t('layout.contactAdministrator')}
                             </Typography>
                         )}
                     </Stack>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleLogout} variant='contained' color='primary'>
-                        Logout
+                        {t('profile.logout')}
                     </Button>
                 </DialogActions>
             </Dialog>

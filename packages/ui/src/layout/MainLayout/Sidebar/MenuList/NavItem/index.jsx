@@ -151,7 +151,7 @@ const NavItem = ({ item, level, navType, onClick, onUploadFile }) => {
                         background: theme.palette.teal.main,
                         color: 'white'
                     }}
-                    label={'BETA'}
+                    label={t('common.beta')}
                 />
             )}
         </ListItemButton>

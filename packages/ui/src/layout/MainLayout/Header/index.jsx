@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import { useSelector, useDispatch } from 'react-redux'
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import { Button, Avatar, Box, ButtonBase, Switch, Typography, Link } from '@mui/material'
@@ -82,6 +83,7 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
 
 const GitHubStarButton = ({ starCount, isDark }) => {
     const theme = useTheme()
+    const { t } = useTranslation()
 
     const formattedStarCount = starCount.toLocaleString()
 
@@ -117,7 +119,7 @@ const GitHubStarButton = ({ starCount, isDark }) => {
                         ></path>
                     </svg>
                     <Typography variant='caption' sx={{ fontWeight: 600, color: isDark ? 'white' : theme.palette.text.primary }}>
-                        Star
+                        {t('layout.githubStar')}
                     </Typography>
                 </Box>
                 <Box
@@ -145,6 +147,7 @@ GitHubStarButton.propTypes = {
 const Header = ({ handleLeftDrawerToggle }) => {
     const theme = useTheme()
     const navigate = useNavigate()
+    const { t } = useTranslation()
 
     const customization = useSelector((state) => state.customization)
     const logoutApi = useApi(accountApi.logout)
@@ -171,7 +174,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
     const signOutClicked = () => {
         logoutApi.request()
         enqueueSnackbar({
-            message: 'Logging out...',
+            message: t('layout.loggingOut'),
             options: {
                 key: new Date().getTime() + Math.random(),
                 variant: 'success',
@@ -294,7 +297,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
                     onClick={() => setIsPricingOpen(true)}
                     startIcon={<IconSparkles size={20} />}
                 >
-                    Upgrade
+                    {t('layout.upgrade')}
                 </Button>
             )}
             {isPricingOpen && isCloud && (
