@@ -1,6 +1,7 @@
 import { createPortal } from 'react-dom'
 import PropTypes from 'prop-types'
 import { useState, useEffect, useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 
 // Material
 import { Dialog, DialogActions, DialogContent, DialogTitle, Box, Typography, Divider, Stack, OutlinedInput, Button } from '@mui/material'
@@ -18,15 +19,17 @@ import { IconTestPipe2 } from '@tabler/icons-react'
 import useNotifier from '@/utils/useNotifier'
 
 // const
-import { evaluationPrompts } from '@/views/evaluators/evaluationPrompts'
+import { evaluationPrompts, getLocalizedEvaluationPrompts } from '@/views/evaluators/evaluationPrompts'
 
 const SamplePromptDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     useNotifier()
 
     const [selectedPromptName, setSelectedPromptName] = useState('')
     const [selectedConfig, setSelectedConfig] = useState([])
     const [selectedPromptText, setSelectedPromptText] = useState('')
+    const localizedEvaluationPrompts = useMemo(() => getLocalizedEvaluationPrompts(t), [t])
 
     useEffect(() => {
         resetData()
@@ -65,16 +68,16 @@ const SamplePromptDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
 
     const columns = useMemo(
         () => [
-            { field: 'property', headerName: 'Property', flex: 1 },
+            { field: 'property', headerName: t('pages.evaluators.property'), flex: 1 },
             {
                 field: 'type',
-                headerName: 'Type',
+                headerName: t('common.type'),
                 type: 'singleSelect',
                 valueOptions: ['string', 'number', 'boolean'],
                 width: 120
             },
-            { field: 'description', headerName: 'Description', flex: 1 },
-            { field: 'required', headerName: 'Required', type: 'boolean', width: 80 },
+            { field: 'description', headerName: t('pages.evaluators.description'), flex: 1 },
+            { field: 'required', headerName: t('pages.evaluators.required'), type: 'boolean', width: 80 },
             {
                 field: 'actions',
                 type: 'actions',
@@ -82,7 +85,7 @@ const SamplePromptDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                 getActions: () => []
             }
         ],
-        []
+        [t]
     )
 
     const component = show ? (
@@ -97,7 +100,7 @@ const SamplePromptDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             <DialogTitle sx={{ fontSize: '1rem' }} id='alert-dialog-title'>
                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                     <IconTestPipe2 style={{ marginRight: '10px' }} />
-                    Sample Prompts
+                    {t('pages.evaluators.samplePrompts')}
                 </div>
             </DialogTitle>
             <DialogContent>
@@ -105,13 +108,14 @@ const SamplePromptDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                     <Divider />
                     <Box>
                         <Typography variant='overline'>
-                            Available Prompts<span style={{ color: 'red' }}>&nbsp;*</span>
+                            {t('pages.evaluators.availablePrompts')}
+                            <span style={{ color: 'red' }}>&nbsp;*</span>
                         </Typography>
                         <Dropdown
                             key={selectedPromptName}
                             name='dataset'
-                            defaultOption='Select Prompt'
-                            options={evaluationPrompts}
+                            defaultOption={t('pages.evaluators.selectPrompt')}
+                            options={localizedEvaluationPrompts}
                             onSelect={onSelected}
                             value={selectedPromptName}
                         />
@@ -120,8 +124,8 @@ const SamplePromptDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                         <Box sx={{ pb: 2 }}>
                             <Stack style={{ position: 'relative', justifyContent: 'space-between' }} direction='row'>
                                 <Stack style={{ position: 'relative', alignItems: 'center' }} direction='row'>
-                                    <Typography variant='overline'>Output Schema</Typography>
-                                    <TooltipWithParser title={'Instruct the LLM to give formatted JSON output'} />
+                                    <Typography variant='overline'>{t('pages.evaluators.outputSchema')}</Typography>
+                                    <TooltipWithParser title={t('pages.evaluators.llmJsonOutputHelp')} />
                                 </Stack>
                             </Stack>
                             <Grid columns={columns} rows={selectedConfig} disabled={'true'} />
@@ -130,7 +134,7 @@ const SamplePromptDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                     {selectedPromptName && (
                         <Box sx={{ pb: 2 }}>
                             <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                <Typography variant='overline'>Prompt</Typography>
+                                <Typography variant='overline'>{t('pages.evaluators.prompt')}</Typography>
                             </div>
                             <OutlinedInput
                                 size='small'
@@ -154,7 +158,7 @@ const SamplePromptDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                     variant='contained'
                     onClick={() => onConfirmPrompt()}
                 >
-                    {'Select Prompt'}
+                    {t('pages.evaluators.selectPrompt')}
                 </StyledButton>
             </DialogActions>
         </Dialog>

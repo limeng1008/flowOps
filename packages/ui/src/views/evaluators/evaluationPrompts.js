@@ -1,7 +1,7 @@
 export const evaluationPrompts = [
     {
         name: 'correctness',
-        label: 'Correctness',
+        labelKey: 'pages.evaluators.optionLabels.correctness',
         json: [{ id: 1, property: 'score', description: 'graded score', type: 'number', required: true }],
         prompt: `Respond with a numeric score based on how well the following response compare to the ground truth. Grade only based expected response:
 
@@ -16,7 +16,7 @@ Do not include any other information in your response. Do not evaluate correctne
     },
     {
         name: 'hallucination',
-        label: 'Hallucination',
+        labelKey: 'pages.evaluators.optionLabels.hallucination',
         json: [
             { id: 1, property: 'score', description: 'provide a score between 0 and 1', type: 'number', required: true },
             { id: 2, property: 'reasoning', description: 'provide a one sentence reasoning', type: 'string', required: true }
@@ -24,3 +24,9 @@ Do not include any other information in your response. Do not evaluate correctne
         prompt: `Evaluate the degree of hallucination in the generation on a continuous scale from 0 to 1. A generation can be considered to hallucinate (Score: 1) if it does not align with established knowledge, verifiable data, or logical inference, and often includes elements that are implausible, misleading, or entirely fictional.\n\nExample:\nQuery: Can eating carrots improve your vision?\nGeneration: Yes, eating carrots significantly improves your vision, especially at night. This is why people who eat lots of carrots never need glasses. Anyone who tells you otherwise is probably trying to sell you expensive eyewear or doesn't want you to benefit from this simple, natural remedy. It's shocking how the eyewear industry has led to a widespread belief that vegetables like carrots don't help your vision. People are so gullible to fall for these money-making schemes.\n\nScore: 1.0\nReasoning: Carrots only improve vision under specific circumstances, namely a lack of vitamin A that leads to decreased vision. Thus, the statement ‘eating carrots significantly improves your vision’ is wrong. Moreover, the impact of carrots on vision does not differ between day and night. So also the clause ‘especially is night’ is wrong. Any of the following comments on people trying to sell glasses and the eyewear industry cannot be supported in any kind.\n\nInput:\nQuery: {question}\nGeneration: {actualOutput}\n\nThink step by step.`
     }
 ]
+
+export const getLocalizedEvaluationPrompts = (t) =>
+    evaluationPrompts.map((prompt) => ({
+        ...prompt,
+        label: prompt.labelKey ? t(prompt.labelKey) : prompt.label
+    }))

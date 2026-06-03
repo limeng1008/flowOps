@@ -33,12 +33,12 @@ import empty_evaluatorSVG from '@/assets/images/empty_evaluators.svg'
 import { IconTrash, IconPlus, IconJson, IconX, IconNumber123, IconAbc, IconAugmentedReality } from '@tabler/icons-react'
 
 // const
-import { evaluators as evaluatorsOptions, numericOperators } from '../evaluators/evaluatorConstant'
+import { evaluators as evaluatorsOptions, getEvaluatorOptionLabel, numericOperators } from '../evaluators/evaluatorConstant'
 
 // ==============================|| Evaluators ||============================== //
 
 const Evaluators = () => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const dispatch = useDispatch()
@@ -54,6 +54,7 @@ const Evaluators = () => {
     const [showEvaluatorDialog, setShowEvaluatorDialog] = useState(false)
     const [dialogProps, setDialogProps] = useState({})
     const [evaluators, setEvaluators] = useState([])
+    const dateTimeFormat = i18n.language?.startsWith('zh') ? 'YYYY年M月D日 HH:mm' : 'MMMM Do YYYY, hh:mm A'
 
     const getAllEvaluators = useApi(evaluatorsApi.getAllEvaluators)
 
@@ -82,8 +83,8 @@ const Evaluators = () => {
     const newEvaluator = () => {
         const dialogProp = {
             type: 'ADD',
-            cancelButtonName: 'Cancel',
-            confirmButtonName: 'Add',
+            cancelButtonName: t('common.cancel'),
+            confirmButtonName: t('common.add'),
             data: {}
         }
         setDialogProps(dialogProp)
@@ -93,8 +94,8 @@ const Evaluators = () => {
     const edit = (item) => {
         const dialogProp = {
             type: 'EDIT',
-            cancelButtonName: 'Cancel',
-            confirmButtonName: 'Save',
+            cancelButtonName: t('common.cancel'),
+            confirmButtonName: t('common.save'),
             data: item
         }
         setDialogProps(dialogProp)
@@ -103,10 +104,10 @@ const Evaluators = () => {
 
     const deleteEvaluator = async (item) => {
         const confirmPayload = {
-            title: `Delete`,
-            description: `Delete Evaluator ${item.name}?`,
-            confirmButtonName: 'Delete',
-            cancelButtonName: 'Cancel'
+            title: t('pages.evaluators.deleteTitle'),
+            description: t('pages.evaluators.deleteConfirm', { name: item.name }),
+            confirmButtonName: t('common.delete'),
+            cancelButtonName: t('common.cancel')
         }
         const isConfirmed = await confirm(confirmPayload)
 
@@ -115,7 +116,7 @@ const Evaluators = () => {
                 const deleteResp = await evaluatorsApi.deleteEvaluator(item.id)
                 if (deleteResp.data) {
                     enqueueSnackbar({
-                        message: 'Evaluator deleted',
+                        message: t('pages.evaluators.deleted'),
                         options: {
                             key: new Date().getTime() + Math.random(),
                             variant: 'success',
@@ -130,9 +131,9 @@ const Evaluators = () => {
                 }
             } catch (error) {
                 enqueueSnackbar({
-                    message: `Failed to delete Evaluator: ${
-                        typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                    }`,
+                    message: t('pages.evaluators.deleteFailed', {
+                        message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                    }),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'error',
@@ -196,7 +197,7 @@ const Evaluators = () => {
                                 onClick={newEvaluator}
                                 startIcon={<IconPlus />}
                             >
-                                New Evaluator
+                                {t('pages.evaluators.newEvaluator')}
                             </StyledPermissionButton>
                         </ViewHeader>
                         {!isLoading && evaluators.length <= 0 ? (
@@ -208,7 +209,7 @@ const Evaluators = () => {
                                         alt='empty_evaluatorSVG'
                                     />
                                 </Box>
-                                <div>No Evaluators Yet</div>
+                                <div>{t('pages.evaluators.noEvaluators')}</div>
                             </Stack>
                         ) : (
                             <>
@@ -288,7 +289,7 @@ const Evaluators = () => {
                                                                         <Stack flexDirection='row' sx={{ alignItems: 'center' }}>
                                                                             <Chip
                                                                                 icon={<IconNumber123 />}
-                                                                                label='Numeric'
+                                                                                label={t('pages.evaluators.typeNumeric')}
                                                                                 variant='outlined'
                                                                             />
                                                                         </Stack>
@@ -297,7 +298,7 @@ const Evaluators = () => {
                                                                         <Stack flexDirection='row' sx={{ alignItems: 'center' }}>
                                                                             <Chip
                                                                                 icon={<IconAbc />}
-                                                                                label='Text Based'
+                                                                                label={t('pages.evaluators.typeText')}
                                                                                 variant='outlined'
                                                                             />
                                                                         </Stack>
@@ -306,7 +307,7 @@ const Evaluators = () => {
                                                                         <Stack flexDirection='row' sx={{ alignItems: 'center' }}>
                                                                             <Chip
                                                                                 icon={<IconJson />}
-                                                                                label='JSON Based'
+                                                                                label={t('pages.evaluators.typeJson')}
                                                                                 variant='outlined'
                                                                             />
                                                                         </Stack>
@@ -315,7 +316,7 @@ const Evaluators = () => {
                                                                         <Stack flexDirection='row' sx={{ alignItems: 'center' }}>
                                                                             <Chip
                                                                                 icon={<IconAugmentedReality />}
-                                                                                label='LLM Based'
+                                                                                label={t('pages.evaluators.typeLlm')}
                                                                                 variant='outlined'
                                                                             />
                                                                         </Stack>
@@ -345,14 +346,12 @@ const Evaluators = () => {
                                                                                 }}
                                                                                 label={
                                                                                     <span>
-                                                                                        <b>Measure</b>:{' '}
-                                                                                        {
-                                                                                            [
-                                                                                                ...evaluatorsOptions,
-                                                                                                ...numericOperators
-                                                                                            ].find((item) => item.name === ds?.measure)
-                                                                                                ?.label
-                                                                                        }
+                                                                                        <b>{t('pages.evaluators.measure')}</b>:{' '}
+                                                                                        {getEvaluatorOptionLabel(
+                                                                                            [...evaluatorsOptions, ...numericOperators],
+                                                                                            ds?.measure,
+                                                                                            t
+                                                                                        )}
                                                                                     </span>
                                                                                 }
                                                                             />
@@ -370,14 +369,12 @@ const Evaluators = () => {
                                                                                 }}
                                                                                 label={
                                                                                     <span>
-                                                                                        <b>Operator</b>:{' '}
-                                                                                        {
-                                                                                            [
-                                                                                                ...evaluatorsOptions,
-                                                                                                ...numericOperators
-                                                                                            ].find((item) => item.name === ds?.operator)
-                                                                                                ?.label
-                                                                                        }
+                                                                                        <b>{t('pages.evaluators.operator')}</b>:{' '}
+                                                                                        {getEvaluatorOptionLabel(
+                                                                                            [...evaluatorsOptions, ...numericOperators],
+                                                                                            ds?.operator,
+                                                                                            t
+                                                                                        )}
                                                                                     </span>
                                                                                 }
                                                                             />
@@ -421,14 +418,12 @@ const Evaluators = () => {
                                                                                 }}
                                                                                 label={
                                                                                     <span>
-                                                                                        <b>Operator</b>:{' '}
-                                                                                        {
-                                                                                            [
-                                                                                                ...evaluatorsOptions,
-                                                                                                ...numericOperators
-                                                                                            ].find((item) => item.name === ds?.operator)
-                                                                                                ?.label
-                                                                                        }
+                                                                                        <b>{t('pages.evaluators.operator')}</b>:{' '}
+                                                                                        {getEvaluatorOptionLabel(
+                                                                                            [...evaluatorsOptions, ...numericOperators],
+                                                                                            ds?.operator,
+                                                                                            t
+                                                                                        )}
                                                                                     </span>
                                                                                 }
                                                                             />
@@ -472,12 +467,12 @@ const Evaluators = () => {
                                                                                 }}
                                                                                 label={
                                                                                     <span>
-                                                                                        <b>Operator</b>:{' '}
-                                                                                        {
-                                                                                            [...evaluatorsOptions].find(
-                                                                                                (item) => item.name === ds?.operator
-                                                                                            )?.label
-                                                                                        }
+                                                                                        <b>{t('pages.evaluators.operator')}</b>:{' '}
+                                                                                        {getEvaluatorOptionLabel(
+                                                                                            evaluatorsOptions,
+                                                                                            ds?.operator,
+                                                                                            t
+                                                                                        )}
                                                                                     </span>
                                                                                 }
                                                                             />
@@ -503,7 +498,8 @@ const Evaluators = () => {
                                                                                 }}
                                                                                 label={
                                                                                     <span>
-                                                                                        <b>Prompt</b>: {truncateString(ds?.prompt, 100)}
+                                                                                        <b>{t('pages.evaluators.prompt')}</b>:{' '}
+                                                                                        {truncateString(ds?.prompt, 100)}
                                                                                     </span>
                                                                                 }
                                                                             />
@@ -521,12 +517,12 @@ const Evaluators = () => {
                                                                                 }}
                                                                                 label={
                                                                                     <span>
-                                                                                        <b>Output Schema Elements</b>:{' '}
+                                                                                        <b>{t('pages.evaluators.outputSchemaElements')}</b>:{' '}
                                                                                         {ds?.outputSchema.length > 0
                                                                                             ? ds?.outputSchema
                                                                                                   .map((item) => item.property)
                                                                                                   .join(', ')
-                                                                                            : 'None'}
+                                                                                            : t('pages.evaluators.none')}
                                                                                     </span>
                                                                                 }
                                                                             />
@@ -534,7 +530,7 @@ const Evaluators = () => {
                                                                     )}
                                                                 </TableCell>
                                                                 <TableCell onClick={() => edit(ds)}>
-                                                                    {moment(ds.updatedDate).format('MMMM Do YYYY, hh:mm A')}
+                                                                    {moment(ds.updatedDate).format(dateTimeFormat)}
                                                                 </TableCell>
                                                                 <TableCell>
                                                                     <PermissionIconButton

@@ -30,6 +30,9 @@
 | `packages/ui/public/index.html`                                               | Branding-shell    |
 | `packages/ui/public/manifest.json`                                            | Branding-shell    |
 | `packages/ui/src/index.jsx`                                                   | Branding-shell    |
+| `packages/ui/src/i18n/locales/en.json`                                        | UI-i18n-hardening |
+| `packages/ui/src/i18n/locales/zh.json`                                        | UI-i18n-hardening |
+| `packages/ui/src/i18n/viewsLongTailI18n.test.js`                              | UI-i18n-hardening |
 | `packages/ui/src/layout/AuthLayout/index.jsx`                                 | UI-i18n-hardening |
 | `packages/ui/src/layout/MainLayout/Header/OrgWorkspaceBreadcrumbs/index.jsx`  | UI-i18n-hardening |
 | `packages/ui/src/layout/MainLayout/Header/ProfileSection/index.jsx`           | UI-i18n-hardening |
@@ -209,6 +212,8 @@
 | `packages/ui/src/views/evaluations/EvaluationResultSideDrawer.jsx`            | UI-i18n-hardening |
 | `packages/ui/src/views/evaluations/EvaluationResultVersionsSideDrawer.jsx`    | UI-i18n-hardening |
 | `packages/ui/src/views/evaluators/AddEditEvaluatorDialog.jsx`                 | UI-i18n-hardening |
+| `packages/ui/src/views/evaluators/SamplePromptDialog.jsx`                     | UI-i18n-hardening |
+| `packages/ui/src/views/evaluators/evaluationPrompts.js`                       | UI-i18n-hardening |
 | `packages/ui/src/views/organization/index.jsx`                                | UI-i18n-hardening |
 | `packages/ui/src/views/roles/CreateEditRoleDialog.jsx`                        | UI-i18n-hardening |
 | `packages/ui/src/views/schedule/ScheduleHistoryFAB.jsx`                       | UI-i18n-hardening |
