@@ -44,6 +44,13 @@ const MyComp = () => {
 
 要翻：按钮文字、标题/小标题、占位符 placeholder、表格列头、空状态文案、菜单项、对话框标题与正文、确认/提示/报错文案、Tooltip 文本、tab 名、表单 label。
 
+⚠️ **别只盯 JSX 文本**：大量可见英文藏在 **JS 对象属性/变量字符串**里，grep `>文本<` 会漏。务必逐文件细读，重点这些位置：
+
+-   弹窗配置：`dialogProps.title` / `cancelButtonName` / `confirmButtonName` / `description`（含 `useConfirm` 的 payload）。
+-   通知：`enqueueSnackbar({ message: '...' })`、`setError`、`toast` 文案。
+-   `ViewHeader` 的 `title`/`description` 等通过 props 传入的可见文案。
+-   三元/模板字符串拼的可见文案（如 `` `Delete credential ${name}?` ``）。
+
 **不要翻/不要动**：
 
 -   组件 `name`/节点类型/`baseClasses`/枚举 value/路由 path/CSS 类名/`data-*`/事件名。
