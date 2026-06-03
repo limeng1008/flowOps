@@ -28,13 +28,6 @@ import useNotifier from '@/utils/useNotifier'
 // const
 import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
 import { useTranslation } from 'react-i18next'
-const CSVFORMAT = `Only the first 2 columns will be considered:
-----------------------------
-| Input      | Output      |
-----------------------------
-| test input | test output |
-----------------------------
-`
 
 const AddEditDatasetDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
     const { t } = useTranslation()
@@ -96,7 +89,7 @@ const AddEditDatasetDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             const createResp = await datasetApi.createDataset(obj)
             if (createResp.data) {
                 enqueueSnackbar({
-                    message: 'New Dataset added',
+                    message: t('pages.datasets.added'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -111,9 +104,12 @@ const AddEditDatasetDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to add new Dataset: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('pages.datasets.addFailed', {
+                    message:
+                        typeof error.response?.data === 'object'
+                            ? error.response?.data?.message
+                            : error.response?.data || error.message || t('pages.assistants.unknownError')
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -139,7 +135,7 @@ const AddEditDatasetDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             const saveResp = await datasetApi.updateDataset(dataset.id, saveObj)
             if (saveResp.data) {
                 enqueueSnackbar({
-                    message: 'Dataset saved',
+                    message: t('pages.datasets.saved'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -154,9 +150,12 @@ const AddEditDatasetDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to save Dataset: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('pages.datasets.saveFailed', {
+                    message:
+                        typeof error.response?.data === 'object'
+                            ? error.response?.data?.message
+                            : error.response?.data || error.message || t('pages.assistants.unknownError')
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -184,7 +183,7 @@ const AddEditDatasetDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             <DialogTitle sx={{ fontSize: '1rem' }} id='alert-dialog-title'>
                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                     <IconDatabase style={{ marginRight: '10px' }} />
-                    {dialogProps.type === 'ADD' ? 'Add Dataset' : 'Edit Dataset'}
+                    {dialogProps.type === 'ADD' ? t('pages.datasets.addTitle') : t('pages.datasets.editTitle')}
                 </div>
             </DialogTitle>
             <DialogContent>
@@ -227,8 +226,8 @@ const AddEditDatasetDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                     <Box sx={{ p: 2 }}>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
                             <Typography>
-                                Upload CSV
-                                <TooltipWithParser style={{ mb: 1, mt: 2 }} title={`<pre>${CSVFORMAT}</pre>`} />
+                                {t('pages.datasets.uploadCsv')}
+                                <TooltipWithParser style={{ mb: 1, mt: 2 }} title={`<pre>${t('pages.datasets.csvFormat')}</pre>`} />
                             </Typography>
                             <div style={{ flexGrow: 1 }}></div>
                         </div>
@@ -236,13 +235,9 @@ const AddEditDatasetDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                             disabled={false}
                             fileType='.csv'
                             onChange={(newValue) => setSelectedFile(newValue)}
-                            value={selectedFile ?? 'Choose a file to upload'}
+                            value={selectedFile ?? t('pages.datasets.chooseFile')}
                         />
-                        <SwitchInput
-                            value={firstRowHeaders}
-                            onChange={setFirstRowHeaders}
-                            label={'Treat First Row as headers in the upload file?'}
-                        />
+                        <SwitchInput value={firstRowHeaders} onChange={setFirstRowHeaders} label={t('pages.datasets.firstRowHeaders')} />
                     </Box>
                 )}
             </DialogContent>

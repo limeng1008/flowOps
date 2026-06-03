@@ -194,7 +194,9 @@
 | `packages/ui/src/views/chatmessage/AgentReasoningCard.jsx`                    | UI-i18n-hardening |
 | `packages/ui/src/views/credentials/CredentialInputHandler.jsx`                | UI-i18n-hardening |
 | `packages/ui/src/views/datasets/AddEditDatasetDialog.jsx`                     | UI-i18n-hardening |
+| `packages/ui/src/views/datasets/AddEditDatasetRowDialog.jsx`                  | UI-i18n-hardening |
 | `packages/ui/src/views/datasets/DatasetItems.jsx`                             | UI-i18n-hardening |
+| `packages/ui/src/views/datasets/UploadCSVFileDialog.jsx`                      | UI-i18n-hardening |
 | `packages/ui/src/views/docstore/ComponentsListDialog.jsx`                     | UI-i18n-hardening |
 | `packages/ui/src/views/docstore/DeleteDocStoreDialog.jsx`                     | UI-i18n-hardening |
 | `packages/ui/src/views/docstore/DocStoreInputHandler.jsx`                     | UI-i18n-hardening |
@@ -214,4 +216,5 @@
 | `packages/ui/src/views/users/EditUserDialog.jsx`                              | UI-i18n-hardening |
 | `packages/ui/src/views/webhooklistener/WebhookListenerDrawer.jsx`             | UI-i18n-hardening |
 | `packages/ui/src/views/workspace/AddEditWorkspaceDialog.jsx`                  | UI-i18n-hardening |
+| `packages/ui/src/views/workspace/EditWorkspaceUserRoleDialog.jsx`             | UI-i18n-hardening |
 | `pnpm-lock.yaml`                                                              | UI-dependencies   |

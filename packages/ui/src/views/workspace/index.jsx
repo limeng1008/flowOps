@@ -61,12 +61,13 @@ import { workspaceSwitchSuccess } from '@/store/reducers/authSlice'
 import { Link } from 'react-router-dom'
 
 function ShowWorkspaceRow(props) {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const customization = useSelector((state) => state.customization)
     const currentUser = useSelector((state) => state.auth.user)
     const [open, setOpen] = useState(false)
     const [selectedWorkspaceId, setSelectedWorkspaceId] = useState('')
     const [workspaceUsers, setWorkspaceUsers] = useState([])
+    const dateTimeFormat = i18n.language?.startsWith('zh') ? 'YYYY年M月D日 HH:mm' : 'MMMM Do YYYY, hh:mm A'
 
     const theme = useTheme()
 
@@ -107,7 +108,7 @@ function ShowWorkspaceRow(props) {
                                 background: theme.palette.teal.main,
                                 color: 'white'
                             }}
-                            label={'Active'}
+                            label={t('pages.workspaces.active')}
                         />
                     )}
                 </StyledTableCell>
@@ -127,7 +128,7 @@ function ShowWorkspaceRow(props) {
                         </IconButton>
                     )}
                 </StyledTableCell>
-                <StyledTableCell>{moment(props.workspace.updatedDate).format('MMMM Do YYYY, hh:mm A')}</StyledTableCell>
+                <StyledTableCell>{moment(props.workspace.updatedDate).format(dateTimeFormat)}</StyledTableCell>
                 <StyledTableCell>
                     {props.workspace.name !== 'Default Workspace' && (
                         <PermissionIconButton
@@ -185,7 +186,7 @@ function ShowWorkspaceRow(props) {
                             >
                                 <TableRow>
                                     <StyledTableCell sx={{ width: '60%' }}>{t('profile.user')}</StyledTableCell>
-                                    <StyledTableCell sx={{ width: '40%' }}>Role</StyledTableCell>
+                                    <StyledTableCell sx={{ width: '40%' }}>{t('pages.workspaces.role')}</StyledTableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -196,9 +197,9 @@ function ShowWorkspaceRow(props) {
                                             <StyledTableCell>{item.user.name || item.user.email}</StyledTableCell>
                                             <StyledTableCell>
                                                 {item.isOrgOwner ? (
-                                                    <Chip label='ORGANIZATION OWNER' size={'small'} />
+                                                    <Chip label={t('pages.workspaces.organizationOwner')} size={'small'} />
                                                 ) : item.role.name === 'personal workspace' ? (
-                                                    <Chip label='PERSONAL WORKSPACE' size={'small'} />
+                                                    <Chip label={t('pages.workspaces.personalWorkspace')} size={'small'} />
                                                 ) : (
                                                     item.role.name
                                                 )}
@@ -262,8 +263,8 @@ const Workspaces = () => {
     const addNew = () => {
         const dialogProp = {
             type: 'ADD',
-            cancelButtonName: 'Cancel',
-            confirmButtonName: 'Add',
+            cancelButtonName: t('common.cancel'),
+            confirmButtonName: t('common.add'),
             data: {}
         }
         setWorkspaceDialogProps(dialogProp)
@@ -273,8 +274,8 @@ const Workspaces = () => {
     const edit = (workspace) => {
         const dialogProp = {
             type: 'EDIT',
-            cancelButtonName: 'Cancel',
-            confirmButtonName: 'Save',
+            cancelButtonName: t('common.cancel'),
+            confirmButtonName: t('common.save'),
             data: workspace
         }
         setWorkspaceDialogProps(dialogProp)
@@ -283,10 +284,10 @@ const Workspaces = () => {
 
     const deleteWorkspace = async (workspace) => {
         const confirmPayload = {
-            title: `Delete Workspace ${workspace.name}`,
-            description: `This is irreversible and will remove all associated data inside the workspace. Are you sure you want to delete?`,
-            confirmButtonName: 'Delete',
-            cancelButtonName: 'Cancel'
+            title: t('pages.workspaces.deleteWorkspaceTitle', { name: workspace.name }),
+            description: t('pages.workspaces.deleteWorkspaceConfirm'),
+            confirmButtonName: t('common.delete'),
+            cancelButtonName: t('common.cancel')
         }
         const isConfirmed = await confirm(confirmPayload)
 
@@ -297,7 +298,7 @@ const Workspaces = () => {
                 const deleteResp = await workspaceApi.deleteWorkspace(deleteWorkspaceId)
                 if (deleteResp.data) {
                     enqueueSnackbar({
-                        message: 'Workspace deleted',
+                        message: t('pages.workspaces.deleted'),
                         options: {
                             key: new Date().getTime() + Math.random(),
                             variant: 'success',
@@ -313,9 +314,12 @@ const Workspaces = () => {
             } catch (error) {
                 console.error('Failed to delete workspace:', error)
                 enqueueSnackbar({
-                    message: `Failed to delete workspace: ${
-                        typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                    }`,
+                    message: t('pages.workspaces.deleteFailed', {
+                        message:
+                            typeof error.response?.data === 'object'
+                                ? error.response?.data?.message
+                                : error.response?.data || error.message || t('pages.assistants.unknownError')
+                    }),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'error',
@@ -416,7 +420,7 @@ const Workspaces = () => {
                             onSearchChange={onSearchChange}
                             search={true}
                             title={t('pages.workspaces.title')}
-                            searchPlaceholder='Search Workspaces'
+                            searchPlaceholder={t('pages.workspaces.searchPlaceholder')}
                         >
                             <StyledPermissionButton
                                 permissionId={'workspace:create'}
@@ -437,7 +441,7 @@ const Workspaces = () => {
                                         alt='workspaces_emptySVG'
                                     />
                                 </Box>
-                                <div>No Workspaces Yet</div>
+                                <div>{t('pages.workspaces.noWorkspaces')}</div>
                             </Stack>
                         ) : (
                             <TableContainer
@@ -534,7 +538,7 @@ const Workspaces = () => {
                     <Stack spacing={2} alignItems='center'>
                         <CircularProgress />
                         <Typography variant='body1' style={{ color: 'white' }}>
-                            Switching workspace...
+                            {t('layout.switchingWorkspace')}
                         </Typography>
                     </Stack>
                 </DialogContent>
@@ -544,7 +548,7 @@ const Workspaces = () => {
                     <Stack spacing={2} alignItems='center'>
                         <CircularProgress />
                         <Typography variant='body1' style={{ color: 'white' }}>
-                            Deleting workspace...
+                            {t('pages.workspaces.deletingWorkspace')}
                         </Typography>
                     </Stack>
                 </DialogContent>

@@ -37,6 +37,7 @@ import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
 import { enqueueSnackbar as enqueueSnackbarAction, closeSnackbar as closeSnackbarAction } from '@/store/actions'
 import useApi from '@/hooks/useApi'
 import { autocompleteClasses } from '@mui/material/Autocomplete'
+import { useTranslation } from 'react-i18next'
 
 const StyledPopper = styled(Popper)({
     boxShadow: '0px 8px 10px -5px rgb(0 0 0 / 20%), 0px 16px 24px 2px rgb(0 0 0 / 14%), 0px 6px 30px 5px rgb(0 0 0 / 12%)',
@@ -51,6 +52,7 @@ const StyledPopper = styled(Popper)({
 })
 
 const EditWorkspaceUserRoleDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const currentUser = useSelector((state) => state.auth.user)
 
@@ -118,7 +120,7 @@ const EditWorkspaceUserRoleDialog = ({ show, dialogProps, onCancel, onConfirm })
             const saveResp = await workspaceApi.updateWorkspaceUserRole(saveObj)
             if (saveResp.data) {
                 enqueueSnackbar({
-                    message: 'WorkspaceUser Details Updated',
+                    message: t('pages.workspaces.userRoleUpdated'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -133,9 +135,12 @@ const EditWorkspaceUserRoleDialog = ({ show, dialogProps, onCancel, onConfirm })
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to update WorkspaceUser: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('pages.workspaces.userRoleUpdateFailed', {
+                    message:
+                        typeof error.response?.data === 'object'
+                            ? error.response?.data?.message
+                            : error.response?.data || error.message || t('pages.assistants.unknownError')
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -166,14 +171,15 @@ const EditWorkspaceUserRoleDialog = ({ show, dialogProps, onCancel, onConfirm })
             <DialogTitle sx={{ fontSize: '1rem' }} id='alert-dialog-title'>
                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                     <IconUser style={{ marginRight: '10px' }} />
-                    {'Change Workspace Role - '} {userEmail || ''} {user.name ? `(${user.name})` : ''}
+                    {t('pages.workspaces.changeRoleTitle', { email: userEmail || '', name: user.name ? `(${user.name})` : '' })}
                 </div>
             </DialogTitle>
             <DialogContent>
                 <Box sx={{ p: 1 }}>
                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                         <Typography>
-                            New Role to Assign<span style={{ color: 'red' }}>&nbsp;*</span>
+                            {t('pages.workspaces.newRoleToAssign')}
+                            <span style={{ color: 'red' }}>&nbsp;*</span>
                         </Typography>
                         <div style={{ flexGrow: 1 }}></div>
                     </div>
@@ -183,7 +189,9 @@ const EditWorkspaceUserRoleDialog = ({ show, dialogProps, onCancel, onConfirm })
                         onChange={handleRoleChange}
                         getOptionLabel={(option) => option.label || ''}
                         options={availableRoles}
-                        renderInput={(params) => <TextField {...params} variant='outlined' placeholder='Select Role' />}
+                        renderInput={(params) => (
+                            <TextField {...params} variant='outlined' placeholder={t('pages.workspaces.selectRole')} />
+                        )}
                         value={selectedRole}
                         PopperComponent={StyledPopper}
                     />
