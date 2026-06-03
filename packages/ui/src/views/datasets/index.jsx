@@ -53,11 +53,12 @@ import { useError } from '@/store/context/ErrorContext'
 // ==============================|| Datasets ||============================== //
 
 const EvalDatasets = () => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const navigate = useNavigate()
     const theme = useTheme()
     const { confirm } = useConfirm()
     const { error } = useError()
+    const dateTimeFormat = i18n.language?.startsWith('zh') ? 'YYYY年M月D日 HH:mm' : 'MMMM Do YYYY, hh:mm A'
 
     const customization = useSelector((state) => state.customization)
 
@@ -103,8 +104,8 @@ const EvalDatasets = () => {
     const addNew = () => {
         const dialogProp = {
             type: 'ADD',
-            cancelButtonName: 'Cancel',
-            confirmButtonName: 'Add',
+            cancelButtonName: t('common.cancel'),
+            confirmButtonName: t('common.add'),
             data: {}
         }
         setDatasetDialogProps(dialogProp)
@@ -114,8 +115,8 @@ const EvalDatasets = () => {
     const edit = (dataset) => {
         const dialogProp = {
             type: 'EDIT',
-            cancelButtonName: 'Cancel',
-            confirmButtonName: 'Save',
+            cancelButtonName: t('common.cancel'),
+            confirmButtonName: t('common.save'),
             data: dataset
         }
         setDatasetDialogProps(dialogProp)
@@ -124,10 +125,10 @@ const EvalDatasets = () => {
 
     const deleteDataset = async (dataset) => {
         const confirmPayload = {
-            title: `Delete`,
-            description: `Delete dataset ${dataset.name}?`,
-            confirmButtonName: 'Delete',
-            cancelButtonName: 'Cancel'
+            title: t('pages.datasets.deleteTitle'),
+            description: t('pages.datasets.deleteConfirm', { name: dataset.name }),
+            confirmButtonName: t('common.delete'),
+            cancelButtonName: t('common.cancel')
         }
         const isConfirmed = await confirm(confirmPayload)
 
@@ -136,7 +137,7 @@ const EvalDatasets = () => {
                 const deleteResp = await datasetsApi.deleteDataset(dataset.id)
                 if (deleteResp.data) {
                     enqueueSnackbar({
-                        message: 'Dataset deleted',
+                        message: t('pages.datasets.deleted'),
                         options: {
                             key: new Date().getTime() + Math.random(),
                             variant: 'success',
@@ -151,9 +152,12 @@ const EvalDatasets = () => {
                 }
             } catch (error) {
                 enqueueSnackbar({
-                    message: `Failed to delete dataset: ${
-                        typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                    }`,
+                    message: t('pages.datasets.deleteFailed', {
+                        message:
+                            typeof error.response?.data === 'object'
+                                ? error.response?.data?.message
+                                : error.response?.data || error.message || t('pages.assistants.unknownError')
+                    }),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'error',
@@ -249,7 +253,7 @@ const EvalDatasets = () => {
                                             <TableRow>
                                                 <TableCell>{t('common.name')}</TableCell>
                                                 <TableCell>{t('common.description')}</TableCell>
-                                                <TableCell>Rows</TableCell>
+                                                <TableCell>{t('pages.datasets.rows')}</TableCell>
                                                 <TableCell>{t('pages.credentials.colLastUpdated')}</TableCell>
                                                 <Available permission={'datasets:update,datasets:create'}>
                                                     <TableCell> </TableCell>
@@ -322,7 +326,7 @@ const EvalDatasets = () => {
                                                             </TableCell>
                                                             <TableCell onClick={() => goToRows(ds)}>{ds?.rowCount}</TableCell>
                                                             <TableCell onClick={() => goToRows(ds)}>
-                                                                {moment(ds.updatedDate).format('MMMM Do YYYY, hh:mm A')}
+                                                                {moment(ds.updatedDate).format(dateTimeFormat)}
                                                             </TableCell>
                                                             <Available permission={'datasets:update,datasets:create'}>
                                                                 <TableCell>

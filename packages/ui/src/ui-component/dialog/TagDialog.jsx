@@ -60,7 +60,7 @@ const TagDialog = ({ isOpen, dialogProps, onClose, onSubmit }) => {
             aria-describedby='category-dialog-description'
         >
             <DialogTitle sx={{ fontSize: '1rem' }} id='alert-dialog-title'>
-                Set Chatflow Category Tags
+                {t('uiComponents.tags.title')}
             </DialogTitle>
             <DialogContent>
                 <Box>
@@ -83,11 +83,11 @@ const TagDialog = ({ isOpen, dialogProps, onClose, onSubmit }) => {
                             value={inputValue}
                             onChange={handleInputChange}
                             onKeyDown={handleInputKeyDown}
-                            label='Add a tag'
+                            label={t('uiComponents.tags.addTag')}
                             variant='outlined'
                         />
                         <Typography variant='body2' sx={{ fontStyle: 'italic', mt: 1 }} color='text.secondary'>
-                            Enter a tag and press enter to add it to the list. You can add as many tags as you want.
+                            {t('uiComponents.tags.help')}
                         </Typography>
                     </form>
                 </Box>

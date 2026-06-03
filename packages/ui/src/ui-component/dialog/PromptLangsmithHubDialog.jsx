@@ -262,7 +262,7 @@ const PromptLangsmithHubDialog = ({ promptType, show, onCancel, onSubmit }) => {
                 <Box sx={{ display: 'flex', flexDirection: 'row', p: 2, pt: 1, alignItems: 'center' }}>
                     <FormControl sx={{ mr: 1, width: '30%' }}>
                         <InputLabel size='small' id='model-checkbox-label'>
-                            Model
+                            {t('uiComponents.promptHub.model')}
                         </InputLabel>
                         <Select
                             id='model-checkbox'
@@ -271,7 +271,7 @@ const PromptLangsmithHubDialog = ({ promptType, show, onCancel, onSubmit }) => {
                             size='small'
                             value={modelName}
                             onChange={handleModelChange}
-                            input={<OutlinedInput label='Model' />}
+                            input={<OutlinedInput label={t('uiComponents.promptHub.model')} />}
                             renderValue={(selected) => selected.map((x) => x.name).join(', ')}
                             endAdornment={
                                 modelName.length ? (
@@ -299,7 +299,7 @@ const PromptLangsmithHubDialog = ({ promptType, show, onCancel, onSubmit }) => {
                     </FormControl>
                     <FormControl sx={{ mr: 1, width: '30%' }}>
                         <InputLabel size='small' id='usecase-checkbox-label'>
-                            Usecase
+                            {t('uiComponents.promptHub.usecase')}
                         </InputLabel>
                         <Select
                             autoWidth={false}
@@ -309,7 +309,7 @@ const PromptLangsmithHubDialog = ({ promptType, show, onCancel, onSubmit }) => {
                             size='small'
                             value={usecase}
                             onChange={handleUsecaseChange}
-                            input={<OutlinedInput label='Usecase' />}
+                            input={<OutlinedInput label={t('uiComponents.promptHub.usecase')} />}
                             renderValue={(selected) => selected.map((x) => x.name).join(', ')}
                             endAdornment={
                                 usecase.length ? (
@@ -346,7 +346,7 @@ const PromptLangsmithHubDialog = ({ promptType, show, onCancel, onSubmit }) => {
                             size='small'
                             value={language}
                             onChange={handleLanguageChange}
-                            input={<OutlinedInput label='language' />}
+                            input={<OutlinedInput label={t('profile.language')} />}
                             renderValue={(selected) => selected.map((x) => x.name).join(', ')}
                             endAdornment={
                                 language.length ? (
@@ -384,7 +384,7 @@ const PromptLangsmithHubDialog = ({ promptType, show, onCancel, onSubmit }) => {
                         <Box sx={{ p: 5, height: 'auto' }}>
                             <img style={{ objectFit: 'cover', height: '20vh', width: 'auto' }} src={promptEmptySVG} alt='promptEmptySVG' />
                         </Box>
-                        <div>Please wait....loading Prompts</div>
+                        <div>{t('uiComponents.promptHub.loadingPrompts')}</div>
                     </Stack>
                 )}
                 {!loading && availablePrompNameList && availablePrompNameList.length === 0 && (
@@ -392,7 +392,7 @@ const PromptLangsmithHubDialog = ({ promptType, show, onCancel, onSubmit }) => {
                         <Box sx={{ p: 5, height: 'auto' }}>
                             <img style={{ objectFit: 'cover', height: '20vh', width: 'auto' }} src={promptEmptySVG} alt='promptEmptySVG' />
                         </Box>
-                        <div>No Available Prompts</div>
+                        <div>{t('uiComponents.promptHub.noAvailablePrompts')}</div>
                     </Stack>
                 )}
                 {!loading && availablePrompNameList && availablePrompNameList.length > 0 && (
@@ -404,7 +404,7 @@ const PromptLangsmithHubDialog = ({ promptType, show, onCancel, onSubmit }) => {
                                         <Card variant='outlined' sx={{ height: 470, overflow: 'auto', borderRadius: 0 }}>
                                             <CardContent sx={{ p: 1 }}>
                                                 <Typography sx={{ fontSize: 10 }} color='text.secondary' gutterBottom>
-                                                    Available Prompts
+                                                    {t('uiComponents.promptHub.availablePrompts')}
                                                 </Typography>
                                                 <List component='nav' aria-label='secondary mailbox folder'>
                                                     {availablePrompNameList.map((item, index) => (
@@ -454,7 +454,7 @@ const PromptLangsmithHubDialog = ({ promptType, show, onCancel, onSubmit }) => {
                                                         expandIcon={<ExpandMoreIcon />}
                                                         id='panel2d-header'
                                                     >
-                                                        <Typography>Prompt</Typography>
+                                                        <Typography>{t('uiComponents.promptHub.prompt')}</Typography>
                                                     </AccordionSummary>
                                                     <AccordionDetails>
                                                         <Typography sx={{ wordWrap: 'true' }} color='text.primary'>
@@ -510,7 +510,7 @@ const PromptLangsmithHubDialog = ({ promptType, show, onCancel, onSubmit }) => {
                                                         aria-controls='panel3d-content'
                                                         id='panel3d-header'
                                                     >
-                                                        <Typography>Readme</Typography>
+                                                        <Typography>{t('uiComponents.promptHub.readme')}</Typography>
                                                     </AccordionSummary>
                                                     <AccordionDetails>
                                                         <div

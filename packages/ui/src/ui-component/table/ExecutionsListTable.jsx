@@ -88,9 +88,10 @@ const getIconColor = (state) => {
 }
 
 export const ExecutionsListTable = ({ data, isLoading, onExecutionRowClick, onSelectionChange }) => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
+    const dateTimeFormat = i18n.language?.startsWith('zh') ? 'YYYY年M月D日 HH:mm' : 'MMM D, YYYY h:mm A'
 
     const localStorageKeyOrder = 'executions_order'
     const localStorageKeyOrderBy = 'executions_orderBy'
@@ -175,7 +176,7 @@ export const ExecutionsListTable = ({ data, isLoading, onExecutionRowClick, onSe
                                     }}
                                 />
                             </StyledTableCell>
-                            <StyledTableCell>Status</StyledTableCell>
+                            <StyledTableCell>{t('uiComponents.table.status')}</StyledTableCell>
                             <StyledTableCell>
                                 <TableSortLabel
                                     active={orderBy === 'updatedDate'}
@@ -190,7 +191,7 @@ export const ExecutionsListTable = ({ data, isLoading, onExecutionRowClick, onSe
                                     {t('pages.executions.filterAgentflow')}
                                 </TableSortLabel>
                             </StyledTableCell>
-                            <StyledTableCell>Session</StyledTableCell>
+                            <StyledTableCell>{t('uiComponents.table.session')}</StyledTableCell>
                             <StyledTableCell>
                                 <TableSortLabel
                                     active={orderBy === 'createdDate'}
@@ -276,14 +277,14 @@ export const ExecutionsListTable = ({ data, isLoading, onExecutionRowClick, onSe
                                                 />
                                             </StyledTableCell>
                                             <StyledTableCell onClick={() => onExecutionRowClick(row)}>
-                                                {moment(row.updatedDate).format('MMM D, YYYY h:mm A')}
+                                                {moment(row.updatedDate).format(dateTimeFormat)}
                                             </StyledTableCell>
                                             <StyledTableCell onClick={() => onExecutionRowClick(row)}>
                                                 {row.agentflow?.name}
                                             </StyledTableCell>
                                             <StyledTableCell onClick={() => onExecutionRowClick(row)}>{row.sessionId}</StyledTableCell>
                                             <StyledTableCell onClick={() => onExecutionRowClick(row)}>
-                                                {moment(row.createdDate).format('MMM D, YYYY h:mm A')}
+                                                {moment(row.createdDate).format(dateTimeFormat)}
                                             </StyledTableCell>
                                         </StyledTableRow>
                                     )

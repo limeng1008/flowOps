@@ -69,6 +69,7 @@ export const FlowListTable = ({
 }) => {
     const { t, i18n } = useTranslation()
     const [currentLang, setCurrentLang] = useState(i18n.resolvedLanguage || i18n.language)
+    const dateTimeFormat = i18n.language?.startsWith('zh') ? 'YYYY年M月D日 HH:mm:ss' : 'MMMM Do, YYYY HH:mm:ss'
     useEffect(() => {
         const onLanguageChanged = (lng) => setCurrentLang(lng)
         i18n.on('languageChanged', onLanguageChanged)
@@ -325,16 +326,16 @@ export const FlowListTable = ({
                                                                     fontWeight: 200
                                                                 }}
                                                             >
-                                                                + {(images[row.id]?.length || 0) + (icons[row.id]?.length || 0) - 5} More
+                                                                {t('uiComponents.table.moreItems', {
+                                                                    count: (images[row.id]?.length || 0) + (icons[row.id]?.length || 0) - 5
+                                                                })}
                                                             </Typography>
                                                         </MoreItemsTooltip>
                                                     )}
                                                 </Box>
                                             )}
                                         </StyledTableCell>
-                                        <StyledTableCell key='3'>
-                                            {moment(row.updatedDate).format('MMMM Do, YYYY HH:mm:ss')}
-                                        </StyledTableCell>
+                                        <StyledTableCell key='3'>{moment(row.updatedDate).format(dateTimeFormat)}</StyledTableCell>
                                         {isActionsAvailable && (
                                             <StyledTableCell key='4'>
                                                 <Stack

@@ -81,7 +81,7 @@ const AddEditWorkspaceDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
     const addNewWorkspace = async () => {
         if (workspaceName === 'Default Workspace' || workspaceName === 'Personal Workspace') {
             enqueueSnackbar({
-                message: 'Workspace name cannot be Default Workspace or Personal Workspace - this is a reserved name',
+                message: t('pages.workspaces.reservedName'),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -106,7 +106,7 @@ const AddEditWorkspaceDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             const createResp = await workspaceApi.createWorkspace(obj)
             if (createResp.data) {
                 enqueueSnackbar({
-                    message: 'New Workspace added',
+                    message: t('pages.workspaces.added'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -121,9 +121,12 @@ const AddEditWorkspaceDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to add new Workspace: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('pages.workspaces.addFailed', {
+                    message:
+                        typeof error.response?.data === 'object'
+                            ? error.response?.data?.message
+                            : error.response?.data || error.message || t('pages.assistants.unknownError')
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -152,7 +155,7 @@ const AddEditWorkspaceDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             if (saveResp.data) {
                 store.dispatch(workspaceNameUpdated(saveResp.data))
                 enqueueSnackbar({
-                    message: 'Workspace saved',
+                    message: t('pages.workspaces.saved'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -167,9 +170,12 @@ const AddEditWorkspaceDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to save Workspace: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('pages.workspaces.saveFailed', {
+                    message:
+                        typeof error.response?.data === 'object'
+                            ? error.response?.data?.message
+                            : error.response?.data || error.message || t('pages.assistants.unknownError')
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -197,7 +203,7 @@ const AddEditWorkspaceDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             <DialogTitle sx={{ fontSize: '1rem' }} id='alert-dialog-title'>
                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                     <IconUsersGroup style={{ marginRight: '10px' }} />
-                    {dialogProps.type === 'ADD' ? 'Add Workspace' : 'Edit Workspace'}
+                    {dialogProps.type === 'ADD' ? t('pages.workspaces.addTitle') : t('pages.workspaces.editTitle')}
                 </div>
             </DialogTitle>
             <DialogContent>

@@ -9,11 +9,13 @@ import { Dialog, DialogContent, DialogTitle } from '@mui/material'
 // store
 import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
 import useNotifier from '@/utils/useNotifier'
+import { useTranslation } from 'react-i18next'
 
 // Project imports
 import StarterPrompts from '@/ui-component/extended/StarterPrompts'
 
 const StarterPromptsDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const dispatch = useDispatch()
 
@@ -35,7 +37,7 @@ const StarterPromptsDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             aria-describedby='alert-dialog-description'
         >
             <DialogTitle sx={{ fontSize: '1rem' }} id='alert-dialog-title'>
-                {dialogProps.title || 'Conversation Starter Prompts'}
+                {dialogProps.title || t('canvas.configDialog.starterPromptsTitle')}
             </DialogTitle>
             <DialogContent>
                 <StarterPrompts dialogProps={dialogProps} onConfirm={onConfirm} />
