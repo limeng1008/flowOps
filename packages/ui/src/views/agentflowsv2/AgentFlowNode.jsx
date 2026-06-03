@@ -193,9 +193,8 @@ const AgentFlowNode = ({ data }) => {
     }, [data, ref, updateNodeInternals])
 
     useEffect(() => {
-        const nodeOutdatedMessage = (oldVersion, newVersion) =>
-            `Node version ${oldVersion} outdated\nUpdate to latest version ${newVersion}`
-        const nodeVersionEmptyMessage = (newVersion) => `Node outdated\nUpdate to latest version ${newVersion}`
+        const nodeOutdatedMessage = (oldVersion, newVersion) => t('canvas.nodeWarnings.outdatedVersion', { oldVersion, newVersion })
+        const nodeVersionEmptyMessage = (newVersion) => t('canvas.nodeWarnings.outdated', { newVersion })
 
         const componentNode = canvas.componentNodes.find((nd) => nd.name === data.name)
         if (componentNode) {
@@ -204,17 +203,14 @@ const AgentFlowNode = ({ data }) => {
             } else if (data.version && componentNode.version > data.version) {
                 setWarningMessage(nodeOutdatedMessage(data.version, componentNode.version))
             } else if (componentNode.badge === 'DEPRECATING') {
-                setWarningMessage(
-                    componentNode?.deprecateMessage ??
-                        'This node will be deprecated in the next release. Change to a new node tagged with NEW'
-                )
+                setWarningMessage(componentNode?.deprecateMessage ?? t('canvas.nodeWarnings.deprecatingFallback'))
             } else if (componentNode.warning) {
                 setWarningMessage(componentNode.warning)
             } else {
                 setWarningMessage('')
             }
         }
-    }, [canvas.componentNodes, data.name, data.version])
+    }, [canvas.componentNodes, currentLang, data.name, data.version, t])
 
     return (
         <div ref={ref} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>

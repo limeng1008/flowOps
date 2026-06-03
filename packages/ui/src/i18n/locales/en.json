@@ -397,6 +397,27 @@
         "name": "Name",
         "emailAddress": "Email Address",
         "phoneNumber": "Phone Number",
+        "agentflowGenerator": {
+            "open": "Generate Agentflow",
+            "title": "What would you like to build?",
+            "description": "Enter your prompt to generate an agentflow. Performance may vary with different models. Only nodes and edges are generated, you will need to fill in the input fields for each node.",
+            "promptWebReport": "An agent that can autonomously search the web and generate report",
+            "promptSummarizeDocument": "Summarize a document",
+            "promptSlackResponse": "Generate response to user queries and send it to Slack",
+            "promptCustomerSupportTeam": "A team of agents that can handle all customer queries",
+            "placeholder": "Describe your agent here",
+            "selectModel": "Select model to generate agentflow",
+            "generate": "Generate",
+            "generating": "Generating your Agentflow...",
+            "failed": "Failed to generate agentflow",
+            "missingFields": "Please fill in the following required fields: {{fields}}",
+            "allMandatoryFields": "Please fill in all mandatory fields for the selected model."
+        },
+        "nodeWarnings": {
+            "outdatedVersion": "Node version {{oldVersion}} outdated\nUpdate to latest version {{newVersion}}",
+            "outdated": "Node outdated\nUpdate to latest version {{newVersion}}",
+            "deprecatingFallback": "This node will be deprecated in the next release. Change to a new node tagged with NEW"
+        },
         "dialogs": {
             "fromDate": "From",
             "toDate": "To",

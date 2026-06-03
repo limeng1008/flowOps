@@ -22,16 +22,16 @@ import { useTranslation } from 'react-i18next'
 
 const defaultInstructions = [
     {
-        text: 'An agent that can autonomously search the web and generate report'
+        key: 'canvas.agentflowGenerator.promptWebReport'
     },
     {
-        text: 'Summarize a document'
+        key: 'canvas.agentflowGenerator.promptSummarizeDocument'
     },
     {
-        text: 'Generate response to user queries and send it to Slack'
+        key: 'canvas.agentflowGenerator.promptSlackResponse'
     },
     {
-        text: 'A team of agents that can handle all customer queries'
+        key: 'canvas.agentflowGenerator.promptCustomerSupportTeam'
     }
 ]
 
@@ -124,7 +124,7 @@ const AgentflowGeneratorDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
 
     const displayWarning = (message) => {
         enqueueSnackbar({
-            message: message || 'Please fill in all mandatory fields.',
+            message: message || t('canvas.agentflowGenerator.allMandatoryFields'),
             options: {
                 key: new Date().getTime() + Math.random(),
                 variant: 'warning',
@@ -191,8 +191,8 @@ const AgentflowGeneratorDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
         if (!isValid) {
             const message =
                 missingFields.length > 0
-                    ? `Please fill in the following required fields: ${missingFields.join(', ')}`
-                    : 'Please fill in all mandatory fields for the selected model.'
+                    ? t('canvas.agentflowGenerator.missingFields', { fields: missingFields.join(', ') })
+                    : t('canvas.agentflowGenerator.allMandatoryFields')
             displayWarning(message)
             return
         }
@@ -211,7 +211,7 @@ const AgentflowGeneratorDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
                 onConfirm()
             } else {
                 enqueueSnackbar({
-                    message: response.error || 'Failed to generate agentflow',
+                    message: response.error || t('canvas.agentflowGenerator.failed'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'error',
@@ -226,7 +226,7 @@ const AgentflowGeneratorDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
             }
         } catch (error) {
             enqueueSnackbar({
-                message: error.response?.data?.message || 'Failed to generate agentflow',
+                message: error.response?.data?.message || t('canvas.agentflowGenerator.failed'),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -272,9 +272,13 @@ const AgentflowGeneratorDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
                 <DialogContent>
                     {loading ? (
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column' }}>
-                            <img src={generatorGIF} alt='Generating Agentflow' style={{ maxWidth: '100%', height: 'auto' }} />
+                            <img
+                                src={generatorGIF}
+                                alt={t('canvas.agentflowGenerator.generating')}
+                                style={{ maxWidth: '100%', height: 'auto' }}
+                            />
                             <Typography variant='h5' sx={{ mt: 2 }}>
-                                Generating your Agentflow...
+                                {t('canvas.agentflowGenerator.generating')}
                             </Typography>
                             <Box sx={{ width: '100%', mt: 2 }}>
                                 <LinearProgress
@@ -306,6 +310,7 @@ const AgentflowGeneratorDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
                                 }}
                             >
                                 {defaultInstructions.map((instruction, index) => {
+                                    const instructionText = t(instruction.key)
                                     return (
                                         <Button
                                             size='small'
@@ -328,11 +333,11 @@ const AgentflowGeneratorDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
                                             variant='contained'
                                             color='inherit'
                                             onClick={() => {
-                                                setCustomAssistantInstruction(instruction.text)
+                                                setCustomAssistantInstruction(instructionText)
                                                 setGeneratedInstruction('')
                                             }}
                                         >
-                                            {instruction.text}
+                                            {instructionText}
                                         </Button>
                                     )
                                 })}
@@ -345,7 +350,7 @@ const AgentflowGeneratorDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
                                     rows={12}
                                     disabled={loading}
                                     value={customAssistantInstruction}
-                                    placeholder={'Describe your agent here'}
+                                    placeholder={t('canvas.agentflowGenerator.placeholder')}
                                     onChange={(event) => setCustomAssistantInstruction(event.target.value)}
                                 />
                             )}
@@ -362,7 +367,8 @@ const AgentflowGeneratorDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
                             <Box sx={{ mt: 2 }}>
                                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                                     <Typography>
-                                        Select model to generate agentflow<span style={{ color: 'red' }}>&nbsp;*</span>
+                                        {t('canvas.agentflowGenerator.selectModel')}
+                                        <span style={{ color: 'red' }}>&nbsp;*</span>
                                     </Typography>
                                 </div>
                                 <Dropdown
@@ -434,7 +440,7 @@ const AgentflowGeneratorDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
                                         !checkMandatoryFields().isValid
                                     }
                                 >
-                                    {t('pages.assistants.custom.generate')}
+                                    {t('canvas.agentflowGenerator.generate')}
                                 </LoadingButton>
                             )}
                             {generatedInstruction && (
