@@ -22,6 +22,26 @@ import TableCell from '@mui/material/TableCell'
 import { Close } from '@mui/icons-material'
 import { useTranslation } from 'react-i18next'
 
+const getEvaluationMetricValue = (t, value) => (value || value === 0 ? value : t('pages.evaluations.notAvailable'))
+
+const getEvaluationMetricLabel = (t, key, value) =>
+    t(key, {
+        value: getEvaluationMetricValue(t, value)
+    })
+
+const getEvaluationResultLabel = (t, result) => {
+    switch (result) {
+        case 'Pass':
+            return t('pages.evaluations.pass')
+        case 'Fail':
+            return t('pages.evaluations.fail')
+        case 'Error':
+            return t('pages.evaluations.statusError')
+        default:
+            return result
+    }
+}
+
 const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
     const { t } = useTranslation()
     const onOpen = () => {}
@@ -59,14 +79,14 @@ const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
         <SwipeableDrawer sx={{ zIndex: 2000 }} anchor='right' open={show} onClose={() => onClickFunction()} onOpen={onOpen}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #ccc' }}>
                 <Typography variant='overline' sx={{ margin: 1, fontWeight: 'bold' }}>
-                    Evaluation Details
+                    {t('pages.evaluations.details')}
                 </Typography>
                 <Button endIcon={<Close />} onClick={() => onClickFunction()} />
             </div>
             <Box sx={{ width: 600, p: 2 }} role='presentation'>
                 <Box>
                     <Typography variant='overline' sx={{ fontWeight: 'bold' }}>
-                        Evaluation Id
+                        {t('pages.evaluations.evaluationId')}
                     </Typography>
                     <Typography variant='body2'>{dialogProps.data.evaluationId}</Typography>
                 </Box>
@@ -77,7 +97,7 @@ const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
                 <Box>
                     <br />
                     <Typography variant='overline' sx={{ fontWeight: 'bold' }}>
-                        Input
+                        {t('pages.evaluations.input')}
                     </Typography>
                     <Typography variant='body2'>{dialogProps.data.input}</Typography>
                 </Box>
@@ -88,7 +108,7 @@ const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
                 <Box>
                     <br />
                     <Typography variant='overline' sx={{ fontWeight: 'bold' }}>
-                        Expected Output
+                        {t('pages.evaluations.expectedOutput')}
                     </Typography>
                     <Typography variant='body2'>{dialogProps.data.expectedOutput}</Typography>
                 </Box>
@@ -119,7 +139,7 @@ const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
                                 <Box>
                                     <br />
                                     <Typography variant='overline' sx={{ fontWeight: 'bold' }}>
-                                        {dialogProps.data.errors[index] === '' ? 'Actual Output' : 'Error'}
+                                        {dialogProps.data.errors[index] === '' ? t('pages.evaluations.actualOutput') : t('common.error')}
                                     </Typography>
                                     <Typography variant='body2'>
                                         {dialogProps.data.errors[index] === '' ? (
@@ -149,48 +169,60 @@ const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
                                 <Box>
                                     <br />
                                     <Typography variant='overline' style={{ fontWeight: 'bold' }}>
-                                        Latency Metrics
+                                        {t('pages.evaluations.latencyMetrics')}
                                     </Typography>
                                     <Typography variant='body2'>
                                         <Stack sx={{ mt: 1, alignItems: 'center', flexWrap: 'wrap' }} flexDirection='row' gap={1}>
                                             <Chip
                                                 variant='outlined'
                                                 size='small'
-                                                label={
-                                                    dialogProps.data.metrics[0]?.apiLatency
-                                                        ? 'API: ' + dialogProps.data.metrics[index]?.apiLatency
-                                                        : 'API: N/A'
-                                                }
+                                                label={getEvaluationMetricLabel(
+                                                    t,
+                                                    'pages.evaluations.apiMetric',
+                                                    dialogProps.data.metrics[index]?.apiLatency
+                                                )}
                                             />
                                             {dialogProps.data.metrics[index]?.chain && (
                                                 <Chip
                                                     variant='outlined'
                                                     size='small'
-                                                    label={'Chain: ' + dialogProps.data.metrics[index]?.chain}
+                                                    label={getEvaluationMetricLabel(
+                                                        t,
+                                                        'pages.evaluations.chainMetric',
+                                                        dialogProps.data.metrics[index]?.chain
+                                                    )}
                                                 />
                                             )}
                                             {dialogProps.data.metrics[index]?.retriever && (
                                                 <Chip
                                                     variant='outlined'
                                                     size='small'
-                                                    label={'Retriever: ' + dialogProps.data.metrics[index]?.retriever}
+                                                    label={getEvaluationMetricLabel(
+                                                        t,
+                                                        'pages.evaluations.retrieverMetric',
+                                                        dialogProps.data.metrics[index]?.retriever
+                                                    )}
                                                 />
                                             )}
                                             {dialogProps.data.metrics[index]?.tool && (
                                                 <Chip
                                                     variant='outlined'
                                                     size='small'
-                                                    label={'Retriever: ' + dialogProps.data.metrics[index]?.tool}
+                                                    label={getEvaluationMetricLabel(
+                                                        t,
+                                                        'pages.evaluations.toolMetric',
+                                                        dialogProps.data.metrics[index]?.tool
+                                                    )}
                                                 />
                                             )}
                                             <Chip
                                                 variant='outlined'
                                                 size='small'
-                                                label={
+                                                label={getEvaluationMetricLabel(
+                                                    t,
+                                                    'pages.evaluations.llmMetric',
                                                     dialogProps.data.metrics[index]?.llm
-                                                        ? 'LLM: ' + dialogProps.data.metrics[index]?.llm
-                                                        : 'LLM: N/A'
-                                                }
+                                                )}
                                             />
                                         </Stack>
                                     </Typography>
@@ -201,25 +233,25 @@ const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
                                 {dialogProps.data.metrics[index]?.nested_metrics ? (
                                     <Box>
                                         <Typography variant='overline' style={{ fontWeight: 'bold' }}>
-                                            Tokens
+                                            {t('pages.evaluations.tokens')}
                                         </Typography>
                                         <Table size='small' style={{ border: '1px solid #ccc' }}>
                                             <TableHead>
                                                 <TableRow>
                                                     <TableCell align='left' style={{ fontSize: '11px', fontWeight: 'bold' }}>
-                                                        Node
+                                                        {t('pages.evaluations.node')}
                                                     </TableCell>
                                                     <TableCell align='left' style={{ fontSize: '11px', fontWeight: 'bold' }}>
-                                                        Provider & Model
+                                                        {t('pages.evaluations.providerModel')}
                                                     </TableCell>
                                                     <TableCell align='right' style={{ fontSize: '11px', fontWeight: 'bold', width: '15%' }}>
-                                                        Input
+                                                        {t('pages.evaluations.input')}
                                                     </TableCell>
                                                     <TableCell align='right' style={{ fontSize: '11px', fontWeight: 'bold', width: '15%' }}>
                                                         {t('common.output')}
                                                     </TableCell>
                                                     <TableCell align='right' style={{ fontSize: '11px', fontWeight: 'bold', width: '15%' }}>
-                                                        Total
+                                                        {t('pages.evaluations.total')}
                                                     </TableCell>
                                                 </TableRow>
                                             </TableHead>
@@ -253,7 +285,7 @@ const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
                                                         scope='row'
                                                         colspan={2}
                                                     >
-                                                        Total
+                                                        {t('pages.evaluations.total')}
                                                     </TableCell>
                                                     <TableCell align='right' style={{ fontSize: '11px', fontWeight: 'bold' }}>
                                                         {dialogProps.data.metrics[index].promptTokens}
@@ -271,36 +303,36 @@ const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
                                 ) : (
                                     <Box>
                                         <Typography variant='overline' style={{ fontWeight: 'bold' }}>
-                                            Tokens
+                                            {t('pages.evaluations.tokens')}
                                         </Typography>
                                         <Typography variant='body2'>
                                             <Stack sx={{ mt: 1, alignItems: 'center', flexWrap: 'wrap' }} flexDirection='row' gap={1}>
                                                 <Chip
                                                     variant='outlined'
                                                     size='small'
-                                                    label={
+                                                    label={getEvaluationMetricLabel(
+                                                        t,
+                                                        'pages.evaluations.totalMetric',
                                                         dialogProps.data.metrics[index]?.totalTokens
-                                                            ? 'Total: ' + dialogProps.data.metrics[index]?.totalTokens
-                                                            : 'Total: N/A'
-                                                    }
+                                                    )}
                                                 />
                                                 <Chip
                                                     variant='outlined'
                                                     size='small'
-                                                    label={
+                                                    label={getEvaluationMetricLabel(
+                                                        t,
+                                                        'pages.evaluations.promptMetric',
                                                         dialogProps.data.metrics[index]?.promptTokens
-                                                            ? 'Prompt: ' + dialogProps.data.metrics[index]?.promptTokens
-                                                            : 'Prompt: N/A'
-                                                    }
+                                                    )}
                                                 />
                                                 <Chip
                                                     variant='outlined'
                                                     size='small'
-                                                    label={
+                                                    label={getEvaluationMetricLabel(
+                                                        t,
+                                                        'pages.evaluations.completionMetric',
                                                         dialogProps.data.metrics[index]?.completionTokens
-                                                            ? 'Completion: ' + dialogProps.data.metrics[index]?.completionTokens
-                                                            : 'Completion: N/A'
-                                                    }
+                                                    )}
                                                 />
                                             </Stack>
                                         </Typography>
@@ -310,25 +342,25 @@ const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
                                 {dialogProps.data.metrics[index]?.nested_metrics ? (
                                     <Box>
                                         <Typography variant='overline' style={{ fontWeight: 'bold' }}>
-                                            Cost
+                                            {t('pages.evaluations.cost')}
                                         </Typography>
                                         <Table size='small' style={{ border: '1px solid #ccc' }}>
                                             <TableHead>
                                                 <TableRow>
                                                     <TableCell align='left' style={{ fontSize: '11px', fontWeight: 'bold' }}>
-                                                        Node
+                                                        {t('pages.evaluations.node')}
                                                     </TableCell>
                                                     <TableCell align='left' style={{ fontSize: '11px', fontWeight: 'bold' }}>
-                                                        Provider & Model
+                                                        {t('pages.evaluations.providerModel')}
                                                     </TableCell>
                                                     <TableCell align='right' style={{ fontSize: '11px', width: '15%', fontWeight: 'bold' }}>
-                                                        Input
+                                                        {t('pages.evaluations.input')}
                                                     </TableCell>
                                                     <TableCell align='right' style={{ fontSize: '11px', width: '15%', fontWeight: 'bold' }}>
                                                         {t('common.output')}
                                                     </TableCell>
                                                     <TableCell align='right' style={{ fontSize: '11px', width: '15%', fontWeight: 'bold' }}>
-                                                        Total
+                                                        {t('pages.evaluations.total')}
                                                     </TableCell>
                                                 </TableRow>
                                             </TableHead>
@@ -361,7 +393,7 @@ const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
                                                         scope='row'
                                                         colspan={2}
                                                     >
-                                                        Total
+                                                        {t('pages.evaluations.total')}
                                                     </TableCell>
                                                     <TableCell align='right' style={{ fontSize: '11px', fontWeight: 'bold' }}>
                                                         {dialogProps.data.metrics[index].promptCost}
@@ -379,36 +411,36 @@ const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
                                 ) : (
                                     <Box>
                                         <Typography variant='overline' style={{ fontWeight: 'bold' }}>
-                                            Cost
+                                            {t('pages.evaluations.cost')}
                                         </Typography>
                                         <Typography variant='body2'>
                                             <Stack sx={{ mt: 1, alignItems: 'center', flexWrap: 'wrap' }} flexDirection='row' gap={1}>
                                                 <Chip
                                                     variant='outlined'
                                                     size='small'
-                                                    label={
+                                                    label={getEvaluationMetricLabel(
+                                                        t,
+                                                        'pages.evaluations.totalMetric',
                                                         dialogProps.data.metrics[index]?.totalCost
-                                                            ? 'Total: ' + dialogProps.data.metrics[index]?.totalCost
-                                                            : 'Total: N/A'
-                                                    }
+                                                    )}
                                                 />
                                                 <Chip
                                                     variant='outlined'
                                                     size='small'
-                                                    label={
+                                                    label={getEvaluationMetricLabel(
+                                                        t,
+                                                        'pages.evaluations.promptMetric',
                                                         dialogProps.data.metrics[index]?.promptCost
-                                                            ? 'Prompt: ' + dialogProps.data.metrics[index]?.promptCost
-                                                            : 'Completion: N/A'
-                                                    }
+                                                    )}
                                                 />
                                                 <Chip
                                                     variant='outlined'
                                                     size='small'
-                                                    label={
+                                                    label={getEvaluationMetricLabel(
+                                                        t,
+                                                        'pages.evaluations.completionMetric',
                                                         dialogProps.data.metrics[index]?.completionCost
-                                                            ? 'Completion: ' + dialogProps.data.metrics[index]?.completionCost
-                                                            : 'Completion: N/A'
-                                                    }
+                                                    )}
                                                 />
                                             </Stack>
                                         </Typography>
@@ -422,7 +454,7 @@ const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
                                     dialogProps.data.customEvals[index].length > 0 && (
                                         <Box>
                                             <Typography variant='overline' style={{ fontWeight: 'bold' }}>
-                                                Custom Evaluators
+                                                {t('pages.evaluations.customEvaluators')}
                                             </Typography>
                                             <Box>
                                                 {dialogProps.data.customEvals[index] &&
@@ -441,13 +473,13 @@ const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
                                                                     backgroundColor: evaluator.result === 'Pass' ? '#00c853' : '#ff1744'
                                                                 }}
                                                                 size='small'
-                                                                label={evaluator.result}
+                                                                label={getEvaluationResultLabel(t, evaluator.result)}
                                                             />
                                                             <Chip
                                                                 sx={{ width: 'max-content' }}
                                                                 variant='outlined'
                                                                 size='small'
-                                                                label={`Evaluator: ${evaluator.name}`}
+                                                                label={t('pages.evaluations.evaluatorLabel', { name: evaluator.name })}
                                                             ></Chip>
                                                             <Chip
                                                                 sx={{ width: 'max-content' }}
@@ -477,7 +509,7 @@ const EvaluationResultSideDrawer = ({ show, dialogProps, onClickFunction }) => {
                                         <Box>
                                             <br />
                                             <Typography variant='overline' sx={{ fontWeight: 'bold' }}>
-                                                LLM Graded
+                                                {t('pages.evaluations.llmGraded')}
                                             </Typography>
                                             <Stack flexDirection='row' gap={1} sx={{ alignItems: 'center', flexWrap: 'wrap' }}>
                                                 {Object.entries(dialogProps.data.llmEvaluators[index]).map(([key, value], index) => (

@@ -288,7 +288,29 @@ const requiredKeys = [
     'pages.evaluations.skip',
     'pages.evaluations.next',
     'pages.evaluations.pass',
-    'pages.evaluations.fail'
+    'pages.evaluations.fail',
+    'pages.evaluations.details',
+    'pages.evaluations.evaluationId',
+    'pages.evaluations.input',
+    'pages.evaluations.expectedOutput',
+    'pages.evaluations.actualOutput',
+    'pages.evaluations.latencyMetrics',
+    'pages.evaluations.tokens',
+    'pages.evaluations.node',
+    'pages.evaluations.providerModel',
+    'pages.evaluations.total',
+    'pages.evaluations.cost',
+    'pages.evaluations.customEvaluators',
+    'pages.evaluations.evaluatorLabel',
+    'pages.evaluations.llmGraded',
+    'pages.evaluations.apiMetric',
+    'pages.evaluations.chainMetric',
+    'pages.evaluations.retrieverMetric',
+    'pages.evaluations.toolMetric',
+    'pages.evaluations.llmMetric',
+    'pages.evaluations.totalMetric',
+    'pages.evaluations.promptMetric',
+    'pages.evaluations.completionMetric'
 ]
 
 const get = (obj, key) => key.split('.').reduce((acc, part) => acc?.[part], obj)
@@ -697,5 +719,51 @@ describe('views long-tail i18n coverage', () => {
         expect(createDialogSource).not.toContain('No Grading')
         expect(createDialogSource).not.toContain('Model Name')
         expect(createDialogSource).not.toContain('Previous Step')
+    })
+
+    it('localizes evaluation result side drawers visible copy and dates', () => {
+        const resultDrawerSource = read('views/evaluations/EvaluationResultSideDrawer.jsx')
+        const versionsDrawerSource = read('views/evaluations/EvaluationResultVersionsSideDrawer.jsx')
+        const metricsCardSource = read('views/evaluations/MetricsItemCard.jsx')
+
+        expect(resultDrawerSource).toContain("t('pages.evaluations.details')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.evaluationId')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.input')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.expectedOutput')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.actualOutput')")
+        expect(resultDrawerSource).toContain("t('common.error')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.latencyMetrics')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.tokens')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.node')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.providerModel')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.total')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.cost')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.customEvaluators')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.evaluatorLabel'")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.llmGraded')")
+        expect(resultDrawerSource).toContain('getEvaluationMetricLabel')
+        expect(resultDrawerSource).toContain('getEvaluationResultLabel')
+        expect(resultDrawerSource).toContain("'pages.evaluations.apiMetric'")
+        expect(resultDrawerSource).toContain("'pages.evaluations.promptMetric'")
+        expect(resultDrawerSource).toContain("'pages.evaluations.completionMetric'")
+        expect(resultDrawerSource).not.toContain('Evaluation Details')
+        expect(resultDrawerSource).not.toContain('Evaluation Id')
+        expect(resultDrawerSource).not.toContain('Expected Output')
+        expect(resultDrawerSource).not.toContain('Actual Output')
+        expect(resultDrawerSource).not.toContain('Latency Metrics')
+        expect(resultDrawerSource).not.toContain('Provider & Model')
+        expect(resultDrawerSource).not.toContain('Custom Evaluators')
+        expect(resultDrawerSource).not.toContain('LLM Graded')
+        expect(resultDrawerSource).not.toContain("'API: '")
+        expect(resultDrawerSource).not.toContain("'Prompt: '")
+        expect(resultDrawerSource).not.toContain('Evaluator: ${evaluator.name}')
+
+        expect(versionsDrawerSource).toContain('const { t, i18n } = useTranslation()')
+        expect(versionsDrawerSource).toContain('formatEvaluationDate')
+        expect(versionsDrawerSource).not.toContain("format('DD-MMM-YYYY, hh:mm:ss A')")
+
+        expect(metricsCardSource).not.toContain("'PASS RATE'")
+        expect(metricsCardSource).not.toContain("'TOKENS USED'")
+        expect(metricsCardSource).not.toContain("'LATENCY (ms)'")
     })
 })
