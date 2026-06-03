@@ -79,7 +79,10 @@ class HumanHandoff_Tools implements INode {
         const webhookUrl = getCredentialParam('webhookUrl', credentialData, nodeData)
         const feishuSecret = getCredentialParam('feishuSecret', credentialData, nodeData)
 
-        return createHandoffTool({ platform, webhookUrl, feishuSecret, toolName, toolDescription, sessionLabel })
+        // 运行时完整对话历史（用户 + 客服双方），Agent 在初始化工具时透传 options
+        const chatHistory = (options?.agentflowRuntime?.chatHistory as any[]) ?? []
+
+        return createHandoffTool({ platform, webhookUrl, feishuSecret, toolName, toolDescription, sessionLabel, chatHistory })
     }
 }
 
