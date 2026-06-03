@@ -9,11 +9,13 @@ import { Dialog, DialogContent, DialogTitle } from '@mui/material'
 // store
 import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
 import useNotifier from '@/utils/useNotifier'
+import { useTranslation } from 'react-i18next'
 
 // Project imports
 import SpeechToText from '@/ui-component/extended/SpeechToText'
 
 const SpeechToTextDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const dispatch = useDispatch()
 
@@ -35,7 +37,7 @@ const SpeechToTextDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
             aria-describedby='alert-dialog-description'
         >
             <DialogTitle sx={{ fontSize: '1rem' }} id='alert-dialog-title'>
-                {dialogProps.title || 'Allowed Domains'}
+                {dialogProps.title || t('canvas.configDialog.speechToTextTitle')}
             </DialogTitle>
             <DialogContent>
                 <SpeechToText dialogProps={dialogProps} onConfirm={onConfirm} />

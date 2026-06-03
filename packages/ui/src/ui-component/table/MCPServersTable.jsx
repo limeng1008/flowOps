@@ -52,7 +52,14 @@ const getStatusColors = (status, isDarkMode, theme) => {
     }
 }
 
+const statusI18nKeyMap = {
+    [MCP_SERVER_STATUS.PENDING]: 'uiComponents.mcp.status.pending',
+    [MCP_SERVER_STATUS.AUTHORIZED]: 'uiComponents.mcp.status.authorized',
+    [MCP_SERVER_STATUS.ERROR]: 'uiComponents.mcp.status.error'
+}
+
 export const StatusBadge = ({ status }) => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const colors = getStatusColors(status, customization.isDarkMode, theme)
@@ -72,7 +79,9 @@ export const StatusBadge = ({ status }) => {
             }}
         >
             <div style={{ width: 8, height: 8, borderRadius: '50%', backgroundColor: colors[1], marginRight: 5 }} />
-            <span style={{ fontSize: '0.65rem', color: colors[2], textTransform: 'uppercase' }}>{status}</span>
+            <span style={{ fontSize: '0.65rem', color: colors[2], textTransform: 'uppercase' }}>
+                {t(statusI18nKeyMap[status] || statusI18nKeyMap[MCP_SERVER_STATUS.PENDING])}
+            </span>
         </div>
     )
 }
@@ -97,8 +106,8 @@ export const MCPServersTable = ({ data, isLoading, onSelect }) => {
                 >
                     <TableRow>
                         <StyledTableCell>{t('common.name')}</StyledTableCell>
-                        <StyledTableCell>Server URL</StyledTableCell>
-                        <StyledTableCell>Status</StyledTableCell>
+                        <StyledTableCell>{t('uiComponents.table.serverUrl')}</StyledTableCell>
+                        <StyledTableCell>{t('uiComponents.table.status')}</StyledTableCell>
                         <StyledTableCell>{t('menu.tools')}</StyledTableCell>
                         <StyledTableCell>&nbsp;</StyledTableCell>
                     </TableRow>
@@ -179,7 +188,7 @@ export const MCPServersTable = ({ data, isLoading, onSelect }) => {
                                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
                                                 <IconTool size={14} />
                                                 <Typography sx={{ fontSize: 13 }}>
-                                                    {toolCount} {toolCount === 1 ? 'tool' : 'tools'}
+                                                    {t('uiComponents.table.toolCount', { count: toolCount })}
                                                 </Typography>
                                             </Box>
                                         </StyledTableCell>

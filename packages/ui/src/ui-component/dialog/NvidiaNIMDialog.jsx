@@ -48,7 +48,11 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
     const [showContainerConfirm, setShowContainerConfirm] = useState(false)
     const [existingContainer, setExistingContainer] = useState(null)
 
-    const steps = ['Download Installer', 'Pull Image', 'Start Container']
+    const steps = [
+        t('uiComponents.nvidia.stepDownloadInstaller'),
+        t('uiComponents.nvidia.stepPullImage'),
+        t('uiComponents.nvidia.stepStartContainer')
+    ]
 
     const handleDownloadInstaller = async () => {
         try {
@@ -62,7 +66,7 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
             } else if (err.response?.data) {
                 errorData = err.response.data.message
             }
-            alert('Failed to download installer: ' + errorData)
+            alert(t('uiComponents.nvidia.failedDownloadInstaller', { message: errorData }))
             setLoading(false)
         }
     }
@@ -80,7 +84,7 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
             } else if (err.response?.data) {
                 errorData = err.response.data.message
             }
-            alert('Failed to preload: ' + errorData)
+            alert(t('uiComponents.nvidia.failedPreload', { message: errorData }))
             setLoading(false)
         }
     }
@@ -125,7 +129,7 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
                     // Continue polling if image not found
                     if (err.response?.status !== 404) {
                         clearInterval(interval)
-                        alert('Failed to check image status: ' + err.message)
+                        alert(t('uiComponents.nvidia.failedCheckImageStatus', { message: err.message }))
                         setLoading(false)
                     }
                 }
@@ -139,7 +143,7 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
             } else if (err.response?.data) {
                 errorData = err.response.data.message
             }
-            alert('Failed to pull image: ' + errorData)
+            alert(t('uiComponents.nvidia.failedPullImage', { message: errorData }))
             setLoading(false)
         }
     }
@@ -161,7 +165,7 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
             } catch (err) {
                 // Handle port in use by non-model container
                 if (err.response?.status === 409) {
-                    alert(`Port ${hostPort} is already in use by another container. Please choose a different port.`)
+                    alert(t('uiComponents.nvidia.portInUse', { port: hostPort }))
                     setLoading(false)
                     return
                 }
@@ -180,7 +184,7 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
             } else if (err.response?.data) {
                 errorData = err.response.data.message
             }
-            alert('Failed to check container status: ' + errorData)
+            alert(t('uiComponents.nvidia.failedCheckContainerStatus', { message: errorData }))
             setLoading(false)
         }
     }
@@ -215,7 +219,7 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
                     // Continue polling if container not found
                     if (err.response?.status !== 404) {
                         clearInterval(interval)
-                        alert('Failed to check container status: ' + err.message)
+                        alert(t('uiComponents.nvidia.failedCheckContainerStatus', { message: err.message }))
                         setLoading(false)
                     }
                 }
@@ -229,7 +233,7 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
             } else if (err.response?.data) {
                 errorData = err.response.data.message
             }
-            alert('Failed to start container: ' + errorData)
+            alert(t('uiComponents.nvidia.failedStartContainer', { message: errorData }))
             setLoading(false)
         }
     }
@@ -254,7 +258,7 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
                     // Continue polling if container not found
                     if (err.response?.status !== 404) {
                         clearInterval(interval)
-                        alert('Failed to check container status: ' + err.message)
+                        alert(t('uiComponents.nvidia.failedCheckContainerStatus', { message: err.message }))
                         setLoading(false)
                     }
                 }
@@ -268,21 +272,21 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
             } else if (err.response?.data) {
                 errorData = err.response.data.message
             }
-            alert('Failed to check container status: ' + errorData)
+            alert(t('uiComponents.nvidia.failedCheckContainerStatus', { message: errorData }))
             setLoading(false)
         }
     }
 
     const handleNext = () => {
         if (activeStep === 1 && !imageTag) {
-            alert('Please enter an image tag')
+            alert(t('uiComponents.nvidia.enterImageTag'))
             return
         }
 
         if (activeStep === 2) {
             const port = parseInt(hostPort)
             if (isNaN(port) || port < 1 || port > 65535) {
-                alert('Please enter a valid port number between 1 and 65535')
+                alert(t('uiComponents.nvidia.validPort'))
                 return
             }
         }
@@ -323,7 +327,7 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
     const component = open ? (
         <>
             <Dialog open={open}>
-                <DialogTitle>NIM Setup</DialogTitle>
+                <DialogTitle>{t('uiComponents.nvidia.setupTitle')}</DialogTitle>
                 <DialogContent>
                     <Stepper activeStep={activeStep}>
                         {steps.map((label) => (
@@ -335,9 +339,7 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
 
                     {activeStep === 0 && (
                         <div style={{ marginTop: 20 }}>
-                            <p style={{ marginBottom: 20 }}>
-                                Would you like to download the NIM installer? Click Next if it has been installed
-                            </p>
+                            <p style={{ marginBottom: 20 }}>{t('uiComponents.nvidia.downloadInstallerPrompt')}</p>
                             {loading && <CircularProgress />}
                         </div>
                     )}
@@ -345,8 +347,12 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
                     {activeStep === 1 && (
                         <div>
                             <FormControl fullWidth sx={{ mt: 2 }}>
-                                <InputLabel>Model</InputLabel>
-                                <Select label='Model' value={imageTag} onChange={(e) => setImageTag(e.target.value)}>
+                                <InputLabel>{t('uiComponents.nvidia.model')}</InputLabel>
+                                <Select
+                                    label={t('uiComponents.nvidia.model')}
+                                    value={imageTag}
+                                    onChange={(e) => setImageTag(e.target.value)}
+                                >
                                     {Object.entries(modelOptions).map(([value, { label }]) => (
                                         <MenuItem key={value} value={value}>
                                             {label}
@@ -361,14 +367,14 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
                                     sx={{ mt: 1 }}
                                     onClick={() => window.open(modelOptions[imageTag].licenseUrl, '_blank')}
                                 >
-                                    View License
+                                    {t('uiComponents.nvidia.viewLicense')}
                                 </Button>
                             )}
                             {loading && (
                                 <div>
                                     <div style={{ marginBottom: 20 }} />
                                     <CircularProgress />
-                                    <p>Pulling image...</p>
+                                    <p>{t('uiComponents.nvidia.pullingImage')}</p>
                                 </div>
                             )}
                         </div>
@@ -380,31 +386,31 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
                                 <>
                                     <div style={{ marginBottom: 20 }} />
                                     <CircularProgress />
-                                    <p>Starting container...</p>
+                                    <p>{t('uiComponents.nvidia.startingContainer')}</p>
                                 </>
                             ) : (
                                 <>
                                     <FormControl fullWidth sx={{ mt: 2 }}>
-                                        <InputLabel>Relax Memory Constraints</InputLabel>
+                                        <InputLabel>{t('uiComponents.nvidia.relaxMemoryConstraints')}</InputLabel>
                                         <Select
-                                            label='Relax Memory Constraints'
+                                            label={t('uiComponents.nvidia.relaxMemoryConstraints')}
                                             value={nimRelaxMemConstraints}
                                             onChange={(e) => setNimRelaxMemConstraints(e.target.value)}
                                         >
                                             <MenuItem value='1'>{t('common.yes')}</MenuItem>
-                                            <MenuItem value='0'>No</MenuItem>
+                                            <MenuItem value='0'>{t('common.no')}</MenuItem>
                                         </Select>
                                     </FormControl>
                                     <TextField
                                         fullWidth
                                         type='number'
-                                        label='Host Port'
+                                        label={t('uiComponents.nvidia.hostPort')}
                                         value={hostPort}
                                         onChange={(e) => setHostPort(e.target.value)}
                                         inputProps={{ min: 1, max: 65535 }}
                                         sx={{ mt: 2 }}
                                     />
-                                    <p style={{ marginTop: 20 }}>Click Next to start the container.</p>
+                                    <p style={{ marginTop: 20 }}>{t('uiComponents.nvidia.startContainerPrompt')}</p>
                                 </>
                             )}
                         </div>
@@ -416,33 +422,34 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
                     </Button>
                     {activeStep === 0 && (
                         <Button onClick={handleNext} variant='outline' color='secondary'>
-                            Next
+                            {t('common.next')}
                         </Button>
                     )}
                     <Button
                         onClick={activeStep === 0 ? handleDownloadInstaller : handleNext}
                         disabled={loading || (activeStep === 2 && (!nimRelaxMemConstraints || !hostPort))}
                     >
-                        {activeStep === 0 ? 'Download' : 'Next'}
+                        {activeStep === 0 ? t('common.download') : t('common.next')}
                     </Button>
                 </DialogActions>
             </Dialog>
             <Dialog open={showContainerConfirm} onClose={() => setShowContainerConfirm(false)}>
-                <DialogTitle>Container Already Exists</DialogTitle>
+                <DialogTitle>{t('uiComponents.nvidia.containerAlreadyExists')}</DialogTitle>
                 <DialogContent>
-                    <p>A container for this image already exists:</p>
+                    <p>{t('uiComponents.nvidia.containerExistsDesc')}</p>
                     <div>
                         <p>
-                            <strong>Name:</strong> {existingContainer?.name || 'N/A'}
+                            <strong>{t('common.name')}:</strong> {existingContainer?.name || t('uiComponents.nvidia.notAvailable')}
                         </p>
                         <p>
-                            <strong>Status:</strong> {existingContainer?.status || 'N/A'}
+                            <strong>{t('uiComponents.table.status')}:</strong>{' '}
+                            {existingContainer?.status || t('uiComponents.nvidia.notAvailable')}
                         </p>
                     </div>
-                    <p>You can:</p>
+                    <p>{t('uiComponents.nvidia.youCan')}:</p>
                     <ul>
-                        <li>Use the existing container (recommended)</li>
-                        <li>Change the port and try again</li>
+                        <li>{t('uiComponents.nvidia.useExistingRecommended')}</li>
+                        <li>{t('uiComponents.nvidia.changePortAndRetry')}</li>
                     </ul>
                 </DialogContent>
                 <DialogActions>
@@ -460,7 +467,7 @@ const NvidiaNIMDialog = ({ open, onClose, onComplete }) => {
                             handleUseExistingContainer()
                         }}
                     >
-                        Use Existing
+                        {t('uiComponents.nvidia.useExisting')}
                     </Button>
                 </DialogActions>
             </Dialog>

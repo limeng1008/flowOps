@@ -65,10 +65,10 @@ const ShareWithWorkspaceDialog = ({ show, dialogProps, onCancel, setError }) => 
 
     const columns = useMemo(
         () => [
-            { field: 'workspaceName', headerName: 'Workspace', editable: false, flex: 1 },
-            { field: 'shared', headerName: 'Share', type: 'boolean', editable: true, width: 180 }
+            { field: 'workspaceName', headerName: t('layout.workspace'), editable: false, flex: 1 },
+            { field: 'shared', headerName: t('permissions.actions.share'), type: 'boolean', editable: true, width: 180 }
         ],
-        []
+        [t]
     )
 
     useEffect(() => {
@@ -132,7 +132,7 @@ const ShareWithWorkspaceDialog = ({ show, dialogProps, onCancel, setError }) => 
             const sharedResp = await workspaceApi.setSharedWorkspacesForItem(dialogProps.data.id, obj)
             if (sharedResp.data) {
                 enqueueSnackbar({
-                    message: 'Items Shared Successfully',
+                    message: t('uiComponents.share.itemsShared'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -148,9 +148,12 @@ const ShareWithWorkspaceDialog = ({ show, dialogProps, onCancel, setError }) => 
         } catch (error) {
             if (setError) setError(error)
             enqueueSnackbar({
-                message: `Failed to share Item: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('uiComponents.share.failed', {
+                    message:
+                        typeof error.response?.data === 'object'
+                            ? error.response?.data?.message
+                            : error.response?.data || error.message || t('pages.assistants.unknownError')
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',

@@ -17,7 +17,11 @@ export const TableViewOnly = ({ columns, rows, sx }) => {
         if (row[key] === null || row[key] === undefined) {
             return ''
         } else if (key === 'enabled') {
-            return row[key] ? <Chip label='Enabled' color='primary' /> : <Chip label='Disabled' />
+            return row[key] ? (
+                <Chip label={t('uiComponents.table.enabled')} color='primary' />
+            ) : (
+                <Chip label={t('uiComponents.table.disabled')} />
+            )
         } else if (key === 'type' && row.schema) {
             // If there's schema information, add a tooltip
             let schemaContent
@@ -42,13 +46,13 @@ export const TableViewOnly = ({ columns, rows, sx }) => {
                 // Handle object format: { "field": "string", "field2": "number", ... }
                 schemaContent = JSON.stringify(row.schema, null, 2).replace(/\n/g, '<br>').replace(/ /g, '&nbsp;')
             } else {
-                schemaContent = 'No schema available'
+                schemaContent = t('uiComponents.table.noSchemaAvailable')
             }
 
             return (
                 <Stack direction='row' alignItems='center' spacing={1}>
                     <Typography>{row[key]}</Typography>
-                    <TooltipWithParser title={`<div>Schema:<br/>${schemaContent}</div>`} />
+                    <TooltipWithParser title={`<div>${t('uiComponents.table.schema')}:<br/>${schemaContent}</div>`} />
                 </Stack>
             )
         } else if (typeof row[key] === 'object') {
@@ -69,12 +73,10 @@ export const TableViewOnly = ({ columns, rows, sx }) => {
                                 <TableCell key={index}>
                                     {col === 'enabled' ? (
                                         <>
-                                            Override
+                                            {t('uiComponents.table.override')}
                                             <TooltipWithParser
                                                 style={{ mb: 1, mt: 2, marginLeft: 10 }}
-                                                title={
-                                                    'If enabled, this variable can be overridden in API calls and embeds. If disabled, any overrides will be ignored. To change this, go to Security settings in Chatflow Configuration.'
-                                                }
+                                                title={t('uiComponents.table.overrideHelp')}
                                             />
                                         </>
                                     ) : COLUMN_HEADER_KEY_MAP[col] ? (

@@ -236,6 +236,9 @@
         "date": "日期",
         "selectAll": "全选",
         "submit": "提交",
+        "download": "下载",
+        "next": "下一步",
+        "error": "错误",
         "ok": "确定",
         "yes": "是",
         "noRows": "暂无数据",
@@ -571,6 +574,100 @@
             "mcpServerDesc": "Model Context Protocol 服务",
             "overrideConfig": "覆盖配置",
             "overrideConfigDesc": "通过 API 覆盖流程配置"
+        }
+    },
+    "uiComponents": {
+        "buttons": {
+            "copyToClipboard": "复制到剪贴板",
+            "thumbsUp": "点赞",
+            "thumbsDown": "点踩"
+        },
+        "table": {
+            "enabled": "已启用",
+            "disabled": "已禁用",
+            "override": "允许覆盖",
+            "overrideHelp": "启用后，该变量可在 API 调用和嵌入中被覆盖；禁用后，所有覆盖都会被忽略。如需修改，请前往 Chatflow 配置中的安全设置。",
+            "schema": "结构",
+            "noSchemaAvailable": "暂无结构信息",
+            "serverUrl": "服务地址",
+            "status": "状态",
+            "session": "会话",
+            "toolCount": "{{count}} 个工具",
+            "moreItems": "+ {{count}} 更多"
+        },
+        "promptHub": {
+            "model": "模型",
+            "usecase": "用例",
+            "loadingPrompts": "请稍候，正在加载提示词",
+            "noAvailablePrompts": "暂无可用提示词",
+            "availablePrompts": "可用提示词",
+            "prompt": "提示词",
+            "readme": "说明"
+        },
+        "dialogs": {
+            "sourceDocuments": "来源文档"
+        },
+        "tags": {
+            "title": "设置对话流分类标签",
+            "addTag": "添加标签",
+            "help": "输入标签后按回车添加到列表，可添加多个标签。"
+        },
+        "share": {
+            "itemsShared": "已成功分享项目",
+            "failed": "分享项目失败：{{message}}"
+        },
+        "inviteUsers": {
+            "title": "邀请用户",
+            "selectUsers": "选择用户",
+            "inviteByNameOrEmail": "按姓名或邮箱邀请用户",
+            "noResults": "暂无结果",
+            "inviteEmail": "邀请 {{email}}",
+            "roleToAssign": "分配角色",
+            "selectRole": "选择角色",
+            "invalidEmailsRemoved": "已移除一个或多个无效邮箱。",
+            "alreadyInWorkspaceOrOrganization": "以下用户已在工作区或组织中：{{emails}}",
+            "invitedToWorkspace": "用户已邀请到工作区",
+            "noDataReceived": "服务器未返回数据",
+            "failedInvite": "邀请用户到工作区失败：{{message}}",
+            "alreadyMemberTooltip": "{{name}} 已是该工作区成员，不会重复邀请。",
+            "invitationTooltip": "将向此邮箱地址发送邀请"
+        },
+        "mcp": {
+            "status": {
+                "pending": "待授权",
+                "authorized": "已授权",
+                "error": "错误"
+            }
+        },
+        "nvidia": {
+            "setupTitle": "NIM 设置",
+            "stepDownloadInstaller": "下载安装器",
+            "stepPullImage": "拉取镜像",
+            "stepStartContainer": "启动容器",
+            "failedDownloadInstaller": "下载安装器失败：{{message}}",
+            "failedPreload": "预加载失败：{{message}}",
+            "failedCheckImageStatus": "检查镜像状态失败：{{message}}",
+            "failedPullImage": "拉取镜像失败：{{message}}",
+            "portInUse": "端口 {{port}} 已被其他容器占用，请选择其他端口。",
+            "failedCheckContainerStatus": "检查容器状态失败：{{message}}",
+            "failedStartContainer": "启动容器失败：{{message}}",
+            "enterImageTag": "请输入镜像标签",
+            "validPort": "请输入 1 到 65535 之间的有效端口号",
+            "downloadInstallerPrompt": "是否下载 NIM 安装器？如果已经安装，请点击下一步",
+            "model": "模型",
+            "viewLicense": "查看许可证",
+            "pullingImage": "正在拉取镜像…",
+            "startingContainer": "正在启动容器…",
+            "relaxMemoryConstraints": "放宽内存限制",
+            "hostPort": "主机端口",
+            "startContainerPrompt": "点击下一步启动容器。",
+            "containerAlreadyExists": "容器已存在",
+            "containerExistsDesc": "该镜像已有容器：",
+            "youCan": "你可以",
+            "useExistingRecommended": "使用已有容器（推荐）",
+            "changePortAndRetry": "更换端口后重试",
+            "useExisting": "使用已有容器",
+            "notAvailable": "暂无"
         }
     },
     "pages": {

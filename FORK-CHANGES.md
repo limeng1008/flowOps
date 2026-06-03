@@ -47,7 +47,10 @@
 | `packages/ui/src/routes/index.jsx`                                            | UI-i18n-hardening |
 | `packages/ui/src/themes/index.js`                                             | T4-theme-entry    |
 | `packages/ui/src/ui-component/array/ArrayRenderer.jsx`                        | UI-i18n-hardening |
+| `packages/ui/src/ui-component/button/CopyToClipboardButton.jsx`               | UI-i18n-hardening |
 | `packages/ui/src/ui-component/button/FlowListMenu.jsx`                        | UI-i18n-hardening |
+| `packages/ui/src/ui-component/button/ThumbsDownButton.jsx`                    | UI-i18n-hardening |
+| `packages/ui/src/ui-component/button/ThumbsUpButton.jsx`                      | UI-i18n-hardening |
 | `packages/ui/src/ui-component/cards/DocumentStoreCard.jsx`                    | UI-i18n-hardening |
 | `packages/ui/src/ui-component/cards/ItemCard.jsx`                             | UI-i18n-hardening |
 | `packages/ui/src/ui-component/dialog/AboutDialog.jsx`                         | UI-i18n-hardening |
@@ -55,6 +58,9 @@
 | `packages/ui/src/ui-component/dialog/ExportAsTemplateDialog.jsx`              | UI-i18n-hardening |
 | `packages/ui/src/ui-component/dialog/NodeInfoDialog.jsx`                      | UI-i18n-hardening |
 | `packages/ui/src/ui-component/dialog/SaveChatflowDialog.jsx`                  | UI-i18n-hardening |
+| `packages/ui/src/ui-component/dialog/SourceDocDialog.jsx`                     | UI-i18n-hardening |
+| `packages/ui/src/ui-component/dialog/SpeechToTextDialog.jsx`                  | UI-i18n-hardening |
+| `packages/ui/src/ui-component/dialog/StarterPromptsDialog.jsx`                | UI-i18n-hardening |
 | `packages/ui/src/ui-component/dialog/ViewLeadsDialog.jsx`                     | UI-i18n-hardening |
 | `packages/ui/src/ui-component/dialog/ViewMessagesDialog.jsx`                  | UI-i18n-hardening |
 | `packages/ui/src/ui-component/dropdown/Dropdown.jsx`                          | UI-i18n-hardening |

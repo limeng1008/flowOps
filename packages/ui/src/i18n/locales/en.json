@@ -236,6 +236,9 @@
         "date": "Date",
         "selectAll": "Select all",
         "submit": "Submit",
+        "download": "Download",
+        "next": "Next",
+        "error": "Error",
         "ok": "OK",
         "yes": "Yes",
         "noRows": "No rows",
@@ -571,6 +574,100 @@
             "mcpServerDesc": "Model Context Protocol server",
             "overrideConfig": "Override Config",
             "overrideConfigDesc": "Override flow configuration via API"
+        }
+    },
+    "uiComponents": {
+        "buttons": {
+            "copyToClipboard": "Copy to clipboard",
+            "thumbsUp": "Thumbs up",
+            "thumbsDown": "Thumbs down"
+        },
+        "table": {
+            "enabled": "Enabled",
+            "disabled": "Disabled",
+            "override": "Override",
+            "overrideHelp": "If enabled, this variable can be overridden in API calls and embeds. If disabled, any overrides will be ignored. To change this, go to Security settings in Chatflow Configuration.",
+            "schema": "Schema",
+            "noSchemaAvailable": "No schema available",
+            "serverUrl": "Server URL",
+            "status": "Status",
+            "session": "Session",
+            "toolCount": "{{count}} tool(s)",
+            "moreItems": "+ {{count}} More"
+        },
+        "promptHub": {
+            "model": "Model",
+            "usecase": "Usecase",
+            "loadingPrompts": "Please wait... loading prompts",
+            "noAvailablePrompts": "No available prompts",
+            "availablePrompts": "Available prompts",
+            "prompt": "Prompt",
+            "readme": "Readme"
+        },
+        "dialogs": {
+            "sourceDocuments": "Source Documents"
+        },
+        "tags": {
+            "title": "Set Chatflow Category Tags",
+            "addTag": "Add a tag",
+            "help": "Enter a tag and press enter to add it to the list. You can add as many tags as you want."
+        },
+        "share": {
+            "itemsShared": "Items shared successfully",
+            "failed": "Failed to share item: {{message}}"
+        },
+        "inviteUsers": {
+            "title": "Invite Users",
+            "selectUsers": "Select Users",
+            "inviteByNameOrEmail": "Invite users by name or email",
+            "noResults": "No results found",
+            "inviteEmail": "Invite {{email}}",
+            "roleToAssign": "Role to Assign",
+            "selectRole": "Select Role",
+            "invalidEmailsRemoved": "One or more invalid emails were removed.",
+            "alreadyInWorkspaceOrOrganization": "The following users are already in the workspace or organization: {{emails}}",
+            "invitedToWorkspace": "Users invited to workspace",
+            "noDataReceived": "No data received from the server",
+            "failedInvite": "Failed to invite users to workspace: {{message}}",
+            "alreadyMemberTooltip": "{{name}} is already a member of this workspace and will not be invited again.",
+            "invitationTooltip": "An invitation will be sent to this email address"
+        },
+        "mcp": {
+            "status": {
+                "pending": "Pending",
+                "authorized": "Authorized",
+                "error": "Error"
+            }
+        },
+        "nvidia": {
+            "setupTitle": "NIM Setup",
+            "stepDownloadInstaller": "Download Installer",
+            "stepPullImage": "Pull Image",
+            "stepStartContainer": "Start Container",
+            "failedDownloadInstaller": "Failed to download installer: {{message}}",
+            "failedPreload": "Failed to preload: {{message}}",
+            "failedCheckImageStatus": "Failed to check image status: {{message}}",
+            "failedPullImage": "Failed to pull image: {{message}}",
+            "portInUse": "Port {{port}} is already in use by another container. Please choose a different port.",
+            "failedCheckContainerStatus": "Failed to check container status: {{message}}",
+            "failedStartContainer": "Failed to start container: {{message}}",
+            "enterImageTag": "Please enter an image tag",
+            "validPort": "Please enter a valid port number between 1 and 65535",
+            "downloadInstallerPrompt": "Would you like to download the NIM installer? Click Next if it has been installed",
+            "model": "Model",
+            "viewLicense": "View License",
+            "pullingImage": "Pulling image...",
+            "startingContainer": "Starting container...",
+            "relaxMemoryConstraints": "Relax Memory Constraints",
+            "hostPort": "Host Port",
+            "startContainerPrompt": "Click Next to start the container.",
+            "containerAlreadyExists": "Container Already Exists",
+            "containerExistsDesc": "A container for this image already exists:",
+            "youCan": "You can",
+            "useExistingRecommended": "Use the existing container (recommended)",
+            "changePortAndRetry": "Change the port and try again",
+            "useExisting": "Use Existing",
+            "notAvailable": "N/A"
         }
     },
     "pages": {
