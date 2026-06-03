@@ -51,14 +51,16 @@ const spin = keyframes`
 
 // ─── Status palette ───────────────────────────────────────────────────────────
 const STATUS_META = {
-    connecting: { label: 'CONNECTING', tone: 'info' },
-    idle: { label: 'IDLE', tone: 'default' },
-    listening: { label: 'LISTENING', tone: 'success' },
-    running: { label: 'RUNNING', tone: 'warning' },
-    done: { label: 'COMPLETED', tone: 'success' },
-    stopped: { label: 'STOPPED', tone: 'info' },
-    error: { label: 'ERROR', tone: 'error' }
+    connecting: { labelKey: 'statusConnecting', tone: 'info' },
+    idle: { labelKey: 'statusIdle', tone: 'default' },
+    listening: { labelKey: 'statusListening', tone: 'success' },
+    running: { labelKey: 'statusRunning', tone: 'warning' },
+    done: { labelKey: 'statusCompleted', tone: 'success' },
+    stopped: { labelKey: 'statusStopped', tone: 'info' },
+    error: { labelKey: 'statusError', tone: 'error' }
 }
+
+const getWebhookStatusLabel = (t, status) => t(`pages.webhookListener.${(STATUS_META[status] ?? STATUS_META.idle).labelKey}`)
 
 const TONE_COLOR = (theme, tone) => {
     if (tone === 'success') return theme.palette.success.main
@@ -87,6 +89,7 @@ const Caption = ({ children }) => (
 Caption.propTypes = { children: PropTypes.node }
 
 const StatusPill = ({ status }) => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const meta = STATUS_META[status] ?? STATUS_META.idle
     const color = TONE_COLOR(theme, meta.tone)
@@ -115,7 +118,9 @@ const StatusPill = ({ status }) => {
                     animation: animated ? `${subtleBlink} 1.4s ease-in-out infinite` : 'none'
                 }}
             />
-            <Typography sx={{ fontFamily: MONO_STACK, fontSize: 10.5, letterSpacing: '0.12em', fontWeight: 600 }}>{meta.label}</Typography>
+            <Typography sx={{ fontFamily: MONO_STACK, fontSize: 10.5, letterSpacing: '0.12em', fontWeight: 600 }}>
+                {getWebhookStatusLabel(t, status)}
+            </Typography>
         </Stack>
     )
 }
@@ -171,6 +176,7 @@ const SonarIdle = () => {
 // ─── Endpoint block ───────────────────────────────────────────────────────────
 
 const EndpointBlock = ({ method, url, isDark, onCopy }) => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const [showCurl, setShowCurl] = useState(false)
     const [copied, setCopied] = useState(false)
@@ -178,8 +184,11 @@ const EndpointBlock = ({ method, url, isDark, onCopy }) => {
     const iconColor = isDark ? 'common.white' : 'text.primary'
 
     const curl = useMemo(
-        () => `curl -X ${method} '${url}' \\\n  -H 'Content-Type: application/json' \\\n  -d '{ "question": "Hello from cURL" }'`,
-        [method, url]
+        () =>
+            `curl -X ${method} '${url}' \\\n  -H 'Content-Type: application/json' \\\n  -d '{ "question": "${t(
+                'pages.webhookListener.curlQuestion'
+            )}" }'`,
+        [method, t, url]
     )
 
     const copy = (text, setter) => {
@@ -233,7 +242,7 @@ const EndpointBlock = ({ method, url, isDark, onCopy }) => {
                 >
                     {url}
                 </Box>
-                <Tooltip title={copied ? 'Copied' : 'Copy URL'}>
+                <Tooltip title={copied ? t('pages.webhookListener.copied') : t('pages.webhookListener.copyUrl')}>
                     <IconButton size='small' onClick={() => copy(url, setCopied)} sx={{ p: 0.5, color: iconColor }}>
                         {copied ? <IconCircleCheck size={14} color={theme.palette.success.main} /> : <IconCopy size={14} />}
                     </IconButton>
@@ -258,7 +267,7 @@ const EndpointBlock = ({ method, url, isDark, onCopy }) => {
                         '&:hover': { bgcolor: 'transparent', color: isDark ? 'common.white' : 'text.primary' }
                     }}
                 >
-                    cURL example
+                    {t('pages.webhookListener.curlExample')}
                 </Button>
                 <Collapse in={showCurl} timeout='auto' unmountOnExit>
                     <Box
@@ -279,7 +288,7 @@ const EndpointBlock = ({ method, url, isDark, onCopy }) => {
                         }}
                     >
                         {curl}
-                        <Tooltip title={copiedCurl ? 'Copied' : 'Copy cURL'}>
+                        <Tooltip title={copiedCurl ? t('pages.webhookListener.copied') : t('pages.webhookListener.copyCurl')}>
                             <IconButton
                                 size='small'
                                 onClick={() => copy(curl, setCopiedCurl)}
@@ -433,7 +442,7 @@ const WebhookListenerDrawer = ({ open, chatflowid, onClose, onStatusChange }) =>
                                 if (typeof payload.data === 'string') setFinalMessage((m) => m + payload.data)
                                 break
                             case 'error':
-                                setErrorMessage(typeof payload.data === 'string' ? payload.data : 'Execution error')
+                                setErrorMessage(typeof payload.data === 'string' ? payload.data : t('pages.webhookListener.executionError'))
                                 setStatus('error')
                                 break
                             case 'executionEnd':
@@ -456,12 +465,12 @@ const WebhookListenerDrawer = ({ open, chatflowid, onClose, onStatusChange }) =>
                 })
             } catch (err) {
                 if (!ctrl.signal.aborted) {
-                    setErrorMessage(err?.message || 'Listener disconnected')
+                    setErrorMessage(err?.message || t('pages.webhookListener.listenerDisconnected'))
                     setStatus('error')
                 }
             }
         },
-        [chatflowid, applyNodeStatus, resetRun, finishedAt]
+        [chatflowid, applyNodeStatus, resetRun, finishedAt, t]
     )
 
     // ── Lifecycle: register listener on open, tear down on close
@@ -479,7 +488,7 @@ const WebhookListenerDrawer = ({ open, chatflowid, onClose, onStatusChange }) =>
                 openStream(id)
             } catch (err) {
                 if (cancelled) return
-                setErrorMessage(err?.response?.data?.message || err?.message || 'Failed to register listener')
+                setErrorMessage(err?.response?.data?.message || err?.message || t('pages.webhookListener.registerFailed'))
                 setStatus('error')
             }
         })()
@@ -625,11 +634,13 @@ const WebhookListenerDrawer = ({ open, chatflowid, onClose, onStatusChange }) =>
                                 lineHeight: 1
                             }}
                         >
-                            Webhook Listener
+                            {t('pages.webhookListener.title')}
                         </Typography>
-                        <Typography sx={{ fontSize: 14, fontWeight: 600, mt: 0.25, color: 'text.primary' }}>Live observatory</Typography>
+                        <Typography sx={{ fontSize: 14, fontWeight: 600, mt: 0.25, color: 'text.primary' }}>
+                            {t('pages.webhookListener.liveObservatory')}
+                        </Typography>
                     </Box>
-                    <Tooltip title={maximized ? 'Restore width' : 'Expand'}>
+                    <Tooltip title={maximized ? t('pages.webhookListener.restoreWidth') : t('pages.webhookListener.expand')}>
                         <IconButton
                             size='small'
                             onClick={() => setMaximized((v) => !v)}
@@ -670,18 +681,20 @@ const WebhookListenerDrawer = ({ open, chatflowid, onClose, onStatusChange }) =>
             <Box sx={{ flex: 1, overflow: 'auto', px: 2.5, py: 2 }}>
                 {/* Endpoint */}
                 <Box sx={{ mb: 3 }}>
-                    <Caption>Endpoint</Caption>
+                    <Caption>{t('pages.webhookListener.endpoint')}</Caption>
                     <EndpointBlock method={method} url={webhookUrl} isDark={isDark} />
                 </Box>
 
                 <Divider sx={{ my: 2.5, opacity: 0.6 }} />
 
-                {/* Process flow — same expandable tree the chat panel uses, with per-node JSON drilldown */}
+                {/* Execution trace - same expandable tree the chat panel uses, with per-node JSON drilldown */}
                 <Box sx={{ mb: 3 }}>
                     <Stack direction='row' alignItems='center' justifyContent='space-between' sx={{ mb: 1 }}>
-                        <Caption>Process flow</Caption>
+                        <Caption>{t('pages.webhookListener.processFlow')}</Caption>
                         {status === 'running' && (
-                            <Typography sx={{ fontFamily: MONO_STACK, fontSize: 10, color: 'warning.main' }}>streaming…</Typography>
+                            <Typography sx={{ fontFamily: MONO_STACK, fontSize: 10, color: 'warning.main' }}>
+                                {t('pages.webhookListener.streaming')}
+                            </Typography>
                         )}
                     </Stack>
 
@@ -696,21 +709,21 @@ const WebhookListenerDrawer = ({ open, chatflowid, onClose, onStatusChange }) =>
                         <Box sx={{ textAlign: 'center' }}>
                             <SonarIdle />
                             <Typography sx={{ fontSize: 12, color: 'text.secondary', mt: 1 }}>
-                                Waiting for an incoming webhook request…
+                                {t('pages.webhookListener.waiting')}
                             </Typography>
                             <Typography sx={{ fontFamily: MONO_STACK, fontSize: 10.5, color: 'text.disabled', mt: 0.5 }}>
-                                Send a {method} to the endpoint above to trigger the flow.
+                                {t('pages.webhookListener.sendMethod', { method })}
                             </Typography>
                         </Box>
                     ) : status === 'connecting' ? (
                         <Stack direction='row' alignItems='center' spacing={1} sx={{ color: 'text.secondary' }}>
                             <IconLoader2 size={14} style={{ animation: `${spin} 0.9s linear infinite` }} />
-                            <Typography sx={{ fontSize: 12 }}>Opening event stream…</Typography>
+                            <Typography sx={{ fontSize: 12 }}>{t('pages.webhookListener.openingStream')}</Typography>
                         </Stack>
                     ) : status === 'running' ? (
                         <Stack direction='row' alignItems='center' spacing={1} sx={{ color: 'text.secondary' }}>
                             <IconLoader2 size={14} style={{ animation: `${spin} 0.9s linear infinite` }} />
-                            <Typography sx={{ fontSize: 12 }}>Flow started — first node executing…</Typography>
+                            <Typography sx={{ fontSize: 12 }}>{t('pages.webhookListener.flowStarted')}</Typography>
                         </Stack>
                     ) : status === 'error' ? (
                         <Box
@@ -725,7 +738,7 @@ const WebhookListenerDrawer = ({ open, chatflowid, onClose, onStatusChange }) =>
                                 fontFamily: MONO_STACK
                             }}
                         >
-                            {errorMessage || 'Listener error'}
+                            {errorMessage || t('pages.webhookListener.listenerError')}
                         </Box>
                     ) : (
                         <Typography sx={{ fontSize: 12, color: 'text.disabled' }}>—</Typography>
@@ -737,7 +750,7 @@ const WebhookListenerDrawer = ({ open, chatflowid, onClose, onStatusChange }) =>
                     <>
                         <Divider sx={{ my: 2.5, opacity: 0.6 }} />
                         <Box>
-                            <Caption>Response</Caption>
+                            <Caption>{t('pages.webhookListener.response')}</Caption>
                             <Box
                                 sx={{
                                     border: `1px solid ${theme.palette.divider}`,
@@ -764,7 +777,7 @@ const WebhookListenerDrawer = ({ open, chatflowid, onClose, onStatusChange }) =>
                                     <MemoizedReactMarkdown chatflowid={chatflowid}>{finalMessage}</MemoizedReactMarkdown>
                                 ) : (
                                     <Typography sx={{ fontFamily: MONO_STACK, fontSize: 12, color: 'text.secondary' }}>
-                                        Flow completed without a text response.
+                                        {t('pages.webhookListener.completedWithoutText')}
                                     </Typography>
                                 )}
                             </Box>
@@ -821,7 +834,7 @@ const WebhookListenerDrawer = ({ open, chatflowid, onClose, onStatusChange }) =>
                         '&:hover': { color: isDark ? 'common.white' : 'text.primary', bgcolor: 'transparent' }
                     }}
                 >
-                    Reset trace
+                    {t('pages.webhookListener.resetTrace')}
                 </Button>
             </Box>
         </Drawer>

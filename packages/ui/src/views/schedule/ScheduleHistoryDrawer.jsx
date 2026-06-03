@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { useSelector } from 'react-redux'
 import moment from 'moment'
+import 'moment/locale/zh-cn'
 
 // MUI
 import {
@@ -50,6 +51,8 @@ import TablePagination, { DEFAULT_ITEMS_PER_PAGE } from '@/ui-component/paginati
 import { ExecutionDetails } from '@/views/agentexecutions/ExecutionDetails'
 import { useTranslation } from 'react-i18next'
 
+moment.locale('en')
+
 const PAGE_SIZE_STORAGE_KEY = 'scheduleHistoryPageSize'
 
 // Drag-to-resize bounds (left-edge handle)
@@ -60,14 +63,26 @@ const MAX_DRAWER_WIDTH = typeof window !== 'undefined' ? window.innerWidth : 192
 // ─── Status helpers ──────────────────────────────────────────────────────────
 
 const STATUS_META = {
-    SUCCEEDED: { label: 'OK', color: 'success.dark', Icon: CheckCircleIcon },
-    FAILED: { label: 'Failed', color: 'error.main', Icon: ErrorIcon },
-    SKIPPED: { label: 'Skipped', color: 'grey.500', Icon: IconCircleMinus },
-    QUEUED: { label: 'Queued', color: 'info.main', Icon: IconClock },
-    RUNNING: { label: 'Running', color: 'warning.dark', Icon: IconLoader }
+    SUCCEEDED: { color: 'success.dark', Icon: CheckCircleIcon },
+    FAILED: { color: 'error.main', Icon: ErrorIcon },
+    SKIPPED: { color: 'grey.500', Icon: IconCircleMinus },
+    QUEUED: { color: 'info.main', Icon: IconClock },
+    RUNNING: { color: 'warning.dark', Icon: IconLoader }
+}
+
+const getScheduleStatusLabel = (t, status) => {
+    const statusLabels = {
+        SUCCEEDED: t('pages.schedule.statusOk'),
+        FAILED: t('pages.schedule.statusFailed'),
+        SKIPPED: t('pages.schedule.statusSkipped'),
+        QUEUED: t('pages.schedule.statusQueued'),
+        RUNNING: t('pages.schedule.statusRunning')
+    }
+    return statusLabels[status] ?? status
 }
 
 const StatusCell = ({ status }) => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const meta = STATUS_META[status] ?? STATUS_META.QUEUED
     const isSpin = status === 'RUNNING'
@@ -82,7 +97,7 @@ const StatusCell = ({ status }) => {
                 />
             </Box>
             <Typography variant='body2' sx={{ color: meta.color, fontWeight: 500 }}>
-                {meta.label}
+                {getScheduleStatusLabel(t, status)}
             </Typography>
         </Stack>
     )
@@ -117,7 +132,12 @@ const StyledTableRow = styled(TableRow)(({ theme, clickable }) => ({
 
 // ─── Time formatters ─────────────────────────────────────────────────────────
 
-const relTime = (date) => (date ? moment(date).fromNow() : '—')
+const relTime = (date, i18n) =>
+    date
+        ? moment(date)
+              .locale(i18n.language?.startsWith('zh') ? 'zh-cn' : 'en')
+              .fromNow()
+        : '—'
 const fmtDate = (date) => (date ? moment(date).format('YYYY-MM-DD HH:mm:ss') : '—')
 
 // Formats a date in the given IANA timezone using Intl (no moment-timezone dependency).
@@ -144,11 +164,11 @@ const fmtDateInTz = (date, timezone) => {
     }
 }
 
-const fmtNextRun = (date) => {
+const fmtNextRun = (date, t, i18n) => {
     if (!date) return { text: '—', overdue: false }
     const m = moment(date)
-    if (m.isBefore(moment())) return { text: 'due now', overdue: true }
-    return { text: m.fromNow(), overdue: false }
+    if (m.isBefore(moment())) return { text: t('pages.schedule.dueNow'), overdue: true }
+    return { text: relTime(date, i18n), overdue: false }
 }
 const fmtDuration = (ms) => {
     if (ms == null) return '—'
@@ -158,7 +178,7 @@ const fmtDuration = (ms) => {
 
 // ─── Cron → human readable (best-effort, falls back to expression) ───────────
 
-const cronHumanize = (cron, timezone) => {
+const cronHumanize = (cron, timezone, t) => {
     if (!cron) return '—'
     const parts = cron.trim().split(/\s+/)
     const tz = timezone && timezone !== 'UTC' ? ` (${timezone})` : ' (UTC)'
@@ -167,16 +187,19 @@ const cronHumanize = (cron, timezone) => {
         if (parts.length === 5) {
             const [m, h, dom, mon, dow] = parts
             if (dom === '*' && mon === '*' && dow === '*' && m !== '*' && h !== '*') {
-                return `Every day at ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}${tz}`
+                return t('pages.schedule.everyDayAt', { time: `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`, timezone: tz })
             }
             if (dom === '*' && mon === '*' && dow === '1-5' && m !== '*' && h !== '*') {
-                return `Every weekday at ${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}${tz}`
+                return t('pages.schedule.everyWeekdayAt', {
+                    time: `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`,
+                    timezone: tz
+                })
             }
             if (m === '0' && h === '*' && dom === '*' && mon === '*' && dow === '*') {
-                return `Every hour${tz}`
+                return t('pages.schedule.everyHour', { timezone: tz })
             }
             if (m === '*' && h === '*' && dom === '*' && mon === '*' && dow === '*') {
-                return `Every minute${tz}`
+                return t('pages.schedule.everyMinute', { timezone: tz })
             }
         }
     } catch {
@@ -188,7 +211,7 @@ const cronHumanize = (cron, timezone) => {
 // ─── Main drawer ─────────────────────────────────────────────────────────────
 
 const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
 
@@ -334,19 +357,15 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
             } catch (e) {
                 setErrorModal({
                     open: true,
-                    title: 'Could not load execution',
-                    message: e?.response?.data?.message || e?.message || 'Unknown error'
+                    title: t('pages.schedule.loadExecutionFailedTitle'),
+                    message: e?.response?.data?.message || e?.message || t('pages.schedule.unknownError')
                 })
             }
         } else if (row.status === 'FAILED' || row.status === 'SKIPPED') {
             setErrorModal({
                 open: true,
-                title: row.status === 'FAILED' ? 'Run failed before execution started' : 'Run was skipped',
-                message:
-                    row.error ||
-                    (row.status === 'SKIPPED'
-                        ? 'The schedule was skipped (commonly: disabled, past end date, or invalid input).'
-                        : 'No further details available.')
+                title: row.status === 'FAILED' ? t('pages.schedule.failedBeforeStart') : t('pages.schedule.skippedTitle'),
+                message: row.error || (row.status === 'SKIPPED' ? t('pages.schedule.skippedDescription') : t('pages.schedule.noDetails'))
             })
         }
     }
@@ -377,10 +396,12 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
         try {
             const resp = await chatflowsApi.deleteScheduleTriggerLogs(chatflowid, selectedIds)
             const data = resp?.data ?? {}
+            const deletedLogs = data.deletedLogs ?? selectedIds.length
+            const deletedExecutions = data.deletedExecutions ?? 0
             enqueueSnackbar({
-                message: `Deleted ${data.deletedLogs ?? selectedIds.length} log${
-                    (data.deletedLogs ?? selectedIds.length) === 1 ? '' : 's'
-                }${data.deletedExecutions ? ` and ${data.deletedExecutions} execution${data.deletedExecutions === 1 ? '' : 's'}` : ''}`,
+                message: deletedExecutions
+                    ? t('pages.schedule.deletedLogsWithExecutions', { logs: deletedLogs, executions: deletedExecutions })
+                    : t('pages.schedule.deletedLogs', { logs: deletedLogs }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'success',
@@ -396,7 +417,9 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
             fetchAll()
         } catch (e) {
             enqueueSnackbar({
-                message: e?.response?.data?.message || e?.message || 'Failed to delete logs',
+                message: t('pages.schedule.deleteFailed', {
+                    message: e?.response?.data?.message || e?.message || t('pages.schedule.unknownError')
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -417,7 +440,7 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
 
     const record = statusData?.record
     const enabled = !!statusData?.enabled
-    const cronHuman = cronHumanize(record?.cronExpression, record?.timezone)
+    const cronHuman = cronHumanize(record?.cronExpression, record?.timezone, t)
     const nextRunAt = record?.nextRunAt
     const lastLog = logs[0]
 
@@ -489,7 +512,7 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
                         <Stack direction='row' alignItems='center' spacing={1.5}>
                             <IconCalendar size={20} />
                             <Typography variant='h4' sx={{ m: 0 }}>
-                                Schedule History
+                                {t('pages.schedule.history')}
                             </Typography>
                         </Stack>
                         <IconButton onClick={onClose} size='small' aria-label='close'>
@@ -499,7 +522,7 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
 
                     <Stack direction='row' alignItems='center' spacing={1.5} sx={{ mt: 2 }}>
                         <Chip
-                            label={enabled ? 'Active' : 'Disabled'}
+                            label={enabled ? t('pages.schedule.active') : t('pages.schedule.disabled')}
                             size='small'
                             sx={{
                                 bgcolor: enabled
@@ -527,21 +550,21 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
                     <Stack direction='row' spacing={3} sx={{ mt: 1 }}>
                         <Box>
                             <Typography variant='caption' color='text.secondary'>
-                                Last run
+                                {t('pages.schedule.lastRun')}
                             </Typography>
                             <Tooltip title={lastLog ? fmtDate(lastLog.scheduledAt) : ''}>
-                                <Typography variant='body2'>{lastLog ? relTime(lastLog.scheduledAt) : '—'}</Typography>
+                                <Typography variant='body2'>{lastLog ? relTime(lastLog.scheduledAt, i18n) : '—'}</Typography>
                             </Tooltip>
                         </Box>
                         <Box>
                             <Typography variant='caption' color='text.secondary'>
-                                Next run
+                                {t('pages.schedule.nextRun')}
                             </Typography>
                             {(() => {
                                 if (!enabled || !nextRunAt) {
                                     return <Typography variant='body2'>—</Typography>
                                 }
-                                const { text, overdue } = fmtNextRun(nextRunAt)
+                                const { text, overdue } = fmtNextRun(nextRunAt, t, i18n)
                                 const tz = record?.timezone || 'UTC'
                                 const exactInTz = fmtDateInTz(nextRunAt, tz)
                                 const exactLocal = fmtDate(nextRunAt)
@@ -549,8 +572,8 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
                                     <Tooltip
                                         title={
                                             overdue
-                                                ? `Expected: ${exactInTz} (${tz}) — scheduler may be lagging or the next fire is imminent`
-                                                : `Local time: ${exactLocal}`
+                                                ? t('pages.schedule.expected', { time: exactInTz, timezone: tz })
+                                                : t('pages.schedule.localTime', { time: exactLocal })
                                         }
                                     >
                                         <Box>
@@ -579,10 +602,16 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
                         <FormControlLabel
                             sx={{ m: 0 }}
                             control={<Switch size='small' checked={autoRefresh} onChange={(e) => setAutoRefresh(e.target.checked)} />}
-                            label={<Typography variant='caption'>Auto-refresh</Typography>}
+                            label={<Typography variant='caption'>{t('pages.schedule.autoRefresh')}</Typography>}
                         />
                         <Box sx={{ flex: 1 }} />
-                        <Tooltip title={selectedIds.length === 0 ? 'Select rows to delete' : `Delete ${selectedIds.length} selected`}>
+                        <Tooltip
+                            title={
+                                selectedIds.length === 0
+                                    ? t('pages.schedule.selectRowsToDelete')
+                                    : t('pages.schedule.deleteSelected', { count: selectedIds.length })
+                            }
+                        >
                             {/* span wrapper so Tooltip works on a disabled button */}
                             <span>
                                 <IconButton
@@ -630,8 +659,8 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
                         <Box sx={{ p: 6, textAlign: 'center', color: 'text.secondary' }}>
                             <IconClock size={40} style={{ opacity: 0.4 }} />
                             <Typography variant='body2' sx={{ mt: 2 }}>
-                                No runs yet.
-                                {enabled && nextRunAt ? ` Next fire ${relTime(nextRunAt)}.` : ''}
+                                {t('pages.schedule.noRunsYet')}
+                                {enabled && nextRunAt ? ` ${t('pages.schedule.nextFire', { time: relTime(nextRunAt, i18n) })}` : ''}
                             </Typography>
                         </Box>
                     ) : (
@@ -648,9 +677,9 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
                                                 inputProps={{ 'aria-label': 'Select all rows on page' }}
                                             />
                                         </StyledTableCell>
-                                        <StyledTableCell>Status</StyledTableCell>
-                                        <StyledTableCell>Scheduled At</StyledTableCell>
-                                        <StyledTableCell>Duration</StyledTableCell>
+                                        <StyledTableCell>{t('pages.schedule.status')}</StyledTableCell>
+                                        <StyledTableCell>{t('pages.schedule.scheduledAt')}</StyledTableCell>
+                                        <StyledTableCell>{t('pages.schedule.duration')}</StyledTableCell>
                                         <StyledTableCell>{t('pages.executions.stateError')}</StyledTableCell>
                                     </TableRow>
                                 </TableHead>
@@ -734,22 +763,16 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
 
             {/* Bulk-delete confirmation */}
             <Dialog open={deleteDialogOpen} onClose={() => !deleting && setDeleteDialogOpen(false)} maxWidth='sm' fullWidth>
-                <DialogTitle>
-                    {t('common.delete')} {selectedIds.length} log{selectedIds.length === 1 ? '' : 's'}?
-                </DialogTitle>
+                <DialogTitle>{t('pages.schedule.deleteLogsTitle', { count: selectedIds.length })}</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>
-                        This will also permanently delete the linked execution traces. Schedule trigger logs that never produced an
-                        execution (skipped or pre-execution failures) are deleted but have no associated execution to remove. This action
-                        cannot be undone.
-                    </DialogContentText>
+                    <DialogContentText>{t('pages.schedule.deleteLogsDescription')}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setDeleteDialogOpen(false)} disabled={deleting}>
                         {t('common.cancel')}
                     </Button>
                     <Button onClick={handleConfirmDelete} color='error' disabled={deleting} variant='contained'>
-                        {deleting ? 'Deleting…' : 'Delete'}
+                        {deleting ? t('pages.schedule.deleting') : t('common.delete')}
                     </Button>
                 </DialogActions>
             </Dialog>
