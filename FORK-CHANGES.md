@@ -109,6 +109,7 @@
 | `packages/ui/src/views/chatmessage/ChatMessage.jsx`                           | UI-i18n-hardening |
 | `packages/ui/src/views/chatmessage/ChatPopUp.jsx`                             | UI-i18n-hardening |
 | `packages/ui/src/views/credentials/AddEditCredentialDialog.jsx`               | UI-i18n-hardening |
+| `packages/ui/src/views/credentials/CredentialListDialog.jsx`                  | UI-i18n-hardening |
 | `packages/ui/src/views/credentials/index.jsx`                                 | UI-i18n-hardening |
 | `packages/ui/src/views/datasets/index.jsx`                                    | UI-i18n-hardening |
 | `packages/ui/src/views/docstore/AddDocStoreDialog.jsx`                        | UI-i18n-hardening |

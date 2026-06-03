@@ -167,6 +167,7 @@
         "itemsPerPage": "Items per page:",
         "itemsRange": "Items {{start}} to {{end}} of {{total}}",
         "search": "Search",
+        "clearSearch": "Clear Search",
         "name": "Name",
         "category": "Category",
         "nodes": "Nodes",
@@ -311,6 +312,9 @@
                 "domains": "Allowed Domains"
             },
             "credentials": {
+                "searchPlaceholder": "Search credential",
+                "oauthRedirectUrl": "OAuth Redirect URL",
+                "sharedCredential": "Shared Credential",
                 "share": "Share"
             },
             "documentStores": {

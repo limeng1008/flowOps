@@ -482,7 +482,7 @@ const AddEditCredentialDialog = ({ show, dialogProps, onCancel, onConfirm, setEr
                 {!shared && componentCredential && componentCredential.name && componentCredential.name.includes('OAuth2') && (
                     <Box sx={{ p: 2 }}>
                         <Stack sx={{ position: 'relative' }} direction='row'>
-                            <Typography variant='overline'>OAuth Redirect URL</Typography>
+                            <Typography variant='overline'>{t('pages.credentials.oauthRedirectUrl')}</Typography>
                         </Stack>
                         <OutlinedInput
                             id='oauthRedirectUrl'
