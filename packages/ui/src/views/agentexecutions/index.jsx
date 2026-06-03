@@ -360,7 +360,7 @@ const AgentExecutions = () => {
                                         {t('pages.executions.reset')}
                                     </Button>
                                     <Available permissions={['executions:delete']}>
-                                        <Tooltip title='Delete selected executions'>
+                                        <Tooltip title={t('pages.executions.deleteSelectedExecutions')}>
                                             <span>
                                                 <IconButton
                                                     sx={{ height: 30, width: 30 }}
@@ -429,11 +429,10 @@ const AgentExecutions = () => {
                         aria-labelledby='alert-dialog-title'
                         aria-describedby='alert-dialog-description'
                     >
-                        <DialogTitle id='alert-dialog-title'>Confirm Deletion</DialogTitle>
+                        <DialogTitle id='alert-dialog-title'>{t('pages.executions.deleteConfirmTitle')}</DialogTitle>
                         <DialogContent>
                             <DialogContentText id='alert-dialog-description'>
-                                Are you sure you want to delete {selectedExecutionIds.length} execution
-                                {selectedExecutionIds.length !== 1 ? 's' : ''}? This action cannot be undone.
+                                {t('pages.executions.deleteConfirmDescription', { count: selectedExecutionIds.length })}
                             </DialogContentText>
                         </DialogContent>
                         <DialogActions>

@@ -42,6 +42,7 @@ import { FLOWISE_CREDENTIAL_ID, AGENTFLOW_ICONS } from '@/store/constant'
 import { NodeExecutionDetails } from '@/views/agentexecutions/NodeExecutionDetails'
 import ShareExecutionDialog from './ShareExecutionDialog'
 import { enqueueSnackbar as enqueueSnackbarAction, closeSnackbar as closeSnackbarAction } from '@/store/actions'
+import { useTranslation } from 'react-i18next'
 
 // API
 import executionsApi from '@/api/executions'
@@ -291,6 +292,7 @@ const DEFAULT_DRAWER_WIDTH = window.innerWidth - 400
 const MAX_DRAWER_WIDTH = window.innerWidth
 
 export const ExecutionDetails = ({ open, isPublic, execution, metadata, onClose, onProceedSuccess, onUpdateSharing, onRefresh }) => {
+    const { t, i18n } = useTranslation()
     const [drawerWidth, setDrawerWidth] = useState(Math.min(DEFAULT_DRAWER_WIDTH, MAX_DRAWER_WIDTH))
     const [executionTree, setExecution] = useState([])
     const [expandedItems, setExpandedItems] = useState([])
@@ -301,6 +303,7 @@ export const ExecutionDetails = ({ open, isPublic, execution, metadata, onClose,
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const updateExecutionApi = useApi(executionsApi.updateExecution)
+    const dateTimeFormat = i18n.language?.startsWith('zh') ? 'YYYY年M月D日 HH:mm' : 'MMM D, YYYY h:mm A'
 
     const dispatch = useDispatch()
 
@@ -318,7 +321,7 @@ export const ExecutionDetails = ({ open, isPublic, execution, metadata, onClose,
         // Show success message
         dispatch(
             enqueueSnackbarAction({
-                message: 'ID copied to clipboard',
+                message: t('pages.executions.idCopied'),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'success',
@@ -433,7 +436,7 @@ export const ExecutionDetails = ({ open, isPublic, execution, metadata, onClose,
 
                 // Create a virtual node for this iteration
                 const iterationNodeId = `${parentId}_${iterationIndex}`
-                const iterationLabel = `Iteration #${iterationIndex}`
+                const iterationLabel = t('pages.executions.iterationLabel', { index: iterationIndex })
 
                 // Determine status based on child nodes
                 const childNodes = nodeIds.map((id) => nodeMap.get(id))
@@ -642,7 +645,7 @@ export const ExecutionDetails = ({ open, isPublic, execution, metadata, onClose,
             // Show success message
             dispatch(
                 enqueueSnackbarAction({
-                    message: newIsPublic ? 'Execution shared publicly' : 'Execution is no longer public',
+                    message: newIsPublic ? t('pages.executions.sharedPublicly') : t('pages.executions.noLongerPublic'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -744,7 +747,9 @@ export const ExecutionDetails = ({ open, isPublic, execution, metadata, onClose,
                                 sx={{ pl: 1 }}
                                 icon={<IconExternalLink size={15} />}
                                 variant='outlined'
-                                label={localMetadata?.agentflow?.name || localMetadata?.agentflow?.id || 'Go to AgentFlow'}
+                                label={
+                                    localMetadata?.agentflow?.name || localMetadata?.agentflow?.id || t('pages.executions.goToAgentflow')
+                                }
                                 className={'button'}
                                 onClick={() => window.open(`/v2/agentcanvas/${localMetadata?.agentflow?.id}`, '_blank')}
                             />
@@ -752,7 +757,7 @@ export const ExecutionDetails = ({ open, isPublic, execution, metadata, onClose,
 
                         {!isPublic && (
                             <Tooltip
-                                title={`Execution ID: ${localMetadata?.id || ''}`}
+                                title={t('pages.executions.executionId', { id: localMetadata?.id || '' })}
                                 placement='top'
                                 disableHoverListener={!localMetadata?.id}
                             >
@@ -760,7 +765,7 @@ export const ExecutionDetails = ({ open, isPublic, execution, metadata, onClose,
                                     sx={{ ml: 1, pl: 1 }}
                                     icon={<IconCopy size={15} />}
                                     variant='outlined'
-                                    label={copied ? 'Copied!' : 'Copy ID'}
+                                    label={copied ? t('pages.executions.copied') : t('pages.executions.copyId')}
                                     className={'button'}
                                     onClick={copyToClipboard}
                                 />
@@ -778,7 +783,7 @@ export const ExecutionDetails = ({ open, isPublic, execution, metadata, onClose,
                                     )
                                 }
                                 variant='outlined'
-                                label={updateExecutionApi.loading ? 'Updating...' : 'Share'}
+                                label={updateExecutionApi.loading ? t('pages.executions.updating') : t('pages.executions.share')}
                                 className={'button'}
                                 onClick={() => onSharePublicly()}
                                 disabled={updateExecutionApi.loading}
@@ -796,7 +801,7 @@ export const ExecutionDetails = ({ open, isPublic, execution, metadata, onClose,
                                     )
                                 }
                                 variant='outlined'
-                                label={updateExecutionApi.loading ? 'Updating...' : 'Public'}
+                                label={updateExecutionApi.loading ? t('pages.executions.updating') : t('pages.executions.public')}
                                 className={'button'}
                                 onClick={() => setShowShareDialog(true)}
                                 disabled={updateExecutionApi.loading}
@@ -805,7 +810,7 @@ export const ExecutionDetails = ({ open, isPublic, execution, metadata, onClose,
 
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', alignContent: 'center' }}>
                             <Typography sx={{ flex: 1, mt: 1 }} color='text.primary'>
-                                {metadata?.updatedDate ? moment(metadata.updatedDate).format('MMM D, YYYY h:mm A') : 'N/A'}
+                                {metadata?.updatedDate ? moment(metadata.updatedDate).format(dateTimeFormat) : t('common.notAvailable')}
                             </Typography>
                             <IconButton
                                 onClick={() => onRefresh(localMetadata?.id)}
@@ -816,7 +821,7 @@ export const ExecutionDetails = ({ open, isPublic, execution, metadata, onClose,
                                         backgroundColor: (theme) => theme.palette.primary.main + '20'
                                     }
                                 }}
-                                title='Refresh execution data'
+                                title={t('pages.executions.refreshExecutionData')}
                             >
                                 <IconRefresh size={20} />
                             </IconButton>
@@ -851,7 +856,7 @@ export const ExecutionDetails = ({ open, isPublic, execution, metadata, onClose,
                         onProceedSuccess={onProceedSuccess}
                     />
                 ) : (
-                    <Typography color='text.secondary'>No data available for this item</Typography>
+                    <Typography color='text.secondary'>{t('pages.executions.noItemData')}</Typography>
                 )}
             </Box>
         </Box>
@@ -860,7 +865,7 @@ export const ExecutionDetails = ({ open, isPublic, execution, metadata, onClose,
     // Resize handle component (shared between modes)
     const resizeHandle = (
         <button
-            aria-label='Resize drawer'
+            aria-label={t('pages.executions.resizeDrawer')}
             style={{
                 position: 'absolute',
                 left: 0,

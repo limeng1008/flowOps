@@ -80,7 +80,9 @@
 | `packages/ui/src/ui-component/table/Table.jsx`                                | UI-i18n-hardening |
 | `packages/ui/src/ui-component/tooltip/TooltipWithParser.jsx`                  | UI-i18n-hardening |
 | `packages/ui/src/views/account/index.jsx`                                     | UI-i18n-hardening |
+| `packages/ui/src/views/agentexecutions/ExecutionDetails.jsx`                  | UI-i18n-hardening |
 | `packages/ui/src/views/agentexecutions/index.jsx`                             | UI-i18n-hardening |
+| `packages/ui/src/views/agentexecutions/PublicExecutionDetails.jsx`            | UI-i18n-hardening |
 | `packages/ui/src/views/agentflows/index.jsx`                                  | UI-i18n-hardening |
 | `packages/ui/src/views/agentflowsv2/AgentFlowNode.jsx`                        | UI-i18n-hardening |
 | `packages/ui/src/views/agentflowsv2/ConfigInput.jsx`                          | UI-i18n-hardening |

@@ -110,7 +110,7 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
 
     const onSubmitResponse = async (type, feedback = '') => {
         setIsLoading(true)
-        setLoadingMessage(`Submitting feedback...`)
+        setLoadingMessage(t('pages.executions.submittingFeedback'))
         const params = {
             question: feedback ? feedback : type.charAt(0).toUpperCase() + type.slice(1),
             chatId: metadata?.sessionId,
@@ -128,12 +128,12 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                 response = await predictionApi.sendMessageAndGetPrediction(metadata?.agentflowId, params)
             }
             if (response && response.data) {
-                enqueueSnackbar('Successfully submitted response', { variant: 'success' })
+                enqueueSnackbar(t('pages.executions.responseSubmitted'), { variant: 'success' })
                 if (onProceedSuccess) onProceedSuccess(response.data)
             }
         } catch (error) {
             console.error(error)
-            enqueueSnackbar(error?.message || 'Failed to submit response', { variant: 'error' })
+            enqueueSnackbar(error?.message || t('pages.executions.responseSubmitFailed'), { variant: 'error' })
         } finally {
             setIsLoading(false)
             setLoadingMessage('')
@@ -215,9 +215,9 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                         }}
                     >
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <Typography variant='body1'>Else condition fulfilled</Typography>
+                            <Typography variant='body1'>{t('pages.executions.elseConditionFulfilled')}</Typography>
                             <Chip
-                                label={condition.isFulfilled ? 'Fulfilled' : 'Not Fulfilled'}
+                                label={condition.isFulfilled ? t('pages.executions.fulfilled') : t('pages.executions.notFulfilled')}
                                 size='small'
                                 sx={{ color: 'white', backgroundColor: theme.palette.success.dark }}
                                 variant='filled'
@@ -238,9 +238,9 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                     }}
                 >
                     <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Typography variant='subtitle2'>Condition {index}</Typography>
+                        <Typography variant='subtitle2'>{t('pages.executions.condition', { index })}</Typography>
                         <Chip
-                            label={condition.isFulfilled ? 'Fulfilled' : 'Not Fulfilled'}
+                            label={condition.isFulfilled ? t('pages.executions.fulfilled') : t('pages.executions.notFulfilled')}
                             size='small'
                             variant='filled'
                             sx={{ color: 'white', backgroundColor: theme.palette.success.dark }}
@@ -312,7 +312,7 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                 {data.output && data.output.timeMetadata && data.output.timeMetadata.delta && (
                     <Chip
                         icon={<IconClock size={17} />}
-                        label={`${(data.output.timeMetadata.delta / 1000).toFixed(2)} seconds`}
+                        label={t('pages.executions.seconds', { count: (data.output.timeMetadata.delta / 1000).toFixed(2) })}
                         variant='contained'
                         color='secondary'
                         size='small'
@@ -322,7 +322,7 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                 {data.output && data.output.usageMetadata && data.output.usageMetadata.total_tokens && (
                     <Chip
                         icon={<IconCoins size={17} />}
-                        label={`${data.output.usageMetadata.total_tokens} tokens`}
+                        label={t('pages.executions.tokens', { count: data.output.usageMetadata.total_tokens })}
                         variant='contained'
                         color='primary'
                         size='small'
@@ -364,9 +364,9 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                         }}
                         variant='contained'
                         value='rendered'
-                        title='Rendered'
+                        title={t('pages.executions.rendered')}
                     >
-                        Rendered
+                        {t('pages.executions.rendered')}
                     </ToggleButton>
                     <ToggleButton
                         sx={{
@@ -376,9 +376,9 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                         }}
                         variant='contained'
                         value='raw'
-                        title='Raw'
+                        title={t('pages.executions.raw')}
                     >
-                        Raw
+                        {t('pages.executions.raw')}
                     </ToggleButton>
                 </ToggleButtonGroup>
             </Box>
@@ -471,12 +471,12 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                                                                 return matchingTool.toolNode.label || tool.name
                                                             }
                                                         }
-                                                        return tool.name || 'Tool Call'
+                                                        return tool.name || t('pages.executions.toolCall')
                                                     })()}
                                                 </Typography>
                                                 {isToolUsed && (
                                                     <Chip
-                                                        label='Used'
+                                                        label={t('pages.executions.used')}
                                                         size='small'
                                                         sx={{ ml: 2, color: 'white', backgroundColor: theme.palette.success.dark }}
                                                     />
@@ -495,13 +495,15 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                                     onClick={() => setShowAllTools((prev) => !prev)}
                                     sx={{ mt: 0.5, textTransform: 'none' }}
                                 >
-                                    {showAllTools ? 'Show less' : `Show ${data.output.availableTools.length - 5} more`}
+                                    {showAllTools
+                                        ? t('pages.executions.showLess')
+                                        : t('pages.executions.showMore', { count: data.output.availableTools.length - 5 })}
                                 </Button>
                             )}
                         </Box>
                     )}
                     <Typography sx={{ mt: 2 }} variant='h5' gutterBottom>
-                        Input
+                        {t('pages.executions.input')}
                     </Typography>
                     {data && data.input && data.input.messages && Array.isArray(data.input.messages) && data.input.messages.length > 0 ? (
                         data.input.messages.map((message, index) => (
@@ -629,11 +631,11 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                                                                         return matchingTool.toolNode.label || toolCall.name
                                                                     }
                                                                 }
-                                                                return toolCall.name || 'Tool Call'
+                                                                return toolCall.name || t('pages.executions.toolCall')
                                                             })()}
                                                         </Typography>
                                                         <Chip
-                                                            label='Called'
+                                                            label={t('pages.executions.called')}
                                                             size='small'
                                                             sx={{
                                                                 ml: 2,
@@ -743,7 +745,7 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                                                     }}
                                                     variant='outlined'
                                                     icon={<IconTool size={15} color={tool.error ? theme.palette.error.main : undefined} />}
-                                                    onClick={() => onUsedToolClick(tool, 'Used Tools')}
+                                                    onClick={() => onUsedToolClick(tool, t('pages.executions.usedTools'))}
                                                 />
                                             ) : null
                                         })}
@@ -882,7 +884,7 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                                             return <MemoizedReactMarkdown>{message.content}</MemoizedReactMarkdown>
                                         }
                                     } else {
-                                        return <MemoizedReactMarkdown>{`*No data*`}</MemoizedReactMarkdown>
+                                        return <MemoizedReactMarkdown>{t('pages.executions.noData')}</MemoizedReactMarkdown>
                                     }
                                 })()}
                                 {message.additional_kwargs?.fileAnnotations && message.additional_kwargs.fileAnnotations.length > 0 && (
@@ -959,7 +961,7 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                                 backgroundColor: theme.palette.background.default
                             }}
                         >
-                            <MemoizedReactMarkdown>{data?.input?.question || `*No data*`}</MemoizedReactMarkdown>
+                            <MemoizedReactMarkdown>{data?.input?.question || t('pages.executions.noData')}</MemoizedReactMarkdown>
                         </Box>
                     )}
                     <Typography sx={{ mt: 2 }} variant='h5' gutterBottom>
@@ -1004,7 +1006,7 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                                                 }}
                                                 variant='outlined'
                                                 icon={<IconTool size={15} color={tool.error ? theme.palette.error.main : undefined} />}
-                                                onClick={() => onUsedToolClick(tool, 'Used Tools')}
+                                                onClick={() => onUsedToolClick(tool, t('pages.executions.usedTools'))}
                                             />
                                         ) : null
                                     })}
@@ -1096,10 +1098,14 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                                         )
                                     } catch (e) {
                                         // Not valid JSON, render as markdown
-                                        return <MemoizedReactMarkdown>{data?.output?.content || `*No data*`}</MemoizedReactMarkdown>
+                                        return (
+                                            <MemoizedReactMarkdown>
+                                                {data?.output?.content || t('pages.executions.noData')}
+                                            </MemoizedReactMarkdown>
+                                        )
                                     }
                                 } else {
-                                    return <MemoizedReactMarkdown>{`*No data*`}</MemoizedReactMarkdown>
+                                    return <MemoizedReactMarkdown>{t('pages.executions.noData')}</MemoizedReactMarkdown>
                                 }
                             })()}
                             {data.output?.fileAnnotations && data.output.fileAnnotations.length > 0 && (
@@ -1154,7 +1160,7 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                                 <MemoizedReactMarkdown>
                                     {typeof data?.error === 'object'
                                         ? JSON.stringify(data.error, null, 2)
-                                        : data?.error || `*No error details*`}
+                                        : data?.error || t('pages.executions.noErrorDetails')}
                                 </MemoizedReactMarkdown>
                             </Box>
                         </>
@@ -1208,7 +1214,7 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                         }}
                     >
                         <Button variant='outlined' color='error' sx={{ borderRadius: '25px' }} onClick={handleReject} disabled={isLoading}>
-                            Reject
+                            {t('pages.executions.reject')}
                         </Button>
                         <Button
                             variant='contained'
@@ -1217,7 +1223,7 @@ export const NodeExecutionDetails = ({ data, label, status, metadata, isPublic, 
                             onClick={handleProceed}
                             disabled={isLoading}
                         >
-                            Proceed
+                            {t('pages.executions.proceed')}
                         </Button>
                     </Box>
 

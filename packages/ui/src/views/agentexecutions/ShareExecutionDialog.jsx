@@ -37,7 +37,7 @@ const ShareExecutionDialog = ({ show, executionId, onClose, onUnshare }) => {
         // Show success message
         dispatch(
             enqueueSnackbarAction({
-                message: 'Link copied to clipboard',
+                message: t('pages.executions.linkCopied'),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'success',
@@ -65,11 +65,11 @@ const ShareExecutionDialog = ({ show, executionId, onClose, onUnshare }) => {
     const component = show ? (
         <Dialog open={show} onClose={onClose} maxWidth='sm' fullWidth aria-labelledby='share-dialog-title'>
             <DialogTitle id='share-dialog-title' sx={{ fontSize: '1.1rem', fontWeight: 600 }}>
-                Public Trace Link
+                {t('pages.executions.publicTraceLink')}
             </DialogTitle>
             <DialogContent>
                 <Typography variant='body2' color='text.secondary' sx={{ mb: 2 }}>
-                    Anyone with the link below can view this execution trace.
+                    {t('pages.executions.publicTraceDescription')}
                 </Typography>
 
                 {/* Link Display Box */}
@@ -97,7 +97,7 @@ const ShareExecutionDialog = ({ show, executionId, onClose, onUnshare }) => {
                     >
                         {shareableLink}
                     </Typography>
-                    <Tooltip title={copied ? 'Copied!' : 'Copy link'}>
+                    <Tooltip title={copied ? t('pages.executions.copied') : t('pages.executions.copyLink')}>
                         <Button variant='text' color='primary' onClick={copyToClipboard} startIcon={<IconCopy size={18} />}>
                             {t('pages.apikey.copy')}
                         </Button>
@@ -107,7 +107,7 @@ const ShareExecutionDialog = ({ show, executionId, onClose, onUnshare }) => {
                 {/* Actions */}
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                     <Button color='error' onClick={handleUnshare} sx={{ mr: 1 }}>
-                        Unshare
+                        {t('pages.executions.unshare')}
                     </Button>
                     <Button onClick={onClose}>{t('common.close')}</Button>
                 </Box>
