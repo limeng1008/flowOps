@@ -1,0 +1,649 @@
+{
+    "description": "从会议主题、参会人、原始记录和会议日期中提炼结论、决议、待办与未决问题，生成结构化中文会议纪要",
+    "usecases": ["Agent", "办公"],
+    "nodes": [
+        {
+            "id": "startAgentflow_0",
+            "type": "agentFlow",
+            "position": {
+                "x": 64,
+                "y": 116
+            },
+            "data": {
+                "id": "startAgentflow_0",
+                "label": "Start",
+                "version": 1.1,
+                "name": "startAgentflow",
+                "type": "Start",
+                "color": "#7EE787",
+                "hideInput": true,
+                "baseClasses": ["Start"],
+                "category": "Agent Flows",
+                "description": "Starting point of the agentflow",
+                "inputParams": [
+                    {
+                        "label": "Input Type",
+                        "name": "startInputType",
+                        "type": "options",
+                        "options": [
+                            {
+                                "label": "Chat Input",
+                                "name": "chatInput",
+                                "description": "Start the conversation with chat input"
+                            },
+                            {
+                                "label": "Form Input",
+                                "name": "formInput",
+                                "description": "Start the workflow with form inputs"
+                            }
+                        ],
+                        "default": "chatInput",
+                        "id": "startAgentflow_0-input-startInputType-options",
+                        "display": true
+                    },
+                    {
+                        "label": "Form Title",
+                        "name": "formTitle",
+                        "type": "string",
+                        "placeholder": "Please Fill Out The Form",
+                        "show": {
+                            "startInputType": "formInput"
+                        },
+                        "id": "startAgentflow_0-input-formTitle-string",
+                        "display": true
+                    },
+                    {
+                        "label": "Form Description",
+                        "name": "formDescription",
+                        "type": "string",
+                        "placeholder": "Complete all fields below to continue",
+                        "show": {
+                            "startInputType": "formInput"
+                        },
+                        "id": "startAgentflow_0-input-formDescription-string",
+                        "display": true
+                    },
+                    {
+                        "label": "Form Input Types",
+                        "name": "formInputTypes",
+                        "description": "Specify the type of form input",
+                        "type": "array",
+                        "show": {
+                            "startInputType": "formInput"
+                        },
+                        "array": [
+                            {
+                                "label": "Type",
+                                "name": "type",
+                                "type": "options",
+                                "options": [
+                                    {
+                                        "label": "String",
+                                        "name": "string"
+                                    },
+                                    {
+                                        "label": "Number",
+                                        "name": "number"
+                                    },
+                                    {
+                                        "label": "Boolean",
+                                        "name": "boolean"
+                                    },
+                                    {
+                                        "label": "Options",
+                                        "name": "options"
+                                    }
+                                ],
+                                "default": "string"
+                            },
+                            {
+                                "label": "Label",
+                                "name": "label",
+                                "type": "string",
+                                "placeholder": "Label for the input"
+                            },
+                            {
+                                "label": "Variable Name",
+                                "name": "name",
+                                "type": "string",
+                                "placeholder": "Variable name for the input (must be camel case)",
+                                "description": "Variable name must be camel case. For example: firstName, lastName, etc."
+                            },
+                            {
+                                "label": "Add Options",
+                                "name": "addOptions",
+                                "type": "array",
+                                "show": {
+                                    "formInputTypes[$index].type": "options"
+                                },
+                                "array": [
+                                    {
+                                        "label": "Option",
+                                        "name": "option",
+                                        "type": "string"
+                                    }
+                                ]
+                            }
+                        ],
+                        "id": "startAgentflow_0-input-formInputTypes-array",
+                        "display": true
+                    },
+                    {
+                        "label": "Ephemeral Memory",
+                        "name": "startEphemeralMemory",
+                        "type": "boolean",
+                        "description": "Start fresh for every execution without past chat history",
+                        "optional": true,
+                        "id": "startAgentflow_0-input-startEphemeralMemory-boolean",
+                        "display": true
+                    },
+                    {
+                        "label": "Flow State",
+                        "name": "startState",
+                        "description": "Runtime state during the execution of the workflow",
+                        "type": "array",
+                        "optional": true,
+                        "array": [
+                            {
+                                "label": "Key",
+                                "name": "key",
+                                "type": "string",
+                                "placeholder": "Foo"
+                            },
+                            {
+                                "label": "Value",
+                                "name": "value",
+                                "type": "string",
+                                "placeholder": "Bar",
+                                "optional": true
+                            }
+                        ],
+                        "id": "startAgentflow_0-input-startState-array",
+                        "display": true
+                    },
+                    {
+                        "label": "Persist State",
+                        "name": "startPersistState",
+                        "type": "boolean",
+                        "description": "Persist the state in the same session",
+                        "optional": true,
+                        "id": "startAgentflow_0-input-startPersistState-boolean",
+                        "display": true
+                    }
+                ],
+                "inputAnchors": [],
+                "inputs": {
+                    "startInputType": "formInput",
+                    "formTitle": "会议纪要整理智能体",
+                    "formDescription": "粘贴会议速记或原始记录，自动整理会议摘要、决议、行动项与未决问题。",
+                    "formInputTypes": [
+                        {
+                            "type": "string",
+                            "label": "会议主题",
+                            "name": "meetingTopic",
+                            "addOptions": ""
+                        },
+                        {
+                            "type": "string",
+                            "label": "参会人",
+                            "name": "attendees",
+                            "addOptions": ""
+                        },
+                        {
+                            "type": "string",
+                            "label": "原始记录/速记",
+                            "name": "rawNotes",
+                            "addOptions": ""
+                        },
+                        {
+                            "type": "string",
+                            "label": "会议日期",
+                            "name": "meetingDate",
+                            "addOptions": ""
+                        }
+                    ],
+                    "startEphemeralMemory": true,
+                    "startState": "",
+                    "startPersistState": ""
+                },
+                "outputAnchors": [
+                    {
+                        "id": "startAgentflow_0-output-startAgentflow",
+                        "label": "Start",
+                        "name": "startAgentflow"
+                    }
+                ],
+                "outputs": {},
+                "selected": false
+            },
+            "width": 103,
+            "height": 66,
+            "positionAbsolute": {
+                "x": 64,
+                "y": 116
+            },
+            "selected": false,
+            "dragging": false
+        },
+        {
+            "id": "llmAgentflow_0",
+            "position": {
+                "x": 264,
+                "y": 104
+            },
+            "data": {
+                "id": "llmAgentflow_0",
+                "label": "会议纪要整理",
+                "version": 1,
+                "name": "llmAgentflow",
+                "type": "LLM",
+                "color": "#64B5F6",
+                "baseClasses": ["LLM"],
+                "category": "Agent Flows",
+                "description": "Large language models to analyze user-provided inputs and generate responses",
+                "inputParams": [
+                    {
+                        "label": "Model",
+                        "name": "llmModel",
+                        "type": "asyncOptions",
+                        "loadMethod": "listModels",
+                        "loadConfig": true,
+                        "id": "llmAgentflow_0-input-llmModel-asyncOptions",
+                        "display": true
+                    },
+                    {
+                        "label": "Messages",
+                        "name": "llmMessages",
+                        "type": "array",
+                        "optional": true,
+                        "acceptVariable": true,
+                        "array": [
+                            {
+                                "label": "Role",
+                                "name": "role",
+                                "type": "options",
+                                "options": [
+                                    {
+                                        "label": "System",
+                                        "name": "system"
+                                    },
+                                    {
+                                        "label": "Assistant",
+                                        "name": "assistant"
+                                    },
+                                    {
+                                        "label": "Developer",
+                                        "name": "developer"
+                                    },
+                                    {
+                                        "label": "User",
+                                        "name": "user"
+                                    }
+                                ]
+                            },
+                            {
+                                "label": "Content",
+                                "name": "content",
+                                "type": "string",
+                                "acceptVariable": true,
+                                "generateInstruction": true,
+                                "rows": 4
+                            }
+                        ],
+                        "id": "llmAgentflow_0-input-llmMessages-array",
+                        "display": true
+                    },
+                    {
+                        "label": "Enable Memory",
+                        "name": "llmEnableMemory",
+                        "type": "boolean",
+                        "description": "Enable memory for the conversation thread",
+                        "default": true,
+                        "optional": true,
+                        "id": "llmAgentflow_0-input-llmEnableMemory-boolean",
+                        "display": true
+                    },
+                    {
+                        "label": "Memory Type",
+                        "name": "llmMemoryType",
+                        "type": "options",
+                        "options": [
+                            {
+                                "label": "All Messages",
+                                "name": "allMessages",
+                                "description": "Retrieve all messages from the conversation"
+                            },
+                            {
+                                "label": "Window Size",
+                                "name": "windowSize",
+                                "description": "Uses a fixed window size to surface the last N messages"
+                            },
+                            {
+                                "label": "Conversation Summary",
+                                "name": "conversationSummary",
+                                "description": "Summarizes the whole conversation"
+                            },
+                            {
+                                "label": "Conversation Summary Buffer",
+                                "name": "conversationSummaryBuffer",
+                                "description": "Summarize conversations once token limit is reached. Default to 2000"
+                            }
+                        ],
+                        "optional": true,
+                        "default": "allMessages",
+                        "show": {
+                            "llmEnableMemory": true
+                        },
+                        "id": "llmAgentflow_0-input-llmMemoryType-options",
+                        "display": false
+                    },
+                    {
+                        "label": "Window Size",
+                        "name": "llmMemoryWindowSize",
+                        "type": "number",
+                        "default": "20",
+                        "description": "Uses a fixed window size to surface the last N messages",
+                        "show": {
+                            "llmMemoryType": "windowSize"
+                        },
+                        "id": "llmAgentflow_0-input-llmMemoryWindowSize-number",
+                        "display": false
+                    },
+                    {
+                        "label": "Max Token Limit",
+                        "name": "llmMemoryMaxTokenLimit",
+                        "type": "number",
+                        "default": "2000",
+                        "description": "Summarize conversations once token limit is reached. Default to 2000",
+                        "show": {
+                            "llmMemoryType": "conversationSummaryBuffer"
+                        },
+                        "id": "llmAgentflow_0-input-llmMemoryMaxTokenLimit-number",
+                        "display": false
+                    },
+                    {
+                        "label": "Input Message",
+                        "name": "llmUserMessage",
+                        "type": "string",
+                        "description": "Add an input message as user message at the end of the conversation",
+                        "rows": 4,
+                        "optional": true,
+                        "acceptVariable": true,
+                        "show": {
+                            "llmEnableMemory": true
+                        },
+                        "id": "llmAgentflow_0-input-llmUserMessage-string",
+                        "display": false
+                    },
+                    {
+                        "label": "Return Response As",
+                        "name": "llmReturnResponseAs",
+                        "type": "options",
+                        "options": [
+                            {
+                                "label": "User Message",
+                                "name": "userMessage"
+                            },
+                            {
+                                "label": "Assistant Message",
+                                "name": "assistantMessage"
+                            }
+                        ],
+                        "default": "userMessage",
+                        "id": "llmAgentflow_0-input-llmReturnResponseAs-options",
+                        "display": true
+                    },
+                    {
+                        "label": "JSON Structured Output",
+                        "name": "llmStructuredOutput",
+                        "description": "Instruct the LLM to give output in a JSON structured schema",
+                        "type": "array",
+                        "optional": true,
+                        "acceptVariable": true,
+                        "array": [
+                            {
+                                "label": "Key",
+                                "name": "key",
+                                "type": "string"
+                            },
+                            {
+                                "label": "Type",
+                                "name": "type",
+                                "type": "options",
+                                "options": [
+                                    {
+                                        "label": "String",
+                                        "name": "string"
+                                    },
+                                    {
+                                        "label": "String Array",
+                                        "name": "stringArray"
+                                    },
+                                    {
+                                        "label": "Number",
+                                        "name": "number"
+                                    },
+                                    {
+                                        "label": "Boolean",
+                                        "name": "boolean"
+                                    },
+                                    {
+                                        "label": "Enum",
+                                        "name": "enum"
+                                    },
+                                    {
+                                        "label": "JSON Array",
+                                        "name": "jsonArray"
+                                    }
+                                ]
+                            },
+                            {
+                                "label": "Enum Values",
+                                "name": "enumValues",
+                                "type": "string",
+                                "placeholder": "value1, value2, value3",
+                                "description": "Enum values. Separated by comma",
+                                "optional": true,
+                                "show": {
+                                    "llmStructuredOutput[$index].type": "enum"
+                                }
+                            },
+                            {
+                                "label": "JSON Schema",
+                                "name": "jsonSchema",
+                                "type": "code",
+                                "placeholder": "{\n    \"answer\": {\n        \"type\": \"string\",\n        \"description\": \"Value of the answer\"\n    }\n}",
+                                "description": "JSON schema for the structured output",
+                                "optional": true,
+                                "show": {
+                                    "llmStructuredOutput[$index].type": "jsonArray"
+                                }
+                            },
+                            {
+                                "label": "Description",
+                                "name": "description",
+                                "type": "string",
+                                "placeholder": "Description of the key"
+                            }
+                        ],
+                        "id": "llmAgentflow_0-input-llmStructuredOutput-array",
+                        "display": true
+                    },
+                    {
+                        "label": "Update Flow State",
+                        "name": "llmUpdateState",
+                        "description": "Update runtime state during the execution of the workflow",
+                        "type": "array",
+                        "optional": true,
+                        "acceptVariable": true,
+                        "array": [
+                            {
+                                "label": "Key",
+                                "name": "key",
+                                "type": "asyncOptions",
+                                "loadMethod": "listRuntimeStateKeys",
+                                "freeSolo": true
+                            },
+                            {
+                                "label": "Value",
+                                "name": "value",
+                                "type": "string",
+                                "acceptVariable": true,
+                                "acceptNodeOutputAsVariable": true
+                            }
+                        ],
+                        "id": "llmAgentflow_0-input-llmUpdateState-array",
+                        "display": true
+                    }
+                ],
+                "inputAnchors": [],
+                "inputs": {
+                    "llmModel": "chatZhipuAI",
+                    "llmMessages": [
+                        {
+                            "role": "system",
+                            "content": "<p>你是一名专业会议纪要助手，擅长从零散会议记录、速记和口语化表达中提炼摘要、明确决议、行动项和未决问题。请忠于用户提供的原始记录，不臆造未提及的信息；无法确认的负责人、日期或结论请标注“待确认”。输出应简洁、客观、可执行，适合直接发给团队复盘。</p>"
+                        },
+                        {
+                            "role": "user",
+                            "content": "<p>请根据以下信息整理中文会议纪要：</p><p>会议主题：<span class=\"variable\" data-type=\"mention\" data-id=\"$form.meetingTopic\" data-label=\"$form.meetingTopic\">{{ $form.meetingTopic }}</span></p><p>参会人：<span class=\"variable\" data-type=\"mention\" data-id=\"$form.attendees\" data-label=\"$form.attendees\">{{ $form.attendees }}</span></p><p>原始记录/速记：<span class=\"variable\" data-type=\"mention\" data-id=\"$form.rawNotes\" data-label=\"$form.rawNotes\">{{ $form.rawNotes }}</span></p><p>会议日期：<span class=\"variable\" data-type=\"mention\" data-id=\"$form.meetingDate\" data-label=\"$form.meetingDate\">{{ $form.meetingDate }}</span></p><p>要求：从原始记录中提炼会议摘要、明确决议、待办事项和未决问题。行动项需要包含任务、负责人和截止时间；如果记录中没有明确负责人或截止时间，请写“待确认”。不要补写原始记录里没有的信息。</p>"
+                        }
+                    ],
+                    "llmEnableMemory": false,
+                    "llmReturnResponseAs": "userMessage",
+                    "llmStructuredOutput": [
+                        {
+                            "key": "summary",
+                            "type": "string",
+                            "enumValues": "",
+                            "jsonSchema": "",
+                            "description": "会议摘要，概括讨论背景、主要结论和整体进展"
+                        },
+                        {
+                            "key": "decisions",
+                            "type": "stringArray",
+                            "enumValues": "",
+                            "jsonSchema": "",
+                            "description": "会议中已经明确的决议或共识"
+                        },
+                        {
+                            "key": "actionItems",
+                            "type": "jsonArray",
+                            "enumValues": "",
+                            "jsonSchema": "{\n    \"task\": {\n        \"type\": \"string\",\n        \"description\": \"待办任务\"\n    },\n    \"owner\": {\n        \"type\": \"string\",\n        \"description\": \"负责人；未明确则写待确认\"\n    },\n    \"dueDate\": {\n        \"type\": \"string\",\n        \"description\": \"截止时间；未明确则写待确认\"\n    }\n}",
+                            "description": "会议后需要跟进的行动项，每项包含任务、负责人和截止时间"
+                        },
+                        {
+                            "key": "openIssues",
+                            "type": "stringArray",
+                            "enumValues": "",
+                            "jsonSchema": "",
+                            "description": "会议中尚未解决或需要后续确认的问题"
+                        }
+                    ],
+                    "llmUpdateState": "",
+                    "llmModelConfig": {
+                        "cache": "",
+                        "modelName": "glm-4.5",
+                        "customModelName": "",
+                        "temperature": 0.8,
+                        "streaming": true,
+                        "maxTokens": "",
+                        "topP": "",
+                        "frequencyPenalty": "",
+                        "presencePenalty": "",
+                        "timeout": "",
+                        "stopSequence": "",
+                        "baseOptions": "",
+                        "llmModel": "chatZhipuAI"
+                    }
+                },
+                "outputAnchors": [
+                    {
+                        "id": "llmAgentflow_0-output-llmAgentflow",
+                        "label": "LLM",
+                        "name": "llmAgentflow"
+                    }
+                ],
+                "outputs": {},
+                "selected": false
+            },
+            "type": "agentFlow",
+            "width": 200,
+            "height": 72,
+            "selected": false,
+            "positionAbsolute": {
+                "x": 264,
+                "y": 104
+            },
+            "dragging": false
+        },
+        {
+            "id": "stickyNoteAgentflow_0",
+            "type": "stickyNote",
+            "position": {
+                "x": 264,
+                "y": 238
+            },
+            "data": {
+                "id": "stickyNoteAgentflow_0",
+                "label": "Sticky Note",
+                "version": 1,
+                "name": "stickyNoteAgentflow",
+                "type": "StickyNote",
+                "color": "#fee440",
+                "baseClasses": ["StickyNote"],
+                "category": "Agent Flows",
+                "description": "Add notes to the agent flow",
+                "inputParams": [
+                    {
+                        "label": "",
+                        "name": "note",
+                        "type": "string",
+                        "rows": 1,
+                        "placeholder": "Type something here",
+                        "optional": true,
+                        "id": "stickyNoteAgentflow_0-input-note-string",
+                        "display": true
+                    }
+                ],
+                "inputAnchors": [],
+                "inputs": {
+                    "note": "默认使用「智谱 GLM」模型，导入后请在 LLM 节点连接你的智谱 AI 凭证。原始记录可直接粘贴长文本；若真机验证想节省成本，可临时切到 glm-4-flash。生成纪要前建议确保速记包含发言上下文，发布前请人工确认决议和行动项。"
+                },
+                "outputAnchors": [
+                    {
+                        "id": "stickyNoteAgentflow_0-output-stickyNoteAgentflow",
+                        "label": "Sticky Note",
+                        "name": "stickyNoteAgentflow"
+                    }
+                ],
+                "outputs": {},
+                "selected": false
+            },
+            "width": 300,
+            "height": 143,
+            "positionAbsolute": {
+                "x": 264,
+                "y": 238
+            },
+            "selected": false,
+            "dragging": false
+        }
+    ],
+    "edges": [
+        {
+            "source": "startAgentflow_0",
+            "sourceHandle": "startAgentflow_0-output-startAgentflow",
+            "target": "llmAgentflow_0",
+            "targetHandle": "llmAgentflow_0",
+            "data": {
+                "sourceColor": "#7EE787",
+                "targetColor": "#64B5F6",
+                "isHumanInput": false
+            },
+            "type": "agentFlow",
+            "id": "startAgentflow_0-startAgentflow_0-output-startAgentflow-llmAgentflow_0-llmAgentflow_0"
+        }
+    ]
+}
