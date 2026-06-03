@@ -227,7 +227,68 @@ const requiredKeys = [
     'pages.evaluators.optionDescriptions.evaluateText',
     'pages.evaluators.optionDescriptions.evaluateJson',
     'pages.evaluators.optionDescriptions.evaluateNumeric',
-    'pages.evaluators.optionDescriptions.llmGrading'
+    'pages.evaluators.optionDescriptions.llmGrading',
+    'pages.evaluations.newEvaluation',
+    'pages.evaluations.startNewEvaluation',
+    'pages.evaluations.enableAutoRefresh',
+    'pages.evaluations.disableAutoRefresh',
+    'pages.evaluations.noEvaluations',
+    'pages.evaluations.deleteSelected',
+    'pages.evaluations.deleteTitle',
+    'pages.evaluations.deleteAllVersionsConfirm',
+    'pages.evaluations.deleteVersionsConfirm',
+    'pages.evaluations.deleted',
+    'pages.evaluations.deleteFailed',
+    'pages.evaluations.createFailed',
+    'pages.evaluations.unknownError',
+    'pages.evaluations.latestVersion',
+    'pages.evaluations.averageMetrics',
+    'pages.evaluations.lastEvaluated',
+    'pages.evaluations.lastRun',
+    'pages.evaluations.flows',
+    'pages.evaluations.dataset',
+    'pages.evaluations.status',
+    'pages.evaluations.viewResults',
+    'pages.evaluations.totalRunsMetric',
+    'pages.evaluations.avgLatencyMetric',
+    'pages.evaluations.passRateMetric',
+    'pages.evaluations.notAvailable',
+    'pages.evaluations.statusPending',
+    'pages.evaluations.statusCompleted',
+    'pages.evaluations.statusError',
+    'pages.evaluations.stepDatasets',
+    'pages.evaluations.stepEvaluators',
+    'pages.evaluations.stepLlmMetrics',
+    'pages.evaluations.fillMandatory',
+    'pages.evaluations.selectDatasetTitle',
+    'pages.evaluations.selectDatasetDescription',
+    'pages.evaluations.computedMetrics',
+    'pages.evaluations.customEvaluatorsTitle',
+    'pages.evaluations.customEvaluatorsDescription',
+    'pages.evaluations.gradeWithLlmTitle',
+    'pages.evaluations.gradeWithLlmDescription',
+    'pages.evaluations.evaluationNameHelp',
+    'pages.evaluations.evaluationPlaceholder',
+    'pages.evaluations.datasetToUse',
+    'pages.evaluations.selectDataset',
+    'pages.evaluations.datasetAsConversation',
+    'pages.evaluations.selectFlows',
+    'pages.evaluations.flowTypeAgentflowsV2',
+    'pages.evaluations.flowTypeCustomAssistants',
+    'pages.evaluations.flowTypeCustomAssistant',
+    'pages.evaluations.selectEvaluators',
+    'pages.evaluations.useLlmToGrade',
+    'pages.evaluations.noGrading',
+    'pages.evaluations.enterModelName',
+    'pages.evaluations.modelName',
+    'pages.evaluations.selectCredential',
+    'pages.evaluations.connectCredential',
+    'pages.evaluations.previousStep',
+    'pages.evaluations.skipEvaluators',
+    'pages.evaluations.skip',
+    'pages.evaluations.next',
+    'pages.evaluations.pass',
+    'pages.evaluations.fail'
 ]
 
 const get = (obj, key) => key.split('.').reduce((acc, part) => acc?.[part], obj)
@@ -550,5 +611,91 @@ describe('views long-tail i18n coverage', () => {
         expect(createEvalSource).toContain('getEvaluatorOptionLabel(evaluatorsOptions, evaluator.name, t)')
         expect(resultDrawerSource).toContain('getEvaluatorOptionLabel')
         expect(resultDrawerSource).toContain("t('pages.evaluators.actualOutput')")
+    })
+
+    it('localizes evaluations list and create-evaluation wizard visible copy', () => {
+        const evaluationsSource = read('views/evaluations/index.jsx')
+        const createDialogSource = read('views/evaluations/CreateEvaluationDialog.jsx')
+
+        expect(evaluationsSource).toContain('const { t, i18n } = useTranslation()')
+        expect(evaluationsSource).toContain("confirmButtonName: t('pages.evaluations.startNewEvaluation')")
+        expect(evaluationsSource).toContain("t('pages.evaluations.deleteAllVersionsConfirm'")
+        expect(evaluationsSource).toContain("t('pages.evaluations.deleteVersionsConfirm'")
+        expect(evaluationsSource).toContain("message: t('pages.evaluations.deleted'")
+        expect(evaluationsSource).toContain("t('pages.evaluations.deleteFailed'")
+        expect(evaluationsSource).toContain("t('pages.evaluations.createFailed'")
+        expect(evaluationsSource).toContain(
+            "title={autoRefresh ? t('pages.evaluations.disableAutoRefresh') : t('pages.evaluations.enableAutoRefresh')}"
+        )
+        expect(evaluationsSource).toContain("t('pages.evaluations.newEvaluation')")
+        expect(evaluationsSource).toContain("t('pages.evaluations.deleteSelected'")
+        expect(evaluationsSource).toContain("t('pages.evaluations.noEvaluations')")
+        expect(evaluationsSource).toContain("t('pages.evaluations.latestVersion')")
+        expect(evaluationsSource).toContain("t('pages.evaluations.averageMetrics')")
+        expect(evaluationsSource).toContain("t('pages.evaluations.lastEvaluated')")
+        expect(evaluationsSource).toContain("t('pages.evaluations.lastRun')")
+        expect(evaluationsSource).toContain("t('pages.evaluations.flows')")
+        expect(evaluationsSource).toContain("t('pages.evaluations.dataset')")
+        expect(evaluationsSource).toContain("t('pages.evaluations.status')")
+        expect(evaluationsSource).toContain("t('pages.evaluations.viewResults')")
+        expect(evaluationsSource).toContain("t('pages.evaluations.totalRunsMetric'")
+        expect(evaluationsSource).toContain("t('pages.evaluations.avgLatencyMetric'")
+        expect(evaluationsSource).toContain("t('pages.evaluations.passRateMetric'")
+        expect(evaluationsSource).toContain('formatEvaluationDate')
+        expect(evaluationsSource).toContain('getEvaluationStatusLabel')
+        expect(evaluationsSource).not.toContain('New Evaluation')
+        expect(evaluationsSource).not.toContain('No Evaluations Yet')
+        expect(evaluationsSource).not.toContain('Latest Version')
+        expect(evaluationsSource).not.toContain('Average Metrics')
+        expect(evaluationsSource).not.toContain('Total Runs:')
+        expect(evaluationsSource).not.toContain('Avg Latency:')
+        expect(evaluationsSource).not.toContain('Pass Rate:')
+        expect(evaluationsSource).not.toContain('View Results')
+        expect(evaluationsSource).not.toContain("format('DD-MMM-YYYY, hh:mm:ss A')")
+
+        expect(createDialogSource).toContain("t('pages.evaluations.stepDatasets')")
+        expect(createDialogSource).toContain("t('pages.evaluations.stepEvaluators')")
+        expect(createDialogSource).toContain("t('pages.evaluations.stepLlmMetrics')")
+        expect(createDialogSource).toContain("t('pages.evaluations.startNewEvaluation')")
+        expect(createDialogSource).toContain("t('pages.evaluations.fillMandatory')")
+        expect(createDialogSource).toContain("t('pages.evaluations.selectDatasetTitle')")
+        expect(createDialogSource).toContain("t('pages.evaluations.selectDatasetDescription')")
+        expect(createDialogSource).toContain("t('pages.evaluations.computedMetrics')")
+        expect(createDialogSource).toContain("t('pages.evaluations.customEvaluatorsTitle')")
+        expect(createDialogSource).toContain("t('pages.evaluations.customEvaluatorsDescription')")
+        expect(createDialogSource).toContain("t('pages.evaluations.gradeWithLlmTitle')")
+        expect(createDialogSource).toContain("t('pages.evaluations.gradeWithLlmDescription')")
+        expect(createDialogSource).toContain("title={t('pages.evaluations.evaluationNameHelp')}")
+        expect(createDialogSource).toContain("placeholder={t('pages.evaluations.evaluationPlaceholder')}")
+        expect(createDialogSource).toContain("t('pages.evaluations.datasetToUse')")
+        expect(createDialogSource).toContain("defaultOption={t('pages.evaluations.selectDataset')}")
+        expect(createDialogSource).toContain("t('pages.evaluations.datasetAsConversation')")
+        expect(createDialogSource).toContain("t('pages.evaluations.selectFlows')")
+        expect(createDialogSource).toContain("t('pages.evaluations.flowTypeAgentflowsV2')")
+        expect(createDialogSource).toContain("t('pages.evaluations.flowTypeCustomAssistants')")
+        expect(createDialogSource).toContain("t('pages.evaluations.selectEvaluators')")
+        expect(createDialogSource).toContain("t('pages.evaluations.useLlmToGrade')")
+        expect(createDialogSource).toContain("t('pages.evaluations.noGrading')")
+        expect(createDialogSource).toContain("t('pages.evaluations.enterModelName')")
+        expect(createDialogSource).toContain("placeholder={t('pages.evaluations.modelName')}")
+        expect(createDialogSource).toContain("t('pages.evaluations.selectCredential')")
+        expect(createDialogSource).toContain("label: t('pages.evaluations.connectCredential')")
+        expect(createDialogSource).toContain("title={t('pages.evaluations.previousStep')}")
+        expect(createDialogSource).toContain("title={t('pages.evaluations.skipEvaluators')}")
+        expect(createDialogSource).toContain("t('pages.evaluations.skip')")
+        expect(createDialogSource).toContain("t('pages.evaluations.next')")
+        expect(createDialogSource).toContain("t('pages.evaluations.pass')")
+        expect(createDialogSource).toContain("t('pages.evaluations.fail')")
+        expect(createDialogSource).not.toContain('Start New Evaluation')
+        expect(createDialogSource).not.toContain('Fill all the mandatory fields')
+        expect(createDialogSource).not.toContain('Select dataset to be tested on flows')
+        expect(createDialogSource).not.toContain('Friendly name to tag this run.')
+        expect(createDialogSource).not.toContain('Select Dataset')
+        expect(createDialogSource).not.toContain('Agentflows (v2)')
+        expect(createDialogSource).not.toContain('Custom Assistants')
+        expect(createDialogSource).not.toContain('Select the Evaluators')
+        expect(createDialogSource).not.toContain('No Grading')
+        expect(createDialogSource).not.toContain('Model Name')
+        expect(createDialogSource).not.toContain('Previous Step')
     })
 })
