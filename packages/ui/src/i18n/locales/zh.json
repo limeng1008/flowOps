@@ -397,6 +397,27 @@
         "name": "姓名",
         "emailAddress": "邮箱地址",
         "phoneNumber": "手机号",
+        "agentflowGenerator": {
+            "open": "生成智能体流",
+            "title": "你想搭建什么智能体？",
+            "description": "输入需求后会自动生成智能体流。不同模型的生成效果可能不同；这里只生成节点和连线，各节点的输入参数仍需你按业务补全。",
+            "promptWebReport": "自主搜索网页并生成报告",
+            "promptSummarizeDocument": "总结一份文档",
+            "promptSlackResponse": "回答用户问题并发送到 Slack",
+            "promptCustomerSupportTeam": "搭建一个处理客户问题的智能体团队",
+            "placeholder": "描述你的智能体需求",
+            "selectModel": "选择用于生成智能体流的模型",
+            "generate": "生成",
+            "generating": "正在生成智能体流...",
+            "failed": "生成智能体流失败",
+            "missingFields": "请填写以下必填项：{{fields}}",
+            "allMandatoryFields": "请补全所选模型的必填参数。"
+        },
+        "nodeWarnings": {
+            "outdatedVersion": "节点版本 {{oldVersion}} 已过期\n请更新到最新版本 {{newVersion}}",
+            "outdated": "节点已过期\n请更新到最新版本 {{newVersion}}",
+            "deprecatingFallback": "该节点将在下一版本弃用，请改用带有“新”标记的新节点。"
+        },
         "dialogs": {
             "fromDate": "从",
             "toDate": "到",

@@ -400,9 +400,8 @@ const AddNodes = ({ nodesData, node, isAgentCanvas, isAgentflowv2, onFlowGenerat
     const handleOpenDialog = () => {
         setOpenDialog(true)
         setDialogProps({
-            title: 'What would you like to build?',
-            description:
-                'Enter your prompt to generate an agentflow. Performance may vary with different models. Only nodes and edges are generated, you will need to fill in the input fields for each node.'
+            title: t('canvas.agentflowGenerator.title'),
+            description: t('canvas.agentflowGenerator.description')
         })
     }
 
@@ -442,7 +441,7 @@ const AddNodes = ({ nodesData, node, isAgentCanvas, isAgentflowv2, onFlowGenerat
                     size='small'
                     color='primary'
                     aria-label='generate'
-                    title='Generate Agentflow'
+                    title={t('canvas.agentflowGenerator.open')}
                 >
                     <IconSparkles />
                 </StyledFab>

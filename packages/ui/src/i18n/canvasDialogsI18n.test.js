@@ -1,5 +1,7 @@
 const en = require('./locales/en.json')
 const zh = require('./locales/zh.json')
+const fs = require('fs')
+const path = require('path')
 
 const requiredKeys = [
     'canvas.dialogs.fromDate',
@@ -55,6 +57,21 @@ const requiredKeys = [
     'canvas.dialogs.skippedTooltip',
     'canvas.dialogs.deletedTooltip',
     'canvas.dialogs.enabled',
+    'canvas.agentflowGenerator.title',
+    'canvas.agentflowGenerator.description',
+    'canvas.agentflowGenerator.promptWebReport',
+    'canvas.agentflowGenerator.promptSummarizeDocument',
+    'canvas.agentflowGenerator.promptSlackResponse',
+    'canvas.agentflowGenerator.promptCustomerSupportTeam',
+    'canvas.agentflowGenerator.placeholder',
+    'canvas.agentflowGenerator.selectModel',
+    'canvas.agentflowGenerator.generate',
+    'canvas.agentflowGenerator.generating',
+    'canvas.agentflowGenerator.failed',
+    'canvas.agentflowGenerator.missingFields',
+    'canvas.nodeWarnings.outdatedVersion',
+    'canvas.nodeWarnings.outdated',
+    'canvas.nodeWarnings.deprecatingFallback',
     'common.date',
     'common.selectAll',
     'common.export'
@@ -66,5 +83,31 @@ describe('canvas dialog i18n coverage', () => {
     it.each(requiredKeys)('has English and Chinese copy for %s', (key) => {
         expect(get(en, key)).toBeTruthy()
         expect(get(zh, key)).toBeTruthy()
+    })
+
+    it('routes Agentflow generator dialog copy through i18n', () => {
+        const addNodesSource = fs.readFileSync(path.join(__dirname, '../views/canvas/AddNodes.jsx'), 'utf8')
+        const dialogSource = fs.readFileSync(path.join(__dirname, '../ui-component/dialog/AgentflowGeneratorDialog.jsx'), 'utf8')
+
+        expect(addNodesSource).toContain("t('canvas.agentflowGenerator.title')")
+        expect(addNodesSource).toContain("t('canvas.agentflowGenerator.description')")
+        expect(dialogSource).toContain("key: 'canvas.agentflowGenerator.promptWebReport'")
+        expect(dialogSource).toContain('const instructionText = t(instruction.key)')
+        expect(dialogSource).toContain("t('canvas.agentflowGenerator.placeholder')")
+        expect(dialogSource).toContain("t('canvas.agentflowGenerator.selectModel')")
+        expect(dialogSource).not.toContain('What would you like to build?')
+        expect(dialogSource).not.toContain('Describe your agent here')
+    })
+
+    it('routes canvas node warning tooltip copy through i18n', () => {
+        const canvasNodeSource = fs.readFileSync(path.join(__dirname, '../views/canvas/CanvasNode.jsx'), 'utf8')
+        const agentFlowNodeSource = fs.readFileSync(path.join(__dirname, '../views/agentflowsv2/AgentFlowNode.jsx'), 'utf8')
+
+        expect(canvasNodeSource).toContain("t('canvas.nodeWarnings.outdatedVersion'")
+        expect(canvasNodeSource).toContain("t('canvas.nodeWarnings.outdated'")
+        expect(agentFlowNodeSource).toContain("t('canvas.nodeWarnings.outdatedVersion'")
+        expect(agentFlowNodeSource).toContain("t('canvas.nodeWarnings.outdated'")
+        expect(canvasNodeSource).not.toContain('Node version ${oldVersion} outdated')
+        expect(agentFlowNodeSource).not.toContain('Node version ${oldVersion} outdated')
     })
 })
