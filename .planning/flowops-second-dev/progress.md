@@ -40,3 +40,10 @@
 -   T6：i18n 重放 codemod + 残留英文审计补齐；并把节点描述与输入 tooltip 翻译解耦（`translateNodeTooltip`）。
 -   Polish：国产节点中文化（label/description）+ lobe-icons 官方品牌图标（MIT）替换占位图（name/type 不变，DISABLED_NODES/models.flowops key 安全）。
 -   Review 拦截：剔除 Codex 误造的假 provider `EmbeddingDeepseek`（DeepSeek 无 embedding 接口）；早前「隐藏 Base Path」伪需求 + 混入的零散 i18n 已回退。组件 tsc 0 / jest 42、UI i18n 测试、divergence 门禁全绿。
+
+### Phase 2 行业模板市场（启动）
+
+-   新增首个行业模板「营销文案生成智能体」（AgentflowV2，form→LLM 范式：表单 → chatZhipuAI → 结构化输出）+ 结构校验测试，已合并入 main。
+-   **真机验证通过**：用智谱 `glm-4-flash` 实跑，产出结构化中文营销文案（主题 + 多条 标题/正文/CTA + 话题标签 + AB 建议）——端到端打通（智谱端点/鉴权/请求/结构化输出全对）。
+-   **踩坑修复**：AgentflowV2 表单变量必须 `{{ $form.字段 }}`，裸 `{{ 字段 }}` 静默传空 → LLM 输出空壳；修正营销文案 + PPT Deck Agent（同 bug），测试加 `$form` 守卫。教训：模板结构测试绿 ≠ 运行对，新模板须真机跑一次。
+-   产出《Codex Phase 2 行业模板执行计划》`codex-phase2-templates-plan.md`：4 个 form→LLM 模板（报告 / 会议纪要 / 招聘 JD / 客户邮件），把 `$form` 铁律 + 测试守卫写死；RAG 知识库问答与合同审阅留作单独任务。
