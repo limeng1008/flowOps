@@ -82,7 +82,11 @@
 | `packages/ui/src/views/assistants/openai/DeleteConfirmDialog.jsx`             | UI-i18n-hardening |
 | `packages/ui/src/views/assistants/openai/LoadAssistantDialog.jsx`             | UI-i18n-hardening |
 | `packages/ui/src/views/assistants/openai/OpenAIAssistantLayout.jsx`           | UI-i18n-hardening |
+| `packages/ui/src/views/auth/confirm-email-change.jsx`                         | UI-i18n-hardening |
+| `packages/ui/src/views/auth/expired.jsx`                                      | UI-i18n-hardening |
 | `packages/ui/src/views/auth/forgotPassword.jsx`                               | UI-i18n-hardening |
+| `packages/ui/src/views/auth/rateLimited.jsx`                                  | UI-i18n-hardening |
+| `packages/ui/src/views/auth/ssoSuccess.jsx`                                   | UI-i18n-hardening |
 | `packages/ui/src/views/auth/loginActivity.jsx`                                | UI-i18n-hardening |
 | `packages/ui/src/views/auth/register.jsx`                                     | UI-i18n-hardening |
 | `packages/ui/src/views/auth/resetPassword.jsx`                                | UI-i18n-hardening |

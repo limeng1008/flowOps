@@ -111,7 +111,19 @@
         "passwordsDoNotMatch": "新密码与确认密码不一致。",
         "verifyingEmail": "正在验证邮箱…",
         "verificationFailed": "邮箱验证失败。",
-        "emailVerifiedSuccessfully": "邮箱验证成功。"
+        "emailVerifiedSuccessfully": "邮箱验证成功。",
+        "licenseExpiredTitle": "您的企业版授权已过期",
+        "licenseExpiredDesc": "请联系我们的支持团队续期授权。",
+        "contactSupport": "联系支持",
+        "rateLimitedTitle": "429 请求过于频繁",
+        "rateLimitedDesc": "您在短时间内的请求次数过多，请等待 {{seconds}} 秒后重试。",
+        "backToHome": "返回首页",
+        "ssoLoadingDashboard": "正在加载控制台…",
+        "ssoLoadingData": "正在加载数据…",
+        "confirmingEmailChange": "正在确认邮箱变更…",
+        "confirmationFailed": "确认失败。",
+        "emailUpdatedSuccess": "邮箱更新成功。",
+        "signInNewEmail": "请使用新邮箱地址登录。"
     },
     "landing": {
         "tagline": "企业级 AI 智能体平台",
