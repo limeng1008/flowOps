@@ -107,4 +107,52 @@ describe('SpreadsheetExport agentflow node', () => {
         expect(addSingleFileToStorage).not.toHaveBeenCalled()
         expect(res.output.content).toContain('请提供 JSON 表格数据')
     })
+
+    it('tolerates a ```json code fence around the array (common LLM output)', async () => {
+        const node = new SpreadsheetExport()
+        await node.run(
+            {
+                id: 's',
+                inputs: { docExportContent: '```json\n[{"姓名":"张三","分数":95}]\n```' }
+            },
+            '',
+            baseOptions
+        )
+        const workbook = await workbookFromStorage()
+        const worksheet = workbook.getWorksheet('Sheet1')
+        expect(worksheet.getCell('A1').value).toBe('姓名')
+        expect(worksheet.getCell('A2').value).toBe('张三')
+        expect(worksheet.getCell('B2').value).toBe(95)
+    })
+
+    it('tolerates prose around the array (slices the balanced JSON out)', async () => {
+        const node = new SpreadsheetExport()
+        await node.run(
+            { id: 's', inputs: { docExportContent: '好的，这是您要的表格：[["产品","数量"],["平台",3]]。以上。' } },
+            '',
+            baseOptions
+        )
+        const workbook = await workbookFromStorage()
+        const worksheet = workbook.getWorksheet('Sheet1')
+        expect(worksheet.getCell('A1').value).toBe('产品')
+        expect(worksheet.getCell('A2').value).toBe('平台')
+        expect(worksheet.getCell('B2').value).toBe(3)
+    })
+
+    it('unwraps a wrapper object ({ 表格: [...] }) and exports the inner array', async () => {
+        const node = new SpreadsheetExport()
+        await node.run(
+            {
+                id: 's',
+                inputs: { docExportContent: JSON.stringify({ 表格: [{ 月份: '一月', 销量: 120 }] }) }
+            },
+            '',
+            baseOptions
+        )
+        const workbook = await workbookFromStorage()
+        const worksheet = workbook.getWorksheet('Sheet1')
+        expect(worksheet.getCell('A1').value).toBe('月份')
+        expect(worksheet.getCell('B1').value).toBe('销量')
+        expect(worksheet.getCell('B2').value).toBe(120)
+    })
 })
