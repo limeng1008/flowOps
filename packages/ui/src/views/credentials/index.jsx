@@ -425,7 +425,9 @@ const Credentials = () => {
                                                         )}
                                                         {credential.shared && (
                                                             <>
-                                                                <StyledTableCell colSpan={'3'}>Shared Credential</StyledTableCell>
+                                                                <StyledTableCell colSpan={'3'}>
+                                                                    {t('pages.credentials.sharedCredential')}
+                                                                </StyledTableCell>
                                                             </>
                                                         )}
                                                     </StyledTableRow>
