@@ -33,13 +33,50 @@ const toBulletStrings = (raw: any): string[] => {
 
 // Parse deck JSON. Compatible with PPT Deck Agent output: { deckTitle|title, slides:[{title|heading, bullets|points|content, speakerNotes|notes}] }
 // Also accepts a bare slides array.
-const parseDeck = (content: string): Deck | undefined => {
-    let data: any
+// LLM 输出常带 ```json 代码块、前后说明文字，或外层包装对象（{ presentation: {...} }）。
+// 从这些形态里把演示文稿对象 / 幻灯片数组捞出来，避免一段代码块就让下载变成空文件/失败。
+const stripFences = (s: string): string => {
+    const fenced = s.match(/```(?:json)?\s*([\s\S]*?)```/i)
+    return (fenced ? fenced[1] : s).trim()
+}
+
+const tryParse = (s: string): any => {
     try {
-        data = JSON.parse(content)
+        return JSON.parse(s)
     } catch {
         return undefined
     }
+}
+
+const looksLikeSlides = (v: any): boolean => Array.isArray(v) && v.length > 0 && typeof v[0] === 'object' && !Array.isArray(v[0])
+
+const extractDeckJson = (content: string): any => {
+    const cleaned = stripFences(content)
+    let data = tryParse(cleaned)
+
+    // 兜底：从夹杂文字里切出第一个配平的 {..} 或 [..]
+    if (data === undefined) {
+        const objAt = cleaned.indexOf('{')
+        const arrAt = cleaned.indexOf('[')
+        const start = objAt === -1 ? arrAt : arrAt === -1 ? objAt : Math.min(objAt, arrAt)
+        if (start !== -1) {
+            const close = cleaned[start] === '{' ? '}' : ']'
+            const end = cleaned.lastIndexOf(close)
+            if (end > start) data = tryParse(cleaned.slice(start, end + 1))
+        }
+    }
+
+    // 拆外层包装对象：取首个「幻灯片数组」或「含 slides 的对象」属性（{ presentation: {...} } / { deck: [...] }）
+    if (data && !Array.isArray(data) && typeof data === 'object' && !Array.isArray(data.slides)) {
+        const nested = Object.values(data).find((v: any) => looksLikeSlides(v) || (v && typeof v === 'object' && Array.isArray(v.slides)))
+        if (nested) data = nested
+    }
+
+    return data
+}
+
+const parseDeck = (content: string): Deck | undefined => {
+    const data = extractDeckJson(content)
     if (!data || typeof data !== 'object') return undefined
 
     const rawSlides = Array.isArray(data) ? data : data.slides

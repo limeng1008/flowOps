@@ -127,4 +127,54 @@ describe('PptxExport agentflow node', () => {
         expect(addSingleFileToStorage).not.toHaveBeenCalled()
         expect(res.output.content).toContain('slides 数组')
     })
+
+    it('tolerates a ```json code fence around the deck (common LLM output)', async () => {
+        const node = new PptxExport()
+        await node.run(
+            {
+                id: 'p',
+                inputs: {
+                    docExportContent: '```json\n{"deckTitle":"季度会","slides":[{"title":"开场","bullets":["要点甲","要点乙"]}]}\n```'
+                }
+            },
+            '',
+            baseOptions
+        )
+        expect(addSingleFileToStorage).toHaveBeenCalled()
+        const deck = lastDeck()
+        expect(deck.slides.length).toBe(2) // 封面 + 1
+        expect(titleTexts(deck.slides[0])).toContain('季度会')
+        expect(titleTexts(deck.slides[1])).toContain('开场')
+        expect(bulletRun(deck.slides[1]).text.map((b: any) => b.text)).toEqual(['要点甲', '要点乙'])
+    })
+
+    it('tolerates prose around the deck (slices the balanced JSON out)', async () => {
+        const node = new PptxExport()
+        await node.run(
+            { id: 'p', inputs: { docExportContent: '好的，这是演示文稿：{"slides":[{"title":"唯一页","bullets":["内容"]}]}。完成。' } },
+            '',
+            baseOptions
+        )
+        const deck = lastDeck()
+        expect(deck.slides.length).toBe(1) // 无 deckTitle → 无封面
+        expect(titleTexts(deck.slides[0])).toContain('唯一页')
+    })
+
+    it('unwraps a wrapper object ({ presentation: {...} }) and builds the deck', async () => {
+        const node = new PptxExport()
+        await node.run(
+            {
+                id: 'p',
+                inputs: {
+                    docExportContent: JSON.stringify({ presentation: { deckTitle: '年度', slides: [{ title: '第一页', bullets: ['x'] }] } })
+                }
+            },
+            '',
+            baseOptions
+        )
+        const deck = lastDeck()
+        expect(deck.slides.length).toBe(2) // 封面 + 1
+        expect(titleTexts(deck.slides[0])).toContain('年度')
+        expect(titleTexts(deck.slides[1])).toContain('第一页')
+    })
 })
