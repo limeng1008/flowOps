@@ -30,8 +30,8 @@ const CredentialInputHandler = ({ inputParam, data, disabled = false, onReveal }
             value,
             inputParam,
             disabled,
-            confirmButtonName: 'Save',
-            cancelButtonName: 'Cancel'
+            confirmButtonName: t('pages.credentials.expandSave'),
+            cancelButtonName: t('common.cancel')
         }
         setExpandDialogProps(dialogProp)
         setShowExpandDialog(true)
@@ -130,7 +130,7 @@ const CredentialInputHandler = ({ inputParam, data, disabled = false, onReveal }
                                 name={inputParam.name}
                                 options={inputParam.options}
                                 onSelect={(newValue) => (data[inputParam.name] = newValue)}
-                                value={data[inputParam.name] ?? inputParam.default ?? 'choose an option'}
+                                value={data[inputParam.name] ?? inputParam.default ?? t('common.chooseOption')}
                             />
                         )}
                     </Box>

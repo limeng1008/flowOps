@@ -1,0 +1,40 @@
+# FlowOps 一键私有化部署
+# 用法：cp .env.example .env  → 改密钥/数据库密码  → docker compose up -d --build
+services:
+    flowops:
+        build:
+            context: ..
+            dockerfile: deploy/Dockerfile
+        image: flowops:local
+        container_name: flowops
+        restart: unless-stopped
+        env_file: ./.env
+        ports:
+            - '${PORT:-3000}:3000'
+        volumes:
+            # 本地文件存储（上传/导出文件等），数据不出域
+            - flowops-data:/root/.flowise
+        depends_on:
+            flowops-db:
+                condition: service_healthy
+
+    flowops-db:
+        # 默认 PostgreSQL 16；信创环境可改用 Kingbase（PG 兼容），见 README
+        image: postgres:16-alpine
+        container_name: flowops-db
+        restart: unless-stopped
+        environment:
+            POSTGRES_USER: ${DATABASE_USER:-flowops}
+            POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-flowops_db_pwd}
+            POSTGRES_DB: ${DATABASE_NAME:-flowops}
+        volumes:
+            - flowops-db-data:/var/lib/postgresql/data
+        healthcheck:
+            test: ['CMD-SHELL', 'pg_isready -U $${DATABASE_USER:-flowops} -d $${DATABASE_NAME:-flowops}']
+            interval: 10s
+            timeout: 5s
+            retries: 10
+
+volumes:
+    flowops-data:
+    flowops-db-data:

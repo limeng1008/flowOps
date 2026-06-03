@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import { enqueueSnackbar as enqueueSnackbarAction, closeSnackbar as closeSnackbarAction } from '@/store/actions'
 import { store } from '@/store'
 
@@ -26,6 +27,7 @@ const CloudMenuList = () => {
     const dispatch = useDispatch()
     useNotifier()
     const theme = useTheme()
+    const { t } = useTranslation()
 
     const enqueueSnackbar = (...args) => dispatch(enqueueSnackbarAction(...args))
     const closeSnackbar = (...args) => dispatch(closeSnackbarAction(...args))
@@ -36,7 +38,7 @@ const CloudMenuList = () => {
     const signOutClicked = () => {
         logoutApi.request()
         enqueueSnackbar({
-            message: 'Logging out...',
+            message: t('layout.loggingOut'),
             options: {
                 key: new Date().getTime() + Math.random(),
                 variant: 'success',
@@ -80,7 +82,7 @@ const CloudMenuList = () => {
                                     <IconFileText size='1.3rem' strokeWidth='1.5' />
                                 </ListItemIcon>
                                 <Typography variant='body1' color='inherit' sx={{ my: 0.5 }}>
-                                    Documentation
+                                    {t('layout.documentation')}
                                 </Typography>
                             </ListItemButton>
                         </a>
@@ -98,7 +100,7 @@ const CloudMenuList = () => {
                                 <IconLogout size='1.3rem' strokeWidth='1.5' />
                             </ListItemIcon>
                             <Typography variant='body1' color='inherit' sx={{ my: 0.5 }}>
-                                Logout
+                                {t('profile.logout')}
                             </Typography>
                         </ListItemButton>
                     </List>

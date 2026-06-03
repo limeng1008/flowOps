@@ -163,9 +163,9 @@ const AddEditCredentialDialog = ({ show, dialogProps, onCancel, onConfirm, setEr
         } catch (error) {
             if (setError) setError(error)
             enqueueSnackbar({
-                message: `Failed to add new Credential: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('pages.credentials.failedAdd', {
+                    message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -215,9 +215,9 @@ const AddEditCredentialDialog = ({ show, dialogProps, onCancel, onConfirm, setEr
         } catch (error) {
             if (setError) setError(error)
             enqueueSnackbar({
-                message: `Failed to save Credential: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('pages.credentials.failedSave', {
+                    message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -271,7 +271,7 @@ const AddEditCredentialDialog = ({ show, dialogProps, onCancel, onConfirm, setEr
             }
 
             if (!credentialId) {
-                throw new Error('Failed to save credential')
+                throw new Error(t('pages.credentials.failedOAuthSave'))
             }
 
             const authResponse = await oauth2Api.authorize(credentialId)
@@ -285,7 +285,7 @@ const AddEditCredentialDialog = ({ show, dialogProps, onCancel, onConfirm, setEr
                 )
 
                 if (!authWindow) {
-                    throw new Error('Failed to open authorization window. Please check if popups are blocked.')
+                    throw new Error(t('pages.credentials.failedOpenAuthorizationWindow'))
                 }
 
                 // Listen for messages from the popup window
@@ -310,7 +310,9 @@ const AddEditCredentialDialog = ({ show, dialogProps, onCancel, onConfirm, setEr
                             onConfirm(credentialId)
                         } else if (event.data.type === 'OAUTH2_ERROR') {
                             enqueueSnackbar({
-                                message: event.data.message || 'OAuth2 authorization failed',
+                                message:
+                                    event.data.message ||
+                                    t('pages.credentials.oauth2AuthorizationFailed', { message: t('pages.credentials.unknownError') }),
                                 options: {
                                     key: new Date().getTime() + Math.random(),
                                     variant: 'error',
@@ -355,13 +357,15 @@ const AddEditCredentialDialog = ({ show, dialogProps, onCancel, onConfirm, setEr
                     }
                 }, 300000) // 5 minutes
             } else {
-                throw new Error('Invalid response from authorization endpoint')
+                throw new Error(t('pages.credentials.invalidAuthorizationResponse'))
             }
         } catch (error) {
             console.error('OAuth2 authorization error:', error)
             if (setError) setError(error)
             enqueueSnackbar({
-                message: `OAuth2 authorization failed: ${error.response?.data?.message || error.message || 'Unknown error'}`,
+                message: t('pages.credentials.oauth2AuthorizationFailed', {
+                    message: error.response?.data?.message || error.message || t('pages.credentials.unknownError')
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -439,7 +443,9 @@ const AddEditCredentialDialog = ({ show, dialogProps, onCancel, onConfirm, setEr
                             }}
                         >
                             <IconHandStop size={25} color='white' />
-                            <span style={{ color: 'white', marginLeft: 10, fontWeight: 400 }}>Cannot edit shared credential.</span>
+                            <span style={{ color: 'white', marginLeft: 10, fontWeight: 400 }}>
+                                {t('pages.credentials.cannotEditSharedCredential')}
+                            </span>
                         </div>
                     </div>
                 )}
@@ -464,7 +470,7 @@ const AddEditCredentialDialog = ({ show, dialogProps, onCancel, onConfirm, setEr
                     <Box sx={{ p: 2 }}>
                         <Stack sx={{ position: 'relative' }} direction='row'>
                             <Typography variant='overline'>
-                                Credential Name
+                                {t('pages.credentials.credentialName')}
                                 <span style={{ color: 'red' }}>&nbsp;*</span>
                             </Typography>
                         </Stack>
@@ -510,7 +516,7 @@ const AddEditCredentialDialog = ({ show, dialogProps, onCancel, onConfirm, setEr
                 {!shared && componentCredential && componentCredential.name && componentCredential.name.includes('OAuth2') && (
                     <Box sx={{ p: 2 }}>
                         <Button variant='contained' color='secondary' onClick={() => setOAuth2()}>
-                            Authenticate
+                            {t('pages.credentials.authenticate')}
                         </Button>
                     </Box>
                 )}
