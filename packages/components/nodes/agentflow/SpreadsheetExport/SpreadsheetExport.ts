@@ -30,13 +30,48 @@ const normalizeCellValue = (value: any): any => {
     return JSON.stringify(value)
 }
 
-const parseTableData = (content: string): TableData | undefined => {
-    let data: any
+// LLM 输出常带 ```json 代码块、前后说明文字，或外层包装对象（{ data: [...] }）。
+// 从这些形态里把表格数组捞出来，避免一段代码块就让下载变成空文件/失败。
+const stripFences = (s: string): string => {
+    const fenced = s.match(/```(?:json)?\s*([\s\S]*?)```/i)
+    return (fenced ? fenced[1] : s).trim()
+}
+
+const tryParse = (s: string): any => {
     try {
-        data = JSON.parse(content)
+        return JSON.parse(s)
     } catch {
         return undefined
     }
+}
+
+const extractTableJson = (content: string): any => {
+    const cleaned = stripFences(content)
+    let data = tryParse(cleaned)
+
+    // 兜底：从夹杂文字里切出第一个配平的 [..] 或 {..}
+    if (data === undefined) {
+        const arrAt = cleaned.indexOf('[')
+        const objAt = cleaned.indexOf('{')
+        const start = arrAt === -1 ? objAt : objAt === -1 ? arrAt : Math.min(arrAt, objAt)
+        if (start !== -1) {
+            const close = cleaned[start] === '[' ? ']' : '}'
+            const end = cleaned.lastIndexOf(close)
+            if (end > start) data = tryParse(cleaned.slice(start, end + 1))
+        }
+    }
+
+    // 拆外层包装对象：取第一个非空数组值的属性（{ data: [...] } / { 表格: [...] }）
+    if (data && !Array.isArray(data) && typeof data === 'object') {
+        const arr = Object.values(data).find((v) => Array.isArray(v) && v.length > 0)
+        if (arr) data = arr
+    }
+
+    return data
+}
+
+const parseTableData = (content: string): TableData | undefined => {
+    const data = extractTableJson(content)
 
     if (!Array.isArray(data) || data.length === 0) return undefined
 
