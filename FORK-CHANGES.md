@@ -17,11 +17,13 @@
 | Branding-shell    | FlowOps 品牌壳、Logo、HTML 元信息、PWA manifest、启动入口与认证/欢迎体验。                              | 上游更新页面壳时，先取上游结构，再重放 FlowOps Logo/产品名/入口/i18n provider。                                                       |
 | UI-i18n-hardening | 面向中文用户的全量 i18n 包裹、日期/按钮/弹窗/表格/节点文案本地化。                                      | 上游合并后以 locale 为事实源重放 codemod，随后跑 UI i18n tests 和 `pnpm --filter flowise-ui build`。                                  |
 | UI-dependencies   | UI 换皮、动画和 i18n 运行时依赖引入导致的 package/lockfile 变更。                                       | 合并上游依赖时用 pnpm 重新解锁，保留 FlowOps 所需运行时依赖并跑 UI build。                                                            |
+| Components-deps   | 国产模型/导出节点（docx/exceljs 等）引入的 components package 依赖变更。                                | 合并上游依赖时用 pnpm 重新解锁，保留 FlowOps 运行时依赖（docx/exceljs 等），跑 `pnpm --filter flowise-components build` 与节点 jest。 |
 
 ## Modified File Ledger
 
 | File                                                                          | Category          |
 | ----------------------------------------------------------------------------- | ----------------- |
+| `packages/components/package.json`                                            | Components-deps   |
 | `packages/components/src/modelLoader.ts`                                      | T1-model-loader   |
 | `packages/ui/index.html`                                                      | Branding-shell    |
 | `packages/ui/package.json`                                                    | UI-dependencies   |
