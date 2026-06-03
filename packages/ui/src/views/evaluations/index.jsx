@@ -62,8 +62,29 @@ import {
 } from '@tabler/icons-react'
 import empty_evalSVG from '@/assets/images/empty_evals.svg'
 
+const formatEvaluationDate = (date, i18n) => {
+    if (!date) return ''
+    const dateTimeFormat = i18n.language?.startsWith('zh') ? 'YYYY年M月D日 HH:mm:ss' : 'MMMM Do YYYY, h:mm:ss A'
+    return moment(date).format(dateTimeFormat)
+}
+
+const getMetricValue = (t, value, unit = '') => (value || value === 0 ? `${value}${unit}` : t('pages.evaluations.notAvailable'))
+
+const getEvaluationStatusLabel = (t, status) => {
+    switch (status) {
+        case 'pending':
+            return t('pages.evaluations.statusPending')
+        case 'completed':
+            return t('pages.evaluations.statusCompleted')
+        case 'error':
+            return t('pages.evaluations.statusError')
+        default:
+            return status || t('pages.evaluations.notAvailable')
+    }
+}
+
 const EvalsEvaluation = () => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
     const { confirm } = useConfirm()
@@ -131,8 +152,8 @@ const EvalsEvaluation = () => {
     const createEvaluation = () => {
         const dialogProp = {
             type: 'ADD',
-            cancelButtonName: 'Cancel',
-            confirmButtonName: 'Start New Evaluation',
+            cancelButtonName: t('common.cancel'),
+            confirmButtonName: t('pages.evaluations.startNewEvaluation'),
             data: {}
         }
         setDialogProps(dialogProp)
@@ -141,12 +162,10 @@ const EvalsEvaluation = () => {
 
     const deleteEvaluationsAllVersions = async () => {
         const confirmPayload = {
-            title: `Delete`,
-            description: `Delete ${selected.length} ${
-                selected.length > 1 ? 'evaluations' : 'evaluation'
-            }? This will delete all versions of the evaluation.`,
-            confirmButtonName: 'Delete',
-            cancelButtonName: 'Cancel'
+            title: t('pages.evaluations.deleteTitle'),
+            description: t('pages.evaluations.deleteAllVersionsConfirm', { count: selected.length }),
+            confirmButtonName: t('common.delete'),
+            cancelButtonName: t('common.cancel')
         }
         const isConfirmed = await confirm(confirmPayload)
 
@@ -156,7 +175,7 @@ const EvalsEvaluation = () => {
                 const deleteResp = await evaluationApi.deleteEvaluations(selected, isDeleteAllVersion)
                 if (deleteResp.data) {
                     enqueueSnackbar({
-                        message: `${selected.length} ${selected.length > 1 ? 'evaluations' : 'evaluation'} deleted`,
+                        message: t('pages.evaluations.deleted', { count: selected.length }),
                         options: {
                             key: new Date().getTime() + Math.random(),
                             variant: 'success',
@@ -171,9 +190,9 @@ const EvalsEvaluation = () => {
                 }
             } catch (error) {
                 enqueueSnackbar({
-                    message: `Failed to delete ${selected.length > 1 ? 'evaluations' : 'evaluation'}: ${
-                        typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                    }`,
+                    message: t('pages.evaluations.deleteFailed', {
+                        message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                    }),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'error',
@@ -203,7 +222,6 @@ const EvalsEvaluation = () => {
                 // Prepare the data for the table
                 for (let i = 0; i < evalRows.length; i++) {
                     const evalRow = evalRows[i]
-                    evalRows[i].runDate = moment(evalRow.runDate).format('DD-MMM-YYYY, hh:mm:ss A')
                     evalRows[i].average_metrics =
                         typeof evalRow.average_metrics === 'object' ? evalRow.average_metrics : JSON.parse(evalRow.average_metrics)
                     evalRows[i].usedFlows =
@@ -221,7 +239,6 @@ const EvalsEvaluation = () => {
             const evalRows = createNewEvaluation.data
             for (let i = 0; i < evalRows.length; i++) {
                 const evalRow = evalRows[i]
-                evalRows[i].runDate = moment(evalRow.runDate).format('DD-MMM-YYYY, hh:mm:ss A')
                 evalRows[i].average_metrics =
                     typeof evalRow.average_metrics === 'object' ? evalRow.average_metrics : JSON.parse(evalRow.average_metrics)
                 evalRows[i].usedFlows = typeof evalRow.chatflowName === 'object' ? evalRow.chatflowName : JSON.parse(evalRow.chatflowName)
@@ -243,11 +260,14 @@ const EvalsEvaluation = () => {
         if (createNewEvaluation.error) {
             // Change to Notifstack
             enqueueSnackbar({
-                message: `Failed to create new evaluation: ${
-                    typeof createNewEvaluation.error.response?.data === 'object'
-                        ? createNewEvaluation.error.response.data.message
-                        : createNewEvaluation.error.response?.data || createNewEvaluation.error.message || 'Unknown error'
-                }`,
+                message: t('pages.evaluations.createFailed', {
+                    message:
+                        typeof createNewEvaluation.error.response?.data === 'object'
+                            ? createNewEvaluation.error.response.data.message
+                            : createNewEvaluation.error.response?.data ||
+                              createNewEvaluation.error.message ||
+                              t('pages.evaluations.unknownError')
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -334,7 +354,7 @@ const EvalsEvaluation = () => {
                                         }
                                     }
                                 }}
-                                title={autoRefresh ? 'Disable auto-refresh' : 'Enable auto-refresh (every 5s)'}
+                                title={autoRefresh ? t('pages.evaluations.disableAutoRefresh') : t('pages.evaluations.enableAutoRefresh')}
                             >
                                 {autoRefresh ? <IconPlayerPause /> : <IconPlayerPlay />}
                             </ToggleButton>
@@ -359,7 +379,7 @@ const EvalsEvaluation = () => {
                                 onClick={createEvaluation}
                                 startIcon={<IconPlus />}
                             >
-                                New Evaluation
+                                {t('pages.evaluations.newEvaluation')}
                             </StyledPermissionButton>
                         </ViewHeader>
                         {selected.length > 0 && (
@@ -371,7 +391,7 @@ const EvalsEvaluation = () => {
                                 color='error'
                                 startIcon={<IconTrash />}
                             >
-                                {t('common.delete')} {selected.length} {selected.length === 1 ? 'evaluation' : 'evaluations'}
+                                {t('pages.evaluations.deleteSelected', { count: selected.length })}
                             </StyledPermissionButton>
                         )}
                         {!isTableLoading && rows.length <= 0 ? (
@@ -383,7 +403,7 @@ const EvalsEvaluation = () => {
                                         alt='empty_evalSVG'
                                     />
                                 </Box>
-                                <div>No Evaluations Yet</div>
+                                <div>{t('pages.evaluations.noEvaluations')}</div>
                             </Stack>
                         ) : (
                             <>
@@ -413,11 +433,11 @@ const EvalsEvaluation = () => {
                                                 </TableCell>
                                                 <TableCell width={10}> </TableCell>
                                                 <TableCell>{t('common.name')}</TableCell>
-                                                <TableCell>Latest Version</TableCell>
-                                                <TableCell>Average Metrics</TableCell>
-                                                <TableCell>Last Evaluated</TableCell>
-                                                <TableCell>Flow(s)</TableCell>
-                                                <TableCell>Dataset</TableCell>
+                                                <TableCell>{t('pages.evaluations.latestVersion')}</TableCell>
+                                                <TableCell>{t('pages.evaluations.averageMetrics')}</TableCell>
+                                                <TableCell>{t('pages.evaluations.lastEvaluated')}</TableCell>
+                                                <TableCell>{t('pages.evaluations.flows')}</TableCell>
+                                                <TableCell>{t('pages.evaluations.dataset')}</TableCell>
                                                 <TableCell> </TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -514,7 +534,7 @@ const EvalsEvaluation = () => {
 }
 
 function EvaluationRunRow(props) {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const enqueueSnackbar = (...args) => dispatch(enqueueSnackbarAction(...args))
     const closeSnackbar = (...args) => dispatch(closeSnackbarAction(...args))
 
@@ -561,10 +581,10 @@ function EvaluationRunRow(props) {
 
     const deleteChildEvaluations = async () => {
         const confirmPayload = {
-            title: `Delete`,
-            description: `Delete ${childSelected.length} ${childSelected.length > 1 ? 'evaluations' : 'evaluation'}?`,
-            confirmButtonName: 'Delete',
-            cancelButtonName: 'Cancel'
+            title: t('pages.evaluations.deleteTitle'),
+            description: t('pages.evaluations.deleteVersionsConfirm', { count: childSelected.length }),
+            confirmButtonName: t('common.delete'),
+            cancelButtonName: t('common.cancel')
         }
         const isConfirmed = await confirm(confirmPayload)
 
@@ -573,7 +593,7 @@ function EvaluationRunRow(props) {
                 const deleteResp = await evaluationApi.deleteEvaluations(childSelected)
                 if (deleteResp.data) {
                     enqueueSnackbar({
-                        message: `${childSelected.length} evaluations deleted.`,
+                        message: t('pages.evaluations.deleted', { count: childSelected.length }),
                         options: {
                             key: new Date().getTime() + Math.random(),
                             variant: 'success',
@@ -588,9 +608,9 @@ function EvaluationRunRow(props) {
                 }
             } catch (error) {
                 enqueueSnackbar({
-                    message: `Failed to delete Evaluation: ${
-                        typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                    }`,
+                    message: t('pages.evaluations.deleteFailed', {
+                        message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                    }),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'error',
@@ -666,11 +686,9 @@ function EvaluationRunRow(props) {
                             variant='outlined'
                             size='small'
                             color='info'
-                            label={
-                                props.item.average_metrics?.totalRuns
-                                    ? 'Total Runs: ' + props.item.average_metrics?.totalRuns
-                                    : 'Total Runs: N/A'
-                            }
+                            label={t('pages.evaluations.totalRunsMetric', {
+                                value: getMetricValue(t, props.item.average_metrics?.totalRuns)
+                            })}
                         />
                         {props.item.average_metrics?.averageCost && (
                             <Chip variant='outlined' size='small' color='info' label={props.item.average_metrics?.averageCost} />
@@ -679,11 +697,9 @@ function EvaluationRunRow(props) {
                             variant='outlined'
                             size='small'
                             color='info'
-                            label={
-                                props.item.average_metrics?.averageLatency
-                                    ? 'Avg Latency: ' + props.item.average_metrics?.averageLatency + 'ms'
-                                    : 'Avg Latency: N/A'
-                            }
+                            label={t('pages.evaluations.avgLatencyMetric', {
+                                value: getMetricValue(t, props.item.average_metrics?.averageLatency, 'ms')
+                            })}
                         />
                         {props.item.average_metrics?.passPcnt >= 0 && (
                             <Chip
@@ -693,16 +709,14 @@ function EvaluationRunRow(props) {
                                     color: 'white',
                                     backgroundColor: getPassRateColor(props.item.average_metrics?.passPcnt)
                                 }}
-                                label={
-                                    props.item.average_metrics?.passPcnt
-                                        ? 'Pass Rate: ' + props.item.average_metrics.passPcnt + '%'
-                                        : 'Pass Rate: N/A'
-                                }
+                                label={t('pages.evaluations.passRateMetric', {
+                                    value: getMetricValue(t, props.item.average_metrics?.passPcnt, '%')
+                                })}
                             />
                         )}
                     </Stack>
                 </StyledTableCell>
-                <StyledTableCell>{moment(props.item.runDate).format('DD-MMM-YYYY, hh:mm:ss A')}</StyledTableCell>
+                <StyledTableCell>{formatEvaluationDate(props.item.runDate, i18n)}</StyledTableCell>
                 <StyledTableCell>
                     <Stack flexDirection='row' sx={{ gap: 2, alignItems: 'center', flexWrap: 'wrap' }}>
                         {props.item?.usedFlows?.map((usedFlow, index) => (
@@ -735,7 +749,7 @@ function EvaluationRunRow(props) {
                 </StyledTableCell>
                 <TableCell>
                     <IconButton
-                        title='View Results'
+                        title={t('pages.evaluations.viewResults')}
                         color='primary'
                         disabled={props.item.status === 'pending'}
                         onClick={() => showResults(props.item)}
@@ -754,7 +768,7 @@ function EvaluationRunRow(props) {
                             color='error'
                             startIcon={<IconTrash />}
                         >
-                            {t('common.delete')} {childSelected.length} {childSelected.length === 1 ? 'evaluation' : 'evaluations'}
+                            {t('pages.evaluations.deleteSelected', { count: childSelected.length })}
                         </Button>
                     </StyledTableCell>
                 </TableRow>
@@ -776,9 +790,9 @@ function EvaluationRunRow(props) {
                                                     />
                                                 </TableCell>
                                                 <TableCell>{t('profile.version')}</TableCell>
-                                                <TableCell>Last Run</TableCell>
-                                                <TableCell>Average Metrics</TableCell>
-                                                <TableCell>Status</TableCell>
+                                                <TableCell>{t('pages.evaluations.lastRun')}</TableCell>
+                                                <TableCell>{t('pages.evaluations.averageMetrics')}</TableCell>
+                                                <TableCell>{t('pages.evaluations.status')}</TableCell>
                                                 <TableCell> </TableCell>
                                             </TableRow>
                                         </TableHead>
@@ -796,7 +810,7 @@ function EvaluationRunRow(props) {
                                                             </StyledTableCell>
                                                             <StyledTableCell>{childItem.version}</StyledTableCell>
                                                             <StyledTableCell>
-                                                                {moment(childItem.runDate).format('DD-MMM-YYYY, hh:mm:ss A')}
+                                                                {formatEvaluationDate(childItem.runDate, i18n)}
                                                             </StyledTableCell>
                                                             <StyledTableCell>
                                                                 <Stack
@@ -807,11 +821,9 @@ function EvaluationRunRow(props) {
                                                                         variant='outlined'
                                                                         size='small'
                                                                         color='info'
-                                                                        label={
-                                                                            childItem.average_metrics?.totalRuns
-                                                                                ? 'Total Runs: ' + childItem.average_metrics?.totalRuns
-                                                                                : 'Total Runs: N/A'
-                                                                        }
+                                                                        label={t('pages.evaluations.totalRunsMetric', {
+                                                                            value: getMetricValue(t, childItem.average_metrics?.totalRuns)
+                                                                        })}
                                                                     />
                                                                     {childItem.average_metrics?.averageCost && (
                                                                         <Chip
@@ -825,13 +837,13 @@ function EvaluationRunRow(props) {
                                                                         variant='outlined'
                                                                         size='small'
                                                                         color='info'
-                                                                        label={
-                                                                            childItem.average_metrics?.averageLatency
-                                                                                ? 'Avg Latency: ' +
-                                                                                  childItem.average_metrics?.averageLatency +
-                                                                                  'ms'
-                                                                                : 'Avg Latency: N/A'
-                                                                        }
+                                                                        label={t('pages.evaluations.avgLatencyMetric', {
+                                                                            value: getMetricValue(
+                                                                                t,
+                                                                                childItem.average_metrics?.averageLatency,
+                                                                                'ms'
+                                                                            )
+                                                                        })}
                                                                     />
                                                                     {childItem.average_metrics?.passPcnt >= 0 && (
                                                                         <Chip
@@ -843,13 +855,13 @@ function EvaluationRunRow(props) {
                                                                                     childItem.average_metrics?.passPcnt
                                                                                 )
                                                                             }}
-                                                                            label={
-                                                                                childItem.average_metrics?.passPcnt
-                                                                                    ? 'Pass rate: ' +
-                                                                                      childItem.average_metrics.passPcnt +
-                                                                                      '%'
-                                                                                    : 'Pass rate: N/A'
-                                                                            }
+                                                                            label={t('pages.evaluations.passRateMetric', {
+                                                                                value: getMetricValue(
+                                                                                    t,
+                                                                                    childItem.average_metrics?.passPcnt,
+                                                                                    '%'
+                                                                                )
+                                                                            })}
                                                                         />
                                                                     )}
                                                                 </Stack>
@@ -862,7 +874,7 @@ function EvaluationRunRow(props) {
                                                                         color: 'white',
                                                                         backgroundColor: getStatusColor(childItem.status)
                                                                     }}
-                                                                    label={childItem.status}
+                                                                    label={getEvaluationStatusLabel(t, childItem.status)}
                                                                     title={
                                                                         childItem.status === 'error' ? childItem.average_metrics.error : ''
                                                                     }
@@ -870,7 +882,7 @@ function EvaluationRunRow(props) {
                                                             </StyledTableCell>
                                                             <StyledTableCell>
                                                                 <IconButton
-                                                                    title='View Results'
+                                                                    title={t('pages.evaluations.viewResults')}
                                                                     color='primary'
                                                                     disabled={childItem.status === 'pending'}
                                                                     onClick={() => showResults(childItem)}
