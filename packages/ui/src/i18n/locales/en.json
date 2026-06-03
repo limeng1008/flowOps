@@ -111,7 +111,19 @@
         "passwordsDoNotMatch": "New Password and Confirm Password do not match.",
         "verifyingEmail": "Verifying Email...",
         "verificationFailed": "Verification Failed.",
-        "emailVerifiedSuccessfully": "Email Verified Successfully."
+        "emailVerifiedSuccessfully": "Email Verified Successfully.",
+        "licenseExpiredTitle": "Your enterprise license has expired",
+        "licenseExpiredDesc": "Please contact our support team to renew your license.",
+        "contactSupport": "Contact Support",
+        "rateLimitedTitle": "429 Too Many Requests",
+        "rateLimitedDesc": "You have made too many requests in a short period of time. Please wait {{seconds}}s before trying again.",
+        "backToHome": "Back to Home",
+        "ssoLoadingDashboard": "Loading dashboard...",
+        "ssoLoadingData": "Loading data...",
+        "confirmingEmailChange": "Confirming email change...",
+        "confirmationFailed": "Confirmation failed.",
+        "emailUpdatedSuccess": "Email updated successfully.",
+        "signInNewEmail": "Please sign in with your new email address."
     },
     "landing": {
         "tagline": "Enterprise AI Agent Platform",
