@@ -211,9 +211,11 @@
 | `packages/ui/src/views/evaluators/AddEditEvaluatorDialog.jsx`                 | UI-i18n-hardening |
 | `packages/ui/src/views/organization/index.jsx`                                | UI-i18n-hardening |
 | `packages/ui/src/views/roles/CreateEditRoleDialog.jsx`                        | UI-i18n-hardening |
+| `packages/ui/src/views/schedule/ScheduleHistoryFAB.jsx`                       | UI-i18n-hardening |
 | `packages/ui/src/views/schedule/ScheduleHistoryDrawer.jsx`                    | UI-i18n-hardening |
 | `packages/ui/src/views/tools/CustomMcpServerDialog.jsx`                       | UI-i18n-hardening |
 | `packages/ui/src/views/users/EditUserDialog.jsx`                              | UI-i18n-hardening |
+| `packages/ui/src/views/webhooklistener/WebhookListenerFAB.jsx`                | UI-i18n-hardening |
 | `packages/ui/src/views/webhooklistener/WebhookListenerDrawer.jsx`             | UI-i18n-hardening |
 | `packages/ui/src/views/workspace/AddEditWorkspaceDialog.jsx`                  | UI-i18n-hardening |
 | `packages/ui/src/views/workspace/EditWorkspaceUserRoleDialog.jsx`             | UI-i18n-hardening |

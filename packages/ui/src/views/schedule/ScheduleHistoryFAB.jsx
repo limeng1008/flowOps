@@ -8,8 +8,10 @@ import { StyledFab } from '@/ui-component/button/StyledFab'
 import chatflowsApi from '@/api/chatflows'
 import useApi from '@/hooks/useApi'
 import ScheduleHistoryDrawer from './ScheduleHistoryDrawer'
+import { useTranslation } from 'react-i18next'
 
 const ScheduleHistoryFAB = ({ chatflowid, onOpenChange }) => {
+    const { t } = useTranslation()
     const [open, setOpen] = useState(false)
     const [runningCount, setRunningCount] = useState(0)
 
@@ -39,7 +41,7 @@ const ScheduleHistoryFAB = ({ chatflowid, onOpenChange }) => {
 
     return (
         <>
-            <Tooltip title='Schedule History'>
+            <Tooltip title={t('pages.schedule.history')}>
                 <Badge
                     color='warning'
                     variant='dot'

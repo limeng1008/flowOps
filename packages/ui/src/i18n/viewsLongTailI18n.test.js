@@ -78,7 +78,71 @@ const requiredKeys = [
     'pages.workspaces.never',
     'pages.workspaces.statusActive',
     'pages.workspaces.statusInvited',
-    'pages.workspaces.statusInactive'
+    'pages.workspaces.statusInactive',
+    'pages.schedule.history',
+    'pages.schedule.active',
+    'pages.schedule.disabled',
+    'pages.schedule.lastRun',
+    'pages.schedule.nextRun',
+    'pages.schedule.dueNow',
+    'pages.schedule.localTime',
+    'pages.schedule.expected',
+    'pages.schedule.autoRefresh',
+    'pages.schedule.selectRowsToDelete',
+    'pages.schedule.deleteSelected',
+    'pages.schedule.noRunsYet',
+    'pages.schedule.nextFire',
+    'pages.schedule.status',
+    'pages.schedule.scheduledAt',
+    'pages.schedule.duration',
+    'pages.schedule.deleteLogsTitle',
+    'pages.schedule.deleteLogsDescription',
+    'pages.schedule.deleting',
+    'pages.schedule.deletedLogs',
+    'pages.schedule.deleteFailed',
+    'pages.schedule.loadExecutionFailedTitle',
+    'pages.schedule.unknownError',
+    'pages.schedule.failedBeforeStart',
+    'pages.schedule.skippedTitle',
+    'pages.schedule.skippedDescription',
+    'pages.schedule.noDetails',
+    'pages.schedule.statusOk',
+    'pages.schedule.statusFailed',
+    'pages.schedule.statusSkipped',
+    'pages.schedule.statusQueued',
+    'pages.schedule.statusRunning',
+    'pages.schedule.everyDayAt',
+    'pages.schedule.everyWeekdayAt',
+    'pages.schedule.everyHour',
+    'pages.schedule.everyMinute',
+    'pages.webhookListener.title',
+    'pages.webhookListener.liveObservatory',
+    'pages.webhookListener.endpoint',
+    'pages.webhookListener.processFlow',
+    'pages.webhookListener.response',
+    'pages.webhookListener.copied',
+    'pages.webhookListener.copyUrl',
+    'pages.webhookListener.copyCurl',
+    'pages.webhookListener.curlExample',
+    'pages.webhookListener.restoreWidth',
+    'pages.webhookListener.expand',
+    'pages.webhookListener.streaming',
+    'pages.webhookListener.waiting',
+    'pages.webhookListener.sendMethod',
+    'pages.webhookListener.openingStream',
+    'pages.webhookListener.flowStarted',
+    'pages.webhookListener.listenerError',
+    'pages.webhookListener.executionError',
+    'pages.webhookListener.listenerDisconnected',
+    'pages.webhookListener.registerFailed',
+    'pages.webhookListener.completedWithoutText',
+    'pages.webhookListener.statusConnecting',
+    'pages.webhookListener.statusIdle',
+    'pages.webhookListener.statusListening',
+    'pages.webhookListener.statusRunning',
+    'pages.webhookListener.statusCompleted',
+    'pages.webhookListener.statusStopped',
+    'pages.webhookListener.statusError'
 ]
 
 const get = (obj, key) => key.split('.').reduce((acc, part) => acc?.[part], obj)
@@ -245,5 +309,71 @@ describe('views long-tail i18n coverage', () => {
         expect(usersSource).not.toContain('No Assigned Users Yet')
         expect(usersSource).not.toContain('Email/Name')
         expect(usersSource).not.toContain('Never')
+    })
+
+    it('localizes schedule history and webhook listener runtime panels', () => {
+        const scheduleFabSource = read('views/schedule/ScheduleHistoryFAB.jsx')
+        const scheduleDrawerSource = read('views/schedule/ScheduleHistoryDrawer.jsx')
+        const webhookFabSource = read('views/webhooklistener/WebhookListenerFAB.jsx')
+        const webhookDrawerSource = read('views/webhooklistener/WebhookListenerDrawer.jsx')
+
+        expect(scheduleFabSource).toContain('const { t } = useTranslation()')
+        expect(scheduleFabSource).toContain("title={t('pages.schedule.history')}")
+        expect(scheduleFabSource).not.toContain("title='Schedule History'")
+
+        expect(scheduleDrawerSource).toContain("t('pages.schedule.history')")
+        expect(scheduleDrawerSource).toContain("label={enabled ? t('pages.schedule.active') : t('pages.schedule.disabled')}")
+        expect(scheduleDrawerSource).toContain("t('pages.schedule.lastRun')")
+        expect(scheduleDrawerSource).toContain("t('pages.schedule.nextRun')")
+        expect(scheduleDrawerSource).toContain("t('pages.schedule.autoRefresh')")
+        expect(scheduleDrawerSource).toContain("t('pages.schedule.selectRowsToDelete')")
+        expect(scheduleDrawerSource).toContain("t('pages.schedule.deleteSelected'")
+        expect(scheduleDrawerSource).toContain("t('pages.schedule.noRunsYet')")
+        expect(scheduleDrawerSource).toContain("t('pages.schedule.status')")
+        expect(scheduleDrawerSource).toContain("t('pages.schedule.scheduledAt')")
+        expect(scheduleDrawerSource).toContain("t('pages.schedule.duration')")
+        expect(scheduleDrawerSource).toContain("t('pages.schedule.deleteLogsTitle'")
+        expect(scheduleDrawerSource).toContain("t('pages.schedule.deleteLogsDescription')")
+        expect(scheduleDrawerSource).toContain("t('pages.schedule.deletedLogs'")
+        expect(scheduleDrawerSource).toContain("t('pages.schedule.deleteFailed'")
+        expect(scheduleDrawerSource).toContain('getScheduleStatusLabel')
+        expect(scheduleDrawerSource).not.toContain('Schedule History')
+        expect(scheduleDrawerSource).not.toContain("label={enabled ? 'Active' : 'Disabled'}")
+        expect(scheduleDrawerSource).not.toContain('Last run')
+        expect(scheduleDrawerSource).not.toContain('Next run')
+        expect(scheduleDrawerSource).not.toContain('Auto-refresh')
+        expect(scheduleDrawerSource).not.toContain('Select rows to delete')
+        expect(scheduleDrawerSource).not.toContain('Scheduled At')
+        expect(scheduleDrawerSource).not.toContain('This will also permanently delete')
+        expect(scheduleDrawerSource).not.toContain('Deleting…')
+
+        expect(webhookFabSource).toContain('const { t } = useTranslation()')
+        expect(webhookFabSource).toContain("title={t('pages.webhookListener.title')}")
+        expect(webhookFabSource).not.toContain("title='Webhook Listener'")
+
+        expect(webhookDrawerSource).toContain("t('pages.webhookListener.title')")
+        expect(webhookDrawerSource).toContain("t('pages.webhookListener.liveObservatory')")
+        expect(webhookDrawerSource).toContain("t('pages.webhookListener.endpoint')")
+        expect(webhookDrawerSource).toContain("t('pages.webhookListener.processFlow')")
+        expect(webhookDrawerSource).toContain("t('pages.webhookListener.response')")
+        expect(webhookDrawerSource).toContain("t('pages.webhookListener.copied')")
+        expect(webhookDrawerSource).toContain("t('pages.webhookListener.copyUrl')")
+        expect(webhookDrawerSource).toContain("t('pages.webhookListener.copyCurl')")
+        expect(webhookDrawerSource).toContain("t('pages.webhookListener.curlExample')")
+        expect(webhookDrawerSource).toContain("t('pages.webhookListener.waiting')")
+        expect(webhookDrawerSource).toContain("t('pages.webhookListener.sendMethod'")
+        expect(webhookDrawerSource).toContain("t('pages.webhookListener.openingStream')")
+        expect(webhookDrawerSource).toContain("t('pages.webhookListener.flowStarted')")
+        expect(webhookDrawerSource).toContain("t('pages.webhookListener.listenerError')")
+        expect(webhookDrawerSource).toContain("t('pages.webhookListener.completedWithoutText')")
+        expect(webhookDrawerSource).toContain('getWebhookStatusLabel')
+        expect(webhookDrawerSource).not.toContain('Live observatory')
+        expect(webhookDrawerSource).not.toContain('Copy URL')
+        expect(webhookDrawerSource).not.toContain('cURL example')
+        expect(webhookDrawerSource).not.toContain('Process flow')
+        expect(webhookDrawerSource).not.toContain('Waiting for an incoming webhook request')
+        expect(webhookDrawerSource).not.toContain('Opening event stream')
+        expect(webhookDrawerSource).not.toContain('Flow started')
+        expect(webhookDrawerSource).not.toContain('Flow completed without a text response.')
     })
 })

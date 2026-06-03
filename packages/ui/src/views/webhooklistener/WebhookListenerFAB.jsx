@@ -6,6 +6,7 @@ import { IconWebhook } from '@tabler/icons-react'
 
 import { StyledFab } from '@/ui-component/button/StyledFab'
 import WebhookListenerDrawer from './WebhookListenerDrawer'
+import { useTranslation } from 'react-i18next'
 
 // Two pulses: a slow ambient one for "listening" (waiting), a fast one for "running" (in-flight)
 const pulseSlow = keyframes`
@@ -28,6 +29,7 @@ const STATUS_COLOR = {
 }
 
 const WebhookListenerFAB = ({ chatflowid, onOpenChange }) => {
+    const { t } = useTranslation()
     const [open, setOpen] = useState(false)
     const [status, setStatus] = useState('idle')
 
@@ -41,7 +43,7 @@ const WebhookListenerFAB = ({ chatflowid, onOpenChange }) => {
 
     return (
         <>
-            <Tooltip title='Webhook Listener'>
+            <Tooltip title={t('pages.webhookListener.title')}>
                 <Badge
                     overlap='circular'
                     variant='dot'
