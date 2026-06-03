@@ -101,6 +101,20 @@ class DocumentExport_Agentflow implements INode {
         const chatId = options.chatId as string
         const state = options.agentflowRuntime?.state as ICommonObject
 
+        // Guard: empty content would silently produce an empty file. Tell the user how to wire it.
+        if (!content.trim()) {
+            return {
+                id: nodeData.id,
+                name: this.name,
+                input: { format },
+                output: {
+                    content:
+                        '⚠️ 导出内容为空：请在「文档导出」节点的 Content 中引用上游节点输出（例如上游 LLM 节点），或直接填入文本，再运行。'
+                },
+                state
+            }
+        }
+
         let mime: string
         let buffer: Buffer
         if (format === 'docx') {

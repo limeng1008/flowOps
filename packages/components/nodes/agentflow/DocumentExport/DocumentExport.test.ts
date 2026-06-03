@@ -78,4 +78,11 @@ describe('DocumentExport agentflow node', () => {
         const args = (addSingleFileToStorage as jest.Mock).mock.calls[0]
         expect(args[2]).toBe('a_b_c__.txt')
     })
+
+    it('does not produce a file when content is empty; returns a guidance message', async () => {
+        const node = new DocumentExport()
+        const res = await node.run({ id: 'd', inputs: { docExportContent: '   ', docExportFormat: 'docx' } }, '', baseOptions)
+        expect(addSingleFileToStorage).not.toHaveBeenCalled()
+        expect(res.output.content).toContain('导出内容为空')
+    })
 })
