@@ -47,3 +47,11 @@
 -   **真机验证通过**：用智谱 `glm-4-flash` 实跑，产出结构化中文营销文案（主题 + 多条 标题/正文/CTA + 话题标签 + AB 建议）——端到端打通（智谱端点/鉴权/请求/结构化输出全对）。
 -   **踩坑修复**：AgentflowV2 表单变量必须 `{{ $form.字段 }}`，裸 `{{ 字段 }}` 静默传空 → LLM 输出空壳；修正营销文案 + PPT Deck Agent（同 bug），测试加 `$form` 守卫。教训：模板结构测试绿 ≠ 运行对，新模板须真机跑一次。
 -   产出《Codex Phase 2 行业模板执行计划》`codex-phase2-templates-plan.md`：4 个 form→LLM 模板（报告 / 会议纪要 / 招聘 JD / 客户邮件），把 `$form` 铁律 + 测试守卫写死；RAG 知识库问答与合同审阅留作单独任务。
+
+### 商业化验收 + 补全计划（2026-06-04）
+
+-   **验收 Codex/limeng 本轮产出**（分支 `codex/billing-v1`）：UI i18n 1539 测试全绿、components 串行全套件 exit 0、内容安全节点 8/8、导出节点 23/23、客服工具 17/17、billing service 7/7、8 个营销/客服模板 JSON 合法。
+-   **修复**：内容安全审核节点 + 凭证「源码已提交但漏 build dist」（同国产模型旧坑）→ 补 `pnpm --filter flowise-components build`（含 svg）+ 重启后端（14:09 就绪零报错），节点现可加载。
+-   **商业化 5 项现状盘点**：计费模块 ✅（billing v1，三维度 token/bot/seat 配额已挂请求入口，幂等去重+权限+UTC 周期）、官网/文档/帮助中心 ✅（`publicSite/index.jsx` 903 行真内容）、支付集成 ⚠️ 半成品（仅 402 拦截，无真实收款渠道）、客服/工单系统 ❌、品牌 logo/VI ❌。
+-   **billing v1 待补点**（验收挑刺）：支付断头路（升级无下单流程）、前端 billing 页未真机验证、还在 `codex/billing-v1` 未并主干、国产模型 token usage 字段格式与 OpenAI 不一致需校准计费口径。
+-   产出《商业化补全执行计划》`codex-commercialization-plan.md`（不含已做的计费/官网）：T1 支付宝/微信**沙箱对接骨架**（零新依赖手写 `crypto` 验签，接 billing 升级出口）、T2 **自建轻量工单**（Ticket+TicketMessage，复用账号体系+权限隔离）、T3 **占位 VI**（SVG 字标/favicon/VI 令牌/BrandLogo 收口+替换指引）。钉死铁律：4 库 migration、不 `pnpm add`、钱按分存整数、密钥只读 env、回调验签失败即拒、订单状态机只进不退、i18n en+zh 同步。边界：真实收款仍需营业执照+商户号+公网回调+ICP 备案，Codex 不碰。
