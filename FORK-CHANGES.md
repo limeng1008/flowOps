@@ -164,6 +164,7 @@
 | `packages/ui/src/views/workspace/index.jsx`                                   | UI-i18n-hardening |
 | `packages/ui/src/ui-component/dialog/AgentflowGeneratorDialog.jsx`            | UI-i18n-hardening |
 | `packages/ui/src/ui-component/dialog/ChatFeedbackContentDialog.jsx`           | UI-i18n-hardening |
+| `packages/ui/src/ui-component/dialog/ExpandTextDialog.jsx`                    | UI-i18n-hardening |
 | `packages/ui/src/ui-component/dialog/ExpandRichInputDialog.jsx`               | UI-i18n-hardening |
 | `packages/ui/src/ui-component/dialog/InviteUsersDialog.jsx`                   | UI-i18n-hardening |
 | `packages/ui/src/ui-component/dialog/ManageScrapedLinksDialog.jsx`            | UI-i18n-hardening |

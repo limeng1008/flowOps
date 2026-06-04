@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { translateNodeLabel } from '@/i18n/nodeI18n'
 import { cloneDeep } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import moment from 'moment/moment'
@@ -48,7 +49,8 @@ import useNotifier from '@/utils/useNotifier'
 const steps = ['pages.documentStores.stepEmbeddings', 'pages.documentStores.stepVectorStore', 'pages.documentStores.stepRecordManager']
 
 const VectorStoreConfigure = () => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
+    const currentLang = i18n.resolvedLanguage || i18n.language
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const { hasAssignedWorkspace } = useAuth()
@@ -651,7 +653,7 @@ const VectorStoreConfigure = () => {
                                                                     )}
                                                                 </div>
                                                                 <Typography sx={{ ml: 2 }} variant='h3'>
-                                                                    {selectedEmbeddingsProvider.label}
+                                                                    {translateNodeLabel(selectedEmbeddingsProvider.label, currentLang)}
                                                                 </Typography>
                                                                 <div style={{ flex: 1 }}></div>
                                                                 <div
@@ -769,7 +771,7 @@ const VectorStoreConfigure = () => {
                                                                     )}
                                                                 </div>
                                                                 <Typography sx={{ ml: 2 }} variant='h3'>
-                                                                    {selectedVectorStoreProvider.label}
+                                                                    {translateNodeLabel(selectedVectorStoreProvider.label, currentLang)}
                                                                 </Typography>
                                                                 <div style={{ flex: 1 }}></div>
                                                                 <div
@@ -895,7 +897,7 @@ const VectorStoreConfigure = () => {
                                                                     )}
                                                                 </div>
                                                                 <Typography sx={{ ml: 2 }} variant='h3'>
-                                                                    {selectedRecordManagerProvider.label}
+                                                                    {translateNodeLabel(selectedRecordManagerProvider.label, currentLang)}
                                                                 </Typography>
                                                                 <div style={{ flex: 1 }}></div>
                                                                 <div

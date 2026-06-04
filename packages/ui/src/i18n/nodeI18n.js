@@ -339,6 +339,8 @@ const nodeLabelMap = {
     'Max Tokens to Sample': '最大生成 Token 数',
     'Latency Optimized': '低延迟优化',
     'Use Global Inference Endpoint': '使用全局推理端点',
+    'Cohere Input Type': 'Cohere 输入类型',
+    'Max AWS API retries': 'AWS API 最大重试次数',
     'Base Path to load': '加载路径',
     'Base Path to store': '存储路径',
     'Chunk Size': '块大小',
@@ -979,6 +981,14 @@ const nodeTooltipMap = {
     'Force the global cross-region inference profile instead of the region-specific one. Bedrock routes dynamically across regions for maximum availability.':
         '强制使用全局跨区域推理配置，而不是当前区域专属配置。Bedrock 会在多个区域间动态路由，以提高可用性。',
     'Region to use for the model.': '模型使用的云服务区域。',
+    'Custom endpoint host to use for the model. Provide the hostname without scheme. If provided, will override the default endpoint host.':
+        '模型使用的自定义端点 Host。只填写主机名，不需要带 http/https；填写后会覆盖默认端点。',
+    'Specifies the type of input passed to the model. Required for cohere embedding models v3 and higher. <a target="_blank" href="https://docs.cohere.com/reference/embed">Official Docs</a>':
+        '指定传给模型的输入类型。Cohere embedding v3 及以上模型必填。<a target="_blank" href="https://docs.cohere.com/reference/embed">官方文档</a>',
+    'Documents batch size to send to AWS API for Titan model embeddings. Used to avoid throttling.':
+        '发送到 AWS API 的 Titan 向量模型文档批大小，用于降低触发限流的概率。',
+    'This will limit the number of AWS API for Titan model embeddings call retries. Used to avoid throttling.':
+        '限制 Titan 向量模型调用 AWS API 的重试次数，用于降低触发限流的概率。',
     'Whether or not to stream tokens as they are generated.': '是否在模型生成 Token 时实时流式返回。',
     'Whether or not to stream tokens as they are generated': '是否在模型生成 Token 时实时流式返回。',
     'Allow image input. Refer to the <a href="https://docs.flowiseai.com/using-flowise/uploads#image" target="_blank">docs</a> for more details.':

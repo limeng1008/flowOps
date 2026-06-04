@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { useState, useContext } from 'react'
+import { useState, useContext, useEffect } from 'react'
 import { useSelector } from 'react-redux'
 
 // material-ui
@@ -26,14 +26,27 @@ import { flowContext } from '@/store/context/ReactFlowContext'
 // const
 import { FLOWISE_CREDENTIAL_ID } from '@/store/constant'
 import { useTranslation } from 'react-i18next'
+import { translateNodeLabel, translateNodeInputPlaceholder, translateNodeTooltip } from '@/i18n/nodeI18n'
 
 // ===========================|| DocStoreInputHandler ||=========================== //
 
 const DocStoreInputHandler = ({ inputParam, data, disabled = false, onNodeDataChange }) => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
+    const [currentLang, setCurrentLang] = useState(i18n.resolvedLanguage || i18n.language)
     const customization = useSelector((state) => state.customization)
     const flowContextValue = useContext(flowContext)
     const nodeDataChangeHandler = onNodeDataChange || flowContextValue?.onNodeDataChange
+
+    useEffect(() => {
+        const onLanguageChanged = (lng) => setCurrentLang(lng)
+        i18n.on('languageChanged', onLanguageChanged)
+        return () => i18n.off('languageChanged', onLanguageChanged)
+    }, [i18n])
+
+    const tL = (s) => translateNodeLabel(s, currentLang)
+    const tT = (s) => translateNodeTooltip(s, currentLang)
+    const tP = (s) => translateNodeInputPlaceholder(s, currentLang)
+    const translatedInputParam = inputParam ? { ...inputParam, placeholder: tP(inputParam.placeholder) } : inputParam
 
     const [showExpandDialog, setShowExpandDialog] = useState(false)
     const [expandDialogProps, setExpandDialogProps] = useState({})
@@ -53,8 +66,8 @@ const DocStoreInputHandler = ({ inputParam, data, disabled = false, onNodeDataCh
             value,
             inputParam,
             disabled,
-            confirmButtonName: 'Save',
-            cancelButtonName: 'Cancel'
+            confirmButtonName: t('common.save'),
+            cancelButtonName: t('common.cancel')
         }
         setExpandDialogProps(dialogProps)
         setShowExpandDialog(true)
@@ -66,8 +79,8 @@ const DocStoreInputHandler = ({ inputParam, data, disabled = false, onNodeDataCh
             relativeLinksMethod,
             limit,
             selectedLinks,
-            confirmButtonName: 'Save',
-            cancelButtonName: 'Cancel'
+            confirmButtonName: t('common.save'),
+            cancelButtonName: t('common.cancel')
         }
         setManageScrapedLinksDialogProps(dialogProps)
         setShowManageScrapedLinksDialog(true)
@@ -99,9 +112,11 @@ const DocStoreInputHandler = ({ inputParam, data, disabled = false, onNodeDataCh
                     <Box sx={{ p: 2 }}>
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
                             <Typography>
-                                {inputParam.label}
+                                {tL(inputParam.label)}
                                 {!inputParam.optional && <span style={{ color: 'red' }}>&nbsp;*</span>}
-                                {inputParam.description && <TooltipWithParser style={{ marginLeft: 10 }} title={inputParam.description} />}
+                                {inputParam.description && (
+                                    <TooltipWithParser style={{ marginLeft: 10 }} title={tT(inputParam.description)} />
+                                )}
                             </Typography>
                             <div style={{ flexGrow: 1 }}></div>
                             {((inputParam.type === 'string' && inputParam.rows) || inputParam.type === 'code') && (
@@ -135,7 +150,7 @@ const DocStoreInputHandler = ({ inputParam, data, disabled = false, onNodeDataCh
                                 }}
                             >
                                 <IconAlertTriangle size={30} color='orange' />
-                                <span style={{ color: 'rgb(116,66,16)', marginLeft: 10 }}>{inputParam.warning}</span>
+                                <span style={{ color: 'rgb(116,66,16)', marginLeft: 10 }}>{tT(inputParam.warning)}</span>
                             </div>
                         )}
                         {inputParam.type === 'credential' && (
@@ -143,7 +158,7 @@ const DocStoreInputHandler = ({ inputParam, data, disabled = false, onNodeDataCh
                                 key={JSON.stringify(inputParam)}
                                 disabled={disabled}
                                 data={getCredential()}
-                                inputParam={inputParam}
+                                inputParam={translatedInputParam}
                                 onSelect={(newValue) => {
                                     data.credential = newValue
                                     data.inputs[FLOWISE_CREDENTIAL_ID] = newValue // in case data.credential is not updated
@@ -159,7 +174,7 @@ const DocStoreInputHandler = ({ inputParam, data, disabled = false, onNodeDataCh
                                 disabled={disabled}
                                 fileType={inputParam.fileType || '*'}
                                 onChange={(newValue) => handleDataChange({ inputParam, newValue })}
-                                value={data.inputs[inputParam.name] ?? inputParam.default ?? 'Choose a file to upload'}
+                                value={data.inputs[inputParam.name] ?? inputParam.default ?? t('pages.documentStores.chooseFileToUpload')}
                             />
                         )}
                         {inputParam.type === 'boolean' && (
@@ -188,7 +203,7 @@ const DocStoreInputHandler = ({ inputParam, data, disabled = false, onNodeDataCh
                                         height={inputParam.rows ? '100px' : '200px'}
                                         theme={customization.isDarkMode ? 'dark' : 'light'}
                                         lang={'js'}
-                                        placeholder={inputParam.placeholder}
+                                        placeholder={tP(inputParam.placeholder)}
                                         onValueChange={(code) => (data.inputs[inputParam.name] = code)}
                                         basicSetup={{ highlightActiveLine: false, highlightActiveLineGutter: false }}
                                     />
@@ -199,7 +214,7 @@ const DocStoreInputHandler = ({ inputParam, data, disabled = false, onNodeDataCh
                             <Input
                                 key={data.inputs[inputParam.name]}
                                 disabled={disabled}
-                                inputParam={inputParam}
+                                inputParam={translatedInputParam}
                                 onChange={(newValue) => (data.inputs[inputParam.name] = newValue)}
                                 onBlur={(newValue) => handleDataChange({ inputParam, newValue })}
                                 value={data.inputs[inputParam.name] ?? inputParam.default ?? ''}
@@ -221,7 +236,7 @@ const DocStoreInputHandler = ({ inputParam, data, disabled = false, onNodeDataCh
                                 name={inputParam.name}
                                 options={inputParam.options}
                                 onSelect={(newValue) => handleDataChange({ inputParam, newValue })}
-                                value={data.inputs[inputParam.name] ?? inputParam.default ?? 'choose an option'}
+                                value={data.inputs[inputParam.name] ?? inputParam.default ?? t('common.chooseOption')}
                             />
                         )}
                         {inputParam.type === 'multiOptions' && (
@@ -231,7 +246,7 @@ const DocStoreInputHandler = ({ inputParam, data, disabled = false, onNodeDataCh
                                 name={inputParam.name}
                                 options={inputParam.options}
                                 onSelect={(newValue) => handleDataChange({ inputParam, newValue })}
-                                value={data.inputs[inputParam.name] ?? inputParam.default ?? 'choose an option'}
+                                value={data.inputs[inputParam.name] ?? inputParam.default ?? t('common.chooseOption')}
                             />
                         )}
                         {(inputParam.type === 'asyncOptions' || inputParam.type === 'asyncMultiOptions') && (
@@ -246,7 +261,7 @@ const DocStoreInputHandler = ({ inputParam, data, disabled = false, onNodeDataCh
                                             nodeData={data}
                                             freeSolo={inputParam.freeSolo}
                                             multiple={inputParam.type === 'asyncMultiOptions'}
-                                            value={data.inputs[inputParam.name] ?? inputParam.default ?? 'choose an option'}
+                                            value={data.inputs[inputParam.name] ?? inputParam.default ?? t('common.chooseOption')}
                                             onSelect={(newValue) => handleDataChange({ inputParam, newValue })}
                                             onCreateNew={() => addAsyncOption(inputParam.name)}
                                             fullWidth={true}
@@ -291,7 +306,7 @@ const DocStoreInputHandler = ({ inputParam, data, disabled = false, onNodeDataCh
                                             )
                                         }
                                     >
-                                        Manage Links
+                                        {t('pages.documentStores.manageLinks')}
                                     </Button>
                                     <ManageScrapedLinksDialog
                                         show={showManageScrapedLinksDialog}
