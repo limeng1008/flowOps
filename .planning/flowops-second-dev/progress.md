@@ -53,3 +53,4 @@
 -   商业化补全 T3 占位 VI 启动：从 `codex/billing-v1` 切出 `codex/commercialization-v1`，只执行品牌视觉统一，不碰 T1 支付 / T2 工单。
 -   新增 FlowOps 占位 VI：SVG 字标、方形 mark、favicon/PWA 图标、主题品牌 token、全局中文优先字体栈和 `BrandLogo` 统一入口。
 -   新增 `docs/brand/FlowOps-VI.md`，记录色彩、字体、logo 用法、露出点清单和正式 VI 替换步骤。
+-   商业化补全 T1 支付沙箱骨架：新增 `PaymentOrder`、支付宝/微信 provider、支付 service/controller/route、四库 migration（`1777100000000`）和 env 占位；验签失败拒绝并记录，金额按整数分处理。

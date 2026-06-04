@@ -21,6 +21,7 @@ import { CustomMcpServer } from './CustomMcpServer'
 import { BillingPlan } from './BillingPlan'
 import { BillingSubscription } from './BillingSubscription'
 import { BillingUsage } from './BillingUsage'
+import { PaymentOrder } from './PaymentOrder'
 import { SupportTicket } from './SupportTicket'
 import { LoginActivity, WorkspaceShared, WorkspaceUsers } from '../../enterprise/database/entities/EnterpriseEntities'
 import { User } from '../../enterprise/database/entities/user.entity'
@@ -62,6 +63,7 @@ export const entities = {
     BillingPlan,
     BillingSubscription,
     BillingUsage,
+    PaymentOrder,
     SupportTicket,
     Organization,
     Role,
