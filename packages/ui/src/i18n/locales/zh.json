@@ -1494,6 +1494,7 @@
             "viewRole": "查看角色",
             "createNewRole": "创建新角色",
             "roleName": "角色名称",
+            "roleNameNoSpaces": "角色名称不能包含空格。",
             "roleNamePlaceholder": "输入角色名称",
             "roleDescription": "角色描述",
             "roleDescriptionPlaceholder": "填写角色描述"

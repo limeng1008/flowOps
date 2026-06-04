@@ -459,6 +459,96 @@ const requiredKeys = [
     'pages.documentStores.noUpsertHistory',
     'pages.documentStores.upsertVectorDatabase',
     'common.learnMore',
+    'pages.tools.mcp.toolNameRequired',
+    'pages.tools.mcp.toolNameMax',
+    'pages.tools.mcp.toolNamePattern',
+    'pages.tools.mcp.settingsSaved',
+    'pages.tools.mcp.disabled',
+    'pages.tools.mcp.saveSettingsFailed',
+    'pages.tools.mcp.urlCopied',
+    'pages.tools.mcp.rotateTokenTitle',
+    'pages.tools.mcp.rotateTokenDescription',
+    'pages.tools.mcp.rotate',
+    'pages.tools.mcp.tokenRotated',
+    'pages.tools.mcp.rotateTokenFailed',
+    'pages.tools.mcp.loadConfigFailed',
+    'pages.tools.mcp.loadingConfig',
+    'pages.tools.mcp.exposeAsServer',
+    'pages.tools.mcp.toolIdentifierHelp',
+    'pages.tools.mcp.descriptionPlaceholder',
+    'pages.tools.mcp.descriptionHelp',
+    'pages.tools.mcp.streamableHttpEndpoint',
+    'pages.tools.mcp.copyUrlToClipboard',
+    'pages.tools.mcp.endpointHelp',
+    'pages.tools.mcp.bearerToken',
+    'pages.tools.mcp.tokenCopied',
+    'pages.tools.mcp.copyToken',
+    'pages.tools.mcp.rotateToken',
+    'pages.tools.mcp.authorizationHeaderHelp',
+    'pages.tools.mcp.saving',
+    'pages.tools.mcp.serverUrlRequired',
+    'pages.tools.mcp.maskedUrlError',
+    'pages.tools.mcp.onlyHttpUrls',
+    'pages.tools.mcp.validUrl',
+    'pages.tools.mcp.readOnly',
+    'pages.tools.mcp.readOnlyTooltip',
+    'pages.tools.mcp.destructive',
+    'pages.tools.mcp.destructiveTooltip',
+    'pages.tools.mcp.external',
+    'pages.tools.mcp.externalTooltip',
+    'pages.tools.mcp.parameterCount',
+    'pages.tools.mcp.parameters',
+    'pages.tools.mcp.required',
+    'pages.tools.mcp.optional',
+    'pages.tools.mcp.defaultValue',
+    'pages.tools.mcp.createReturnedNoId',
+    'pages.tools.mcp.failedAddServer',
+    'pages.tools.mcp.serverAddedConnected',
+    'pages.tools.mcp.addedFailedConnect',
+    'pages.tools.mcp.redactedHeaderValue',
+    'pages.tools.mcp.failedSaveServer',
+    'pages.tools.mcp.savedReconnected',
+    'pages.tools.mcp.savedFailedReconnect',
+    'pages.tools.mcp.connectedTools',
+    'pages.tools.mcp.authorizationFailed',
+    'pages.tools.mcp.deleteTitle',
+    'pages.tools.mcp.deleteConfirm',
+    'pages.tools.mcp.deleted',
+    'pages.tools.mcp.failedDelete',
+    'pages.tools.mcp.customMcpServer',
+    'pages.tools.mcp.serverName',
+    'pages.tools.mcp.serverUrl',
+    'pages.tools.mcp.iconSource',
+    'pages.tools.mcp.authentication',
+    'pages.tools.mcp.noAuthentication',
+    'pages.tools.mcp.customHeaders',
+    'pages.tools.mcp.headers',
+    'pages.tools.mcp.headerKey',
+    'pages.tools.mcp.headerValue',
+    'pages.tools.mcp.addHeader',
+    'pages.tools.mcp.discoveredTools',
+    'pages.tools.mcp.filterTools',
+    'pages.tools.mcp.filteredToolsCount',
+    'pages.tools.mcp.toolsCount',
+    'pages.tools.mcp.collapseAll',
+    'pages.tools.mcp.expandAll',
+    'pages.tools.mcp.noToolsMatch',
+    'pages.tools.mcp.connecting',
+    'pages.tools.mcp.authorize',
+    'pages.tools.mcp.addConnect',
+    'pages.tools.mcp.reconnecting',
+    'pages.tools.mcp.saveReconnect',
+    'pages.tools.mcp.serverNameTooltip',
+    'pages.tools.mcp.serverUrlTooltip',
+    'pages.tools.mcp.authTooltip',
+    'pages.roles.editRole',
+    'pages.roles.viewRole',
+    'pages.roles.createNewRole',
+    'pages.roles.roleName',
+    'pages.roles.roleNameNoSpaces',
+    'pages.roles.roleNamePlaceholder',
+    'pages.roles.roleDescription',
+    'pages.roles.roleDescriptionPlaceholder',
     'pages.executions.copyId',
     'pages.executions.copied',
     'pages.executions.idCopied',
@@ -1246,5 +1336,62 @@ describe('views long-tail i18n coverage', () => {
 
         expect(vectorStorePopUpSource).toContain("title={t('pages.documentStores.upsertVectorDatabase')}")
         expect(vectorStorePopUpSource).not.toContain('Upsert Vector Database')
+    })
+
+    it('localizes B6 MCP dialogs and role editor residual visible copy', () => {
+        const mcpServerSource = read('ui-component/extended/McpServer.jsx')
+        const customMcpSource = read('views/tools/CustomMcpServerDialog.jsx')
+        const roleDialogSource = read('views/roles/CreateEditRoleDialog.jsx')
+
+        expect(mcpServerSource).toContain("t('pages.tools.mcp.toolNameRequired')")
+        expect(mcpServerSource).toContain("showSuccess(t('pages.tools.mcp.settingsSaved'))")
+        expect(mcpServerSource).toContain("t('pages.tools.mcp.rotateTokenTitle')")
+        expect(mcpServerSource).toContain("t('pages.tools.mcp.loadingConfig')")
+        expect(mcpServerSource).toContain("label={t('pages.tools.mcp.exposeAsServer')}")
+        expect(mcpServerSource).toContain("t('pages.tools.mcp.toolIdentifierHelp')")
+        expect(mcpServerSource).toContain("placeholder={t('pages.tools.mcp.descriptionPlaceholder')}")
+        expect(mcpServerSource).toContain("t('pages.tools.mcp.streamableHttpEndpoint')")
+        expect(mcpServerSource).toContain("title={t('pages.tools.mcp.copyUrlToClipboard')}")
+        expect(mcpServerSource).toContain("t('pages.tools.mcp.authorizationHeaderHelp')")
+        expect(mcpServerSource).toContain("loading ? t('pages.tools.mcp.saving') : t('common.save')")
+        expect(mcpServerSource).not.toContain('Tool name is required')
+        expect(mcpServerSource).not.toContain('MCP Server settings saved')
+        expect(mcpServerSource).not.toContain('Expose as MCP Server')
+        expect(mcpServerSource).not.toContain('Loading MCP Server configuration...')
+        expect(mcpServerSource).not.toContain('Streamable HTTP Endpoint')
+        expect(mcpServerSource).not.toContain('Saving...')
+
+        expect(customMcpSource).toContain("label={t('pages.tools.mcp.readOnly')}")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.parameterCount'")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.parameters')")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.required')")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.failedAddServer'")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.redactedHeaderValue'")
+        expect(customMcpSource).toContain("title: t('pages.tools.mcp.deleteTitle')")
+        expect(customMcpSource).toContain("t('pages.tools.addCustomMcpServer')")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.serverName')")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.noAuthentication')")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.addHeader')")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.discoveredTools')")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.filteredToolsCount'")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.noToolsMatch'")
+        expect(customMcpSource).toContain("authorizing ? t('pages.tools.mcp.connecting') : t('pages.tools.mcp.authorize')")
+        expect(customMcpSource).not.toContain('READ-ONLY')
+        expect(customMcpSource).not.toContain('Failed to add MCP Server')
+        expect(customMcpSource).not.toContain('Delete MCP Server')
+        expect(customMcpSource).not.toContain('Add Custom MCP Server')
+        expect(customMcpSource).not.toContain('No Authentication')
+        expect(customMcpSource).not.toContain('Discovered Tools')
+        expect(customMcpSource).not.toContain('Collapse all')
+        expect(customMcpSource).not.toContain('Add & Connect')
+
+        expect(roleDialogSource).toContain("t('pages.roles.editRole')")
+        expect(roleDialogSource).toContain("t('pages.roles.roleName')")
+        expect(roleDialogSource).toContain("placeholder={t('pages.roles.roleNamePlaceholder')}")
+        expect(roleDialogSource).toContain("t('pages.roles.roleDescription')")
+        expect(roleDialogSource).not.toContain('Edit Role')
+        expect(roleDialogSource).not.toContain('Role Name')
+        expect(roleDialogSource).not.toContain('Enter role name')
+        expect(roleDialogSource).not.toContain('Description of the role')
     })
 })

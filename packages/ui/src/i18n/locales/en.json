@@ -1494,6 +1494,7 @@
             "viewRole": "View Role",
             "createNewRole": "Create New Role",
             "roleName": "Role Name",
+            "roleNameNoSpaces": "Role name cannot contain spaces.",
             "roleNamePlaceholder": "Enter role name",
             "roleDescription": "Role Description",
             "roleDescriptionPlaceholder": "Description of the role"
