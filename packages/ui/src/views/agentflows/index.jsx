@@ -244,7 +244,7 @@ const Agentflows = () => {
                                 value='v2'
                                 title='V2'
                             >
-                                <Chip sx={{ mr: 1 }} label='NEW' size='small' color='primary' />
+                                <Chip sx={{ mr: 1 }} label={t('common.new')} size='small' color='primary' />
                                 V2
                             </ToggleButton>
                             <ToggleButton

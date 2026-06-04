@@ -26,10 +26,10 @@ const HowToUseFunctionDialog = ({ show, onCancel }) => {
                         {t('pages.tools.howToUseFunctionDialog.schemaVariables')}
                         <ul style={{ marginTop: 10 }}>
                             <li>
-                                Property = <code>userid</code>
+                                {t('pages.tools.howToUseFunctionDialog.propertyLabel')} = <code>userid</code>
                             </li>
                             <li>
-                                Variable = <code>$userid</code>
+                                {t('pages.tools.howToUseFunctionDialog.variableLabel')} = <code>$userid</code>
                             </li>
                         </ul>
                     </li>

@@ -46,6 +46,8 @@ const requiredKeys = [
     'pages.tools.howToUseFunctionDialog.title',
     'pages.tools.howToUseFunctionDialog.libraries',
     'pages.tools.howToUseFunctionDialog.schemaVariables',
+    'pages.tools.howToUseFunctionDialog.propertyLabel',
+    'pages.tools.howToUseFunctionDialog.variableLabel',
     'pages.tools.howToUseFunctionDialog.flowConfig',
     'pages.tools.howToUseFunctionDialog.customVariables',
     'pages.tools.howToUseFunctionDialog.returnString'
@@ -120,11 +122,15 @@ describe('tools i18n coverage', () => {
         expect(source).toContain("t('pages.tools.howToUseFunctionDialog.title')")
         expect(source).toContain("t('pages.tools.howToUseFunctionDialog.libraries')")
         expect(source).toContain("t('pages.tools.howToUseFunctionDialog.schemaVariables')")
+        expect(source).toContain("t('pages.tools.howToUseFunctionDialog.propertyLabel')")
+        expect(source).toContain("t('pages.tools.howToUseFunctionDialog.variableLabel')")
         expect(source).toContain("t('pages.tools.howToUseFunctionDialog.flowConfig')")
         expect(source).toContain("t('pages.tools.howToUseFunctionDialog.customVariables')")
         expect(source).toContain("t('pages.tools.howToUseFunctionDialog.returnString')")
         expect(source).not.toContain('How To Use Function')
         expect(source).not.toContain('You can use any libraries imported in FlowOps')
+        expect(source).not.toContain('Property =')
+        expect(source).not.toContain('Variable =')
     })
 
     it('translates the shared data grid actions used by node forms', () => {

@@ -12,6 +12,15 @@ const requiredKeys = [
     'common.copy',
     'common.copied',
     'common.info',
+    'common.status',
+    'common.new',
+    'common.on',
+    'auth.rateLimitTooManyRequests',
+    'layout.trial.prefix',
+    'layout.trial.daysLeft',
+    'layout.trial.suffix',
+    'layout.trial.paymentMethodNotice',
+    'layout.trial.updatePaymentMethod',
     'canvas.toggleSnapping',
     'canvas.toggleBackground',
     'canvas.confirmChangeTitle',
@@ -30,10 +39,16 @@ const requiredKeys = [
     'components.analytics.releaseDescription',
     'components.analytics.configurationSaved',
     'components.analytics.configurationSaveFailed',
+    'components.errorBoundary.title',
+    'components.errorBoundary.description',
+    'components.errorBoundary.retry',
+    'components.errorBoundary.raiseIssue',
     'components.validation.validateNodes',
     'components.validation.noIssuesFound',
     'components.validation.failed',
     'components.validation.checklist',
+    'components.monthDaysPicker.lastDay',
+    'components.monthDaysPicker.lastDayTooltip',
     'pages.marketplaces.shareCustomTemplate',
     'pages.marketplaces.deleteCustomTemplateTitle',
     'pages.marketplaces.deleteCustomTemplateConfirm',
@@ -48,6 +63,8 @@ const requiredKeys = [
     'pages.documentStores.refreshAllLoadersConfirm',
     'pages.documentStores.deleteStoreLoadersConfirm',
     'pages.documentStores.deleteStoreLoadersWithVectorConfirm',
+    'pages.documentStores.retrievalPlaygroundDescription',
+    'pages.documentStores.enterQuery',
     'pages.roles.invite',
     'pages.roles.deleteTitle',
     'pages.roles.deleteConfirm',
@@ -74,7 +91,12 @@ describe('final i18n sweep coverage', () => {
         const chatPopUpSource = fs.readFileSync(path.join(__dirname, '../views/chatmessage/ChatPopUp.jsx'), 'utf8')
         const embedChatSource = fs.readFileSync(path.join(__dirname, '../views/chatflows/EmbedChat.jsx'), 'utf8')
         const documentStoreSource = fs.readFileSync(path.join(__dirname, '../views/docstore/DocumentStoreDetail.jsx'), 'utf8')
+        const vectorStoreQuerySource = fs.readFileSync(path.join(__dirname, '../views/docstore/VectorStoreQuery.jsx'), 'utf8')
         const arrayRendererSource = fs.readFileSync(path.join(__dirname, '../ui-component/array/ArrayRenderer.jsx'), 'utf8')
+        const errorBoundarySource = fs.readFileSync(path.join(__dirname, '../ErrorBoundary.jsx'), 'utf8')
+        const errorContextSource = fs.readFileSync(path.join(__dirname, '../store/context/ErrorContext.jsx'), 'utf8')
+        const trialInfoSource = fs.readFileSync(path.join(__dirname, '../layout/MainLayout/Sidebar/TrialInfo.jsx'), 'utf8')
+        const monthDaysPickerSource = fs.readFileSync(path.join(__dirname, '../ui-component/picker/MonthDaysPicker.jsx'), 'utf8')
 
         expect(codeBlockSource).toContain("title={t('common.copy')}")
         expect(codeBlockSource).toContain("t('components.markdown.copied')")
@@ -86,7 +108,13 @@ describe('final i18n sweep coverage', () => {
         expect(chatPopUpSource).toContain("t('pages.chatMessage.clearHistoryConfirm')")
         expect(embedChatSource).toContain('getDefaultThemeConfig(t)')
         expect(documentStoreSource).toContain("t('pages.documentStores.refreshAllLoadersTitle')")
+        expect(vectorStoreQuerySource).toContain("t('pages.documentStores.retrievalPlaygroundDescription')")
+        expect(vectorStoreQuerySource).toContain("t('pages.documentStores.enterQuery')")
         expect(arrayRendererSource).toContain("t('canvas.elseBranch')")
+        expect(errorBoundarySource).toContain("t('components.errorBoundary.title')")
+        expect(errorContextSource).toContain("t('auth.rateLimitTooManyRequests')")
+        expect(trialInfoSource).toContain("t('layout.trial.paymentMethodNotice')")
+        expect(monthDaysPickerSource).toContain("t('components.monthDaysPicker.lastDayTooltip')")
         expect(codeBlockSource).not.toContain("title='Copy'")
         expect(codeBlockSource).not.toContain('Copied!')
         expect(feedbackSource).not.toContain('Provide additional feedback')
@@ -100,7 +128,15 @@ describe('final i18n sweep coverage', () => {
         expect(embedChatSource).not.toContain('By using this chatbot')
         expect(embedChatSource).not.toContain('Start Chatting')
         expect(documentStoreSource).not.toContain('Refresh all loaders and upsert all chunks?')
+        expect(vectorStoreQuerySource).not.toContain('Retrieval Playground - Test your vector store retrieval settings')
+        expect(vectorStoreQuerySource).not.toContain('Enter your Query')
         expect(arrayRendererSource).not.toContain("description: 'Else'")
+        expect(errorBoundarySource).not.toContain('Oh snap!')
+        expect(errorBoundarySource).not.toContain('The following error occurred when loading this page.')
+        expect(errorBoundarySource).not.toContain('Please retry after some time.')
+        expect(errorContextSource).not.toContain("You're making a lot of requests.")
+        expect(trialInfoSource).not.toContain('Update your payment method to avoid service interruption.')
+        expect(monthDaysPickerSource).not.toContain('Always runs on the last day of every month')
     })
 
     it('routes marketplace, canvas controls, node dialogs, and role actions through i18n', () => {
@@ -118,6 +154,8 @@ describe('final i18n sweep coverage', () => {
         const agentflowNodeSource = fs.readFileSync(path.join(__dirname, '../views/agentflowsv2/AgentFlowNode.jsx'), 'utf8')
         const iterationNodeSource = fs.readFileSync(path.join(__dirname, '../views/agentflowsv2/IterationNode.jsx'), 'utf8')
         const rolesSource = fs.readFileSync(path.join(__dirname, '../views/roles/index.jsx'), 'utf8')
+        const agentflowsSource = fs.readFileSync(path.join(__dirname, '../views/agentflows/index.jsx'), 'utf8')
+        const analyticsSource = fs.readFileSync(path.join(__dirname, '../ui-component/extended/AnalyseFlow.jsx'), 'utf8')
 
         expect(marketplaceSource).toContain("t('pages.marketplaces.shareCustomTemplate')")
         expect(marketplaceCanvasSource).toContain("title={t('canvas.toggleSnapping')}")
@@ -136,6 +174,8 @@ describe('final i18n sweep coverage', () => {
         expect(iterationNodeSource).toContain("title={t('common.info')}")
         expect(rolesSource).toContain("confirmButtonName: t('pages.roles.invite')")
         expect(rolesSource).toContain("t('pages.roles.deleteConfirm'")
+        expect(agentflowsSource).toContain("label={t('common.new')}")
+        expect(analyticsSource).toContain("t('common.on')")
         expect(marketplaceSource).not.toContain("'Add New Tool'")
         expect(marketplaceCanvasSource).not.toContain("title='toggle snapping'")
         expect(canvasSource).not.toContain('Confirm Change')
@@ -145,5 +185,7 @@ describe('final i18n sweep coverage', () => {
         expect(credentialInputSource).not.toContain("'choose an option'")
         expect(addNodesSource).not.toContain('By {node.author}')
         expect(rolesSource).not.toContain('Role deleted')
+        expect(agentflowsSource).not.toContain("label='NEW'")
+        expect(analyticsSource).not.toContain('>ON<')
     })
 })

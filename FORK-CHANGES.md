@@ -29,6 +29,7 @@
 | `packages/ui/package.json`                                                    | UI-dependencies   |
 | `packages/ui/public/index.html`                                               | Branding-shell    |
 | `packages/ui/public/manifest.json`                                            | Branding-shell    |
+| `packages/ui/src/ErrorBoundary.jsx`                                           | UI-i18n-hardening |
 | `packages/ui/src/index.jsx`                                                   | Branding-shell    |
 | `packages/ui/src/i18n/locales/en.json`                                        | UI-i18n-hardening |
 | `packages/ui/src/i18n/locales/zh.json`                                        | UI-i18n-hardening |
@@ -43,11 +44,13 @@
 | `packages/ui/src/layout/MainLayout/Sidebar/MenuList/NavGroup/index.jsx`       | UI-i18n-hardening |
 | `packages/ui/src/layout/MainLayout/Sidebar/MenuList/NavItem/index.jsx`        | UI-i18n-hardening |
 | `packages/ui/src/layout/MainLayout/Sidebar/MenuList/index.jsx`                | UI-i18n-hardening |
+| `packages/ui/src/layout/MainLayout/Sidebar/TrialInfo.jsx`                     | UI-i18n-hardening |
 | `packages/ui/src/layout/MainLayout/ViewHeader.jsx`                            | UI-i18n-hardening |
 | `packages/ui/src/menu-items/agentsettings.js`                                 | UI-i18n-hardening |
 | `packages/ui/src/menu-items/customassistant.js`                               | UI-i18n-hardening |
 | `packages/ui/src/menu-items/settings.js`                                      | UI-i18n-hardening |
 | `packages/ui/src/routes/index.jsx`                                            | UI-i18n-hardening |
+| `packages/ui/src/store/context/ErrorContext.jsx`                              | UI-i18n-hardening |
 | `packages/ui/src/themes/index.js`                                             | T4-theme-entry    |
 | `packages/ui/src/ui-component/array/ArrayRenderer.jsx`                        | UI-i18n-hardening |
 | `packages/ui/src/ui-component/button/CopyToClipboardButton.jsx`               | UI-i18n-hardening |
@@ -76,6 +79,7 @@
 | `packages/ui/src/ui-component/json/SelectVariable.jsx`                        | UI-i18n-hardening |
 | `packages/ui/src/ui-component/markdown/CodeBlock.jsx`                         | UI-i18n-hardening |
 | `packages/ui/src/ui-component/pagination/TablePagination.jsx`                 | UI-i18n-hardening |
+| `packages/ui/src/ui-component/picker/MonthDaysPicker.jsx`                     | UI-i18n-hardening |
 | `packages/ui/src/ui-component/table/DocumentStoreTable.jsx`                   | UI-i18n-hardening |
 | `packages/ui/src/ui-component/table/FlowListTable.jsx`                        | UI-i18n-hardening |
 | `packages/ui/src/ui-component/table/MarketplaceTable.jsx`                     | UI-i18n-hardening |

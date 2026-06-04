@@ -78,7 +78,14 @@
         "failedSwitchWorkspace": "工作区切换失败",
         "organization": "组织",
         "workspace": "工作区",
-        "organizationName": "{{name}} 的组织"
+        "organizationName": "{{name}} 的组织",
+        "trial": {
+            "prefix": "试用期还剩",
+            "daysLeft": "{{count}} 天",
+            "suffix": "。",
+            "paymentMethodNotice": "请更新付款方式，避免服务中断。",
+            "updatePaymentMethod": "更新付款方式"
+        }
     },
     "auth": {
         "welcomeBack": "欢迎回来",
@@ -136,6 +143,7 @@
         "registerAccountFailed": "注册账号失败：{{message}}",
         "registrationSuccessful": "注册成功，即将跳转到登录页面。",
         "registrationVerifyEmail": "要完成注册，请点击我们发送到你邮箱中的验证链接。",
+        "rateLimitTooManyRequests": "请求过于频繁，请稍后再试。",
         "validation": {
             "nameRequired": "请输入姓名",
             "emailRequired": "请输入邮箱",
@@ -263,6 +271,7 @@
         "copy": "复制",
         "copied": "已复制！",
         "info": "信息",
+        "status": "状态",
         "date": "日期",
         "selectAll": "全选",
         "submit": "提交",
@@ -284,6 +293,8 @@
         "noData": "暂无数据",
         "noResults": "暂无结果",
         "addNew": "新增",
+        "new": "新",
+        "on": "开",
         "none": "无",
         "true": "是",
         "false": "否",
@@ -379,6 +390,12 @@
         "nodeInfo": {
             "openDocumentation": "打开文档"
         },
+        "errorBoundary": {
+            "title": "页面加载异常",
+            "description": "加载该页面时发生以下错误。",
+            "retry": "请稍后重试。如果问题仍然存在，可以通过 Discord 联系我们。",
+            "raiseIssue": "你也可以在 Github 提交 Issue。"
+        },
         "analytics": {
             "connectCredential": "连接凭证",
             "projectName": "项目名称",
@@ -395,6 +412,10 @@
             "noIssuesFound": "当前流程未发现问题！",
             "failed": "流程校验失败",
             "checklist": "检查项（{{count}}）"
+        },
+        "monthDaysPicker": {
+            "lastDay": "最后一天",
+            "lastDayTooltip": "始终在每个月最后一天运行，会自动解析为 28、29、30 或 31 号，并兼容短月份和闰年。不同于选择 31 号，该设置每个月都会触发。"
         }
     },
     "permissions": {
@@ -1347,6 +1368,8 @@
                 "title": "函数使用说明",
                 "libraries": "可以使用 FlowOps 已内置的依赖库。",
                 "schemaVariables": "可以通过 $ 前缀读取输入参数中的字段：",
+                "propertyLabel": "属性",
+                "variableLabel": "变量",
                 "flowConfig": "可以读取默认流程上下文：",
                 "customVariables": "可以读取自定义变量：",
                 "returnString": "函数最后必须返回字符串。"
@@ -1548,6 +1571,8 @@
             "viewEditChunks": "查看/编辑片段",
             "upsertAllChunks": "Upsert 全部片段",
             "retrievalQuery": "检索测试",
+            "retrievalPlaygroundDescription": "检索测试区 - 测试你的向量库检索配置",
+            "enterQuery": "输入你的查询",
             "refresh": "刷新",
             "refreshAllLoadersTitle": "刷新全部加载器并 Upsert 所有分块？",
             "refreshAllLoadersConfirm": "这会重新处理所有加载器并 Upsert 所有分块，可能需要一些时间。",

@@ -263,8 +263,8 @@ const VectorStoreQuery = () => {
                     <ViewHeader
                         isBackButton={true}
                         search={false}
-                        title={documentStore?.name || 'Document Store'}
-                        description='Retrieval Playground - Test your vector store retrieval settings'
+                        title={documentStore?.name || t('pages.documentStores.title')}
+                        description={t('pages.documentStores.retrievalPlaygroundDescription')}
                         onBack={() => navigate(-1)}
                     >
                         <PermissionButton
@@ -275,7 +275,7 @@ const VectorStoreQuery = () => {
                             startIcon={<IconDeviceFloppy />}
                             onClick={saveConfig}
                         >
-                            Save Config
+                            {t('pages.documentStores.saveConfig')}
                         </PermissionButton>
                     </ViewHeader>
                     <div style={{ width: '100%' }}></div>
@@ -285,7 +285,8 @@ const VectorStoreQuery = () => {
                                 <Box>
                                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                                         <Typography variant='overline'>
-                                            Enter your Query<span style={{ color: 'red' }}>&nbsp;*</span>
+                                            {t('pages.documentStores.enterQuery')}
+                                            <span style={{ color: 'red' }}>&nbsp;*</span>
                                         </Typography>
 
                                         <div style={{ flexGrow: 1 }}></div>

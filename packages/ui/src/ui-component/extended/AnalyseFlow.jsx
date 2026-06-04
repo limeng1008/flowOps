@@ -376,7 +376,7 @@ const AnalyseFlow = ({ dialogProps }) => {
                                             backgroundColor: '#70e000'
                                         }}
                                     />
-                                    <span style={{ color: '#006400', marginLeft: 10 }}>ON</span>
+                                    <span style={{ color: '#006400', marginLeft: 10 }}>{t('common.on')}</span>
                                 </div>
                             )}
                         </ListItem>
