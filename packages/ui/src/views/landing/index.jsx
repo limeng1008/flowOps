@@ -15,26 +15,29 @@ import {
 } from '@tabler/icons-react'
 
 import { SUPPORTED_LANGUAGES } from '@/i18n'
-import FlowOpsLogo from '@/assets/images/flowops_dark.svg'
+import FlowOpsLogo from '@/assets/images/flowops_white.svg'
 import AgentGraphImage from '@/assets/images/agentgraph.png'
 import ChatHistoryImage from '@/assets/images/chathistory.png'
 import SharingImage from '@/assets/images/sharing.png'
 import RobotImage from '@/assets/images/robot.png'
 
 const C = {
-    bg: '#08111f',
-    bg2: '#0f172a',
-    surface: '#111827',
-    surface2: '#162033',
-    border: 'rgba(226, 232, 240, 0.14)',
-    teal: '#5eead4',
+    bg: '#eef7ff',
+    bg2: '#f1fff9',
+    surface: 'rgba(255, 255, 255, 0.58)',
+    surface2: 'rgba(255, 255, 255, 0.38)',
+    surfaceStrong: 'rgba(255, 255, 255, 0.78)',
+    border: 'rgba(255, 255, 255, 0.58)',
+    teal: '#14b8a6',
     tealDeep: '#14b8a6',
-    blue: '#60a5fa',
-    amber: '#fbbf24',
-    text: '#f8fafc',
-    muted: '#cbd5e1',
-    quiet: '#94a3b8',
-    ink: '#0f172a'
+    blue: '#097cff',
+    amber: '#f4cf4a',
+    text: '#102033',
+    muted: 'rgba(16, 32, 51, 0.68)',
+    quiet: 'rgba(16, 32, 51, 0.52)',
+    ink: '#0f172a',
+    glassBlur: 'blur(22px) saturate(1.45)',
+    shadow: '0 22px 60px rgba(15, 23, 42, 0.14)'
 }
 
 const parseStatValue = (value) => {
@@ -308,7 +311,16 @@ const LandingPage = () => {
     }, [])
 
     return (
-        <Box ref={pageRef} sx={{ minHeight: '100vh', backgroundColor: C.bg, color: C.text }}>
+        <Box
+            ref={pageRef}
+            sx={{
+                minHeight: '100vh',
+                color: C.text,
+                backgroundColor: C.bg,
+                backgroundImage:
+                    'radial-gradient(900px 520px at 12% 8%, rgba(9,124,255,0.20), transparent 58%), radial-gradient(820px 500px at 88% 16%, rgba(20,184,166,0.18), transparent 56%), linear-gradient(135deg, #eef7ff, #f8fbff 46%, #f1fff9)'
+            }}
+        >
             <Box
                 className='landing-nav'
                 component='nav'
@@ -323,9 +335,10 @@ const LandingPage = () => {
                     px: { xs: 2.5, md: 8 },
                     py: 2,
                     borderBottom: `1px solid ${C.border}`,
-                    backgroundColor: 'rgba(8,17,31,0.86)',
-                    backdropFilter: 'blur(14px)',
-                    WebkitBackdropFilter: 'blur(14px)'
+                    backgroundColor: C.surfaceStrong,
+                    boxShadow: C.shadow,
+                    backdropFilter: C.glassBlur,
+                    WebkitBackdropFilter: C.glassBlur
                 }}
             >
                 <Box component='img' src={FlowOpsLogo} alt='FlowOps' sx={{ width: { xs: 136, md: 158 }, height: 'auto' }} />
@@ -342,7 +355,18 @@ const LandingPage = () => {
                     >
                         {t.navPlaybook}
                     </Button>
-                    <Stack direction='row' spacing={0.5} sx={{ p: 0.5, border: `1px solid ${C.border}`, borderRadius: '999px' }}>
+                    <Stack
+                        direction='row'
+                        spacing={0.5}
+                        sx={{
+                            p: 0.5,
+                            border: `1px solid ${C.border}`,
+                            borderRadius: '999px',
+                            backgroundColor: C.surface,
+                            backdropFilter: C.glassBlur,
+                            WebkitBackdropFilter: C.glassBlur
+                        }}
+                    >
                         {SUPPORTED_LANGUAGES.map((lng) => {
                             const active = currentLang === lng.code || currentLang?.startsWith(`${lng.code}-`)
                             return (
@@ -356,9 +380,9 @@ const LandingPage = () => {
                                         py: 0.35,
                                         borderRadius: '999px',
                                         textTransform: 'none',
-                                        color: active ? C.ink : C.muted,
-                                        backgroundColor: active ? C.teal : 'transparent',
-                                        '&:hover': { backgroundColor: active ? C.teal : 'rgba(255,255,255,0.08)' }
+                                        color: active ? '#ecfeff' : C.muted,
+                                        backgroundColor: active ? C.tealDeep : 'transparent',
+                                        '&:hover': { backgroundColor: active ? C.tealDeep : C.surfaceStrong }
                                     }}
                                 >
                                     {lng.label}
@@ -369,7 +393,7 @@ const LandingPage = () => {
                     <Button
                         onClick={goLogin}
                         variant='contained'
-                        sx={{ borderRadius: '8px', textTransform: 'none', backgroundColor: C.tealDeep, color: '#ecfeff' }}
+                        sx={{ borderRadius: '999px', textTransform: 'none', backgroundColor: C.tealDeep, color: '#ecfeff' }}
                     >
                         {t.navLogin}
                     </Button>
@@ -387,7 +411,7 @@ const LandingPage = () => {
                     py: { xs: 9, md: 12 },
                     overflow: 'hidden',
                     backgroundImage:
-                        'linear-gradient(135deg, rgba(20,184,166,0.18), rgba(96,165,250,0.08) 42%, rgba(251,191,36,0.08)), linear-gradient(180deg, rgba(8,17,31,0.55), rgba(8,17,31,1))'
+                        'linear-gradient(135deg, rgba(255,255,255,0.42), rgba(255,255,255,0.10)), radial-gradient(720px 380px at 18% 10%, rgba(9,124,255,0.20), transparent 64%), radial-gradient(720px 380px at 82% 14%, rgba(20,184,166,0.16), transparent 64%)'
                 }}
             >
                 <Box
@@ -397,7 +421,7 @@ const LandingPage = () => {
                         inset: 0,
                         opacity: 0.22,
                         backgroundImage:
-                            'linear-gradient(rgba(255,255,255,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.08) 1px, transparent 1px)',
+                            'linear-gradient(rgba(255,255,255,0.42) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.36) 1px, transparent 1px)',
                         backgroundSize: '56px 56px'
                     }}
                 />
@@ -406,7 +430,7 @@ const LandingPage = () => {
                         className='landing-hero-item'
                         icon={<IconWorld size={16} />}
                         label={t.badge}
-                        sx={{ mb: 3, color: C.teal, borderColor: 'rgba(94,234,212,0.38)', backgroundColor: 'rgba(8,17,31,0.56)' }}
+                        sx={{ mb: 3, color: C.tealDeep, borderColor: C.border, backgroundColor: C.surface }}
                         variant='outlined'
                     />
                     <Typography
@@ -434,10 +458,10 @@ const LandingPage = () => {
                             endIcon={<IconArrowRight size={18} />}
                             sx={{
                                 minWidth: 160,
-                                borderRadius: '8px',
+                                borderRadius: '999px',
                                 textTransform: 'none',
                                 fontWeight: 800,
-                                color: C.ink,
+                                color: '#ecfeff',
                                 backgroundColor: C.teal,
                                 '&:hover': { backgroundColor: C.tealDeep, color: '#ecfeff' }
                             }}
@@ -449,11 +473,13 @@ const LandingPage = () => {
                             onClick={scrollToCases}
                             sx={{
                                 minWidth: 160,
-                                borderRadius: '8px',
+                                borderRadius: '999px',
                                 textTransform: 'none',
                                 color: C.text,
                                 border: `1px solid ${C.border}`,
-                                backgroundColor: 'rgba(255,255,255,0.06)'
+                                backgroundColor: C.surface,
+                                backdropFilter: C.glassBlur,
+                                WebkitBackdropFilter: C.glassBlur
                             }}
                         >
                             {t.secondaryCta}
@@ -464,7 +490,15 @@ const LandingPage = () => {
                             <Box
                                 className='landing-stat-card landing-hover-lift'
                                 key={label}
-                                sx={{ p: 2.5, border: `1px solid ${C.border}`, borderRadius: '8px', backgroundColor: 'rgba(8,17,31,0.64)' }}
+                                sx={{
+                                    p: 2.5,
+                                    border: `1px solid ${C.border}`,
+                                    borderRadius: '8px',
+                                    backgroundColor: C.surface,
+                                    boxShadow: C.shadow,
+                                    backdropFilter: C.glassBlur,
+                                    WebkitBackdropFilter: C.glassBlur
+                                }}
                             >
                                 <Typography
                                     className='landing-stat-value'
@@ -482,7 +516,11 @@ const LandingPage = () => {
                 </Box>
             </Box>
 
-            <Box id='case-studies' component='section' sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 8, md: 11 }, backgroundColor: C.bg }}>
+            <Box
+                id='case-studies'
+                component='section'
+                sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 8, md: 11 }, backgroundColor: 'transparent' }}
+            >
                 <Box sx={{ maxWidth: 1100, mx: 'auto' }}>
                     <Stack
                         direction={{ xs: 'column', md: 'row' }}
@@ -516,7 +554,10 @@ const LandingPage = () => {
                                     border: `1px solid ${C.border}`,
                                     borderRadius: '8px',
                                     overflow: 'hidden',
-                                    backgroundColor: C.surface
+                                    backgroundColor: C.surface,
+                                    boxShadow: C.shadow,
+                                    backdropFilter: C.glassBlur,
+                                    WebkitBackdropFilter: C.glassBlur
                                 }}
                             >
                                 <Box
@@ -525,7 +566,9 @@ const LandingPage = () => {
                                         display: 'flex',
                                         alignItems: 'center',
                                         justifyContent: 'center',
-                                        backgroundColor: C.surface2
+                                        backgroundColor: C.surface2,
+                                        backdropFilter: C.glassBlur,
+                                        WebkitBackdropFilter: C.glassBlur
                                     }}
                                 >
                                     <Box
@@ -559,7 +602,7 @@ const LandingPage = () => {
             <Box
                 id='playbook'
                 component='section'
-                sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 8, md: 11 }, backgroundColor: '#f8fafc', color: C.ink }}
+                sx={{ px: { xs: 2.5, md: 8 }, py: { xs: 8, md: 11 }, backgroundColor: 'rgba(255,255,255,0.28)', color: C.ink }}
             >
                 <Box sx={{ maxWidth: 1100, mx: 'auto' }}>
                     <Typography
@@ -580,9 +623,12 @@ const LandingPage = () => {
                                         gridTemplateColumns: '44px 1fr',
                                         gap: 1.5,
                                         p: 2,
-                                        border: '1px solid #e2e8f0',
+                                        border: `1px solid ${C.border}`,
                                         borderRadius: '8px',
-                                        backgroundColor: '#ffffff'
+                                        backgroundColor: C.surface,
+                                        boxShadow: C.shadow,
+                                        backdropFilter: C.glassBlur,
+                                        WebkitBackdropFilter: C.glassBlur
                                     }}
                                 >
                                     <Box
@@ -610,7 +656,15 @@ const LandingPage = () => {
                         </Box>
                         <Box
                             className='landing-reveal landing-hover-lift'
-                            sx={{ borderRadius: '8px', border: '1px solid #e2e8f0', backgroundColor: '#ffffff', p: 3 }}
+                            sx={{
+                                borderRadius: '8px',
+                                border: `1px solid ${C.border}`,
+                                backgroundColor: C.surface,
+                                boxShadow: C.shadow,
+                                backdropFilter: C.glassBlur,
+                                WebkitBackdropFilter: C.glassBlur,
+                                p: 3
+                            }}
                         >
                             <Box
                                 component='img'
@@ -664,7 +718,7 @@ const LandingPage = () => {
                         endIcon={<IconArrowRight size={18} />}
                         sx={{
                             mt: 4,
-                            borderRadius: '8px',
+                            borderRadius: '999px',
                             textTransform: 'none',
                             color: C.ink,
                             fontWeight: 900,

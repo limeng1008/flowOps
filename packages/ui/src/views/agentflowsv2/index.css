@@ -1,12 +1,14 @@
 .edgebutton {
     width: 20px;
     height: 20px;
-    background: #eee;
-    border: 1px solid #fff;
+    background: rgba(255, 255, 255, 0.58);
+    border: 1px solid rgba(255, 255, 255, 0.58);
     cursor: pointer;
     border-radius: 50%;
     font-size: 12px;
     line-height: 1;
+    backdrop-filter: blur(18px) saturate(1.35);
+    -webkit-backdrop-filter: blur(18px) saturate(1.35);
 }
 
 .edgebutton:hover {

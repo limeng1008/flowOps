@@ -58,6 +58,19 @@ $grey900: #212121;
 // transparent
 $transparent: #ffffff00;
 
+// liquid glass surfaces
+$glassLightSurface: rgba(255, 255, 255, 0.58);
+$glassLightSurfaceStrong: rgba(255, 255, 255, 0.78);
+$glassDarkSurface: rgba(8, 17, 31, 0.58);
+$glassDarkSurfaceStrong: rgba(15, 23, 42, 0.78);
+$glassBorder: rgba(255, 255, 255, 0.58);
+$glassDarkBorder: rgba(148, 163, 184, 0.22);
+$glassHighlight: rgba(255, 255, 255, 0.78);
+$glassDarkHighlight: rgba(255, 255, 255, 0.18);
+$glassShadowLight: 0 22px 60px rgba(15, 23, 42, 0.14);
+$glassShadowDark: 0 24px 70px rgba(0, 0, 0, 0.34);
+$glassBlur: 22px;
+
 // ==============================|| DARK THEME VARIANTS ||============================== //
 
 // paper & background
@@ -175,4 +188,17 @@ $darkTextSecondary: #8492c4;
 
     // transparent
     transparent: $transparent;
+
+    // liquid glass surfaces
+    glassLightSurface: $glassLightSurface;
+    glassLightSurfaceStrong: $glassLightSurfaceStrong;
+    glassDarkSurface: $glassDarkSurface;
+    glassDarkSurfaceStrong: $glassDarkSurfaceStrong;
+    glassBorder: $glassBorder;
+    glassDarkBorder: $glassDarkBorder;
+    glassHighlight: $glassHighlight;
+    glassDarkHighlight: $glassDarkHighlight;
+    glassShadowLight: $glassShadowLight;
+    glassShadowDark: $glassShadowDark;
+    glassBlur: $glassBlur;
 }

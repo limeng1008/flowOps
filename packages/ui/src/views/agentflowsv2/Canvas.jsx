@@ -702,7 +702,12 @@ const AgentflowCanvas = () => {
                     color='inherit'
                     elevation={1}
                     sx={{
-                        bgcolor: theme.palette.background.default
+                        background: `linear-gradient(145deg, ${theme.palette.glass.highlight}, transparent 32%), ${theme.palette.glass.surfaceStrong}`,
+                        borderBottom: '1px solid',
+                        borderColor: theme.palette.glass.border,
+                        boxShadow: 'none',
+                        backdropFilter: `blur(${theme.palette.glass.blur}) saturate(1.45)`,
+                        WebkitBackdropFilter: `blur(${theme.palette.glass.blur}) saturate(1.45)`
                     }}
                 >
                     <Toolbar>
@@ -776,7 +781,10 @@ const AgentflowCanvas = () => {
                                     nodeStrokeColor={customization.isDarkMode ? '#525252' : '#fff'}
                                     maskColor={customization.isDarkMode ? 'rgb(45, 45, 45, 0.6)' : 'rgb(240, 240, 240, 0.6)'}
                                     style={{
-                                        backgroundColor: customization.isDarkMode ? theme.palette.background.default : '#fff'
+                                        backgroundColor: theme.palette.glass.surfaceStrong,
+                                        border: `1px solid ${theme.palette.glass.border}`,
+                                        boxShadow: theme.palette.glass.shadow,
+                                        backdropFilter: `blur(${theme.palette.glass.blur}) saturate(1.45)`
                                     }}
                                 />
                                 {isBackgroundEnabled && <Background color='#aaa' gap={16} />}

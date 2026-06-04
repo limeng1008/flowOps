@@ -1,51 +1,117 @@
 export default function componentStyleOverrides(theme) {
-    const bgColor = theme.colors?.grey50
+    const isDark = theme?.customization?.isDarkMode
+    const bgColor = isDark ? theme.colors?.darkPrimary800 : 'rgba(255, 255, 255, 0.46)'
+    const glassBlur = theme.colors?.glassBlur || '22px'
+    const glassSurface = isDark ? theme.colors?.glassDarkSurface : theme.colors?.glassLightSurface
+    const glassSurfaceStrong = isDark ? theme.colors?.glassDarkSurfaceStrong : theme.colors?.glassLightSurfaceStrong
+    const glassBorder = isDark ? theme.colors?.glassDarkBorder : theme.colors?.glassBorder
+    const glassHighlight = isDark ? theme.colors?.glassDarkHighlight : theme.colors?.glassHighlight
+    const glassShadow = isDark ? theme.colors?.glassShadowDark : theme.colors?.glassShadowLight
+    const glassBackdrop = `blur(${glassBlur}) saturate(1.45)`
+    const appBackground = isDark
+        ? 'radial-gradient(900px 520px at 12% 8%, rgba(9,124,255,0.18), transparent 58%), radial-gradient(820px 500px at 88% 16%, rgba(20,184,166,0.14), transparent 56%), linear-gradient(135deg, #07101d 0%, #111827 46%, #0f172a 100%)'
+        : 'radial-gradient(900px 520px at 12% 8%, rgba(9,124,255,0.20), transparent 58%), radial-gradient(820px 500px at 88% 16%, rgba(20,184,166,0.18), transparent 56%), linear-gradient(135deg, #eef7ff 0%, #f8fbff 46%, #f1fff9 100%)'
+    const glassBackground = `linear-gradient(145deg, ${glassHighlight}, transparent 34%), ${glassSurface}`
+    const strongGlassBackground = `linear-gradient(145deg, ${glassHighlight}, transparent 30%), ${glassSurfaceStrong}`
+
     return {
         MuiCssBaseline: {
             styleOverrides: {
+                html: {
+                    minHeight: '100%',
+                    background: isDark ? '#07101d' : '#eef7ff'
+                },
                 body: {
+                    minHeight: '100vh',
+                    background: appBackground,
+                    backgroundAttachment: 'fixed',
                     scrollbarWidth: 'thin',
-                    scrollbarColor: theme?.customization?.isDarkMode
+                    scrollbarColor: isDark
                         ? `${theme.colors?.grey500} ${theme.colors?.darkPrimaryMain}`
-                        : `${theme.colors?.grey300} ${theme.paper}`,
+                        : `${theme.colors?.grey300} transparent`,
+                    '&::before': {
+                        content: '""',
+                        position: 'fixed',
+                        inset: 0,
+                        zIndex: -1,
+                        pointerEvents: 'none',
+                        opacity: isDark ? 0.22 : 0.5,
+                        backgroundImage:
+                            'linear-gradient(rgba(255,255,255,0.42) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.36) 1px, transparent 1px)',
+                        backgroundSize: '44px 44px',
+                        maskImage: 'linear-gradient(180deg, transparent, #000 18%, #000 74%, transparent)'
+                    },
                     '&::-webkit-scrollbar, & *::-webkit-scrollbar': {
                         width: 12,
                         height: 12,
-                        backgroundColor: theme?.customization?.isDarkMode ? theme.colors?.darkPrimaryMain : theme.paper
+                        backgroundColor: 'transparent'
                     },
                     '&::-webkit-scrollbar-thumb, & *::-webkit-scrollbar-thumb': {
                         borderRadius: 8,
-                        backgroundColor: theme?.customization?.isDarkMode ? theme.colors?.grey500 : theme.colors?.grey300,
+                        backgroundColor: isDark ? theme.colors?.grey500 : theme.colors?.grey300,
                         minHeight: 24,
-                        border: `3px solid ${theme?.customization?.isDarkMode ? theme.colors?.darkPrimaryMain : theme.paper}`
+                        border: `3px solid ${isDark ? theme.colors?.darkPrimaryMain : 'rgba(255,255,255,0.42)'}`
                     },
                     '&::-webkit-scrollbar-thumb:focus, & *::-webkit-scrollbar-thumb:focus': {
-                        backgroundColor: theme?.customization?.isDarkMode ? theme.colors?.darkPrimary200 : theme.colors?.grey500
+                        backgroundColor: isDark ? theme.colors?.darkPrimary200 : theme.colors?.grey500
                     },
                     '&::-webkit-scrollbar-thumb:active, & *::-webkit-scrollbar-thumb:active': {
-                        backgroundColor: theme?.customization?.isDarkMode ? theme.colors?.darkPrimary200 : theme.colors?.grey500
+                        backgroundColor: isDark ? theme.colors?.darkPrimary200 : theme.colors?.grey500
                     },
                     '&::-webkit-scrollbar-thumb:hover, & *::-webkit-scrollbar-thumb:hover': {
-                        backgroundColor: theme?.customization?.isDarkMode ? theme.colors?.darkPrimary200 : theme.colors?.grey500
+                        backgroundColor: isDark ? theme.colors?.darkPrimary200 : theme.colors?.grey500
                     },
                     '&::-webkit-scrollbar-corner, & *::-webkit-scrollbar-corner': {
-                        backgroundColor: theme?.customization?.isDarkMode ? theme.colors?.darkPrimaryMain : theme.paper
+                        backgroundColor: 'transparent'
                     }
+                },
+                '#root': {
+                    minHeight: '100vh',
+                    isolation: 'isolate'
+                }
+            }
+        },
+        MuiAppBar: {
+            styleOverrides: {
+                root: {
+                    background: strongGlassBackground,
+                    borderBottom: `1px solid ${glassBorder}`,
+                    boxShadow: 'none',
+                    backdropFilter: glassBackdrop,
+                    WebkitBackdropFilter: glassBackdrop
                 }
             }
         },
         MuiButton: {
             styleOverrides: {
                 root: {
-                    fontWeight: 500,
-                    borderRadius: '4px'
+                    fontWeight: 650,
+                    borderRadius: '999px',
+                    textTransform: 'none',
+                    transition: 'transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease',
+                    '&:active': {
+                        transform: 'scale(0.98)'
+                    }
+                },
+                contained: {
+                    backgroundImage: `linear-gradient(145deg, rgba(255,255,255,0.28), transparent 42%)`,
+                    boxShadow: `0 14px 30px ${isDark ? 'rgba(0,0,0,0.28)' : 'rgba(2,132,199,0.22)'}`,
+                    '&:hover': {
+                        boxShadow: `0 18px 36px ${isDark ? 'rgba(0,0,0,0.34)' : 'rgba(2,132,199,0.28)'}`
+                    }
+                },
+                outlined: {
+                    background: glassBackground,
+                    borderColor: glassBorder,
+                    backdropFilter: glassBackdrop,
+                    WebkitBackdropFilter: glassBackdrop
                 }
             }
         },
         MuiSvgIcon: {
             styleOverrides: {
                 root: {
-                    color: theme?.customization?.isDarkMode ? theme.colors?.paper : 'inherit'
+                    color: isDark ? theme.colors?.paper : 'inherit'
                 }
             }
         },
@@ -55,10 +121,59 @@ export default function componentStyleOverrides(theme) {
             },
             styleOverrides: {
                 root: {
-                    backgroundImage: 'none'
+                    background: glassBackground,
+                    backgroundImage: `linear-gradient(145deg, ${glassHighlight}, transparent 34%)`,
+                    border: `1px solid ${glassBorder}`,
+                    boxShadow: glassShadow,
+                    backdropFilter: glassBackdrop,
+                    WebkitBackdropFilter: glassBackdrop
                 },
                 rounded: {
                     borderRadius: `${theme?.customization?.borderRadius}px`
+                }
+            }
+        },
+        MuiCard: {
+            styleOverrides: {
+                root: {
+                    background: glassBackground,
+                    border: `1px solid ${glassBorder}`,
+                    boxShadow: glassShadow,
+                    backdropFilter: glassBackdrop,
+                    WebkitBackdropFilter: glassBackdrop
+                }
+            }
+        },
+        MuiDrawer: {
+            styleOverrides: {
+                paper: {
+                    background: strongGlassBackground,
+                    borderColor: glassBorder,
+                    boxShadow: glassShadow,
+                    backdropFilter: glassBackdrop,
+                    WebkitBackdropFilter: glassBackdrop
+                }
+            }
+        },
+        MuiDialog: {
+            styleOverrides: {
+                paper: {
+                    background: strongGlassBackground,
+                    border: `1px solid ${glassBorder}`,
+                    boxShadow: glassShadow,
+                    backdropFilter: glassBackdrop,
+                    WebkitBackdropFilter: glassBackdrop
+                }
+            }
+        },
+        MuiPopover: {
+            styleOverrides: {
+                paper: {
+                    background: strongGlassBackground,
+                    border: `1px solid ${glassBorder}`,
+                    boxShadow: glassShadow,
+                    backdropFilter: glassBackdrop,
+                    WebkitBackdropFilter: glassBackdrop
                 }
             }
         },
@@ -95,16 +210,17 @@ export default function componentStyleOverrides(theme) {
                     paddingBottom: '10px',
                     '&.Mui-selected': {
                         color: theme.menuSelected,
-                        backgroundColor: theme.menuSelectedBack,
+                        background: isDark ? 'rgba(94, 234, 212, 0.14)' : 'rgba(20, 184, 166, 0.14)',
+                        boxShadow: `inset 0 0 0 1px ${glassBorder}`,
                         '&:hover': {
-                            backgroundColor: theme.menuSelectedBack
+                            background: isDark ? 'rgba(94, 234, 212, 0.18)' : 'rgba(20, 184, 166, 0.18)'
                         },
                         '& .MuiListItemIcon-root': {
                             color: theme.menuSelected
                         }
                     },
                     '&:hover': {
-                        backgroundColor: theme.menuSelectedBack,
+                        background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.50)',
                         color: theme.menuSelected,
                         '& .MuiListItemIcon-root': {
                             color: theme.menuSelected
@@ -145,13 +261,15 @@ export default function componentStyleOverrides(theme) {
         MuiOutlinedInput: {
             styleOverrides: {
                 root: {
-                    background: theme?.customization?.isDarkMode ? theme.colors?.darkPrimary800 : bgColor,
+                    background: bgColor,
                     borderRadius: `${theme?.customization?.borderRadius}px`,
+                    backdropFilter: `blur(calc(${glassBlur} * 0.64)) saturate(1.25)`,
+                    WebkitBackdropFilter: `blur(calc(${glassBlur} * 0.64)) saturate(1.25)`,
                     '& .MuiOutlinedInput-notchedOutline': {
-                        borderColor: theme.colors?.grey400
+                        borderColor: glassBorder
                     },
-                    '&:hover $notchedOutline': {
-                        borderColor: theme.colors?.primaryLight
+                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                        borderColor: theme.colors?.primary200
                     },
                     '&.MuiInputBase-multiline': {
                         padding: 1
@@ -159,7 +277,7 @@ export default function componentStyleOverrides(theme) {
                 },
                 input: {
                     fontWeight: 500,
-                    background: theme?.customization?.isDarkMode ? theme.colors?.darkPrimary800 : bgColor,
+                    background: 'transparent',
                     padding: '15.5px 14px',
                     borderRadius: `${theme?.customization?.borderRadius}px`,
                     '&.MuiInputBase-inputSizeSmall': {
@@ -196,7 +314,7 @@ export default function componentStyleOverrides(theme) {
         MuiDivider: {
             styleOverrides: {
                 root: {
-                    borderColor: theme.divider,
+                    borderColor: glassBorder,
                     opacity: 1
                 }
             }
@@ -221,8 +339,23 @@ export default function componentStyleOverrides(theme) {
         MuiTooltip: {
             styleOverrides: {
                 tooltip: {
-                    color: theme?.customization?.isDarkMode ? theme.colors?.paper : theme.paper,
-                    background: theme.colors?.grey700
+                    color: isDark ? theme.colors?.paper : theme.textDark,
+                    background: strongGlassBackground,
+                    border: `1px solid ${glassBorder}`,
+                    boxShadow: glassShadow,
+                    backdropFilter: glassBackdrop,
+                    WebkitBackdropFilter: glassBackdrop
+                }
+            }
+        },
+        MuiTableContainer: {
+            styleOverrides: {
+                root: {
+                    background: glassBackground,
+                    border: `1px solid ${glassBorder}`,
+                    boxShadow: glassShadow,
+                    backdropFilter: glassBackdrop,
+                    WebkitBackdropFilter: glassBackdrop
                 }
             }
         },
@@ -230,7 +363,7 @@ export default function componentStyleOverrides(theme) {
             styleOverrides: {
                 option: {
                     '&:hover': {
-                        background: theme?.customization?.isDarkMode ? '#233345 !important' : ''
+                        background: isDark ? 'rgba(255,255,255,0.10) !important' : 'rgba(255,255,255,0.58) !important'
                     }
                 }
             }

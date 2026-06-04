@@ -15,4 +15,26 @@ describe('FlowOps theme variables', () => {
         expect(flowopsVars).toContain('$secondaryMain: #14b8a6;')
         expect(flowopsVars).toContain('$darkBackground: #08111f;')
     })
+
+    it('exposes liquid glass surface tokens through the FlowOps theme layer', () => {
+        const flowopsVarsPath = path.join(__dirname, '../assets/scss/_flowops-vars.module.scss')
+        const palettePath = path.join(__dirname, 'palette.js')
+        const overridePath = path.join(__dirname, 'compStyleOverride.js')
+
+        const flowopsVars = fs.readFileSync(flowopsVarsPath, 'utf8')
+        const palette = fs.readFileSync(palettePath, 'utf8')
+        const overrides = fs.readFileSync(overridePath, 'utf8')
+
+        expect(flowopsVars).toContain('$glassLightSurface:')
+        expect(flowopsVars).toContain('$glassDarkSurface:')
+        expect(flowopsVars).toContain('$glassBorder:')
+        expect(flowopsVars).toContain('$glassBlur:')
+
+        expect(palette).toContain('glass:')
+        expect(palette).toContain('surface:')
+        expect(palette).toContain('blur:')
+
+        expect(overrides).toContain('backdropFilter')
+        expect(overrides).toContain('WebkitBackdropFilter')
+    })
 })

@@ -32,31 +32,35 @@ import AzureSSOLoginIcon from '@/assets/images/microsoft-azure.svg'
 import GoogleSSOLoginIcon from '@/assets/images/google.svg'
 import Auth0SSOLoginIcon from '@/assets/images/auth0.svg'
 import GithubSSOLoginIcon from '@/assets/images/github.svg'
-import FlowOpsLogo from '@/assets/images/flowops_dark.svg'
+import FlowOpsLogo from '@/assets/images/flowops_white.svg'
 
 // ==============================|| design tokens (FlowOps) ||============================== //
 
 const C = {
-    teal: '#5eead4',
+    teal: '#14b8a6',
     tealDeep: '#14b8a6',
-    blue: '#60a5fa',
-    amber: '#fbbf24',
-    text: '#f8fafc',
-    textDim: '#cbd5e1',
-    textMute: '#64748b',
+    blue: '#097cff',
+    amber: '#f4cf4a',
+    text: '#102033',
+    textDim: 'rgba(16, 32, 51, 0.68)',
+    textMute: 'rgba(16, 32, 51, 0.48)',
     glow: 'rgba(20, 184, 166, 0.30)',
-    panel: 'rgba(15, 23, 42, 0.78)',
-    panelSolid: '#0f172a',
-    border: 'rgba(226, 232, 240, 0.14)'
+    panel: 'rgba(255, 255, 255, 0.58)',
+    panelSolid: '#f8fbff',
+    border: 'rgba(255, 255, 255, 0.58)',
+    shadow: '0 22px 60px rgba(15, 23, 42, 0.14)',
+    blur: 'blur(22px) saturate(1.45)'
 }
 
 const inputSx = {
     '& .MuiOutlinedInput-root': {
         borderRadius: '14px',
         color: C.text,
-        backgroundColor: 'rgba(0,0,0,0.30)',
+        backgroundColor: 'rgba(255,255,255,0.46)',
+        backdropFilter: C.blur,
+        WebkitBackdropFilter: C.blur,
         '& fieldset': { borderColor: C.border },
-        '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.20)' },
+        '&:hover fieldset': { borderColor: 'rgba(20,184,166,0.42)' },
         '&.Mui-focused fieldset': { borderColor: C.teal, borderWidth: '1px' }
     },
     '& .MuiOutlinedInput-input': { padding: '14px 16px' },
@@ -65,12 +69,14 @@ const inputSx = {
 
 const ssoBtnSx = {
     height: 48,
-    borderRadius: '8px',
+    borderRadius: '999px',
     textTransform: 'none',
     color: C.text,
     backgroundColor: C.panel,
     border: `1px solid ${C.border}`,
-    '&:hover': { backgroundColor: 'rgba(255,255,255,0.10)', borderColor: 'rgba(94,234,212,0.45)' }
+    backdropFilter: C.blur,
+    WebkitBackdropFilter: C.blur,
+    '&:hover': { backgroundColor: 'rgba(255,255,255,0.78)', borderColor: 'rgba(20,184,166,0.45)' }
 }
 
 // ==============================|| SignInPage ||============================== //
@@ -276,11 +282,11 @@ const SignInPage = () => {
                 gridTemplateColumns: { xs: '1fr', md: '1.05fr 0.95fr' },
                 backgroundColor: C.panel,
                 border: `1px solid ${C.border}`,
-                backdropFilter: 'blur(18px)',
-                WebkitBackdropFilter: 'blur(18px)',
+                backdropFilter: C.blur,
+                WebkitBackdropFilter: C.blur,
                 borderRadius: '8px',
                 overflow: 'hidden',
-                boxShadow: '0 24px 90px rgba(0,0,0,0.36)'
+                boxShadow: C.shadow
             }}
         >
             <Box
@@ -294,7 +300,7 @@ const SignInPage = () => {
                     p: 5,
                     minHeight: 650,
                     background:
-                        'linear-gradient(135deg, rgba(20,184,166,0.18), rgba(96,165,250,0.10)), linear-gradient(180deg, rgba(15,23,42,0.98), rgba(8,17,31,0.98))',
+                        'linear-gradient(145deg, rgba(255,255,255,0.78), rgba(255,255,255,0.22)), radial-gradient(640px 360px at 20% 8%, rgba(9,124,255,0.20), transparent 62%), radial-gradient(640px 360px at 86% 12%, rgba(20,184,166,0.18), transparent 62%)',
                     borderRight: `1px solid ${C.border}`,
                     overflow: 'hidden'
                 }}
@@ -308,9 +314,9 @@ const SignInPage = () => {
                         width: 186,
                         height: 54,
                         borderRadius: '8px',
-                        border: '1px solid rgba(94,234,212,0.25)',
+                        border: '1px solid rgba(20,184,166,0.28)',
                         background:
-                            'linear-gradient(90deg, rgba(94,234,212,0), rgba(94,234,212,0.14), rgba(96,165,250,0.10), rgba(94,234,212,0))',
+                            'linear-gradient(90deg, rgba(20,184,166,0), rgba(20,184,166,0.16), rgba(9,124,255,0.12), rgba(20,184,166,0))',
                         transform: 'rotate(-8deg)',
                         pointerEvents: 'none'
                     }}
@@ -379,7 +385,10 @@ const SignInPage = () => {
                         zIndex: 1,
                         border: `1px solid ${C.border}`,
                         borderRadius: '8px',
-                        backgroundColor: 'rgba(8,17,31,0.74)',
+                        backgroundColor: C.panel,
+                        boxShadow: C.shadow,
+                        backdropFilter: C.blur,
+                        WebkitBackdropFilter: C.blur,
                         p: 2.5
                     }}
                 >
@@ -397,7 +406,7 @@ const SignInPage = () => {
                                     p: 1.5,
                                     borderRadius: '8px',
                                     border: `1px solid ${C.border}`,
-                                    backgroundColor: 'rgba(255,255,255,0.04)'
+                                    backgroundColor: 'rgba(255,255,255,0.46)'
                                 }}
                             >
                                 <Typography sx={{ color: C.text, fontWeight: 900, fontSize: '1.2rem' }}>{metric.value}</Typography>
@@ -422,7 +431,7 @@ const SignInPage = () => {
                 </Box>
             </Box>
 
-            <Box sx={{ p: { xs: 3.5, md: 5 }, backgroundColor: 'rgba(15,23,42,0.55)' }}>
+            <Box sx={{ p: { xs: 3.5, md: 5 }, backgroundColor: 'rgba(255,255,255,0.32)' }}>
                 {/* alerts */}
                 <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
                     {successMessage && (
@@ -531,15 +540,15 @@ const SignInPage = () => {
                             sx={{
                                 mt: 1,
                                 height: 52,
-                                borderRadius: '8px',
+                                borderRadius: '999px',
                                 textTransform: 'none',
                                 fontWeight: 700,
                                 fontSize: '1rem',
-                                color: '#042f2e',
+                                color: '#ecfeff',
                                 backgroundColor: C.teal,
                                 boxShadow: `0 0 40px ${C.glow}`,
                                 '&:hover': { backgroundColor: C.tealDeep },
-                                '&.Mui-disabled': { backgroundColor: 'rgba(94,234,212,0.5)', color: '#042f2e' }
+                                '&.Mui-disabled': { backgroundColor: 'rgba(20,184,166,0.5)', color: '#ecfeff' }
                             }}
                         >
                             {t('auth.loginDashboard')}

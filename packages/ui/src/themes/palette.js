@@ -78,17 +78,25 @@ export default function themePalette(theme) {
             paper: theme.paper,
             default: theme.backgroundDefault
         },
+        glass: {
+            surface: theme.customization.isDarkMode ? theme.colors?.glassDarkSurface : theme.colors?.glassLightSurface,
+            surfaceStrong: theme.customization.isDarkMode ? theme.colors?.glassDarkSurfaceStrong : theme.colors?.glassLightSurfaceStrong,
+            border: theme.customization.isDarkMode ? theme.colors?.glassDarkBorder : theme.colors?.glassBorder,
+            highlight: theme.customization.isDarkMode ? theme.colors?.glassDarkHighlight : theme.colors?.glassHighlight,
+            shadow: theme.customization.isDarkMode ? theme.colors?.glassShadowDark : theme.colors?.glassShadowLight,
+            blur: theme.colors?.glassBlur
+        },
         textBackground: {
             main: theme.customization.isDarkMode ? theme.colors?.darkPrimary800 : theme.colors?.grey50,
             border: theme.customization.isDarkMode ? theme.colors?.transparent : theme.colors?.grey400
         },
         card: {
-            main: theme.customization.isDarkMode ? theme.colors?.darkPrimaryMain : theme.colors?.paper,
-            light: theme.customization.isDarkMode ? theme.colors?.darkPrimary200 : theme.colors?.paper,
-            hover: theme.customization.isDarkMode ? theme.colors?.darkPrimary800 : theme.colors?.paper
+            main: theme.customization.isDarkMode ? theme.colors?.glassDarkSurface : theme.colors?.glassLightSurface,
+            light: theme.customization.isDarkMode ? theme.colors?.glassDarkSurfaceStrong : theme.colors?.glassLightSurfaceStrong,
+            hover: theme.customization.isDarkMode ? theme.colors?.glassDarkSurfaceStrong : theme.colors?.glassLightSurfaceStrong
         },
         asyncSelect: {
-            main: theme.customization.isDarkMode ? theme.colors?.darkPrimary800 : theme.colors?.grey50
+            main: theme.customization.isDarkMode ? theme.colors?.glassDarkSurface : theme.colors?.glassLightSurface
         },
         timeMessage: {
             main: theme.customization.isDarkMode ? theme.colors?.darkLevel2 : theme.colors?.grey200

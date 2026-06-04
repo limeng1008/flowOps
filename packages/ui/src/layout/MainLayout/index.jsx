@@ -82,11 +82,16 @@ const MainLayout = () => {
                 color='inherit'
                 elevation={0}
                 sx={{
-                    bgcolor: theme.palette.background.default,
+                    background: `linear-gradient(145deg, ${theme.palette.glass.highlight}, transparent 32%), ${theme.palette.glass.surfaceStrong}`,
+                    borderBottom: '1px solid',
+                    borderColor: theme.palette.glass.border,
+                    boxShadow: 'none',
+                    backdropFilter: `blur(${theme.palette.glass.blur}) saturate(1.45)`,
+                    WebkitBackdropFilter: `blur(${theme.palette.glass.blur}) saturate(1.45)`,
                     transition: leftDrawerOpened ? theme.transitions.create('width') : 'none'
                 }}
             >
-                <Toolbar sx={{ height: `${headerHeight}px`, borderBottom: '1px solid', borderColor: theme.palette.grey[900] + 25 }}>
+                <Toolbar sx={{ height: `${headerHeight}px` }}>
                     <Header handleLeftDrawerToggle={handleLeftDrawerToggle} />
                 </Toolbar>
             </AppBar>

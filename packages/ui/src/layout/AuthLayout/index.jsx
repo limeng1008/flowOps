@@ -1,16 +1,17 @@
 import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router-dom'
 import { Box, Button, Stack } from '@mui/material'
+import { useTheme } from '@mui/material/styles'
 import { useTranslation } from 'react-i18next'
 import { SUPPORTED_LANGUAGES } from '@/i18n'
 
 // ==============================|| AUTH LAYOUT (FlowOps shell) ||============================== //
 
-const BG = '#08111f'
-
 const AuthLayout = () => {
+    const theme = useTheme()
     const { i18n } = useTranslation()
     const [currentLang, setCurrentLang] = useState(i18n.resolvedLanguage || i18n.language)
+    const isDark = theme.palette.mode === 'dark'
 
     const handleChangeLanguage = (lng) => {
         i18n.changeLanguage(lng)
@@ -31,9 +32,9 @@ const AuthLayout = () => {
                 minHeight: '100vh',
                 width: '100%',
                 overflowX: 'hidden',
-                backgroundColor: BG,
+                backgroundColor: isDark ? '#07101d' : '#eef7ff',
                 backgroundImage:
-                    'linear-gradient(135deg, rgba(20,184,166,0.18) 0%, rgba(8,17,31,0) 32%), linear-gradient(315deg, rgba(37,99,235,0.16) 0%, rgba(8,17,31,0) 36%)'
+                    'radial-gradient(900px 520px at 12% 8%, rgba(9,124,255,0.20), transparent 58%), radial-gradient(820px 500px at 88% 16%, rgba(20,184,166,0.18), transparent 56%), linear-gradient(135deg, rgba(255,255,255,0.58), rgba(255,255,255,0.18))'
             }}
         >
             <Box
@@ -42,7 +43,7 @@ const AuthLayout = () => {
                     inset: 0,
                     pointerEvents: 'none',
                     backgroundImage:
-                        'linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px)',
+                        'linear-gradient(rgba(255,255,255,0.22) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.18) 1px, transparent 1px)',
                     backgroundSize: '44px 44px',
                     maskImage: 'linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.25))'
                 }}
@@ -58,10 +59,11 @@ const AuthLayout = () => {
                     zIndex: 2,
                     p: 0.5,
                     borderRadius: '999px',
-                    backgroundColor: 'rgba(8,17,31,0.72)',
-                    border: '1px solid rgba(255,255,255,0.12)',
-                    backdropFilter: 'blur(14px)',
-                    WebkitBackdropFilter: 'blur(14px)'
+                    background: `linear-gradient(145deg, ${theme.palette.glass.highlight}, transparent 34%), ${theme.palette.glass.surfaceStrong}`,
+                    border: `1px solid ${theme.palette.glass.border}`,
+                    boxShadow: theme.palette.glass.shadow,
+                    backdropFilter: `blur(${theme.palette.glass.blur}) saturate(1.45)`,
+                    WebkitBackdropFilter: `blur(${theme.palette.glass.blur}) saturate(1.45)`
                 }}
             >
                 {SUPPORTED_LANGUAGES.map((lng) => {
@@ -77,9 +79,9 @@ const AuthLayout = () => {
                                 py: 0.5,
                                 borderRadius: '999px',
                                 textTransform: 'none',
-                                color: active ? '#042f2e' : '#e5e7eb',
-                                backgroundColor: active ? '#5eead4' : 'transparent',
-                                '&:hover': { backgroundColor: active ? '#5eead4' : 'rgba(255,255,255,0.10)' }
+                                color: active ? '#042f2e' : theme.palette.text.primary,
+                                backgroundColor: active ? theme.palette.secondary.main : 'transparent',
+                                '&:hover': { backgroundColor: active ? theme.palette.secondary.main : theme.palette.glass.surface }
                             }}
                         >
                             {lng.label}

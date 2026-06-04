@@ -14,15 +14,17 @@ import ScheduleStatusBadge from '@/ui-component/extended/ScheduleStatusBadge'
 import { translateTemplateName, translateTemplateDescription } from '@/i18n/marketplaceI18n'
 
 const CardWrapper = styled(MainCard)(({ theme }) => ({
-    background: theme.palette.card.main,
+    background: `linear-gradient(145deg, ${theme.palette.glass.highlight}, transparent 34%), ${theme.palette.glass.surface}`,
     color: theme.darkTextPrimary,
     overflow: 'auto',
     position: 'relative',
-    boxShadow: '0 2px 14px 0 rgb(32 40 45 / 8%)',
+    boxShadow: theme.palette.glass.shadow,
+    backdropFilter: `blur(${theme.palette.glass.blur}) saturate(1.45)`,
+    WebkitBackdropFilter: `blur(${theme.palette.glass.blur}) saturate(1.45)`,
     cursor: 'pointer',
     '&:hover': {
-        background: theme.palette.card.hover,
-        boxShadow: '0 2px 14px 0 rgb(32 40 45 / 20%)'
+        background: `linear-gradient(145deg, ${theme.palette.glass.highlight}, transparent 30%), ${theme.palette.glass.surfaceStrong}`,
+        boxShadow: theme.palette.glass.shadow
     },
     height: '100%',
     minHeight: '160px',

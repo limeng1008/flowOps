@@ -27,23 +27,27 @@ import { IconExclamationCircle, IconX } from '@tabler/icons-react'
 // ==============================|| ResetPasswordPage ||============================== //
 
 const C = {
-    cyan: '#22d3ee',
-    cyanDeep: '#06b6d4',
-    text: '#e5e7eb',
-    textDim: '#9ca3af',
-    textMute: '#6b7280',
-    glow: 'rgba(34, 211, 238, 0.35)',
-    panel: 'rgba(255, 255, 255, 0.05)',
-    border: 'rgba(255, 255, 255, 0.10)'
+    cyan: '#14b8a6',
+    cyanDeep: '#0f766e',
+    text: '#102033',
+    textDim: 'rgba(16, 32, 51, 0.68)',
+    textMute: 'rgba(16, 32, 51, 0.48)',
+    glow: 'rgba(20, 184, 166, 0.30)',
+    panel: 'rgba(255, 255, 255, 0.58)',
+    border: 'rgba(255, 255, 255, 0.58)',
+    shadow: '0 22px 60px rgba(15, 23, 42, 0.14)',
+    blur: 'blur(22px) saturate(1.45)'
 }
 
 const inputSx = {
     '& .MuiOutlinedInput-root': {
         borderRadius: '14px',
         color: C.text,
-        backgroundColor: 'rgba(0,0,0,0.30)',
+        backgroundColor: 'rgba(255,255,255,0.46)',
+        backdropFilter: C.blur,
+        WebkitBackdropFilter: C.blur,
         '& fieldset': { borderColor: C.border },
-        '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.20)' },
+        '&:hover fieldset': { borderColor: 'rgba(20,184,166,0.42)' },
         '&.Mui-focused fieldset': { borderColor: C.cyan, borderWidth: '1px' }
     },
     '& .MuiOutlinedInput-input': { padding: '14px 16px' },
@@ -169,11 +173,11 @@ const ResetPasswordPage = () => {
                     maxWidth: 520,
                     backgroundColor: C.panel,
                     border: `1px solid ${C.border}`,
-                    backdropFilter: 'blur(24px)',
-                    WebkitBackdropFilter: 'blur(24px)',
+                    backdropFilter: C.blur,
+                    WebkitBackdropFilter: C.blur,
                     borderRadius: '32px',
                     p: { xs: 3.5, md: 5 },
-                    boxShadow: '0 0 80px rgba(34,211,238,0.10)'
+                    boxShadow: C.shadow
                 }}
             >
                 <Stack flexDirection='column' sx={{ gap: 3 }}>
@@ -237,9 +241,11 @@ const ResetPasswordPage = () => {
                                         mt: '8px',
                                         borderRadius: '14px',
                                         color: C.text,
-                                        backgroundColor: 'rgba(0,0,0,0.30)',
+                                        backgroundColor: 'rgba(255,255,255,0.46)',
+                                        backdropFilter: C.blur,
+                                        WebkitBackdropFilter: C.blur,
                                         '& .MuiOutlinedInput-notchedOutline': { borderColor: C.border },
-                                        '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.20)' },
+                                        '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(20,184,166,0.42)' },
                                         '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: C.cyan, borderWidth: '1px' },
                                         '& textarea::placeholder': { color: C.textMute, opacity: 1 }
                                     }}
@@ -289,15 +295,15 @@ const ResetPasswordPage = () => {
                                 sx={{
                                     mt: 1,
                                     height: 52,
-                                    borderRadius: '14px',
+                                    borderRadius: '999px',
                                     textTransform: 'none',
                                     fontWeight: 700,
                                     fontSize: '1rem',
-                                    color: '#000',
+                                    color: '#ecfeff',
                                     backgroundColor: C.cyan,
                                     boxShadow: `0 0 40px ${C.glow}`,
                                     '&:hover': { backgroundColor: C.cyanDeep },
-                                    '&.Mui-disabled': { backgroundColor: 'rgba(34,211,238,0.5)', color: '#000' }
+                                    '&.Mui-disabled': { backgroundColor: 'rgba(20,184,166,0.5)', color: '#ecfeff' }
                                 }}
                                 type='submit'
                             >

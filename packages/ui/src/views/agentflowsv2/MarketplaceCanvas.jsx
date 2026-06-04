@@ -92,7 +92,12 @@ const MarketplaceCanvasV2 = () => {
                     color='inherit'
                     elevation={1}
                     sx={{
-                        bgcolor: theme.palette.background.default
+                        background: `linear-gradient(145deg, ${theme.palette.glass.highlight}, transparent 32%), ${theme.palette.glass.surfaceStrong}`,
+                        borderBottom: '1px solid',
+                        borderColor: theme.palette.glass.border,
+                        boxShadow: 'none',
+                        backdropFilter: `blur(${theme.palette.glass.blur}) saturate(1.45)`,
+                        WebkitBackdropFilter: `blur(${theme.palette.glass.blur}) saturate(1.45)`
                     }}
                 >
                     <Toolbar>
