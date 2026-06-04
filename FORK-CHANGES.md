@@ -208,6 +208,7 @@
 | `packages/ui/src/views/docstore/UpsertHistoryDetailsDialog.jsx`               | UI-i18n-hardening |
 | `packages/ui/src/views/docstore/UpsertHistorySideDrawer.jsx`                  | UI-i18n-hardening |
 | `packages/ui/src/views/evaluations/CreateEvaluationDialog.jsx`                | UI-i18n-hardening |
+| `packages/ui/src/views/evaluations/EvalsResultDialog.jsx`                     | UI-i18n-hardening |
 | `packages/ui/src/views/evaluations/EvaluationResult.jsx`                      | UI-i18n-hardening |
 | `packages/ui/src/views/evaluations/EvaluationResultSideDrawer.jsx`            | UI-i18n-hardening |
 | `packages/ui/src/views/evaluations/EvaluationResultVersionsSideDrawer.jsx`    | UI-i18n-hardening |

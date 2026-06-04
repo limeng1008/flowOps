@@ -25,13 +25,32 @@ import LLMIcon from '@mui/icons-material/ModelTraining'
 import AlarmIcon from '@mui/icons-material/AlarmOn'
 import TokensIcon from '@mui/icons-material/AutoAwesomeMotion'
 import PaidIcon from '@mui/icons-material/Paid'
+import { useTranslation } from 'react-i18next'
 
 // Project imports
 import { StyledTableCell, StyledTableRow } from '@/ui-component/table/TableStyles'
 
 // const
 
+const getEvaluationMetricValue = (t, value) => (value || value === 0 ? value : t('pages.evaluations.notAvailable'))
+
+const getEvaluationMetricLabel = (t, key, value) => t(key, { value: getEvaluationMetricValue(t, value) })
+
+const getEvaluationResultLabel = (t, result) => {
+    switch (result) {
+        case 'Pass':
+            return t('pages.evaluations.pass')
+        case 'Fail':
+            return t('pages.evaluations.fail')
+        case 'Error':
+            return t('pages.evaluations.statusError')
+        default:
+            return result
+    }
+}
+
 const EvalsResultDialog = ({ show, dialogProps, onCancel, openDetailsDrawer }) => {
+    const { t } = useTranslation()
     const portalElement = document.getElementById('portal')
     const customization = useSelector((state) => state.customization)
     const theme = useTheme()
@@ -80,7 +99,7 @@ const EvalsResultDialog = ({ show, dialogProps, onCancel, openDetailsDrawer }) =
                                 }}
                             >
                                 <IconVectorBezier2 style={{ marginRight: 5 }} size={17} />
-                                Flows Used:
+                                {t('pages.evaluations.flowsUsed')}
                             </div>
                             {(dialogProps.data.evaluation.chatflowName || []).map((chatflowUsed, index) => (
                                 <Chip
@@ -100,7 +119,7 @@ const EvalsResultDialog = ({ show, dialogProps, onCancel, openDetailsDrawer }) =
                         </Stack>
                     )}
                     <Button variant='outlined' sx={{ width: 'max-content' }} startIcon={<IconMinimize />} onClick={() => onCancel()}>
-                        Minimize
+                        {t('pages.evaluations.minimize')}
                     </Button>
                 </Stack>
             </DialogTitle>
@@ -124,8 +143,8 @@ const EvalsResultDialog = ({ show, dialogProps, onCancel, openDetailsDrawer }) =
                         >
                             <TableRow>
                                 <TableCell rowSpan='2'>&nbsp;</TableCell>
-                                <TableCell rowSpan='2'>Input</TableCell>
-                                <TableCell rowSpan='2'>Expected Output</TableCell>
+                                <TableCell rowSpan='2'>{t('pages.evaluations.input')}</TableCell>
+                                <TableCell rowSpan='2'>{t('pages.evaluations.expectedOutput')}</TableCell>
                                 {dialogProps.data &&
                                     dialogProps.data.evaluation.chatflowId?.map((chatflowId, index) => (
                                         <React.Fragment key={index}>
@@ -167,12 +186,14 @@ const EvalsResultDialog = ({ show, dialogProps, onCancel, openDetailsDrawer }) =
                                             <TableCell
                                                 style={{ borderLeftStyle: 'dashed', borderLeftColor: 'lightgrey', borderLeftWidth: 1 }}
                                             >
-                                                Actual Output
+                                                {t('pages.evaluations.actualOutput')}
                                             </TableCell>
                                             {dialogProps.data.customEvalsDefined && dialogProps.data.showCustomEvals && (
-                                                <TableCell>Evaluator</TableCell>
+                                                <TableCell>{t('pages.evaluations.evaluator')}</TableCell>
                                             )}
-                                            {dialogProps.data.evaluation?.evaluationType === 'llm' && <TableCell>LLM Evaluation</TableCell>}
+                                            {dialogProps.data.evaluation?.evaluationType === 'llm' && (
+                                                <TableCell>{t('pages.evaluations.llmEvaluation')}</TableCell>
+                                            )}
                                         </React.Fragment>
                                     ))}
                             </TableRow>
@@ -214,22 +235,22 @@ const EvalsResultDialog = ({ show, dialogProps, onCancel, openDetailsDrawer }) =
                                                                         variant='outlined'
                                                                         icon={<PaidIcon />}
                                                                         size='small'
-                                                                        label={
+                                                                        label={getEvaluationMetricLabel(
+                                                                            t,
+                                                                            'pages.evaluations.totalCostMetric',
                                                                             item.metrics[index]?.totalCost
-                                                                                ? 'Total Cost: ' + item.metrics[index]?.totalCost
-                                                                                : 'Total Cost: N/A'
-                                                                        }
+                                                                        )}
                                                                         sx={{ mr: 1, mb: 1 }}
                                                                     />
                                                                     <Chip
                                                                         variant='outlined'
                                                                         size='small'
                                                                         icon={<TokensIcon />}
-                                                                        label={
+                                                                        label={getEvaluationMetricLabel(
+                                                                            t,
+                                                                            'pages.evaluations.totalTokensMetric',
                                                                             item.metrics[index]?.totalTokens
-                                                                                ? 'Total Tokens: ' + item.metrics[index]?.totalTokens
-                                                                                : 'Total Tokens: N/A'
-                                                                        }
+                                                                        )}
                                                                         sx={{ mr: 1, mb: 1 }}
                                                                     />
                                                                     {dialogProps.data.showTokenMetrics && (
@@ -238,24 +259,22 @@ const EvalsResultDialog = ({ show, dialogProps, onCancel, openDetailsDrawer }) =
                                                                                 variant='outlined'
                                                                                 size='small'
                                                                                 icon={<TokensIcon />}
-                                                                                label={
+                                                                                label={getEvaluationMetricLabel(
+                                                                                    t,
+                                                                                    'pages.evaluations.promptTokensMetric',
                                                                                     item.metrics[index]?.promptTokens
-                                                                                        ? 'Prompt Tokens: ' +
-                                                                                          item.metrics[index]?.promptTokens
-                                                                                        : 'Prompt Tokens: N/A'
-                                                                                }
+                                                                                )}
                                                                                 sx={{ mr: 1, mb: 1 }}
                                                                             />{' '}
                                                                             <Chip
                                                                                 variant='outlined'
                                                                                 size='small'
                                                                                 icon={<TokensIcon />}
-                                                                                label={
+                                                                                label={getEvaluationMetricLabel(
+                                                                                    t,
+                                                                                    'pages.evaluations.completionTokensMetric',
                                                                                     item.metrics[index]?.completionTokens
-                                                                                        ? 'Completion Tokens: ' +
-                                                                                          item.metrics[index]?.completionTokens
-                                                                                        : 'Completion Tokens: N/A'
-                                                                                }
+                                                                                )}
                                                                                 sx={{ mr: 1, mb: 1 }}
                                                                             />{' '}
                                                                         </>
@@ -266,23 +285,22 @@ const EvalsResultDialog = ({ show, dialogProps, onCancel, openDetailsDrawer }) =
                                                                                 variant='outlined'
                                                                                 size='small'
                                                                                 icon={<PaidIcon />}
-                                                                                label={
+                                                                                label={getEvaluationMetricLabel(
+                                                                                    t,
+                                                                                    'pages.evaluations.promptCostMetric',
                                                                                     item.metrics[index]?.promptCost
-                                                                                        ? 'Prompt Cost: ' + item.metrics[index]?.promptCost
-                                                                                        : 'Prompt Cost: N/A'
-                                                                                }
+                                                                                )}
                                                                                 sx={{ mr: 1, mb: 1 }}
                                                                             />{' '}
                                                                             <Chip
                                                                                 variant='outlined'
                                                                                 size='small'
                                                                                 icon={<PaidIcon />}
-                                                                                label={
+                                                                                label={getEvaluationMetricLabel(
+                                                                                    t,
+                                                                                    'pages.evaluations.completionCostMetric',
                                                                                     item.metrics[index]?.completionCost
-                                                                                        ? 'Completion Cost: ' +
-                                                                                          item.metrics[index]?.completionCost
-                                                                                        : 'Completion Cost: N/A'
-                                                                                }
+                                                                                )}
                                                                                 sx={{ mr: 1, mb: 1 }}
                                                                             />{' '}
                                                                         </>
@@ -291,11 +309,11 @@ const EvalsResultDialog = ({ show, dialogProps, onCancel, openDetailsDrawer }) =
                                                                         variant='outlined'
                                                                         size='small'
                                                                         icon={<AlarmIcon />}
-                                                                        label={
+                                                                        label={getEvaluationMetricLabel(
+                                                                            t,
+                                                                            'pages.evaluations.apiLatencyMetric',
                                                                             item.metrics[index]?.apiLatency
-                                                                                ? 'API Latency: ' + item.metrics[index]?.apiLatency
-                                                                                : 'API Latency: N/A'
-                                                                        }
+                                                                        )}
                                                                         sx={{ mr: 1, mb: 1 }}
                                                                     />{' '}
                                                                     {dialogProps.data.showLatencyMetrics && (
@@ -305,11 +323,11 @@ const EvalsResultDialog = ({ show, dialogProps, onCancel, openDetailsDrawer }) =
                                                                                     variant='outlined'
                                                                                     size='small'
                                                                                     icon={<AlarmIcon />}
-                                                                                    label={
+                                                                                    label={getEvaluationMetricLabel(
+                                                                                        t,
+                                                                                        'pages.evaluations.chainLatencyMetric',
                                                                                         item.metrics[index]?.chain
-                                                                                            ? 'Chain Latency: ' + item.metrics[index]?.chain
-                                                                                            : 'Chain Latency: N/A'
-                                                                                    }
+                                                                                    )}
                                                                                     sx={{ mr: 1, mb: 1 }}
                                                                                 />
                                                                             )}{' '}
@@ -319,10 +337,11 @@ const EvalsResultDialog = ({ show, dialogProps, onCancel, openDetailsDrawer }) =
                                                                                     icon={<AlarmIcon />}
                                                                                     size='small'
                                                                                     sx={{ mr: 1, mb: 1 }}
-                                                                                    label={
-                                                                                        'Retriever Latency: ' +
+                                                                                    label={getEvaluationMetricLabel(
+                                                                                        t,
+                                                                                        'pages.evaluations.retrieverLatencyMetric',
                                                                                         item.metrics[index]?.retriever
-                                                                                    }
+                                                                                    )}
                                                                                 />
                                                                             )}{' '}
                                                                             {item.metrics[index]?.tool && (
@@ -331,18 +350,22 @@ const EvalsResultDialog = ({ show, dialogProps, onCancel, openDetailsDrawer }) =
                                                                                     icon={<AlarmIcon />}
                                                                                     size='small'
                                                                                     sx={{ mr: 1, mb: 1 }}
-                                                                                    label={'Tool Latency: ' + item.metrics[index]?.tool}
+                                                                                    label={getEvaluationMetricLabel(
+                                                                                        t,
+                                                                                        'pages.evaluations.toolLatencyMetric',
+                                                                                        item.metrics[index]?.tool
+                                                                                    )}
                                                                                 />
                                                                             )}{' '}
                                                                             <Chip
                                                                                 variant='outlined'
                                                                                 icon={<AlarmIcon />}
                                                                                 size='small'
-                                                                                label={
+                                                                                label={getEvaluationMetricLabel(
+                                                                                    t,
+                                                                                    'pages.evaluations.llmLatencyMetric',
                                                                                     item.metrics[index]?.llm
-                                                                                        ? 'LLM Latency: ' + item.metrics[index]?.llm
-                                                                                        : 'LLM Latency: N/A'
-                                                                                }
+                                                                                )}
                                                                                 sx={{ mr: 1, mb: 1 }}
                                                                             />{' '}
                                                                         </>
@@ -390,6 +413,7 @@ const EvalsResultDialog = ({ show, dialogProps, onCancel, openDetailsDrawer }) =
                                                                         }}
                                                                         variant={'contained'}
                                                                         size='small'
+                                                                        title={getEvaluationResultLabel(t, evaluator.result)}
                                                                         label={`${evaluator.name}`}
                                                                     ></Chip>
                                                                 </Stack>
