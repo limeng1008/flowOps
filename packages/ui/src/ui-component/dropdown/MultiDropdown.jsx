@@ -1,10 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 import { Popper, FormControl, TextField, Box, Typography } from '@mui/material'
 import Autocomplete, { autocompleteClasses } from '@mui/material/Autocomplete'
 import { useTheme, styled } from '@mui/material/styles'
 import PropTypes from 'prop-types'
+import { translateNodeLabel, translateNodeDescription } from '@/i18n/nodeI18n'
 
 const StyledPopper = styled(Popper)({
     boxShadow: '0px 8px 10px -5px rgb(0 0 0 / 20%), 0px 16px 24px 2px rgb(0 0 0 / 14%), 0px 6px 30px 5px rgb(0 0 0 / 12%)',
@@ -18,16 +20,32 @@ const StyledPopper = styled(Popper)({
     }
 })
 
+const isChooseOptionValue = (candidate, chooseOptionLabel) => candidate === 'choose an option' || candidate === chooseOptionLabel
+
 export const MultiDropdown = ({ name, value, options, onSelect, formControlSx = {}, disabled = false, disableClearable = false }) => {
     const customization = useSelector((state) => state.customization)
+    const { t, i18n } = useTranslation()
+    const [currentLang, setCurrentLang] = useState(i18n.resolvedLanguage || i18n.language)
+    useEffect(() => {
+        const onLanguageChanged = (lng) => setCurrentLang(lng)
+        i18n.on('languageChanged', onLanguageChanged)
+        return () => i18n.off('languageChanged', onLanguageChanged)
+    }, [i18n])
+    const chooseOptionLabel = t('common.chooseOption')
     const findMatchingOptions = (options = [], internalValue) => {
         let values = []
-        if ('choose an option' !== internalValue && internalValue && typeof internalValue === 'string') values = JSON.parse(internalValue)
+        if (!isChooseOptionValue(internalValue, chooseOptionLabel) && internalValue && typeof internalValue === 'string')
+            values = JSON.parse(internalValue)
         else values = internalValue
+        if (!Array.isArray(values)) return []
         return options.filter((option) => values.includes(option.name))
     }
     const getDefaultOptionValue = () => []
     let [internalValue, setInternalValue] = useState(value ?? [])
+    const getTranslatedOptionLabel = (option) => {
+        if (typeof option === 'string') return translateNodeLabel(option, currentLang)
+        return translateNodeLabel(option?.label || option?.name || '', currentLang)
+    }
     const theme = useTheme()
 
     return (
@@ -41,6 +59,7 @@ export const MultiDropdown = ({ name, value, options, onSelect, formControlSx = 
                 filterSelectedOptions
                 options={options || []}
                 value={findMatchingOptions(options, internalValue) || getDefaultOptionValue()}
+                getOptionLabel={getTranslatedOptionLabel}
                 onChange={(e, selections) => {
                     let value = ''
                     if (selections.length) {
@@ -72,9 +91,11 @@ export const MultiDropdown = ({ name, value, options, onSelect, formControlSx = 
                 renderOption={(props, option) => (
                     <Box component='li' {...props}>
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <Typography variant='h5'>{option.label}</Typography>
+                            <Typography variant='h5'>{translateNodeLabel(option.label, currentLang)}</Typography>
                             {option.description && (
-                                <Typography sx={{ color: customization.isDarkMode ? '#9e9e9e' : '' }}>{option.description}</Typography>
+                                <Typography sx={{ color: customization.isDarkMode ? '#9e9e9e' : '' }}>
+                                    {translateNodeDescription(option.description, currentLang)}
+                                </Typography>
                             )}
                         </div>
                     </Box>

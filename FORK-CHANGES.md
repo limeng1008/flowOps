@@ -34,6 +34,7 @@
 | `packages/ui/src/i18n/locales/en.json`                                        | UI-i18n-hardening |
 | `packages/ui/src/i18n/locales/zh.json`                                        | UI-i18n-hardening |
 | `packages/ui/src/i18n/canvasNodeBadgesI18n.test.js`                           | UI-i18n-hardening |
+| `packages/ui/src/i18n/finalI18nSweep.test.js`                                 | UI-i18n-hardening |
 | `packages/ui/src/i18n/nodeI18n.js`                                            | UI-i18n-hardening |
 | `packages/ui/src/i18n/viewsLongTailI18n.test.js`                              | UI-i18n-hardening |
 | `packages/ui/src/layout/AuthLayout/index.jsx`                                 | UI-i18n-hardening |
@@ -71,7 +72,9 @@
 | `packages/ui/src/ui-component/dialog/StarterPromptsDialog.jsx`                | UI-i18n-hardening |
 | `packages/ui/src/ui-component/dialog/ViewLeadsDialog.jsx`                     | UI-i18n-hardening |
 | `packages/ui/src/ui-component/dialog/ViewMessagesDialog.jsx`                  | UI-i18n-hardening |
+| `packages/ui/src/ui-component/dropdown/AsyncDropdown.jsx`                     | UI-i18n-hardening |
 | `packages/ui/src/ui-component/dropdown/Dropdown.jsx`                          | UI-i18n-hardening |
+| `packages/ui/src/ui-component/dropdown/MultiDropdown.jsx`                     | UI-i18n-hardening |
 | `packages/ui/src/ui-component/extended/Logo.jsx`                              | Branding-shell    |
 | `packages/ui/src/ui-component/extended/TextToSpeech.jsx`                      | UI-i18n-hardening |
 | `packages/ui/src/ui-component/file/File.jsx`                                  | UI-i18n-hardening |
