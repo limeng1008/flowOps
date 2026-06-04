@@ -79,6 +79,21 @@ describe('canvas node badge i18n coverage', () => {
         )
         expect(
             translateNodeTooltip(
+                'Give your agent context about different document sources. Document stores must be upserted in advance.',
+                'zh'
+            )
+        ).toBe('为智能体提供不同文档来源作为上下文。文档库需要提前完成入库。')
+        expect(
+            translateNodeTooltip(
+                'Give your agent context about different document sources from existing vector stores and embeddings',
+                'zh'
+            )
+        ).toBe('从现有向量库和嵌入中为智能体提供不同文档来源作为上下文。')
+        expect(
+            translateNodeTooltip('Document stores to retrieve information from. Document stores must be upserted in advance.', 'zh')
+        ).toBe('用于检索信息的文档库。文档库需要提前完成入库。')
+        expect(
+            translateNodeTooltip(
                 'This will limit the number of AWS API for Titan model embeddings call retries. Used to avoid throttling.',
                 'zh'
             )

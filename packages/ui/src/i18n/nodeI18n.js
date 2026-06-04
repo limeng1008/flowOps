@@ -569,6 +569,12 @@ const nodeDescriptionMap = {
     'Memory for agentflow to remember the state of the conversation using MySQL database': '使用 MySQL 让 agentflow 记忆对话状态',
     'Memory for agentflow to remember the state of the conversation using Postgres database': '使用 Postgres 让 agentflow 记忆对话状态',
     'Memory for agentflow to remember the state of the conversation using SQLite database': '使用 SQLite 让 agentflow 记忆对话状态',
+    'Give your agent context about different document sources. Document stores must be upserted in advance.':
+        '为智能体提供不同文档来源作为上下文。文档库需要提前完成入库。',
+    'Give your agent context about different document sources from existing vector stores and embeddings':
+        '从现有向量库和嵌入中为智能体提供不同文档来源作为上下文。',
+    'Document stores to retrieve information from. Document stores must be upserted in advance.':
+        '用于检索信息的文档库。文档库需要提前完成入库。',
     'Retrieve chat messages stored in database': '读取数据库中的对话消息',
     'Stores and manages chat memory using Mem0 service': '通过 Mem0 服务存储与管理对话记忆',
     'Stores the conversation in MongoDB Atlas': '将对话存储到 MongoDB Atlas',
@@ -1006,6 +1012,12 @@ const nodeTooltipMap = {
     'Whether to return source documents': '是否返回来源文档。',
     'Return source documents': '返回来源文档。',
     'Add an input message as user message at the end of the conversation': '在对话末尾追加一条用户消息作为输入消息。',
+    'Give your agent context about different document sources. Document stores must be upserted in advance.':
+        '为智能体提供不同文档来源作为上下文。文档库需要提前完成入库。',
+    'Give your agent context about different document sources from existing vector stores and embeddings':
+        '从现有向量库和嵌入中为智能体提供不同文档来源作为上下文。',
+    'Document stores to retrieve information from. Document stores must be upserted in advance.':
+        '用于检索信息的文档库。文档库需要提前完成入库。',
     'Window of size k to surface the last k back-and-forth to use as memory.': '保留最近 k 轮对话作为记忆。',
     'Uses a window of size k to surface the last k back-and-forth to use as memory': '使用大小为 k 的窗口，把最近 k 轮对话作为记忆。',
     'Summarizes the conversation and stores the current summary in memory': '对对话进行摘要，并将当前摘要存入记忆。',
