@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { translateNodeLabel } from '@/i18n/nodeI18n'
 import { cloneDeep } from 'lodash'
 import { v4 as uuidv4 } from 'uuid'
 import moment from 'moment/moment'
@@ -45,10 +46,11 @@ import { initNode, showHideInputParams, getFileName } from '@/utils/genericHelpe
 import useNotifier from '@/utils/useNotifier'
 
 // const
-const steps = ['Embeddings', 'Vector Store', 'Record Manager']
+const steps = ['pages.documentStores.stepEmbeddings', 'pages.documentStores.stepVectorStore', 'pages.documentStores.stepRecordManager']
 
 const VectorStoreConfigure = () => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
+    const currentLang = i18n.resolvedLanguage || i18n.language
     const navigate = useNavigate()
     const dispatch = useDispatch()
     const { hasAssignedWorkspace } = useAuth()
@@ -131,7 +133,7 @@ const VectorStoreConfigure = () => {
 
     const showEmbeddingsList = () => {
         const dialogProp = {
-            title: 'Select Embeddings Provider'
+            title: t('pages.documentStores.selectEmbeddingsProvider')
         }
         setDialogProps(dialogProp)
         setShowEmbeddingsListDialog(true)
@@ -155,7 +157,7 @@ const VectorStoreConfigure = () => {
 
     const showVectorStoreList = () => {
         const dialogProp = {
-            title: 'Select a Vector Store Provider'
+            title: t('pages.documentStores.selectVectorStoreProvider')
         }
         setDialogProps(dialogProp)
         setShowVectorStoreListDialog(true)
@@ -173,7 +175,7 @@ const VectorStoreConfigure = () => {
 
     const showRecordManagerList = () => {
         const dialogProp = {
-            title: 'Select a Record Manager'
+            title: t('pages.documentStores.selectRecordManager')
         }
         setDialogProps(dialogProp)
         setShowRecordManagerListDialog(true)
@@ -341,7 +343,7 @@ const VectorStoreConfigure = () => {
                 <Stepper activeStep={getActiveStep()} alternativeLabel>
                     {steps.map((label) => (
                         <Step key={label}>
-                            <StepLabel>{label}</StepLabel>
+                            <StepLabel>{t(label)}</StepLabel>
                         </Step>
                     ))}
                 </Stepper>
@@ -520,7 +522,7 @@ const VectorStoreConfigure = () => {
                                     isBackButton={true}
                                     search={false}
                                     title={getViewHeaderTitle()}
-                                    description='Configure Embeddings, Vector Store and Record Manager'
+                                    description={t('pages.documentStores.configureSubtitle')}
                                     onBack={() => navigate(-1)}
                                 >
                                     {(Object.keys(selectedEmbeddingsProvider).length > 0 ||
@@ -550,7 +552,7 @@ const VectorStoreConfigure = () => {
                                             startIcon={<IconDeviceFloppy />}
                                             onClick={() => saveVectorStoreConfig()}
                                         >
-                                            Save Config
+                                            {t('pages.documentStores.saveConfig')}
                                         </Button>
                                     )}
                                     {Object.keys(selectedEmbeddingsProvider).length > 0 &&
@@ -603,7 +605,7 @@ const VectorStoreConfigure = () => {
                                                     }
                                                 }}
                                             >
-                                                Select Embeddings
+                                                {t('pages.documentStores.selectEmbeddings')}
                                             </Button>
                                         ) : (
                                             <Box>
@@ -651,7 +653,7 @@ const VectorStoreConfigure = () => {
                                                                     )}
                                                                 </div>
                                                                 <Typography sx={{ ml: 2 }} variant='h3'>
-                                                                    {selectedEmbeddingsProvider.label}
+                                                                    {translateNodeLabel(selectedEmbeddingsProvider.label, currentLang)}
                                                                 </Typography>
                                                                 <div style={{ flex: 1 }}></div>
                                                                 <div
@@ -719,7 +721,7 @@ const VectorStoreConfigure = () => {
                                                 }}
                                                 disabled={isVectorStoreDisabled()}
                                             >
-                                                {t('pages.assistants.selectVectorStore')}
+                                                {t('pages.documentStores.selectVectorStore')}
                                             </Button>
                                         ) : (
                                             <Box>
@@ -769,7 +771,7 @@ const VectorStoreConfigure = () => {
                                                                     )}
                                                                 </div>
                                                                 <Typography sx={{ ml: 2 }} variant='h3'>
-                                                                    {selectedVectorStoreProvider.label}
+                                                                    {translateNodeLabel(selectedVectorStoreProvider.label, currentLang)}
                                                                 </Typography>
                                                                 <div style={{ flex: 1 }}></div>
                                                                 <div
@@ -844,8 +846,8 @@ const VectorStoreConfigure = () => {
                                                 disabled={isRecordManagerDisabled()}
                                             >
                                                 {isRecordManagerUnavailable
-                                                    ? 'Record Manager is not applicable for selected Vector Store'
-                                                    : 'Select Record Manager'}
+                                                    ? t('pages.documentStores.recordManagerNotApplicable')
+                                                    : t('pages.documentStores.selectRecordManager')}
                                             </Button>
                                         ) : (
                                             <Box>
@@ -895,7 +897,7 @@ const VectorStoreConfigure = () => {
                                                                     )}
                                                                 </div>
                                                                 <Typography sx={{ ml: 2 }} variant='h3'>
-                                                                    {selectedRecordManagerProvider.label}
+                                                                    {translateNodeLabel(selectedRecordManagerProvider.label, currentLang)}
                                                                 </Typography>
                                                                 <div style={{ flex: 1 }}></div>
                                                                 <div

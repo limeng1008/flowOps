@@ -189,7 +189,7 @@ const EditUserDialog = ({ show, dialogProps, onCancel, onConfirm, setError }) =>
                         disabled={dialogProps?.data?.isOrgOwner}
                         options={getStatusOptions(t)}
                         onSelect={(newValue) => setStatus(newValue)}
-                        value={status ?? 'choose an option'}
+                        value={status ?? t('common.chooseOption')}
                         id='dropdown_status'
                     />
                     {dialogProps?.data?.isOrgOwner && (

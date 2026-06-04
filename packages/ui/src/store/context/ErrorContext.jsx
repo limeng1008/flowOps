@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { redirectWhenUnauthorized } from '@/utils/genericHelper'
 import PropTypes from 'prop-types'
 import { useNavigate } from 'react-router-dom'
@@ -12,11 +13,12 @@ export const ErrorProvider = ({ children }) => {
     const [error, setError] = useState(null)
     const [authRateLimitError, setAuthRateLimitError] = useState(null)
     const navigate = useNavigate()
+    const { t } = useTranslation()
 
     const handleError = async (err) => {
         console.error(err)
         if (err?.response?.status === 429 && err?.response?.data?.type === 'authentication_rate_limit') {
-            setAuthRateLimitError("You're making a lot of requests. Please wait and try again later.")
+            setAuthRateLimitError(t('auth.rateLimitTooManyRequests'))
         } else if (err?.response?.status === 429 && err?.response?.data?.type !== 'authentication_rate_limit') {
             const retryAfterHeader = err?.response?.headers?.['retry-after']
             let retryAfter = 60 // Default in seconds

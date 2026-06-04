@@ -31,10 +31,6 @@ import useNotifier from '@/utils/useNotifier'
 import chatflowsApi from '@/api/chatflows'
 import { useTranslation } from 'react-i18next'
 
-const message = `The full contents of uploaded files will be converted to text and sent to the Agent.
-<br />
-Refer <a href='https://docs.flowiseai.com/using-flowise/uploads#files' target='_blank' style='color: #2196f3'>docs</a> for more details.`
-
 const availableFileTypes = [
     { name: 'CSS', ext: 'text/css', extension: '.css' },
     { name: 'CSV', ext: 'text/csv', extension: '.csv' },
@@ -44,7 +40,7 @@ const availableFileTypes = [
     { name: 'YAML', ext: 'application/x-yaml', extension: '.yaml' },
     { name: 'PDF', ext: 'application/pdf', extension: '.pdf' },
     { name: 'SQL', ext: 'application/sql', extension: '.sql' },
-    { name: 'Text File', ext: 'text/plain', extension: '.txt' },
+    { nameKey: 'canvas.chatConfig.fileTypeText', ext: 'text/plain', extension: '.txt' },
     { name: 'XML', ext: 'application/xml', extension: '.xml' },
     { name: 'DOC', ext: 'application/msword', extension: '.doc' },
     { name: 'DOCX', ext: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', extension: '.docx' },
@@ -99,7 +95,7 @@ const FileUpload = ({ dialogProps }) => {
             })
             if (saveResp.data) {
                 enqueueSnackbar({
-                    message: 'File Upload Configuration Saved',
+                    message: t('canvas.chatConfig.fileUploadSaved'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -114,9 +110,9 @@ const FileUpload = ({ dialogProps }) => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to save File Upload Configuration: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('canvas.chatConfig.fileUploadSaveFailed', {
+                    message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -187,12 +183,14 @@ const FileUpload = ({ dialogProps }) => {
                     }}
                 >
                     <IconBulb size={20} color='#16a34a' style={{ flexShrink: 0 }} />
-                    <Typography sx={{ color: 'text.secondary', fontSize: '0.8125rem', lineHeight: 1.5 }}>{parser(message)}</Typography>
+                    <Typography sx={{ color: 'text.secondary', fontSize: '0.8125rem', lineHeight: 1.5 }}>
+                        {parser(t('canvas.chatConfig.fileUploadNotice'))}
+                    </Typography>
                 </Box>
-                <SwitchInput label='Enable Full File Upload' onChange={handleChange} value={fullFileUpload} />
+                <SwitchInput label={t('canvas.chatConfig.enableFullFileUpload')} onChange={handleChange} value={fullFileUpload} />
             </Box>
 
-            <Typography sx={{ fontSize: '0.875rem', fontWeight: 500, mb: 1 }}>Allow Uploads of Type</Typography>
+            <Typography sx={{ fontSize: '0.875rem', fontWeight: 500, mb: 1 }}>{t('canvas.chatConfig.allowUploadsOfType')}</Typography>
             <div
                 style={{
                     display: 'grid',
@@ -223,7 +221,7 @@ const FileUpload = ({ dialogProps }) => {
                             onChange={handleAllowedFileTypesChange}
                         />
                         <label htmlFor={fileType.ext} style={{ marginLeft: 10, fontSize: '0.8125rem' }}>
-                            {fileType.name} ({fileType.extension})
+                            {fileType.nameKey ? t(fileType.nameKey) : fileType.name} ({fileType.extension})
                         </label>
                     </div>
                 ))}
@@ -247,26 +245,36 @@ const FileUpload = ({ dialogProps }) => {
                         expandIcon={<ExpandMoreIcon sx={{ fontSize: '1.1rem', color: 'text.secondary' }} />}
                         sx={{ minHeight: 40, px: 2, '& .MuiAccordionSummary-content': { my: 0.75 } }}
                     >
-                        <Typography sx={{ fontSize: '0.8125rem', fontWeight: 500, color: 'text.secondary' }}>Advanced Settings</Typography>
+                        <Typography sx={{ fontSize: '0.8125rem', fontWeight: 500, color: 'text.secondary' }}>
+                            {t('canvas.chatConfig.advancedSettings')}
+                        </Typography>
                     </AccordionSummary>
                     <AccordionDetails sx={{ px: 2, pt: 0, pb: 2, display: 'flex', flexDirection: 'column', gap: 2 }}>
                         {/* PDF Processing */}
                         {allowedFileTypes.includes('application/pdf') && (
                             <Box>
                                 <Typography sx={{ fontSize: '0.8125rem', fontWeight: 500, color: 'text.primary', mb: 0.75 }}>
-                                    PDF Processing
+                                    {t('canvas.chatConfig.pdfProcessing')}
                                 </Typography>
                                 <FormControl disabled={!fullFileUpload}>
                                     <RadioGroup name='pdf-usage' value={pdfUsage} onChange={handlePdfUsageChange}>
                                         <FormControlLabel
                                             value='perPage'
                                             control={<Radio size='small' />}
-                                            label={<Typography sx={{ fontSize: '0.8125rem' }}>One document per page</Typography>}
+                                            label={
+                                                <Typography sx={{ fontSize: '0.8125rem' }}>
+                                                    {t('canvas.chatConfig.oneDocumentPerPage')}
+                                                </Typography>
+                                            }
                                         />
                                         <FormControlLabel
                                             value='perFile'
                                             control={<Radio size='small' />}
-                                            label={<Typography sx={{ fontSize: '0.8125rem' }}>One document per file</Typography>}
+                                            label={
+                                                <Typography sx={{ fontSize: '0.8125rem' }}>
+                                                    {t('canvas.chatConfig.oneDocumentPerFile')}
+                                                </Typography>
+                                            }
                                         />
                                     </RadioGroup>
                                 </FormControl>

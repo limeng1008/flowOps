@@ -1,5 +1,6 @@
 import { useState, useEffect, useContext, Fragment } from 'react'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 import PropTypes from 'prop-types'
 import axios from 'axios'
 
@@ -15,6 +16,7 @@ import credentialsApi from '@/api/credentials'
 import { baseURL } from '@/store/constant'
 import { flowContext } from '@/store/context/ReactFlowContext'
 import { getAvailableNodesForVariable } from '@/utils/genericHelper'
+import { translateNodeLabel, translateNodeDescription } from '@/i18n/nodeI18n'
 
 const StyledPopper = styled(Popper)({
     boxShadow: '0px 8px 10px -5px rgb(0 0 0 / 20%), 0px 16px 24px 2px rgb(0 0 0 / 14%), 0px 6px 30px 5px rgb(0 0 0 / 12%)',
@@ -27,6 +29,8 @@ const StyledPopper = styled(Popper)({
         }
     }
 })
+
+const isChooseOptionValue = (candidate, chooseOptionLabel) => candidate === 'choose an option' || candidate === chooseOptionLabel
 
 const fetchList = async ({ name, nodeData, previousNodes, currentNode }) => {
     const selectedParam = nodeData.inputParams.find((param) => param.name === name)
@@ -75,7 +79,15 @@ export const AsyncDropdown = ({
     fullWidth = false
 }) => {
     const customization = useSelector((state) => state.customization)
+    const { t, i18n } = useTranslation()
+    const [currentLang, setCurrentLang] = useState(i18n.resolvedLanguage || i18n.language)
+    useEffect(() => {
+        const onLanguageChanged = (lng) => setCurrentLang(lng)
+        i18n.on('languageChanged', onLanguageChanged)
+        return () => i18n.off('languageChanged', onLanguageChanged)
+    }, [i18n])
     const theme = useTheme()
+    const chooseOptionLabel = t('common.chooseOption')
 
     const [open, setOpen] = useState(false)
     const [options, setOptions] = useState([])
@@ -83,18 +95,23 @@ export const AsyncDropdown = ({
     const findMatchingOptions = (options = [], value) => {
         if (multiple) {
             let values = []
-            if ('choose an option' !== value && value && typeof value === 'string') {
+            if (!isChooseOptionValue(value, chooseOptionLabel) && value && typeof value === 'string') {
                 values = JSON.parse(value)
             } else {
                 values = value
             }
+            if (!Array.isArray(values)) return []
             return options.filter((option) => values.includes(option.name))
         }
         return options.find((option) => option.name === value)
     }
     const getDefaultOptionValue = () => (multiple ? [] : '')
-    const addNewOption = [{ label: '- Create New -', name: '-create-' }]
+    const addNewOption = [{ label: t('common.createNewOption'), name: '-create-' }]
     let [internalValue, setInternalValue] = useState(value ?? 'choose an option')
+    const getTranslatedOptionLabel = (option) => {
+        if (typeof option === 'string') return translateNodeLabel(option, currentLang)
+        return translateNodeLabel(option?.label || option?.name || '', currentLang)
+    }
     const { reactFlowInstance } = useContext(flowContext)
 
     const fetchCredentialList = async () => {
@@ -195,6 +212,7 @@ export const AsyncDropdown = ({
                 }}
                 options={options}
                 value={findMatchingOptions(options, internalValue) || getDefaultOptionValue()}
+                getOptionLabel={getTranslatedOptionLabel}
                 onChange={(e, selection) => {
                     if (multiple) {
                         let value = ''
@@ -244,7 +262,7 @@ export const AsyncDropdown = ({
                                                     key={option.name}
                                                     component='img'
                                                     src={option.imageSrc}
-                                                    alt={option.label || 'Selected Option'}
+                                                    alt={translateNodeLabel(option.label, currentLang)}
                                                     sx={{
                                                         width: 32,
                                                         height: 32,
@@ -296,9 +314,11 @@ export const AsyncDropdown = ({
                             />
                         )}
                         <div style={{ display: 'flex', flexDirection: 'column' }}>
-                            <Typography variant='h5'>{option.label}</Typography>
+                            <Typography variant='h5'>{translateNodeLabel(option.label, currentLang)}</Typography>
                             {option.description && (
-                                <Typography sx={{ color: customization.isDarkMode ? '#9e9e9e' : '' }}>{option.description}</Typography>
+                                <Typography sx={{ color: customization.isDarkMode ? '#9e9e9e' : '' }}>
+                                    {translateNodeDescription(option.description, currentLang)}
+                                </Typography>
                             )}
                         </div>
                     </Box>

@@ -13,27 +13,27 @@ import { useTranslation } from 'react-i18next'
 
 const defaultInstructions = [
     {
-        text: 'Summarize a document',
+        key: 'summarizeDocument',
         img: <IconNotebook />
     },
     {
-        text: 'Translate the language',
+        key: 'translateLanguage',
         img: <IconLanguage />
     },
     {
-        text: 'Write me an email',
+        key: 'writeEmail',
         img: <IconMail />
     },
     {
-        text: 'Convert the code to another language',
+        key: 'convertCode',
         img: <IconCode />
     },
     {
-        text: 'Research and generate a report',
+        key: 'researchReport',
         img: <IconReport />
     },
     {
-        text: 'Plan a trip',
+        key: 'planTrip',
         img: <IconWorld />
     }
 ]
@@ -119,6 +119,7 @@ const AssistantPromptGenerator = ({ show, dialogProps, onCancel, onConfirm }) =>
                         }}
                     >
                         {defaultInstructions.map((instruction, index) => {
+                            const instructionText = t(`canvas.promptGenerator.examples.${instruction.key}`)
                             return (
                                 <Button
                                     size='small'
@@ -127,12 +128,12 @@ const AssistantPromptGenerator = ({ show, dialogProps, onCancel, onConfirm }) =>
                                     variant='outlined'
                                     color='inherit'
                                     onClick={() => {
-                                        setCustomAssistantInstruction(instruction.text)
+                                        setCustomAssistantInstruction(instructionText)
                                         setGeneratedInstruction('')
                                     }}
                                     startIcon={instruction.img}
                                 >
-                                    {instruction.text}
+                                    {instructionText}
                                 </Button>
                             )
                         })}
@@ -145,7 +146,7 @@ const AssistantPromptGenerator = ({ show, dialogProps, onCancel, onConfirm }) =>
                             rows={12}
                             disabled={loading}
                             value={customAssistantInstruction}
-                            placeholder={'Describe your task here'}
+                            placeholder={t('canvas.promptGenerator.placeholder')}
                             onChange={(event) => setCustomAssistantInstruction(event.target.value)}
                         />
                     )}

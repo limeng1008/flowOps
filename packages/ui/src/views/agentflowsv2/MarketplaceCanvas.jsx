@@ -5,6 +5,7 @@ import '@/views/canvas/index.css'
 
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 // material-ui
 import { Toolbar, Box, AppBar } from '@mui/material'
@@ -28,6 +29,7 @@ const edgeTypes = { agentFlow: AgentFlowEdge }
 // ==============================|| CANVAS ||============================== //
 
 const MarketplaceCanvasV2 = () => {
+    const { t } = useTranslation()
     const theme = useTheme()
     const navigate = useNavigate()
     const customization = useSelector((state) => state.customization)
@@ -132,8 +134,8 @@ const MarketplaceCanvasV2 = () => {
                                         onClick={() => {
                                             setIsSnappingEnabled(!isSnappingEnabled)
                                         }}
-                                        title='toggle snapping'
-                                        aria-label='toggle snapping'
+                                        title={t('canvas.toggleSnapping')}
+                                        aria-label={t('canvas.toggleSnapping')}
                                     >
                                         {isSnappingEnabled ? <IconMagnetFilled /> : <IconMagnetOff />}
                                     </button>
@@ -142,8 +144,8 @@ const MarketplaceCanvasV2 = () => {
                                         onClick={() => {
                                             setIsBackgroundEnabled(!isBackgroundEnabled)
                                         }}
-                                        title='toggle background'
-                                        aria-label='toggle background'
+                                        title={t('canvas.toggleBackground')}
+                                        aria-label={t('canvas.toggleBackground')}
                                     >
                                         {isBackgroundEnabled ? <IconArtboard /> : <IconArtboardOff />}
                                     </button>

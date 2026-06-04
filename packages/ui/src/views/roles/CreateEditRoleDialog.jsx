@@ -199,10 +199,9 @@ const CreateEditRoleDialog = ({ show, dialogProps, onCancel, onConfirm, setError
 
     const createRole = async () => {
         try {
-            // if roleName has a space, raise an error
             if (roleName.indexOf(' ') > -1) {
                 enqueueSnackbar({
-                    message: `Role Name cannot contain spaces.`,
+                    message: t('pages.roles.roleNameNoSpaces'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'error',
@@ -312,14 +311,19 @@ const CreateEditRoleDialog = ({ show, dialogProps, onCancel, onConfirm, setError
             <DialogTitle sx={{ fontSize: '1rem' }} id='alert-dialog-title'>
                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                     <IconUser style={{ marginRight: '10px' }} />
-                    {dialogProps.type === 'EDIT' ? 'Edit Role' : dialogProps.type === 'VIEW' ? 'View Role' : 'Create New Role'}
+                    {dialogProps.type === 'EDIT'
+                        ? t('pages.roles.editRole')
+                        : dialogProps.type === 'VIEW'
+                        ? t('pages.roles.viewRole')
+                        : t('pages.roles.createNewRole')}
                 </div>
             </DialogTitle>
             <DialogContent sx={{ backgroundColor: 'transparent' }}>
                 <div className='role-editor'>
                     <Box>
                         <Typography sx={{ mb: 1 }} variant='h5'>
-                            <span style={{ color: 'red' }}>*&nbsp;&nbsp;</span>Role Name
+                            <span style={{ color: 'red' }}>*&nbsp;&nbsp;</span>
+                            {t('pages.roles.roleName')}
                         </Typography>
                         <OutlinedInput
                             id='roleName'
@@ -327,7 +331,7 @@ const CreateEditRoleDialog = ({ show, dialogProps, onCancel, onConfirm, setError
                             size='small'
                             fullWidth
                             disabled={dialogProps.type === 'EDIT' || dialogProps.type === 'VIEW'}
-                            placeholder='Enter role name'
+                            placeholder={t('pages.roles.roleNamePlaceholder')}
                             value={roleName}
                             name='roleName'
                             onChange={handleRoleNameChange}
@@ -335,7 +339,7 @@ const CreateEditRoleDialog = ({ show, dialogProps, onCancel, onConfirm, setError
                     </Box>
                     <Box>
                         <Typography sx={{ mb: 1 }} variant='h5'>
-                            Role Description
+                            {t('pages.roles.roleDescription')}
                         </Typography>
                         <OutlinedInput
                             id='roleDesc'
@@ -343,7 +347,7 @@ const CreateEditRoleDialog = ({ show, dialogProps, onCancel, onConfirm, setError
                             size='small'
                             fullWidth
                             disabled={dialogProps.type === 'VIEW'}
-                            placeholder='Description of the role'
+                            placeholder={t('pages.roles.roleDescriptionPlaceholder')}
                             value={roleDescription}
                             name='roleDesc'
                             onChange={handleRoleDescChange}

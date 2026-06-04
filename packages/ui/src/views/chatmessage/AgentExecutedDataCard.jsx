@@ -181,7 +181,7 @@ function CustomLabel({ icon: Icon, itemStatus, children, name, label, data, meta
                 <IconButton
                     onClick={handleOpenDialog}
                     size='small'
-                    title='View Details'
+                    title={t('common.viewDetails')}
                     sx={{
                         ml: 2,
                         zIndex: 10 // Increase z-index to ensure the button is clickable
@@ -196,7 +196,7 @@ function CustomLabel({ icon: Icon, itemStatus, children, name, label, data, meta
                     {data ? (
                         <NodeExecutionDetails data={data} label={label} metadata={metadata} />
                     ) : (
-                        <Typography color='text.secondary'>No data available for this item</Typography>
+                        <Typography color='text.secondary'>{t('pages.executions.noItemData')}</Typography>
                     )}
                 </DialogContent>
                 <DialogActions>

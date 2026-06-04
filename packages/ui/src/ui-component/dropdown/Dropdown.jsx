@@ -32,6 +32,10 @@ export const Dropdown = ({ name, value, loading, options, onSelect, disabled = f
     const findMatchingOptions = (options = [], value) => options.find((option) => option.name === value)
     const getDefaultOptionValue = () => ''
     let [internalValue, setInternalValue] = useState(value ?? 'choose an option')
+    const getTranslatedOptionLabel = (option) => {
+        if (typeof option === 'string') return translateNodeLabel(option, currentLang)
+        return translateNodeLabel(option?.label || option?.name || '', currentLang)
+    }
     const theme = useTheme()
 
     return (
@@ -45,6 +49,7 @@ export const Dropdown = ({ name, value, loading, options, onSelect, disabled = f
                 loading={loading}
                 options={options || []}
                 value={findMatchingOptions(options, internalValue) || getDefaultOptionValue()}
+                getOptionLabel={getTranslatedOptionLabel}
                 onChange={(e, selection) => {
                     const value = selection ? selection.name : ''
                     setInternalValue(value)

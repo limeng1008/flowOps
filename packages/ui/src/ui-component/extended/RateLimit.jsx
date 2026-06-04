@@ -48,7 +48,7 @@ const RateLimit = ({ dialogProps, hideTitle = false }) => {
             const rateLimitValuesBoolean = [!limitMax, !limitDuration, !limitMsg]
             const rateLimitFilledValues = rateLimitValuesBoolean.filter((value) => value === false)
             if (rateLimitFilledValues.length >= 1 && rateLimitFilledValues.length <= 2) {
-                throw new Error('Need to fill all rate limit input fields')
+                throw new Error(t('canvas.chatConfig.rateLimitInputRequired'))
             } else if (rateLimitFilledValues.length === 3) {
                 obj = {
                     ...obj,
@@ -82,7 +82,7 @@ const RateLimit = ({ dialogProps, hideTitle = false }) => {
             })
             if (saveResp.data) {
                 enqueueSnackbar({
-                    message: 'Rate Limit Configuration Saved',
+                    message: t('canvas.chatConfig.rateLimitSaved'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -97,9 +97,9 @@ const RateLimit = ({ dialogProps, hideTitle = false }) => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to save Rate Limit Configuration: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('canvas.chatConfig.rateLimitSaveFailed', {
+                    message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -153,20 +153,21 @@ const RateLimit = ({ dialogProps, hideTitle = false }) => {
             {!hideTitle && (
                 <Typography variant='h3'>
                     {t('canvas.configDialog.rateLimit')}{' '}
-                    <TooltipWithParser
-                        style={{ marginLeft: 10 }}
-                        title={
-                            'Visit <a target="_blank" href="https://docs.flowiseai.com/configuration/rate-limit">Rate Limit Setup Guide</a> to set up Rate Limit correctly in your hosting environment.'
-                        }
-                    />
+                    <TooltipWithParser style={{ marginLeft: 10 }} title={t('canvas.chatConfig.rateLimitHelp')} />
                 </Typography>
             )}
-            <SwitchInput label='Enable Rate Limit' onChange={handleChange} value={rateLimitStatus} />
+            <SwitchInput label={t('canvas.chatConfig.enableRateLimit')} onChange={handleChange} value={rateLimitStatus} />
             {rateLimitStatus && (
                 <Stack direction='column' spacing={2} sx={{ width: '100%' }}>
-                    {textField(limitMax, 'limitMax', 'Message Limit per Duration', 'number', '5')}
-                    {textField(limitDuration, 'limitDuration', 'Duration in Second', 'number', '60')}
-                    {textField(limitMsg, 'limitMsg', 'Limit Message', 'string', 'You have reached the quota')}
+                    {textField(limitMax, 'limitMax', t('canvas.chatConfig.messageLimitPerDuration'), 'number', '5')}
+                    {textField(limitDuration, 'limitDuration', t('canvas.chatConfig.durationInSeconds'), 'number', '60')}
+                    {textField(
+                        limitMsg,
+                        'limitMsg',
+                        t('canvas.chatConfig.limitMessage'),
+                        'string',
+                        t('canvas.chatConfig.limitMessagePlaceholder')
+                    )}
                 </Stack>
             )}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', mt: 2 }}>

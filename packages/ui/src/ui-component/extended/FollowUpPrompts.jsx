@@ -27,11 +27,6 @@ import { IconX } from '@tabler/icons-react'
 import { Dropdown } from '@/ui-component/dropdown/Dropdown'
 import { useTranslation } from 'react-i18next'
 
-const promptDescription =
-    'Prompt to generate questions based on the conversation history. You can use variable {history} to refer to the conversation history.'
-const defaultPrompt =
-    'Given the following conversations: {history}. Please help me predict the three most likely questions that human would ask and keeping each question short and concise.'
-
 // update when adding new providers
 const FollowUpPromptProviders = {
     ANTHROPIC: 'chatAnthropic',
@@ -50,28 +45,28 @@ const followUpPromptsOptions = {
         icon: anthropicIcon,
         inputs: [
             {
-                label: 'Connect Credential',
+                labelKey: 'canvas.chatConfig.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['anthropicApi']
             },
             {
-                label: 'Model Name',
+                labelKey: 'canvas.chatConfig.modelName',
                 name: 'modelName',
                 type: 'asyncOptions',
                 loadMethod: 'listModels'
             },
             {
-                label: 'Prompt',
+                labelKey: 'canvas.chatConfig.prompt',
                 name: 'prompt',
                 type: 'string',
                 rows: 4,
-                description: promptDescription,
+                descriptionKey: 'canvas.chatConfig.followUpPromptDescription',
                 optional: true,
-                default: defaultPrompt
+                defaultKey: 'canvas.chatConfig.followUpDefaultPrompt'
             },
             {
-                label: 'Temperature',
+                labelKey: 'canvas.chatConfig.temperature',
                 name: 'temperature',
                 type: 'number',
                 step: 0.1,
@@ -86,28 +81,28 @@ const followUpPromptsOptions = {
         icon: azureOpenAiIcon,
         inputs: [
             {
-                label: 'Connect Credential',
+                labelKey: 'canvas.chatConfig.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['azureOpenAIApi']
             },
             {
-                label: 'Model Name',
+                labelKey: 'canvas.chatConfig.modelName',
                 name: 'modelName',
                 type: 'asyncOptions',
                 loadMethod: 'listModels'
             },
             {
-                label: 'Prompt',
+                labelKey: 'canvas.chatConfig.prompt',
                 name: 'prompt',
                 type: 'string',
                 rows: 4,
-                description: promptDescription,
+                descriptionKey: 'canvas.chatConfig.followUpPromptDescription',
                 optional: true,
-                default: defaultPrompt
+                defaultKey: 'canvas.chatConfig.followUpDefaultPrompt'
             },
             {
-                label: 'Temperature',
+                labelKey: 'canvas.chatConfig.temperature',
                 name: 'temperature',
                 type: 'number',
                 step: 0.1,
@@ -122,28 +117,28 @@ const followUpPromptsOptions = {
         icon: geminiIcon,
         inputs: [
             {
-                label: 'Connect Credential',
+                labelKey: 'canvas.chatConfig.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['googleGenerativeAI']
             },
             {
-                label: 'Model Name',
+                labelKey: 'canvas.chatConfig.modelName',
                 name: 'modelName',
                 type: 'asyncOptions',
                 loadMethod: 'listModels'
             },
             {
-                label: 'Prompt',
+                labelKey: 'canvas.chatConfig.prompt',
                 name: 'prompt',
                 type: 'string',
                 rows: 4,
-                description: promptDescription,
+                descriptionKey: 'canvas.chatConfig.followUpPromptDescription',
                 optional: true,
-                default: defaultPrompt
+                defaultKey: 'canvas.chatConfig.followUpDefaultPrompt'
             },
             {
-                label: 'Temperature',
+                labelKey: 'canvas.chatConfig.temperature',
                 name: 'temperature',
                 type: 'number',
                 step: 0.1,
@@ -158,28 +153,28 @@ const followUpPromptsOptions = {
         icon: groqIcon,
         inputs: [
             {
-                label: 'Connect Credential',
+                labelKey: 'canvas.chatConfig.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['groqApi']
             },
             {
-                label: 'Model Name',
+                labelKey: 'canvas.chatConfig.modelName',
                 name: 'modelName',
                 type: 'asyncOptions',
                 loadMethod: 'listModels'
             },
             {
-                label: 'Prompt',
+                labelKey: 'canvas.chatConfig.prompt',
                 name: 'prompt',
                 type: 'string',
                 rows: 4,
-                description: promptDescription,
+                descriptionKey: 'canvas.chatConfig.followUpPromptDescription',
                 optional: true,
-                default: defaultPrompt
+                defaultKey: 'canvas.chatConfig.followUpDefaultPrompt'
             },
             {
-                label: 'Temperature',
+                labelKey: 'canvas.chatConfig.temperature',
                 name: 'temperature',
                 type: 'number',
                 step: 0.1,
@@ -194,28 +189,28 @@ const followUpPromptsOptions = {
         icon: mistralAiIcon,
         inputs: [
             {
-                label: 'Connect Credential',
+                labelKey: 'canvas.chatConfig.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['mistralAIApi']
             },
             {
-                label: 'Model Name',
+                labelKey: 'canvas.chatConfig.modelName',
                 name: 'modelName',
                 type: 'asyncOptions',
                 loadMethod: 'listModels'
             },
             {
-                label: 'Prompt',
+                labelKey: 'canvas.chatConfig.prompt',
                 name: 'prompt',
                 type: 'string',
                 rows: 4,
-                description: promptDescription,
+                descriptionKey: 'canvas.chatConfig.followUpPromptDescription',
                 optional: true,
-                default: defaultPrompt
+                defaultKey: 'canvas.chatConfig.followUpDefaultPrompt'
             },
             {
-                label: 'Temperature',
+                labelKey: 'canvas.chatConfig.temperature',
                 name: 'temperature',
                 type: 'number',
                 step: 0.1,
@@ -230,28 +225,28 @@ const followUpPromptsOptions = {
         icon: openAiIcon,
         inputs: [
             {
-                label: 'Connect Credential',
+                labelKey: 'canvas.chatConfig.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['openAIApi']
             },
             {
-                label: 'Model Name',
+                labelKey: 'canvas.chatConfig.modelName',
                 name: 'modelName',
                 type: 'asyncOptions',
                 loadMethod: 'listModels'
             },
             {
-                label: 'Prompt',
+                labelKey: 'canvas.chatConfig.prompt',
                 name: 'prompt',
                 type: 'string',
                 rows: 4,
-                description: promptDescription,
+                descriptionKey: 'canvas.chatConfig.followUpPromptDescription',
                 optional: true,
-                default: defaultPrompt
+                defaultKey: 'canvas.chatConfig.followUpDefaultPrompt'
             },
             {
-                label: 'Temperature',
+                labelKey: 'canvas.chatConfig.temperature',
                 name: 'temperature',
                 type: 'number',
                 step: 0.1,
@@ -266,32 +261,32 @@ const followUpPromptsOptions = {
         icon: ollamaIcon,
         inputs: [
             {
-                label: 'Base URL',
+                labelKey: 'canvas.chatConfig.baseUrl',
                 name: 'baseUrl',
                 type: 'string',
                 placeholder: 'http://127.0.0.1:11434',
-                description: 'Base URL of your Ollama instance',
+                descriptionKey: 'canvas.chatConfig.ollamaBaseUrlDescription',
                 default: 'http://127.0.0.1:11434'
             },
             {
-                label: 'Model Name',
+                labelKey: 'canvas.chatConfig.modelName',
                 name: 'modelName',
                 type: 'string',
                 placeholder: 'llama2',
-                description: 'Name of the Ollama model to use',
+                descriptionKey: 'canvas.chatConfig.ollamaModelNameDescription',
                 default: 'llama3.2-vision:latest'
             },
             {
-                label: 'Prompt',
+                labelKey: 'canvas.chatConfig.prompt',
                 name: 'prompt',
                 type: 'string',
                 rows: 4,
-                description: promptDescription,
+                descriptionKey: 'canvas.chatConfig.followUpPromptDescription',
                 optional: true,
-                default: defaultPrompt
+                defaultKey: 'canvas.chatConfig.followUpDefaultPrompt'
             },
             {
-                label: 'Temperature',
+                labelKey: 'canvas.chatConfig.temperature',
                 name: 'temperature',
                 type: 'number',
                 step: 0.1,
@@ -351,6 +346,23 @@ const FollowUpPrompts = ({ dialogProps }) => {
         return newVal
     }
 
+    const getLocalizedDefault = (inputParam) => {
+        if (inputParam.defaultKey === 'canvas.chatConfig.followUpDefaultPrompt') return t('canvas.chatConfig.followUpDefaultPrompt')
+        if (inputParam.defaultKey) return t(inputParam.defaultKey)
+        return inputParam.default
+    }
+
+    const localizeInputParam = (inputParam) => ({
+        ...inputParam,
+        label: inputParam.labelKey ? t(inputParam.labelKey) : inputParam.label,
+        description: inputParam.descriptionKey ? t(inputParam.descriptionKey) : inputParam.description,
+        default: getLocalizedDefault(inputParam),
+        options: inputParam.options?.map((option) => ({
+            ...option,
+            label: option.labelKey ? t(option.labelKey) : option.label
+        }))
+    })
+
     const onSave = async () => {
         // TODO: saving without changing the prompt will not save the prompt
         try {
@@ -363,14 +375,14 @@ const FollowUpPrompts = ({ dialogProps }) => {
             const selectedProvider = followUpPromptsConfig.selectedProvider
 
             if (selectedProvider && followUpPromptsConfig[selectedProvider] && followUpPromptsOptions[selectedProvider]) {
+                const localizedInputs = followUpPromptsOptions[selectedProvider].inputs.map(localizeInputParam)
+
                 if (!followUpPromptsConfig[selectedProvider].prompt) {
-                    followUpPromptsConfig[selectedProvider].prompt = followUpPromptsOptions[selectedProvider].inputs.find(
-                        (input) => input.name === 'prompt'
-                    )?.default
+                    followUpPromptsConfig[selectedProvider].prompt = localizedInputs.find((input) => input.name === 'prompt')?.default
                 }
 
                 if (!followUpPromptsConfig[selectedProvider].temperature) {
-                    followUpPromptsConfig[selectedProvider].temperature = followUpPromptsOptions[selectedProvider].inputs.find(
+                    followUpPromptsConfig[selectedProvider].temperature = localizedInputs.find(
                         (input) => input.name === 'temperature'
                     )?.default
                 }
@@ -382,7 +394,7 @@ const FollowUpPrompts = ({ dialogProps }) => {
             })
             if (saveResp.data) {
                 enqueueSnackbar({
-                    message: 'Follow-up Prompts configuration saved',
+                    message: t('canvas.chatConfig.followUpPromptsSaved'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -398,7 +410,7 @@ const FollowUpPrompts = ({ dialogProps }) => {
         } catch (error) {
             const errorData = error.response.data || `${error.response.status}: ${error.response.statusText}`
             enqueueSnackbar({
-                message: `Failed to save follow-up prompts configuration: ${errorData}`,
+                message: t('canvas.chatConfig.followUpPromptsSaveFailed', { message: errorData }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -475,13 +487,13 @@ const FollowUpPrompts = ({ dialogProps }) => {
                 }}
             >
                 <SwitchInput
-                    label='Enable Follow-up Prompts'
+                    label={t('canvas.chatConfig.enableFollowUpPrompts')}
                     onChange={(value) => handleChange('status', value)}
                     value={followUpPromptsConfig.status}
                 />
                 {followUpPromptsConfig && followUpPromptsConfig.status && (
                     <>
-                        <Typography variant='h5'>Providers</Typography>
+                        <Typography variant='h5'>{t('canvas.chatConfig.providers')}</Typography>
                         <FormControl fullWidth>
                             <Select
                                 size='small'
@@ -533,83 +545,92 @@ const FollowUpPrompts = ({ dialogProps }) => {
                                         }
                                     />
                                 </ListItem>
-                                {followUpPromptsOptions[selectedProvider].inputs.map((inputParam, index) => (
-                                    <Box key={index} sx={{ px: 2, width: '100%' }}>
-                                        <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                            <Typography>
-                                                {inputParam.label}
-                                                {!inputParam.optional && <span style={{ color: 'red' }}>&nbsp;*</span>}
-                                                {inputParam.description && (
-                                                    <TooltipWithParser style={{ marginLeft: 10 }} title={inputParam.description} />
-                                                )}
-                                            </Typography>
-                                        </div>
-                                        {inputParam.type === 'credential' && (
-                                            <CredentialInputHandler
-                                                key={`${selectedProvider}-${inputParam.name}`}
-                                                data={
-                                                    followUpPromptsConfig[selectedProvider]?.credentialId
-                                                        ? { credential: followUpPromptsConfig[selectedProvider].credentialId }
-                                                        : {}
-                                                }
-                                                inputParam={inputParam}
-                                                onSelect={(newValue) => setValue(newValue, selectedProvider, 'credentialId')}
-                                            />
-                                        )}
+                                {followUpPromptsOptions[selectedProvider].inputs.map((inputParam, index) => {
+                                    const localizedInputParam = localizeInputParam(inputParam)
+                                    return (
+                                        <Box key={index} sx={{ px: 2, width: '100%' }}>
+                                            <div style={{ display: 'flex', flexDirection: 'row' }}>
+                                                <Typography>
+                                                    {localizedInputParam.label}
+                                                    {!localizedInputParam.optional && <span style={{ color: 'red' }}>&nbsp;*</span>}
+                                                    {localizedInputParam.description && (
+                                                        <TooltipWithParser
+                                                            style={{ marginLeft: 10 }}
+                                                            title={localizedInputParam.description}
+                                                        />
+                                                    )}
+                                                </Typography>
+                                            </div>
+                                            {localizedInputParam.type === 'credential' && (
+                                                <CredentialInputHandler
+                                                    key={`${selectedProvider}-${localizedInputParam.name}`}
+                                                    data={
+                                                        followUpPromptsConfig[selectedProvider]?.credentialId
+                                                            ? { credential: followUpPromptsConfig[selectedProvider].credentialId }
+                                                            : {}
+                                                    }
+                                                    inputParam={localizedInputParam}
+                                                    onSelect={(newValue) => setValue(newValue, selectedProvider, 'credentialId')}
+                                                />
+                                            )}
 
-                                        {(inputParam.type === 'string' ||
-                                            inputParam.type === 'password' ||
-                                            inputParam.type === 'number') && (
-                                            <Input
-                                                key={`${selectedProvider}-${inputParam.name}`}
-                                                inputParam={inputParam}
-                                                onChange={(newValue) => setValue(newValue, selectedProvider, inputParam.name)}
-                                                value={
-                                                    followUpPromptsConfig[selectedProvider] &&
-                                                    followUpPromptsConfig[selectedProvider][inputParam.name]
-                                                        ? followUpPromptsConfig[selectedProvider][inputParam.name]
-                                                        : inputParam.default ?? ''
-                                                }
-                                            />
-                                        )}
+                                            {(localizedInputParam.type === 'string' ||
+                                                localizedInputParam.type === 'password' ||
+                                                localizedInputParam.type === 'number') && (
+                                                <Input
+                                                    key={`${selectedProvider}-${localizedInputParam.name}`}
+                                                    inputParam={localizedInputParam}
+                                                    onChange={(newValue) => setValue(newValue, selectedProvider, localizedInputParam.name)}
+                                                    value={
+                                                        followUpPromptsConfig[selectedProvider] &&
+                                                        followUpPromptsConfig[selectedProvider][localizedInputParam.name]
+                                                            ? followUpPromptsConfig[selectedProvider][localizedInputParam.name]
+                                                            : localizedInputParam.default ?? ''
+                                                    }
+                                                />
+                                            )}
 
-                                        {inputParam.type === 'asyncOptions' && (
-                                            <>
-                                                <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                                    <AsyncDropdown
-                                                        key={`${selectedProvider}-${inputParam.name}`}
-                                                        name={inputParam.name}
-                                                        nodeData={{
-                                                            name: followUpPromptsOptions[selectedProvider].name,
-                                                            inputParams: followUpPromptsOptions[selectedProvider].inputs
-                                                        }}
-                                                        value={
-                                                            followUpPromptsConfig[selectedProvider] &&
-                                                            followUpPromptsConfig[selectedProvider][inputParam.name]
-                                                                ? followUpPromptsConfig[selectedProvider][inputParam.name]
-                                                                : inputParam.default ?? 'choose an option'
-                                                        }
-                                                        onSelect={(newValue) => setValue(newValue, selectedProvider, inputParam.name)}
-                                                    />
-                                                </div>
-                                            </>
-                                        )}
+                                            {localizedInputParam.type === 'asyncOptions' && (
+                                                <>
+                                                    <div style={{ display: 'flex', flexDirection: 'row' }}>
+                                                        <AsyncDropdown
+                                                            key={`${selectedProvider}-${localizedInputParam.name}`}
+                                                            name={localizedInputParam.name}
+                                                            nodeData={{
+                                                                name: followUpPromptsOptions[selectedProvider].name,
+                                                                inputParams:
+                                                                    followUpPromptsOptions[selectedProvider].inputs.map(localizeInputParam)
+                                                            }}
+                                                            value={
+                                                                followUpPromptsConfig[selectedProvider] &&
+                                                                followUpPromptsConfig[selectedProvider][localizedInputParam.name]
+                                                                    ? followUpPromptsConfig[selectedProvider][localizedInputParam.name]
+                                                                    : localizedInputParam.default ?? t('common.chooseOption')
+                                                            }
+                                                            onSelect={(newValue) =>
+                                                                setValue(newValue, selectedProvider, localizedInputParam.name)
+                                                            }
+                                                        />
+                                                    </div>
+                                                </>
+                                            )}
 
-                                        {inputParam.type === 'options' && (
-                                            <Dropdown
-                                                name={inputParam.name}
-                                                options={inputParam.options}
-                                                onSelect={(newValue) => setValue(newValue, selectedProvider, inputParam.name)}
-                                                value={
-                                                    followUpPromptsConfig[selectedProvider] &&
-                                                    followUpPromptsConfig[selectedProvider][inputParam.name]
-                                                        ? followUpPromptsConfig[selectedProvider][inputParam]
-                                                        : inputParam.default ?? 'choose an option'
-                                                }
-                                            />
-                                        )}
-                                    </Box>
-                                ))}
+                                            {localizedInputParam.type === 'options' && (
+                                                <Dropdown
+                                                    name={localizedInputParam.name}
+                                                    options={localizedInputParam.options}
+                                                    onSelect={(newValue) => setValue(newValue, selectedProvider, localizedInputParam.name)}
+                                                    value={
+                                                        followUpPromptsConfig[selectedProvider] &&
+                                                        followUpPromptsConfig[selectedProvider][localizedInputParam.name]
+                                                            ? followUpPromptsConfig[selectedProvider][localizedInputParam.name]
+                                                            : localizedInputParam.default ?? t('common.chooseOption')
+                                                    }
+                                                />
+                                            )}
+                                        </Box>
+                                    )
+                                })}
                             </>
                         )}
                     </>

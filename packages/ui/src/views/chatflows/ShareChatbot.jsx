@@ -120,6 +120,12 @@ const ShareChatbot = ({ isSessionMemory, isAgentCanvas }) => {
     const [copyAnchorEl, setCopyAnchorEl] = useState(null)
     const openCopyPopOver = Boolean(copyAnchorEl)
 
+    const getErrorMessage = (error) => {
+        const data = error?.response?.data
+        if (typeof data === 'object') return data?.message || JSON.stringify(data)
+        return data || error?.message || t('pages.chatflows.share.unknownError')
+    }
+
     const formatObj = () => {
         const obj = {
             botMessage: {
@@ -186,7 +192,7 @@ const ShareChatbot = ({ isSessionMemory, isAgentCanvas }) => {
             })
             if (saveResp.data) {
                 enqueueSnackbar({
-                    message: 'Chatbot Configuration Saved',
+                    message: t('common.chatbotConfigSaved'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -201,9 +207,7 @@ const ShareChatbot = ({ isSessionMemory, isAgentCanvas }) => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to save Chatbot Configuration: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('pages.chatflows.share.saveFailed', { message: getErrorMessage(error) }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -223,7 +227,7 @@ const ShareChatbot = ({ isSessionMemory, isAgentCanvas }) => {
             const saveResp = await chatflowsApi.updateChatflow(chatflowid, { isPublic: checked })
             if (saveResp.data) {
                 enqueueSnackbar({
-                    message: 'Chatbot Configuration Saved',
+                    message: t('common.chatbotConfigSaved'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -238,9 +242,7 @@ const ShareChatbot = ({ isSessionMemory, isAgentCanvas }) => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to save Chatbot Configuration: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('pages.chatflows.share.saveFailed', { message: getErrorMessage(error) }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -431,7 +433,7 @@ const ShareChatbot = ({ isSessionMemory, isAgentCanvas }) => {
                     {`${baseURL}/chatbot/${chatflowid}`}
                 </Typography>
                 <IconButton
-                    title='Copy Link'
+                    title={t('pages.chatflows.share.copyLink')}
                     color='success'
                     onClick={(event) => {
                         navigator.clipboard.writeText(`${baseURL}/chatbot/${chatflowid}`)
@@ -443,7 +445,11 @@ const ShareChatbot = ({ isSessionMemory, isAgentCanvas }) => {
                 >
                     <IconCopy />
                 </IconButton>
-                <IconButton title='Open New Tab' color='primary' onClick={() => window.open(`${baseURL}/chatbot/${chatflowid}`, '_blank')}>
+                <IconButton
+                    title={t('pages.chatflows.share.openNewTab')}
+                    color='primary'
+                    onClick={() => window.open(`${baseURL}/chatbot/${chatflowid}`, '_blank')}
+                >
                     <IconArrowUpRightCircle />
                 </IconButton>
                 <div style={{ flex: 1 }} />
@@ -456,80 +462,88 @@ const ShareChatbot = ({ isSessionMemory, isAgentCanvas }) => {
                                 onSwitchChange(event.target.checked)
                             }}
                         />
-                        <Typography>Make Public</Typography>
-                        <TooltipWithParser
-                            style={{ marginLeft: 10 }}
-                            title={'Making public will allow anyone to access the chatbot without authentication'}
-                        />
+                        <Typography>{t('pages.chatflows.share.makePublic')}</Typography>
+                        <TooltipWithParser style={{ marginLeft: 10 }} title={t('pages.chatflows.share.makePublicHelp')} />
                     </div>
                 </Available>
             </Stack>
 
             <Card sx={{ borderColor: theme.palette.primary[200] + 75, p: 3, mt: 2 }} variant='outlined'>
                 <Stack sx={{ mt: 1, mb: 2, alignItems: 'center' }} direction='row' spacing={2}>
-                    <Typography variant='h4'>Title Settings</Typography>
+                    <Typography variant='h4'>{t('pages.chatflows.share.titleSettings')}</Typography>
                 </Stack>
-                {textField(title, 'title', 'Title', 'string', 'FlowOps Assistant')}
-                {textField(titleAvatarSrc, 'titleAvatarSrc', 'Title Avatar Link', 'string', `/flowops-icon.svg`)}
-                {colorField(titleBackgroundColor, 'titleBackgroundColor', 'Title Background Color')}
-                {colorField(titleTextColor, 'titleTextColor', 'Title TextColor')}
+                {textField(title, 'title', t('pages.chatflows.share.title'), 'string', 'FlowOps Assistant')}
+                {textField(titleAvatarSrc, 'titleAvatarSrc', t('pages.chatflows.share.titleAvatarLink'), 'string', `/flowops-icon.svg`)}
+                {colorField(titleBackgroundColor, 'titleBackgroundColor', t('pages.chatflows.share.titleBackgroundColor'))}
+                {colorField(titleTextColor, 'titleTextColor', t('pages.chatflows.share.titleTextColor'))}
             </Card>
 
             <Card sx={{ borderColor: theme.palette.primary[200] + 75, p: 3, mt: 2 }} variant='outlined'>
                 <Stack sx={{ mt: 1, mb: 2, alignItems: 'center' }} direction='row' spacing={2}>
-                    <Typography variant='h4'>General Settings</Typography>
+                    <Typography variant='h4'>{t('pages.chatflows.share.generalSettings')}</Typography>
                 </Stack>
-                {textField(welcomeMessage, 'welcomeMessage', 'Welcome Message', 'string', 'Hello! This is custom welcome message')}
-                {textField(errorMessage, 'errorMessage', 'Error Message', 'string', 'This is custom error message')}
-                {colorField(backgroundColor, 'backgroundColor', 'Background Color')}
-                {textField(fontSize, 'fontSize', 'Font Size', 'number')}
-                {colorField(poweredByTextColor, 'poweredByTextColor', 'PoweredBy TextColor')}
-                {isAgentCanvas && booleanField(showAgentMessages, 'showAgentMessages', 'Show agent reasonings when using Agentflow')}
-                {booleanField(renderHTML, 'renderHTML', 'Render HTML on the chat')}
-                {isSessionMemory &&
-                    booleanField(generateNewSession, 'generateNewSession', 'Start new session when chatbot link is opened or refreshed')}
+                {textField(
+                    welcomeMessage,
+                    'welcomeMessage',
+                    t('pages.chatflows.share.welcomeMessage'),
+                    'string',
+                    'Hello! This is custom welcome message'
+                )}
+                {textField(errorMessage, 'errorMessage', t('pages.chatflows.share.errorMessage'), 'string', 'This is custom error message')}
+                {colorField(backgroundColor, 'backgroundColor', t('pages.chatflows.share.backgroundColor'))}
+                {textField(fontSize, 'fontSize', t('pages.chatflows.share.fontSize'), 'number')}
+                {colorField(poweredByTextColor, 'poweredByTextColor', t('pages.chatflows.share.poweredByTextColor'))}
+                {isAgentCanvas && booleanField(showAgentMessages, 'showAgentMessages', t('pages.chatflows.share.showAgentMessages'))}
+                {booleanField(renderHTML, 'renderHTML', t('pages.chatflows.share.renderHtml'))}
+                {isSessionMemory && booleanField(generateNewSession, 'generateNewSession', t('pages.chatflows.share.newSessionOnOpen'))}
             </Card>
 
             <Card sx={{ borderColor: theme.palette.primary[200] + 75, p: 3, mt: 2 }} variant='outlined'>
                 <Stack sx={{ mt: 1, mb: 2, alignItems: 'center' }} direction='row' spacing={2}>
-                    <Typography variant='h4'>Bot Message</Typography>
+                    <Typography variant='h4'>{t('pages.chatflows.share.botMessage')}</Typography>
                 </Stack>
-                {colorField(botMessageBackgroundColor, 'botMessageBackgroundColor', 'Background Color')}
-                {colorField(botMessageTextColor, 'botMessageTextColor', 'Text Color')}
+                {colorField(botMessageBackgroundColor, 'botMessageBackgroundColor', t('pages.chatflows.share.backgroundColor'))}
+                {colorField(botMessageTextColor, 'botMessageTextColor', t('pages.chatflows.share.textColor'))}
                 {textField(
                     botMessageAvatarSrc,
                     'botMessageAvatarSrc',
-                    'Avatar Link',
+                    t('pages.chatflows.share.avatarLink'),
                     'string',
                     `https://raw.githubusercontent.com/zahidkhawaja/langchain-chat-nextjs/main/public/parroticon.png`
                 )}
-                {booleanField(botMessageShowAvatar, 'botMessageShowAvatar', 'Show Avatar')}
+                {booleanField(botMessageShowAvatar, 'botMessageShowAvatar', t('pages.chatflows.share.showAvatar'))}
             </Card>
 
             <Card sx={{ borderColor: theme.palette.primary[200] + 75, p: 3, mt: 2 }} variant='outlined'>
                 <Stack sx={{ mt: 1, mb: 2, alignItems: 'center' }} direction='row' spacing={2}>
-                    <Typography variant='h4'>User Message</Typography>
+                    <Typography variant='h4'>{t('pages.chatflows.share.userMessage')}</Typography>
                 </Stack>
-                {colorField(userMessageBackgroundColor, 'userMessageBackgroundColor', 'Background Color')}
-                {colorField(userMessageTextColor, 'userMessageTextColor', 'Text Color')}
+                {colorField(userMessageBackgroundColor, 'userMessageBackgroundColor', t('pages.chatflows.share.backgroundColor'))}
+                {colorField(userMessageTextColor, 'userMessageTextColor', t('pages.chatflows.share.textColor'))}
                 {textField(
                     userMessageAvatarSrc,
                     'userMessageAvatarSrc',
-                    'Avatar Link',
+                    t('pages.chatflows.share.avatarLink'),
                     'string',
                     `https://raw.githubusercontent.com/zahidkhawaja/langchain-chat-nextjs/main/public/usericon.png`
                 )}
-                {booleanField(userMessageShowAvatar, 'userMessageShowAvatar', 'Show Avatar')}
+                {booleanField(userMessageShowAvatar, 'userMessageShowAvatar', t('pages.chatflows.share.showAvatar'))}
             </Card>
 
             <Card sx={{ borderColor: theme.palette.primary[200] + 75, p: 3, mt: 2 }} variant='outlined'>
                 <Stack sx={{ mt: 1, mb: 2, alignItems: 'center' }} direction='row' spacing={2}>
-                    <Typography variant='h4'>Text Input</Typography>
+                    <Typography variant='h4'>{t('pages.chatflows.share.textInput')}</Typography>
                 </Stack>
-                {colorField(textInputBackgroundColor, 'textInputBackgroundColor', 'Background Color')}
-                {colorField(textInputTextColor, 'textInputTextColor', 'Text Color')}
-                {textField(textInputPlaceholder, 'textInputPlaceholder', 'TextInput Placeholder', 'string', `Type question..`)}
-                {colorField(textInputSendButtonColor, 'textInputSendButtonColor', 'TextIntput Send Button Color')}
+                {colorField(textInputBackgroundColor, 'textInputBackgroundColor', t('pages.chatflows.share.backgroundColor'))}
+                {colorField(textInputTextColor, 'textInputTextColor', t('pages.chatflows.share.textColor'))}
+                {textField(
+                    textInputPlaceholder,
+                    'textInputPlaceholder',
+                    t('pages.chatflows.share.textInputPlaceholder'),
+                    'string',
+                    `Type question..`
+                )}
+                {colorField(textInputSendButtonColor, 'textInputSendButtonColor', t('pages.chatflows.share.sendButtonColor'))}
             </Card>
 
             <StyledPermissionButton
@@ -544,7 +558,7 @@ const ShareChatbot = ({ isSessionMemory, isAgentCanvas }) => {
                 variant='contained'
                 onClick={() => onSave()}
             >
-                Save Changes
+                {t('pages.chatflows.share.saveChanges')}
             </StyledPermissionButton>
             <Popover
                 open={openColorPopOver}

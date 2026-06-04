@@ -101,7 +101,7 @@ const DocumentLoaderListDialog = ({ show, dialogProps, onCancel, onDocLoaderSele
                                         color: theme.palette.grey[900]
                                     }
                                 }}
-                                title='Clear Search'
+                                title={t('common.clearSearch')}
                             >
                                 <IconX
                                     stroke={1.5}

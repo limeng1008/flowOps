@@ -40,6 +40,7 @@ import { useTranslation } from 'react-i18next'
 // utils
 
 const OverrideConfigTable = ({ columns, onToggle, rows, sx }) => {
+    const { t } = useTranslation()
     const customization = useSelector((state) => state.customization)
     const isDark = customization?.isDarkMode
 
@@ -71,13 +72,13 @@ const OverrideConfigTable = ({ columns, onToggle, rows, sx }) => {
             } else if (typeof row.schema === 'object' && row.schema !== null) {
                 schemaContent = JSON.stringify(row.schema, null, 2).replace(/\n/g, '<br>').replace(/ /g, '&nbsp;')
             } else {
-                schemaContent = 'No schema available'
+                schemaContent = t('canvas.chatConfig.noSchemaAvailable')
             }
 
             return (
                 <Stack direction='row' alignItems='center' spacing={0.5}>
                     <Typography sx={{ fontSize: '0.8rem' }}>{row[key]}</Typography>
-                    <TooltipWithParser title={`<div>Schema:<br/>${schemaContent}</div>`} />
+                    <TooltipWithParser title={`<div>${t('canvas.chatConfig.schema')}:<br/>${schemaContent}</div>`} />
                 </Stack>
             )
         } else {
@@ -85,7 +86,12 @@ const OverrideConfigTable = ({ columns, onToggle, rows, sx }) => {
         }
     }
 
-    const columnLabels = { label: 'Label', name: 'Name', type: 'Type', enabled: 'On' }
+    const columnLabels = {
+        label: t('canvas.chatConfig.label'),
+        name: t('common.name'),
+        type: t('common.type'),
+        enabled: t('canvas.chatConfig.on')
+    }
 
     return (
         <TableContainer
@@ -340,7 +346,7 @@ const OverrideConfig = ({ dialogProps, hideTitle = false }) => {
             })
             if (saveResp.data) {
                 enqueueSnackbar({
-                    message: 'Override Configuration Saved',
+                    message: t('canvas.chatConfig.overrideSaved'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -355,9 +361,9 @@ const OverrideConfig = ({ dialogProps, hideTitle = false }) => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to save Override Configuration: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('canvas.chatConfig.overrideSaveFailed', {
+                    message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -400,17 +406,16 @@ const OverrideConfig = ({ dialogProps, hideTitle = false }) => {
         <Stack direction='column' spacing={2} sx={{ width: '100%' }}>
             {!hideTitle && (
                 <Typography variant='h3'>
-                    Override Configuration
-                    <TooltipWithParser
-                        style={{ mb: 1, mt: 2, marginLeft: 10 }}
-                        title={
-                            'Enable or disable which properties of the flow configuration can be overridden. Refer to the <a href="https://docs.flowiseai.com/using-flowise/prediction#configuration-override" target="_blank">documentation</a> for more information.'
-                        }
-                    />
+                    {t('canvas.chatConfig.overrideConfiguration')}
+                    <TooltipWithParser style={{ mb: 1, mt: 2, marginLeft: 10 }} title={t('canvas.chatConfig.overrideHelp')} />
                 </Typography>
             )}
             <Stack direction='column' spacing={2} sx={{ width: '100%' }}>
-                <SwitchInput label='Enable Override Configuration' onChange={setOverrideConfigStatus} value={overrideConfigStatus} />
+                <SwitchInput
+                    label={t('canvas.chatConfig.enableOverrideConfiguration')}
+                    onChange={setOverrideConfigStatus}
+                    value={overrideConfigStatus}
+                />
                 {overrideConfigStatus && (
                     <>
                         {nodeOverrides && nodeConfig && (

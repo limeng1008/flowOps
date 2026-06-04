@@ -47,34 +47,33 @@ const speechToTextProviders = {
         url: 'https://platform.openai.com/docs/guides/speech-to-text',
         inputs: [
             {
-                label: 'Connect Credential',
+                labelKey: 'canvas.chatConfig.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['openAIApi']
             },
             {
-                label: 'Language',
+                labelKey: 'canvas.chatConfig.language',
                 name: 'language',
                 type: 'string',
-                description:
-                    'The language of the input audio. Supplying the input language in ISO-639-1 format will improve accuracy and latency.',
+                descriptionKey: 'canvas.chatConfig.languageDescription',
                 placeholder: 'en',
                 optional: true
             },
             {
-                label: 'Prompt',
+                labelKey: 'canvas.chatConfig.prompt',
                 name: 'prompt',
                 type: 'string',
                 rows: 4,
-                description: `An optional text to guide the model's style or continue a previous audio segment. The prompt should match the audio language.`,
+                descriptionKey: 'canvas.chatConfig.sttPromptDescription',
                 optional: true
             },
             {
-                label: 'Temperature',
+                labelKey: 'canvas.chatConfig.temperature',
                 name: 'temperature',
                 type: 'number',
                 step: 0.1,
-                description: `The sampling temperature, between 0 and 1. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.`,
+                descriptionKey: 'canvas.chatConfig.temperatureDescription',
                 optional: true
             }
         ]
@@ -86,7 +85,7 @@ const speechToTextProviders = {
         url: 'https://www.assemblyai.com/',
         inputs: [
             {
-                label: 'Connect Credential',
+                labelKey: 'canvas.chatConfig.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['assemblyAIApi']
@@ -100,48 +99,47 @@ const speechToTextProviders = {
         url: 'https://localai.io/features/audio-to-text/',
         inputs: [
             {
-                label: 'Connect Credential',
+                labelKey: 'canvas.chatConfig.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['localAIApi']
             },
             {
-                label: 'Base URL',
+                labelKey: 'canvas.chatConfig.baseUrl',
                 name: 'baseUrl',
                 type: 'string',
-                description: 'The base URL of the local AI server'
+                descriptionKey: 'canvas.chatConfig.localAiBaseUrlDescription'
             },
             {
-                label: 'Language',
+                labelKey: 'canvas.chatConfig.language',
                 name: 'language',
                 type: 'string',
-                description:
-                    'The language of the input audio. Supplying the input language in ISO-639-1 format will improve accuracy and latency.',
+                descriptionKey: 'canvas.chatConfig.languageDescription',
                 placeholder: 'en',
                 optional: true
             },
             {
-                label: 'Model',
+                labelKey: 'canvas.chatConfig.model',
                 name: 'model',
                 type: 'string',
-                description: `The STT model to load. Defaults to whisper-1 if left blank.`,
+                descriptionKey: 'canvas.chatConfig.sttModelDescription',
                 placeholder: 'whisper-1',
                 optional: true
             },
             {
-                label: 'Prompt',
+                labelKey: 'canvas.chatConfig.prompt',
                 name: 'prompt',
                 type: 'string',
                 rows: 4,
-                description: `An optional text to guide the model's style or continue a previous audio segment. The prompt should match the audio language.`,
+                descriptionKey: 'canvas.chatConfig.sttPromptDescription',
                 optional: true
             },
             {
-                label: 'Temperature',
+                labelKey: 'canvas.chatConfig.temperature',
                 name: 'temperature',
                 type: 'number',
                 step: 0.1,
-                description: `The sampling temperature, between 0 and 1. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.`,
+                descriptionKey: 'canvas.chatConfig.temperatureDescription',
                 optional: true
             }
         ]
@@ -153,35 +151,35 @@ const speechToTextProviders = {
         url: 'https://azure.microsoft.com/en-us/products/cognitive-services/speech-services',
         inputs: [
             {
-                label: 'Connect Credential',
+                labelKey: 'canvas.chatConfig.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['azureCognitiveServices']
             },
             {
-                label: 'Language',
+                labelKey: 'canvas.chatConfig.language',
                 name: 'language',
                 type: 'string',
-                description: 'The recognition language (e.g., "en-US", "es-ES")',
+                descriptionKey: 'canvas.chatConfig.recognitionLanguageDescription',
                 placeholder: 'en-US',
                 optional: true
             },
             {
-                label: 'Profanity Filter Mode',
+                labelKey: 'canvas.chatConfig.profanityFilterMode',
                 name: 'profanityFilterMode',
                 type: 'options',
-                description: 'How to handle profanity in the transcription',
+                descriptionKey: 'canvas.chatConfig.profanityFilterModeDescription',
                 options: [
                     {
-                        label: 'None',
+                        labelKey: 'canvas.chatConfig.profanityNone',
                         name: 'None'
                     },
                     {
-                        label: 'Masked',
+                        labelKey: 'canvas.chatConfig.profanityMasked',
                         name: 'Masked'
                     },
                     {
-                        label: 'Removed',
+                        labelKey: 'canvas.chatConfig.profanityRemoved',
                         name: 'Removed'
                     }
                 ],
@@ -189,10 +187,10 @@ const speechToTextProviders = {
                 optional: true
             },
             {
-                label: 'Audio Channels',
+                labelKey: 'canvas.chatConfig.audioChannels',
                 name: 'channels',
                 type: 'string',
-                description: 'Comma-separated list of audio channels to process (e.g., "0,1")',
+                descriptionKey: 'canvas.chatConfig.audioChannelsDescription',
                 placeholder: '0,1',
                 default: '0,1'
             }
@@ -205,35 +203,33 @@ const speechToTextProviders = {
         url: 'https://console.groq.com/',
         inputs: [
             {
-                label: 'Model',
+                labelKey: 'canvas.chatConfig.model',
                 name: 'model',
                 type: 'string',
-                description: `The STT model to load. Defaults to whisper-large-v3 if left blank.`,
+                descriptionKey: 'canvas.chatConfig.groqSttModelDescription',
                 placeholder: 'whisper-large-v3',
                 optional: true
             },
             {
-                label: 'Connect Credential',
+                labelKey: 'canvas.chatConfig.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['groqApi']
             },
             {
-                label: 'Language',
+                labelKey: 'canvas.chatConfig.language',
                 name: 'language',
                 type: 'string',
-                description:
-                    'The language of the input audio. Supplying the input language in ISO-639-1 format will improve accuracy and latency.',
+                descriptionKey: 'canvas.chatConfig.languageDescription',
                 placeholder: 'en',
                 optional: true
             },
             {
-                label: 'Temperature',
+                labelKey: 'canvas.chatConfig.temperature',
                 name: 'temperature',
                 type: 'number',
                 step: 0.1,
-                description:
-                    'The sampling temperature, between 0 and 1. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic.',
+                descriptionKey: 'canvas.chatConfig.temperatureDescription',
                 optional: true
             }
         ]
@@ -261,7 +257,7 @@ const SpeechToText = ({ dialogProps, onConfirm }) => {
             })
             if (saveResp.data) {
                 enqueueSnackbar({
-                    message: 'Speech To Text Configuration Saved',
+                    message: t('canvas.chatConfig.speechToTextSaved'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -277,9 +273,9 @@ const SpeechToText = ({ dialogProps, onConfirm }) => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to save Speech To Text Configuration: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('canvas.chatConfig.speechToTextSaveFailed', {
+                    message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -323,6 +319,16 @@ const SpeechToText = ({ dialogProps, onConfirm }) => {
         setSelectedProvider(event.target.value)
     }
 
+    const localizeInputParam = (inputParam) => ({
+        ...inputParam,
+        label: inputParam.labelKey ? t(inputParam.labelKey) : inputParam.label,
+        description: inputParam.descriptionKey ? t(inputParam.descriptionKey) : inputParam.description,
+        options: inputParam.options?.map((option) => ({
+            ...option,
+            label: option.labelKey ? t(option.labelKey) : option.label
+        }))
+    })
+
     useEffect(() => {
         if (dialogProps.chatflow && dialogProps.chatflow.speechToText) {
             try {
@@ -352,7 +358,7 @@ const SpeechToText = ({ dialogProps, onConfirm }) => {
     return (
         <>
             <Box fullWidth sx={{ mb: 1, display: 'flex', flexDirection: 'column', gap: 1 }}>
-                <Typography>Providers</Typography>
+                <Typography>{t('canvas.chatConfig.providers')}</Typography>
                 <FormControl fullWidth>
                     <Select
                         size='small'
@@ -419,65 +425,70 @@ const SpeechToText = ({ dialogProps, onConfirm }) => {
                             }
                         />
                     </ListItem>
-                    {speechToTextProviders[selectedProvider].inputs.map((inputParam, index) => (
-                        <Box key={index} sx={{ p: 2 }}>
-                            <div style={{ display: 'flex', flexDirection: 'row' }}>
-                                <Typography>
-                                    {inputParam.label}
-                                    {!inputParam.optional && <span style={{ color: 'red' }}>&nbsp;*</span>}
-                                    {inputParam.description && (
-                                        <TooltipWithParser style={{ marginLeft: 10 }} title={inputParam.description} />
-                                    )}
-                                </Typography>
-                            </div>
-                            {inputParam.type === 'credential' && (
-                                <CredentialInputHandler
-                                    key={speechToText[selectedProvider]?.credentialId}
-                                    data={
-                                        speechToText[selectedProvider]?.credentialId
-                                            ? { credential: speechToText[selectedProvider].credentialId }
-                                            : {}
-                                    }
-                                    inputParam={inputParam}
-                                    onSelect={(newValue) => setValue(newValue, selectedProvider, 'credentialId')}
-                                />
-                            )}
-                            {inputParam.type === 'boolean' && (
-                                <SwitchInput
-                                    onChange={(newValue) => setValue(newValue, selectedProvider, inputParam.name)}
-                                    value={
-                                        speechToText[selectedProvider]
-                                            ? speechToText[selectedProvider][inputParam.name]
-                                            : inputParam.default ?? false
-                                    }
-                                />
-                            )}
-                            {(inputParam.type === 'string' || inputParam.type === 'password' || inputParam.type === 'number') && (
-                                <Input
-                                    inputParam={inputParam}
-                                    onChange={(newValue) => setValue(newValue, selectedProvider, inputParam.name)}
-                                    value={
-                                        speechToText[selectedProvider]
-                                            ? speechToText[selectedProvider][inputParam.name]
-                                            : inputParam.default ?? ''
-                                    }
-                                />
-                            )}
+                    {speechToTextProviders[selectedProvider].inputs.map((inputParam, index) => {
+                        const localizedInputParam = localizeInputParam(inputParam)
+                        return (
+                            <Box key={index} sx={{ p: 2 }}>
+                                <div style={{ display: 'flex', flexDirection: 'row' }}>
+                                    <Typography>
+                                        {localizedInputParam.label}
+                                        {!localizedInputParam.optional && <span style={{ color: 'red' }}>&nbsp;*</span>}
+                                        {localizedInputParam.description && (
+                                            <TooltipWithParser style={{ marginLeft: 10 }} title={localizedInputParam.description} />
+                                        )}
+                                    </Typography>
+                                </div>
+                                {localizedInputParam.type === 'credential' && (
+                                    <CredentialInputHandler
+                                        key={speechToText[selectedProvider]?.credentialId}
+                                        data={
+                                            speechToText[selectedProvider]?.credentialId
+                                                ? { credential: speechToText[selectedProvider].credentialId }
+                                                : {}
+                                        }
+                                        inputParam={localizedInputParam}
+                                        onSelect={(newValue) => setValue(newValue, selectedProvider, 'credentialId')}
+                                    />
+                                )}
+                                {localizedInputParam.type === 'boolean' && (
+                                    <SwitchInput
+                                        onChange={(newValue) => setValue(newValue, selectedProvider, localizedInputParam.name)}
+                                        value={
+                                            speechToText[selectedProvider]
+                                                ? speechToText[selectedProvider][localizedInputParam.name]
+                                                : localizedInputParam.default ?? false
+                                        }
+                                    />
+                                )}
+                                {(localizedInputParam.type === 'string' ||
+                                    localizedInputParam.type === 'password' ||
+                                    localizedInputParam.type === 'number') && (
+                                    <Input
+                                        inputParam={localizedInputParam}
+                                        onChange={(newValue) => setValue(newValue, selectedProvider, localizedInputParam.name)}
+                                        value={
+                                            speechToText[selectedProvider]
+                                                ? speechToText[selectedProvider][localizedInputParam.name]
+                                                : localizedInputParam.default ?? ''
+                                        }
+                                    />
+                                )}
 
-                            {inputParam.type === 'options' && (
-                                <Dropdown
-                                    name={inputParam.name}
-                                    options={inputParam.options}
-                                    onSelect={(newValue) => setValue(newValue, selectedProvider, inputParam.name)}
-                                    value={
-                                        speechToText[selectedProvider]
-                                            ? speechToText[selectedProvider][inputParam.name]
-                                            : inputParam.default ?? 'choose an option'
-                                    }
-                                />
-                            )}
-                        </Box>
-                    ))}
+                                {localizedInputParam.type === 'options' && (
+                                    <Dropdown
+                                        name={localizedInputParam.name}
+                                        options={localizedInputParam.options}
+                                        onSelect={(newValue) => setValue(newValue, selectedProvider, localizedInputParam.name)}
+                                        value={
+                                            speechToText[selectedProvider]
+                                                ? speechToText[selectedProvider][localizedInputParam.name]
+                                                : localizedInputParam.default ?? t('common.chooseOption')
+                                        }
+                                    />
+                                )}
+                            </Box>
+                        )
+                    })}
                 </>
             )}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', mt: 2 }}>

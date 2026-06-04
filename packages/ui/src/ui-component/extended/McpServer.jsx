@@ -50,9 +50,9 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
     const endpointUrl = chatflowId ? `${window.location.origin}/api/v1/mcp/${chatflowId}` : ''
 
     const validateToolName = (name) => {
-        if (!name) return 'Tool name is required'
-        if (name.length > 64) return 'Tool name must be 64 characters or less'
-        if (!/^[A-Za-z0-9_-]+$/.test(name)) return 'Only letters, numbers, underscores, and hyphens allowed'
+        if (!name) return t('pages.tools.mcp.toolNameRequired')
+        if (name.length > 64) return t('pages.tools.mcp.toolNameMax')
+        if (!/^[A-Za-z0-9_-]+$/.test(name)) return t('pages.tools.mcp.toolNamePattern')
         return ''
     }
 
@@ -126,7 +126,7 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
                         setToolName(resp.data.toolName || '')
                         setDescription(resp.data.description || '')
                         onStatusChange?.(resp.data.enabled)
-                        showSuccess('MCP Server settings saved')
+                        showSuccess(t('pages.tools.mcp.settingsSaved'))
                     }
                 } else {
                     const resp = await mcpServerApi.createMcpServerConfig(dialogProps.chatflow.id, {
@@ -140,21 +140,21 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
                         setDescription(resp.data.description || '')
                         setHasExistingConfig(true)
                         onStatusChange?.(resp.data.enabled)
-                        showSuccess('MCP Server settings saved')
+                        showSuccess(t('pages.tools.mcp.settingsSaved'))
                     }
                 }
             } else {
                 await mcpServerApi.deleteMcpServerConfig(dialogProps.chatflow.id)
                 setMcpEnabled(false)
                 onStatusChange?.(false)
-                showSuccess('MCP Server disabled')
+                showSuccess(t('pages.tools.mcp.disabled'))
             }
             await refreshChatflowStore()
         } catch (error) {
             showError(
-                `Failed to save MCP Server settings: ${
-                    typeof error.response?.data === 'object' ? error.response.data.message : error.response?.data || error.message
-                }`
+                t('pages.tools.mcp.saveSettingsFailed', {
+                    message: typeof error.response?.data === 'object' ? error.response.data.message : error.response?.data || error.message
+                })
             )
         } finally {
             setLoading(false)
@@ -164,16 +164,15 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
     const handleCopyUrl = (url) => {
         if (!url) return
         navigator.clipboard.writeText(url)
-        showSuccess('URL copied to clipboard')
+        showSuccess(t('pages.tools.mcp.urlCopied'))
     }
 
     const handleRefreshCode = async () => {
         const confirmPayload = {
-            title: 'Rotate Token',
-            description:
-                'This will invalidate the existing token. Any clients using the old token will need to be updated with the new one. Are you sure?',
-            confirmButtonName: 'Rotate',
-            cancelButtonName: 'Cancel'
+            title: t('pages.tools.mcp.rotateTokenTitle'),
+            description: t('pages.tools.mcp.rotateTokenDescription'),
+            confirmButtonName: t('pages.tools.mcp.rotate'),
+            cancelButtonName: t('common.cancel')
         }
         const isConfirmed = await confirm(confirmPayload)
         if (!isConfirmed) return
@@ -184,14 +183,14 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
             const resp = await mcpServerApi.refreshMcpToken(dialogProps.chatflow.id)
             if (resp.data) {
                 setToken(resp.data.token || '')
-                showSuccess('Token rotated successfully')
+                showSuccess(t('pages.tools.mcp.tokenRotated'))
             }
             await refreshChatflowStore()
         } catch (error) {
             showError(
-                `Failed to rotate token: ${
-                    typeof error.response?.data === 'object' ? error.response.data.message : error.response?.data || error.message
-                }`
+                t('pages.tools.mcp.rotateTokenFailed', {
+                    message: typeof error.response?.data === 'object' ? error.response.data.message : error.response?.data || error.message
+                })
             )
         } finally {
             setLoading(false)
@@ -208,11 +207,12 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
     useEffect(() => {
         if (getMcpServerConfigApi.error) {
             showError(
-                `Failed to load MCP Server configuration: ${
-                    typeof getMcpServerConfigApi.error.response?.data === 'object'
-                        ? getMcpServerConfigApi.error.response.data.message
-                        : getMcpServerConfigApi.error.response?.data || getMcpServerConfigApi.error.message
-                }`
+                t('pages.tools.mcp.loadConfigFailed', {
+                    message:
+                        typeof getMcpServerConfigApi.error.response?.data === 'object'
+                            ? getMcpServerConfigApi.error.response.data.message
+                            : getMcpServerConfigApi.error.response?.data || getMcpServerConfigApi.error.message
+                })
             )
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -233,7 +233,7 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
     if (getMcpServerConfigApi.loading) {
         return (
             <Box sx={{ p: 2, textAlign: 'center' }}>
-                <Typography>Loading MCP Server configuration...</Typography>
+                <Typography>{t('pages.tools.mcp.loadingConfig')}</Typography>
             </Box>
         )
     }
@@ -241,7 +241,7 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
     return (
         <>
             <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                <SwitchInput label='Expose as MCP Server' onChange={handleToggle} value={mcpEnabled} disabled={loading} />
+                <SwitchInput label={t('pages.tools.mcp.exposeAsServer')} onChange={handleToggle} value={mcpEnabled} disabled={loading} />
             </Box>
 
             {mcpEnabled && (
@@ -269,7 +269,7 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
                             variant='caption'
                             sx={{ mt: 0.5, display: 'block', color: customization.isDarkMode ? theme.palette.grey[400] : 'text.secondary' }}
                         >
-                            Used as the MCP tool identifier by LLM clients.
+                            {t('pages.tools.mcp.toolIdentifierHelp')}
                         </Typography>
                     </Box>
 
@@ -285,21 +285,21 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
                             rows={3}
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            placeholder='e.g. Answers product catalog questions'
+                            placeholder={t('pages.tools.mcp.descriptionPlaceholder')}
                             disabled={loading}
                         />
                         <Typography
                             variant='caption'
                             sx={{ mt: 0.5, display: 'block', color: customization.isDarkMode ? theme.palette.grey[400] : 'text.secondary' }}
                         >
-                            Helps LLMs understand when to route queries to this tool. Good descriptions improve tool selection accuracy.
+                            {t('pages.tools.mcp.descriptionHelp')}
                         </Typography>
                     </Box>
 
                     {/* MCP Endpoint URL — visible only when has token */}
                     {token && (
                         <Box>
-                            <Typography sx={{ mb: 1 }}>Streamable HTTP Endpoint</Typography>
+                            <Typography sx={{ mb: 1 }}>{t('pages.tools.mcp.streamableHttpEndpoint')}</Typography>
                             <OutlinedInput
                                 fullWidth
                                 size='small'
@@ -314,7 +314,7 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
                                         <IconButton
                                             size='small'
                                             onClick={() => handleCopyUrl(endpointUrl)}
-                                            title='Copy URL to clipboard'
+                                            title={t('pages.tools.mcp.copyUrlToClipboard')}
                                             sx={{ color: customization.isDarkMode ? theme.palette.grey[300] : 'inherit' }}
                                         >
                                             <IconCopy size={18} />
@@ -330,10 +330,10 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
                                     color: customization.isDarkMode ? theme.palette.grey[400] : 'text.secondary'
                                 }}
                             >
-                                For clients that support the Streamable HTTP transport
+                                {t('pages.tools.mcp.endpointHelp')}
                             </Typography>
 
-                            <Typography sx={{ mb: 1, mt: 2 }}>Token (Bearer Token)</Typography>
+                            <Typography sx={{ mb: 1, mt: 2 }}>{t('pages.tools.mcp.bearerToken')}</Typography>
                             <OutlinedInput
                                 fullWidth
                                 size='small'
@@ -350,9 +350,9 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
                                             size='small'
                                             onClick={() => {
                                                 navigator.clipboard.writeText(token)
-                                                showSuccess('Token copied to clipboard')
+                                                showSuccess(t('pages.tools.mcp.tokenCopied'))
                                             }}
-                                            title='Copy token'
+                                            title={t('pages.tools.mcp.copyToken')}
                                             sx={{ color: customization.isDarkMode ? theme.palette.grey[300] : 'inherit' }}
                                         >
                                             <IconCopy size={18} />
@@ -360,7 +360,7 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
                                         <IconButton
                                             size='small'
                                             onClick={handleRefreshCode}
-                                            title='Rotate token'
+                                            title={t('pages.tools.mcp.rotateToken')}
                                             disabled={loading}
                                             sx={{ color: customization.isDarkMode ? theme.palette.grey[300] : 'inherit' }}
                                         >
@@ -382,8 +382,7 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
                                     })
                                 }}
                             >
-                                Use the URL above as the MCP endpoint and pass the token as a Bearer token in the Authorization header.
-                                Configure your MCP client with:{' '}
+                                {t('pages.tools.mcp.authorizationHeaderHelp')}{' '}
                                 <code
                                     style={{
                                         display: 'block',
@@ -405,7 +404,7 @@ const McpServer = ({ dialogProps, onStatusChange }) => {
                     onClick={onSave}
                     sx={{ minWidth: 100 }}
                 >
-                    {loading ? 'Saving...' : 'Save'}
+                    {loading ? t('pages.tools.mcp.saving') : t('common.save')}
                 </StyledButton>
             </Box>
         </>

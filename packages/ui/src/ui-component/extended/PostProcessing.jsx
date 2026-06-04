@@ -70,15 +70,15 @@ const PostProcessing = ({ dialogProps }) => {
         const dialogProps = {
             value,
             inputParam: {
-                label: 'Post Processing Function',
+                label: t('canvas.chatConfig.postProcessingFunction'),
                 name: 'postProcessingFunction',
                 type: 'code',
                 placeholder: sampleFunction,
                 hideCodeExecute: true
             },
             languageType: 'js',
-            confirmButtonName: 'Save',
-            cancelButtonName: 'Cancel'
+            confirmButtonName: t('common.save'),
+            cancelButtonName: t('common.cancel')
         }
         setExpandDialogProps(dialogProps)
         setShowExpandDialog(true)
@@ -98,7 +98,7 @@ const PostProcessing = ({ dialogProps }) => {
             })
             if (saveResp.data) {
                 enqueueSnackbar({
-                    message: 'Post Processing Settings Saved',
+                    message: t('canvas.chatConfig.postProcessingSaved'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -113,9 +113,9 @@ const PostProcessing = ({ dialogProps }) => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to save Post Processing Settings: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('canvas.chatConfig.postProcessingSaveFailed', {
+                    message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -148,11 +148,11 @@ const PostProcessing = ({ dialogProps }) => {
     return (
         <>
             <Box sx={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
-                <SwitchInput label='Enable Post Processing' onChange={handleChange} value={postProcessingEnabled} />
+                <SwitchInput label={t('canvas.chatConfig.enablePostProcessing')} onChange={handleChange} value={postProcessingEnabled} />
             </Box>
             <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
                 <Box sx={{ width: '100%', display: 'flex', alignItems: 'center' }}>
-                    <Typography>JS Function</Typography>
+                    <Typography>{t('canvas.chatConfig.jsFunction')}</Typography>
                     <Button
                         sx={{ ml: 2 }}
                         variant='outlined'
@@ -217,7 +217,7 @@ const PostProcessing = ({ dialogProps }) => {
                     }}
                 >
                     <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-                        <Typography sx={{ fontSize: '0.875rem', fontWeight: 500 }}>Available Variables</Typography>
+                        <Typography sx={{ fontSize: '0.875rem', fontWeight: 500 }}>{t('canvas.chatConfig.availableVariables')}</Typography>
                     </AccordionSummary>
                     <AccordionDetails sx={{ p: 0 }}>
                         <TableContainer component={Paper} elevation={0} sx={{ boxShadow: 'none', bgcolor: 'transparent' }}>
@@ -234,7 +234,7 @@ const PostProcessing = ({ dialogProps }) => {
                                                 borderColor: customization.isDarkMode ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)'
                                             }}
                                         >
-                                            Variable
+                                            {t('canvas.chatConfig.variable')}
                                         </TableCell>
                                         <TableCell
                                             sx={{
@@ -277,70 +277,70 @@ const PostProcessing = ({ dialogProps }) => {
                                             <code>$flow.rawOutput</code>
                                         </TableCell>
                                         <TableCell>string</TableCell>
-                                        <TableCell>The raw output response from the flow</TableCell>
+                                        <TableCell>{t('canvas.chatConfig.rawOutputDescription')}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>
                                             <code>$flow.input</code>
                                         </TableCell>
                                         <TableCell>string</TableCell>
-                                        <TableCell>The user input message</TableCell>
+                                        <TableCell>{t('canvas.chatConfig.inputDescription')}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>
                                             <code>$flow.chatHistory</code>
                                         </TableCell>
                                         <TableCell>array</TableCell>
-                                        <TableCell>Array of previous messages in the conversation</TableCell>
+                                        <TableCell>{t('canvas.chatConfig.chatHistoryDescription')}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>
                                             <code>$flow.chatflowId</code>
                                         </TableCell>
                                         <TableCell>string</TableCell>
-                                        <TableCell>Unique identifier for the chatflow</TableCell>
+                                        <TableCell>{t('canvas.chatConfig.chatflowIdDescription')}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>
                                             <code>$flow.sessionId</code>
                                         </TableCell>
                                         <TableCell>string</TableCell>
-                                        <TableCell>Current session identifier</TableCell>
+                                        <TableCell>{t('canvas.chatConfig.sessionIdDescription')}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>
                                             <code>$flow.chatId</code>
                                         </TableCell>
                                         <TableCell>string</TableCell>
-                                        <TableCell>Current chat identifier</TableCell>
+                                        <TableCell>{t('canvas.chatConfig.chatIdDescription')}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>
                                             <code>$flow.sourceDocuments</code>
                                         </TableCell>
                                         <TableCell>array</TableCell>
-                                        <TableCell>Source documents used in retrieval (if applicable)</TableCell>
+                                        <TableCell>{t('canvas.chatConfig.sourceDocumentsDescription')}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>
                                             <code>$flow.usedTools</code>
                                         </TableCell>
                                         <TableCell>array</TableCell>
-                                        <TableCell>List of tools used during execution</TableCell>
+                                        <TableCell>{t('canvas.chatConfig.usedToolsDescription')}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>
                                             <code>$flow.artifacts</code>
                                         </TableCell>
                                         <TableCell>array</TableCell>
-                                        <TableCell>List of artifacts generated during execution</TableCell>
+                                        <TableCell>{t('canvas.chatConfig.artifactsDescription')}</TableCell>
                                     </TableRow>
                                     <TableRow>
                                         <TableCell>
                                             <code>$flow.fileAnnotations</code>
                                         </TableCell>
                                         <TableCell>array</TableCell>
-                                        <TableCell>File annotations associated with the response</TableCell>
+                                        <TableCell>{t('canvas.chatConfig.fileAnnotationsDescription')}</TableCell>
                                     </TableRow>
                                 </TableBody>
                             </Table>

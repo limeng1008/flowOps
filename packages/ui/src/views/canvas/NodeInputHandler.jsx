@@ -168,6 +168,12 @@ const NodeInputHandler = ({
     const enqueueSnackbar = (...args) => dispatch(enqueueSnackbarAction(...args))
     const closeSnackbar = (...args) => dispatch(closeSnackbarAction(...args))
 
+    const getErrorMessage = (error, fallbackKey) => {
+        const data = error?.response?.data
+        if (typeof data === 'object') return data?.message || JSON.stringify(data)
+        return data || error?.message || t(fallbackKey)
+    }
+
     const [position, setPosition] = useState(0)
     const [showExpandDialog, setShowExpandDialog] = useState(false)
     const [expandDialogProps, setExpandDialogProps] = useState({})
@@ -199,12 +205,12 @@ const NodeInputHandler = ({
             setWebhookSecretPlaintext(resp.data.webhookSecret)
             dispatch({ type: SET_CHATFLOW, chatflow: { ...canvasChatflow, webhookSecretConfigured: true } })
             enqueueSnackbar({
-                message: 'Webhook secret generated.',
+                message: t('canvas.nodeInput.webhookSecretGenerated'),
                 options: { key: new Date().getTime() + Math.random(), variant: 'success' }
             })
         } catch (error) {
             enqueueSnackbar({
-                message: error?.response?.data?.message || 'Failed to generate webhook secret.',
+                message: getErrorMessage(error, 'canvas.nodeInput.webhookSecretGenerateFailed'),
                 options: { key: new Date().getTime() + Math.random(), variant: 'error' }
             })
         }
@@ -217,12 +223,12 @@ const NodeInputHandler = ({
             setWebhookSecretPlaintext(null)
             dispatch({ type: SET_CHATFLOW, chatflow: { ...canvasChatflow, webhookSecretConfigured: false } })
             enqueueSnackbar({
-                message: 'Webhook secret removed.',
+                message: t('canvas.nodeInput.webhookSecretRemoved'),
                 options: { key: new Date().getTime() + Math.random(), variant: 'success' }
             })
         } catch (error) {
             enqueueSnackbar({
-                message: error?.response?.data?.message || 'Failed to remove webhook secret.',
+                message: getErrorMessage(error, 'canvas.nodeInput.webhookSecretRemoveFailed'),
                 options: { key: new Date().getTime() + Math.random(), variant: 'error' }
             })
         }
@@ -267,8 +273,8 @@ const NodeInputHandler = ({
             nodes: reactFlowInstance?.getNodes() || [],
             edges: reactFlowInstance?.getEdges() || [],
             nodeId: data.id,
-            confirmButtonName: 'Save',
-            cancelButtonName: 'Cancel'
+            confirmButtonName: t('common.save'),
+            cancelButtonName: t('common.cancel')
         }
         if (inputParam.acceptVariable) {
             setExpandRichDialogProps(dialogProps)
@@ -284,8 +290,8 @@ const NodeInputHandler = ({
             data,
             inputParam,
             disabled,
-            confirmButtonName: 'Save',
-            cancelButtonName: 'Cancel'
+            confirmButtonName: t('common.save'),
+            cancelButtonName: t('common.cancel')
         }
         setConditionDialogProps(dialogProps)
         setShowConditionDialog(true)
@@ -311,8 +317,8 @@ const NodeInputHandler = ({
             relativeLinksMethod,
             limit,
             selectedLinks,
-            confirmButtonName: 'Save',
-            cancelButtonName: 'Cancel'
+            confirmButtonName: t('common.save'),
+            cancelButtonName: t('common.cancel')
         }
         setManageScrapedLinksDialogProps(dialogProps)
         setShowManageScrapedLinksDialog(true)
@@ -561,18 +567,18 @@ const NodeInputHandler = ({
     const editAsyncOption = (inputParamName, inputValue) => {
         if (inputParamName === 'selectedTool') {
             setAsyncOptionEditDialogProps({
-                title: 'Edit Tool',
+                title: t('pages.tools.editTitle'),
                 type: 'EDIT',
-                cancelButtonName: 'Cancel',
-                confirmButtonName: 'Save',
+                cancelButtonName: t('common.cancel'),
+                confirmButtonName: t('common.save'),
                 toolId: inputValue
             })
         } else if (inputParamName === 'selectedAssistant') {
             setAsyncOptionEditDialogProps({
-                title: 'Edit Assistant',
+                title: t('pages.assistants.editTitle'),
                 type: 'EDIT',
-                cancelButtonName: 'Cancel',
-                confirmButtonName: 'Save',
+                cancelButtonName: t('common.cancel'),
+                confirmButtonName: t('common.save'),
                 assistantId: inputValue
             })
         }
@@ -582,17 +588,17 @@ const NodeInputHandler = ({
     const addAsyncOption = (inputParamName) => {
         if (inputParamName === 'selectedTool') {
             setAsyncOptionEditDialogProps({
-                title: 'Add New Tool',
+                title: t('pages.tools.addNewTitle'),
                 type: 'ADD',
-                cancelButtonName: 'Cancel',
-                confirmButtonName: 'Add'
+                cancelButtonName: t('common.cancel'),
+                confirmButtonName: t('common.add')
             })
         } else if (inputParamName === 'selectedAssistant') {
             setAsyncOptionEditDialogProps({
-                title: 'Add New Assistant',
+                title: t('pages.assistants.addNewTitle'),
                 type: 'ADD',
-                cancelButtonName: 'Cancel',
-                confirmButtonName: 'Add'
+                cancelButtonName: t('common.cancel'),
+                confirmButtonName: t('common.add')
             })
         }
         setAsyncOptionEditDialog(inputParamName)
@@ -660,7 +666,7 @@ const NodeInputHandler = ({
 
     const displayWarning = () => {
         enqueueSnackbar({
-            message: 'Please fill in all mandatory fields.',
+            message: t('canvas.nodeInput.mandatoryFields'),
             options: {
                 key: new Date().getTime() + Math.random(),
                 variant: 'warning',
@@ -676,7 +682,7 @@ const NodeInputHandler = ({
     const generateDocStoreToolDesc = async (storeId) => {
         if (!storeId) {
             enqueueSnackbar({
-                message: 'Please select a knowledge base',
+                message: t('canvas.nodeInput.selectKnowledgeBase'),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -716,7 +722,7 @@ const NodeInputHandler = ({
                     // Update the input value directly
                     data.inputs[inputParam.name] = content
                     enqueueSnackbar({
-                        message: 'Document Store Tool Description generated successfully',
+                        message: t('canvas.nodeInput.docStoreDescriptionGenerated'),
                         options: {
                             key: new Date().getTime() + Math.random(),
                             variant: 'success',
@@ -732,7 +738,7 @@ const NodeInputHandler = ({
                 console.error('Error generating doc store tool desc', error)
                 setLoading(false)
                 enqueueSnackbar({
-                    message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data,
+                    message: getErrorMessage(error, 'canvas.nodeInput.docStoreDescriptionGenerateFailed'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'error',
@@ -764,7 +770,7 @@ const NodeInputHandler = ({
                     // Update the input value directly
                     data.inputs[inputParam.name] = content
                     enqueueSnackbar({
-                        message: 'Document Store Tool Description generated successfully',
+                        message: t('canvas.nodeInput.docStoreDescriptionGenerated'),
                         options: {
                             key: new Date().getTime() + Math.random(),
                             variant: 'success',
@@ -780,7 +786,7 @@ const NodeInputHandler = ({
                 console.error('Error generating doc store tool desc', error)
                 setLoading(false)
                 enqueueSnackbar({
-                    message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data,
+                    message: getErrorMessage(error, 'canvas.nodeInput.docStoreDescriptionGenerateFailed'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'error',
@@ -812,8 +818,8 @@ const NodeInputHandler = ({
         if (existingModel) {
             // Open prompt generator dialog directly with existing model
             setPromptGeneratorDialogProps({
-                title: 'Generate Instructions',
-                description: 'You can generate a prompt template by sharing basic details about your task.',
+                title: t('canvas.nodeInput.generateInstructionsTitle'),
+                description: t('canvas.nodeInput.generateInstructionsDescription'),
                 data: {
                     selectedChatModel: {
                         name: existingModel,
@@ -833,8 +839,8 @@ const NodeInputHandler = ({
         setModelSelectionCallback(() => async (selectedModel) => {
             // After model selection, open prompt generator dialog
             setPromptGeneratorDialogProps({
-                title: 'Generate Instructions',
-                description: 'You can generate a prompt template by sharing basic details about your task.',
+                title: t('canvas.nodeInput.generateInstructionsTitle'),
+                description: t('canvas.nodeInput.generateInstructionsDescription'),
                 data: { selectedChatModel: selectedModel }
             })
             setPromptGeneratorDialogOpen(true)
@@ -855,7 +861,7 @@ const NodeInputHandler = ({
 
     const webhookMethod = data.inputs?.webhookMethod ?? 'POST'
     const webhookUrlBase = chatflowId ? `${baseURL}/api/v1/webhook/${chatflowId}` : null
-    const webhookUrl = webhookUrlBase ? `${webhookMethod} ${webhookUrlBase}` : 'Save the flow first to generate the webhook URL'
+    const webhookUrl = webhookUrlBase ? `${webhookMethod} ${webhookUrlBase}` : t('canvas.nodeInput.webhookUrlUnavailable')
 
     return (
         <div ref={ref}>
@@ -945,7 +951,7 @@ const NodeInputHandler = ({
                                     variant='outlined'
                                     onClick={() => setIsNvidiaNIMDialogOpen(true)}
                                 >
-                                    Setup NIM Locally
+                                    {t('canvas.nodeInput.setupNimLocally')}
                                 </Button>
                             </>
                         )}
@@ -986,13 +992,13 @@ const NodeInputHandler = ({
                                 </Button>
                             )}
                             {inputParam.acceptVariable && inputParam.type === 'string' && (
-                                <Tooltip title='Type {{ to select variables'>
+                                <Tooltip title={t('canvas.nodeInput.typeVariableHint')}>
                                     <IconVariable size={20} style={{ color: 'teal' }} />
                                 </Tooltip>
                             )}
                             {inputParam.generateDocStoreDescription && (
                                 <IconButton
-                                    title='Generate knowledge base description'
+                                    title={t('canvas.nodeInput.generateKnowledgeDescription')}
                                     sx={{
                                         height: 25,
                                         width: 25
@@ -1006,7 +1012,7 @@ const NodeInputHandler = ({
                             )}
                             {inputParam.generateInstruction && (
                                 <IconButton
-                                    title='Generate instructions'
+                                    title={t('canvas.nodeInput.generateInstructions')}
                                     sx={{
                                         height: 25,
                                         width: 25,
@@ -1103,7 +1109,7 @@ const NodeInputHandler = ({
                                 disabled={disabled}
                                 fileType={inputParam.fileType || '*'}
                                 onChange={(newValue) => (data.inputs[inputParam.name] = newValue)}
-                                value={data.inputs[inputParam.name] ?? inputParam.default ?? 'Choose a file to upload'}
+                                value={data.inputs[inputParam.name] ?? inputParam.default ?? t('common.chooseFileToUpload')}
                             />
                         )}
                         {inputParam.type === 'boolean' && (
@@ -1172,14 +1178,14 @@ const NodeInputHandler = ({
                                     readOnly: true,
                                     endAdornment: chatflowId ? (
                                         <InputAdornment position='end'>
-                                            <Tooltip title='Copy URL'>
+                                            <Tooltip title={t('canvas.nodeInput.copyUrl')}>
                                                 <IconButton
                                                     size='small'
                                                     onClick={() => {
                                                         navigator.clipboard.writeText(webhookUrlBase).then(
                                                             () =>
                                                                 enqueueSnackbar({
-                                                                    message: 'URL copied!',
+                                                                    message: t('canvas.nodeInput.urlCopied'),
                                                                     options: {
                                                                         key: new Date().getTime() + Math.random(),
                                                                         variant: 'success'
@@ -1187,7 +1193,7 @@ const NodeInputHandler = ({
                                                                 }),
                                                             () =>
                                                                 enqueueSnackbar({
-                                                                    message: 'Failed to copy URL.',
+                                                                    message: t('canvas.nodeInput.urlCopyFailed'),
                                                                     options: { key: new Date().getTime() + Math.random(), variant: 'error' }
                                                                 })
                                                         )
@@ -1224,15 +1230,15 @@ const NodeInputHandler = ({
                                                 }
                                             }}
                                         >
-                                            Generate a secret below — without one, every incoming webhook request will be rejected.
+                                            {t('canvas.nodeInput.webhookSecretRequired')}
                                         </Alert>
                                         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                             <Typography variant='body2' sx={{ color: 'text.secondary', flexGrow: 1 }}>
-                                                No secret configured
+                                                {t('canvas.nodeInput.noSecretConfigured')}
                                             </Typography>
                                             {chatflowId && (
                                                 <Button size='small' variant='outlined' onClick={handleSetWebhookSecret}>
-                                                    Generate Secret
+                                                    {t('canvas.nodeInput.generateSecret')}
                                                 </Button>
                                             )}
                                         </Box>
@@ -1250,14 +1256,14 @@ const NodeInputHandler = ({
                                             endAdornment: (
                                                 <InputAdornment position='end' sx={{ gap: 0.5 }}>
                                                     {webhookSecretPlaintext && (
-                                                        <Tooltip title='Copy secret'>
+                                                        <Tooltip title={t('canvas.nodeInput.copySecret')}>
                                                             <IconButton
                                                                 size='small'
                                                                 onClick={() => {
                                                                     navigator.clipboard.writeText(webhookSecretPlaintext).then(
                                                                         () =>
                                                                             enqueueSnackbar({
-                                                                                message: 'Secret copied!',
+                                                                                message: t('canvas.nodeInput.secretCopied'),
                                                                                 options: {
                                                                                     key: new Date().getTime() + Math.random(),
                                                                                     variant: 'success'
@@ -1265,7 +1271,7 @@ const NodeInputHandler = ({
                                                                             }),
                                                                         () =>
                                                                             enqueueSnackbar({
-                                                                                message: 'Failed to copy secret.',
+                                                                                message: t('canvas.nodeInput.secretCopyFailed'),
                                                                                 options: {
                                                                                     key: new Date().getTime() + Math.random(),
                                                                                     variant: 'error'
@@ -1278,12 +1284,12 @@ const NodeInputHandler = ({
                                                             </IconButton>
                                                         </Tooltip>
                                                     )}
-                                                    <Tooltip title='Regenerate secret'>
+                                                    <Tooltip title={t('canvas.nodeInput.regenerateSecret')}>
                                                         <IconButton size='small' onClick={handleSetWebhookSecret}>
                                                             <IconRefresh size={16} />
                                                         </IconButton>
                                                     </Tooltip>
-                                                    <Tooltip title='Remove secret'>
+                                                    <Tooltip title={t('canvas.nodeInput.removeSecret')}>
                                                         <IconButton size='small' onClick={handleClearWebhookSecret}>
                                                             <IconX size={16} />
                                                         </IconButton>
@@ -1374,7 +1380,7 @@ const NodeInputHandler = ({
                                     options={getDropdownOptions(inputParam)}
                                     freeSolo={inputParam.freeSolo}
                                     onSelect={(newValue) => handleDataChange({ inputParam, newValue })}
-                                    value={data.inputs[inputParam.name] ?? inputParam.default ?? 'choose an option'}
+                                    value={data.inputs[inputParam.name] ?? inputParam.default ?? t('common.chooseOption')}
                                 />
                             </div>
                         )}
@@ -1385,7 +1391,7 @@ const NodeInputHandler = ({
                                     name={inputParam.name}
                                     options={getDropdownOptions(inputParam)}
                                     onSelect={(newValue) => handleDataChange({ inputParam, newValue })}
-                                    value={data.inputs[inputParam.name] ?? inputParam.default ?? 'choose an option'}
+                                    value={data.inputs[inputParam.name] ?? inputParam.default ?? []}
                                 />
                             </div>
                         )}
@@ -1400,7 +1406,11 @@ const NodeInputHandler = ({
                                         disabled={disabled}
                                         name={inputParam.name}
                                         nodeData={data}
-                                        value={data.inputs[inputParam.name] ?? inputParam.default ?? 'choose an option'}
+                                        value={
+                                            data.inputs[inputParam.name] ??
+                                            inputParam.default ??
+                                            (inputParam.type === 'asyncMultiOptions' ? [] : t('common.chooseOption'))
+                                        }
                                         freeSolo={inputParam.freeSolo}
                                         multiple={inputParam.type === 'asyncMultiOptions'}
                                         isCreateNewOption={EDITABLE_OPTIONS.includes(inputParam.name)}
@@ -1505,7 +1515,7 @@ const NodeInputHandler = ({
                                             )
                                         }
                                     >
-                                        Manage Links
+                                        {t('pages.documentStores.manageLinks')}
                                     </Button>
                                     <ManageScrapedLinksDialog
                                         show={showManageScrapedLinksDialog}
@@ -1607,7 +1617,7 @@ const NodeInputHandler = ({
                                         }
                                     }
                                 }}
-                                value={selectedTempChatModel?.name ?? 'choose an option'}
+                                value={selectedTempChatModel?.name ?? t('common.chooseOption')}
                             />
                         </Box>
                         {selectedTempChatModel && Object.keys(selectedTempChatModel).length > 0 && (
@@ -1660,7 +1670,7 @@ const NodeInputHandler = ({
                         setPromptGeneratorDialogOpen(false)
                     } catch (error) {
                         enqueueSnackbar({
-                            message: 'Error setting generated instruction',
+                            message: t('canvas.nodeInput.generatedInstructionSetFailed'),
                             options: {
                                 key: new Date().getTime() + Math.random(),
                                 variant: 'error',

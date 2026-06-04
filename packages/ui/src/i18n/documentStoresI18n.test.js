@@ -48,7 +48,40 @@ const documentStoreListKeys = [
     'pages.documentStores.status.new'
 ]
 
-const requiredKeys = [...documentStoreDetailKeys, ...showStoredChunksKeys, ...documentStoreDialogKeys, ...documentStoreListKeys]
+const vectorStoreConfigureKeys = [
+    'pages.documentStores.stepEmbeddings',
+    'pages.documentStores.stepVectorStore',
+    'pages.documentStores.stepRecordManager',
+    'pages.documentStores.selectEmbeddings',
+    'pages.documentStores.selectEmbeddingsProvider',
+    'pages.documentStores.selectVectorStore',
+    'pages.documentStores.selectVectorStoreProvider',
+    'pages.documentStores.selectRecordManager',
+    'pages.documentStores.recordManagerNotApplicable',
+    'pages.documentStores.configureSubtitle',
+    'pages.documentStores.saveConfig'
+]
+
+const documentStoreInputKeys = [
+    'pages.documentStores.chooseFileToUpload',
+    'pages.documentStores.manageScrapedLinksTitle',
+    'pages.documentStores.fetchLinks',
+    'pages.documentStores.fetchedLinksSuccess',
+    'pages.documentStores.scrapedLinks',
+    'pages.documentStores.clearAllLinks',
+    'pages.documentStores.clearAll',
+    'pages.documentStores.noScrapedLinks',
+    'pages.documentStores.manageLinks'
+]
+
+const requiredKeys = [
+    ...documentStoreDetailKeys,
+    ...showStoredChunksKeys,
+    ...documentStoreDialogKeys,
+    ...documentStoreListKeys,
+    ...vectorStoreConfigureKeys,
+    ...documentStoreInputKeys
+]
 
 const menuLabels = [
     'View & Edit Chunks',
@@ -145,5 +178,84 @@ describe('document store i18n coverage', () => {
         expect(tableSource).toContain("t('pages.documentStores.colTotalChars')")
         expect(tableSource).toContain("t('pages.documentStores.colTotalChunks')")
         expect(tableSource).toContain("t('pages.documentStores.colLoaderTypes')")
+    })
+
+    it('translates vector store configuration steps, cards, dialogs, and actions', () => {
+        const source = fs.readFileSync(path.join(__dirname, '../views/docstore/VectorStoreConfigure.jsx'), 'utf8')
+
+        vectorStoreConfigureKeys.forEach((key) => {
+            expect(source).toContain(key)
+        })
+        expect(source).toContain('{t(label)}</StepLabel>')
+        expect(source).toContain("t('pages.documentStores.selectEmbeddingsProvider')")
+        expect(source).toContain("t('pages.documentStores.selectVectorStoreProvider')")
+        expect(source).toContain("t('pages.documentStores.selectRecordManager')")
+        expect(source).toContain("t('pages.documentStores.saveConfig')")
+        expect(source).not.toContain("'Select a Vector Store Provider'")
+        expect(source).not.toContain("'Select a Record Manager'")
+        expect(source).not.toContain('>Save Config<')
+        expect(source).not.toContain("t('pages.assistants.selectVectorStore')")
+    })
+
+    it('routes document store embedded node input copy through node i18n', () => {
+        const source = fs.readFileSync(path.join(__dirname, '../views/docstore/DocStoreInputHandler.jsx'), 'utf8')
+
+        expect(source).toContain('translateNodeLabel')
+        expect(source).toContain('translateNodeTooltip')
+        expect(source).toContain('translateNodeInputPlaceholder')
+        expect(source).toContain('{tL(inputParam.label)}')
+        expect(source).toContain('title={tT(inputParam.description)}')
+        expect(source).toContain('placeholder={tP(inputParam.placeholder)}')
+        expect(source).toContain("confirmButtonName: t('common.save')")
+        expect(source).toContain("cancelButtonName: t('common.cancel')")
+        expect(source).toContain("t('pages.documentStores.chooseFileToUpload')")
+        expect(source).toContain("t('common.chooseOption')")
+        expect(source).toContain("t('pages.documentStores.manageLinks')")
+        expect(source).not.toContain('{inputParam.label}')
+        expect(source).not.toContain('title={inputParam.description}')
+        expect(source).not.toContain('placeholder={inputParam.placeholder}')
+        expect(source).not.toContain("'Choose a file to upload'")
+        expect(source).not.toContain("'choose an option'")
+        expect(source).not.toContain('>Manage Links<')
+    })
+
+    it('translates document store embedded node titles and provider list labels', () => {
+        const configureSource = fs.readFileSync(path.join(__dirname, '../views/docstore/VectorStoreConfigure.jsx'), 'utf8')
+        const listSource = fs.readFileSync(path.join(__dirname, '../views/docstore/ComponentsListDialog.jsx'), 'utf8')
+
+        expect(configureSource).toContain('translateNodeLabel')
+        expect(configureSource).toContain('translateNodeLabel(selectedEmbeddingsProvider.label, currentLang)')
+        expect(configureSource).toContain('translateNodeLabel(selectedVectorStoreProvider.label, currentLang)')
+        expect(configureSource).toContain('translateNodeLabel(selectedRecordManagerProvider.label, currentLang)')
+        expect(listSource).toContain('translateNodeLabel(loader.label, currentLang)')
+        expect(configureSource).not.toContain('{selectedEmbeddingsProvider.label}')
+        expect(configureSource).not.toContain('{selectedVectorStoreProvider.label}')
+        expect(configureSource).not.toContain('{selectedRecordManagerProvider.label}')
+        expect(listSource).not.toContain('<Typography>{loader.label}</Typography>')
+    })
+
+    it('translates document store helper dialogs, actions, and notifications', () => {
+        const expandSource = fs.readFileSync(path.join(__dirname, '../ui-component/dialog/ExpandTextDialog.jsx'), 'utf8')
+        const scrapedLinksSource = fs.readFileSync(path.join(__dirname, '../ui-component/dialog/ManageScrapedLinksDialog.jsx'), 'utf8')
+
+        expect(expandSource).toContain('translateNodeLabel(inputParam.label, currentLang)')
+        expect(expandSource).toContain('translateNodeInputPlaceholder(inputParam.placeholder, currentLang)')
+        expect(expandSource).toContain("t('common.execute')")
+        expect(expandSource).toContain("dialogProps.cancelButtonName || t('common.cancel')")
+        expect(expandSource).toContain("dialogProps.confirmButtonName || t('common.save')")
+        expect(expandSource).not.toContain("<Typography variant='h4'>{inputParam.label}</Typography>")
+        expect(expandSource).not.toContain('placeholder={inputParam.placeholder}')
+        expect(expandSource).not.toContain('>Execute<')
+
+        documentStoreInputKeys.slice(1, -1).forEach((key) => {
+            expect(scrapedLinksSource).toContain(`t('${key}'`)
+        })
+        expect(scrapedLinksSource).not.toContain('Successfully fetched links')
+        expect(scrapedLinksSource).not.toContain('Manage Scraped Links')
+        expect(scrapedLinksSource).not.toContain('>Fetch Links<')
+        expect(scrapedLinksSource).not.toContain('>Scraped Links<')
+        expect(scrapedLinksSource).not.toContain('Clear All Links')
+        expect(scrapedLinksSource).not.toContain('>Clear All<')
+        expect(scrapedLinksSource).not.toContain('Links scraped from the URL will appear here')
     })
 })

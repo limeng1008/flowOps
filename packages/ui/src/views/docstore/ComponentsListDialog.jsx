@@ -13,9 +13,11 @@ import { baseURL } from '@/store/constant'
 import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
 import useApi from '@/hooks/useApi'
 import { useTranslation } from 'react-i18next'
+import { translateNodeLabel } from '@/i18n/nodeI18n'
 
 const ComponentsListDialog = ({ show, dialogProps, onCancel, apiCall, onSelected }) => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
+    const currentLang = i18n.resolvedLanguage || i18n.language
     const portalElement = document.getElementById('portal')
     const customization = useSelector((state) => state.customization)
     const dispatch = useDispatch()
@@ -101,7 +103,7 @@ const ComponentsListDialog = ({ show, dialogProps, onCancel, apiCall, onSelected
                                         color: theme.palette.grey[900]
                                     }
                                 }}
-                                title='Clear Search'
+                                title={t('common.clearSearch')}
                             >
                                 <IconX
                                     stroke={1.5}
@@ -174,7 +176,7 @@ const ComponentsListDialog = ({ show, dialogProps, onCancel, apiCall, onSelected
                                     src={`${baseURL}/api/v1/node-icon/${loader.name}`}
                                 />
                             </div>
-                            <Typography>{loader.label}</Typography>
+                            <Typography>{translateNodeLabel(loader.label, currentLang)}</Typography>
                         </ListItemButton>
                     ))}
                 </List>

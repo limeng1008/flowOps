@@ -444,6 +444,222 @@ const requiredKeys = [
     'pages.logs.last2Months',
     'pages.logs.last3Months',
     'pages.logs.custom',
+    'pages.documentStores.refreshDocumentStore',
+    'pages.documentStores.reprocessAllChunks',
+    'pages.documentStores.noDocumentsYet',
+    'pages.documentStores.pendingProcessingRefresh',
+    'pages.documentStores.noSource',
+    'pages.documentStores.upsertApiNote',
+    'pages.documentStores.overrideExistingConfigurations',
+    'pages.documentStores.recordManagerWarning',
+    'pages.documentStores.previewChunks',
+    'pages.documentStores.previewChunkCount',
+    'pages.documentStores.showChunksInPreview',
+    'pages.documentStores.editChunk',
+    'pages.documentStores.noUpsertHistory',
+    'pages.documentStores.upsertVectorDatabase',
+    'common.learnMore',
+    'pages.tools.mcp.toolNameRequired',
+    'pages.tools.mcp.toolNameMax',
+    'pages.tools.mcp.toolNamePattern',
+    'pages.tools.mcp.settingsSaved',
+    'pages.tools.mcp.disabled',
+    'pages.tools.mcp.saveSettingsFailed',
+    'pages.tools.mcp.urlCopied',
+    'pages.tools.mcp.rotateTokenTitle',
+    'pages.tools.mcp.rotateTokenDescription',
+    'pages.tools.mcp.rotate',
+    'pages.tools.mcp.tokenRotated',
+    'pages.tools.mcp.rotateTokenFailed',
+    'pages.tools.mcp.loadConfigFailed',
+    'pages.tools.mcp.loadingConfig',
+    'pages.tools.mcp.exposeAsServer',
+    'pages.tools.mcp.toolIdentifierHelp',
+    'pages.tools.mcp.descriptionPlaceholder',
+    'pages.tools.mcp.descriptionHelp',
+    'pages.tools.mcp.streamableHttpEndpoint',
+    'pages.tools.mcp.copyUrlToClipboard',
+    'pages.tools.mcp.endpointHelp',
+    'pages.tools.mcp.bearerToken',
+    'pages.tools.mcp.tokenCopied',
+    'pages.tools.mcp.copyToken',
+    'pages.tools.mcp.rotateToken',
+    'pages.tools.mcp.authorizationHeaderHelp',
+    'pages.tools.mcp.saving',
+    'pages.tools.mcp.serverUrlRequired',
+    'pages.tools.mcp.maskedUrlError',
+    'pages.tools.mcp.onlyHttpUrls',
+    'pages.tools.mcp.validUrl',
+    'pages.tools.mcp.readOnly',
+    'pages.tools.mcp.readOnlyTooltip',
+    'pages.tools.mcp.destructive',
+    'pages.tools.mcp.destructiveTooltip',
+    'pages.tools.mcp.external',
+    'pages.tools.mcp.externalTooltip',
+    'pages.tools.mcp.parameterCount',
+    'pages.tools.mcp.parameters',
+    'pages.tools.mcp.required',
+    'pages.tools.mcp.optional',
+    'pages.tools.mcp.defaultValue',
+    'pages.tools.mcp.createReturnedNoId',
+    'pages.tools.mcp.failedAddServer',
+    'pages.tools.mcp.serverAddedConnected',
+    'pages.tools.mcp.addedFailedConnect',
+    'pages.tools.mcp.redactedHeaderValue',
+    'pages.tools.mcp.failedSaveServer',
+    'pages.tools.mcp.savedReconnected',
+    'pages.tools.mcp.savedFailedReconnect',
+    'pages.tools.mcp.connectedTools',
+    'pages.tools.mcp.authorizationFailed',
+    'pages.tools.mcp.deleteTitle',
+    'pages.tools.mcp.deleteConfirm',
+    'pages.tools.mcp.deleted',
+    'pages.tools.mcp.failedDelete',
+    'pages.tools.mcp.customMcpServer',
+    'pages.tools.mcp.serverName',
+    'pages.tools.mcp.serverUrl',
+    'pages.tools.mcp.iconSource',
+    'pages.tools.mcp.authentication',
+    'pages.tools.mcp.noAuthentication',
+    'pages.tools.mcp.customHeaders',
+    'pages.tools.mcp.headers',
+    'pages.tools.mcp.headerKey',
+    'pages.tools.mcp.headerValue',
+    'pages.tools.mcp.addHeader',
+    'pages.tools.mcp.discoveredTools',
+    'pages.tools.mcp.filterTools',
+    'pages.tools.mcp.filteredToolsCount',
+    'pages.tools.mcp.toolsCount',
+    'pages.tools.mcp.collapseAll',
+    'pages.tools.mcp.expandAll',
+    'pages.tools.mcp.noToolsMatch',
+    'pages.tools.mcp.connecting',
+    'pages.tools.mcp.authorize',
+    'pages.tools.mcp.addConnect',
+    'pages.tools.mcp.reconnecting',
+    'pages.tools.mcp.saveReconnect',
+    'pages.tools.mcp.serverNameTooltip',
+    'pages.tools.mcp.serverUrlTooltip',
+    'pages.tools.mcp.authTooltip',
+    'pages.roles.editRole',
+    'pages.roles.viewRole',
+    'pages.roles.createNewRole',
+    'pages.roles.roleName',
+    'pages.roles.roleNameNoSpaces',
+    'pages.roles.roleNamePlaceholder',
+    'pages.roles.roleDescription',
+    'pages.roles.roleDescriptionPlaceholder',
+    'canvas.chatConfig.providers',
+    'canvas.chatConfig.connectCredential',
+    'canvas.chatConfig.language',
+    'canvas.chatConfig.languageDescription',
+    'canvas.chatConfig.prompt',
+    'canvas.chatConfig.sttPromptDescription',
+    'canvas.chatConfig.temperature',
+    'canvas.chatConfig.temperatureDescription',
+    'canvas.chatConfig.baseUrl',
+    'canvas.chatConfig.localAiBaseUrlDescription',
+    'canvas.chatConfig.model',
+    'canvas.chatConfig.sttModelDescription',
+    'canvas.chatConfig.groqSttModelDescription',
+    'canvas.chatConfig.recognitionLanguageDescription',
+    'canvas.chatConfig.profanityFilterMode',
+    'canvas.chatConfig.profanityFilterModeDescription',
+    'canvas.chatConfig.profanityNone',
+    'canvas.chatConfig.profanityMasked',
+    'canvas.chatConfig.profanityRemoved',
+    'canvas.chatConfig.audioChannels',
+    'canvas.chatConfig.audioChannelsDescription',
+    'canvas.chatConfig.voice',
+    'canvas.chatConfig.ttsVoiceDescription',
+    'canvas.chatConfig.elevenLabsVoiceDescription',
+    'canvas.chatConfig.modelName',
+    'canvas.chatConfig.followUpPromptDescription',
+    'canvas.chatConfig.followUpDefaultPrompt',
+    'canvas.chatConfig.ollamaBaseUrlDescription',
+    'canvas.chatConfig.ollamaModelNameDescription',
+    'canvas.chatConfig.speechToTextSaved',
+    'canvas.chatConfig.speechToTextSaveFailed',
+    'canvas.chatConfig.textToSpeechSaved',
+    'canvas.chatConfig.textToSpeechSaveFailed',
+    'canvas.chatConfig.selectProviderCredentialsFirst',
+    'canvas.chatConfig.loadingVoices',
+    'canvas.chatConfig.chooseVoice',
+    'canvas.chatConfig.automaticallyPlayAudio',
+    'canvas.chatConfig.autoPlayHelp',
+    'canvas.chatConfig.testVoice',
+    'canvas.chatConfig.ttsTestText',
+    'canvas.chatConfig.ttsTestFailed',
+    'canvas.chatConfig.noAudioDataReceived',
+    'canvas.chatConfig.followUpPromptsSaved',
+    'canvas.chatConfig.followUpPromptsSaveFailed',
+    'canvas.chatConfig.enableFollowUpPrompts',
+    'canvas.chatConfig.chatFeedbackSaved',
+    'canvas.chatConfig.chatFeedbackSaveFailed',
+    'canvas.chatConfig.enableChatFeedback',
+    'canvas.chatConfig.allowedOriginsSaved',
+    'canvas.chatConfig.allowedOriginsSaveFailed',
+    'canvas.chatConfig.allowedDomainsHelp',
+    'canvas.chatConfig.domains',
+    'canvas.chatConfig.errorMessage',
+    'canvas.chatConfig.unauthorizedDomainErrorHelp',
+    'canvas.chatConfig.unauthorizedDomainMessage',
+    'canvas.chatConfig.leadsSaved',
+    'canvas.chatConfig.leadsSaveFailed',
+    'canvas.chatConfig.enableLeadCapture',
+    'canvas.chatConfig.formTitle',
+    'canvas.chatConfig.formTitlePlaceholder',
+    'canvas.chatConfig.leadSuccessMessage',
+    'canvas.chatConfig.leadSuccessMessagePlaceholder',
+    'canvas.chatConfig.formFields',
+    'canvas.chatConfig.fileUploadSaved',
+    'canvas.chatConfig.fileUploadSaveFailed',
+    'canvas.chatConfig.fileUploadNotice',
+    'canvas.chatConfig.enableFullFileUpload',
+    'canvas.chatConfig.allowUploadsOfType',
+    'canvas.chatConfig.advancedSettings',
+    'canvas.chatConfig.pdfProcessing',
+    'canvas.chatConfig.oneDocumentPerPage',
+    'canvas.chatConfig.oneDocumentPerFile',
+    'canvas.chatConfig.fileTypeText',
+    'canvas.chatConfig.rateLimitSaved',
+    'canvas.chatConfig.rateLimitSaveFailed',
+    'canvas.chatConfig.rateLimitInputRequired',
+    'canvas.chatConfig.rateLimitHelp',
+    'canvas.chatConfig.enableRateLimit',
+    'canvas.chatConfig.messageLimitPerDuration',
+    'canvas.chatConfig.durationInSeconds',
+    'canvas.chatConfig.limitMessage',
+    'canvas.chatConfig.limitMessagePlaceholder',
+    'canvas.chatConfig.postProcessingSaved',
+    'canvas.chatConfig.postProcessingSaveFailed',
+    'canvas.chatConfig.postProcessingFunction',
+    'canvas.chatConfig.enablePostProcessing',
+    'canvas.chatConfig.jsFunction',
+    'canvas.chatConfig.availableVariables',
+    'canvas.chatConfig.variable',
+    'canvas.chatConfig.rawOutputDescription',
+    'canvas.chatConfig.inputDescription',
+    'canvas.chatConfig.chatHistoryDescription',
+    'canvas.chatConfig.chatflowIdDescription',
+    'canvas.chatConfig.sessionIdDescription',
+    'canvas.chatConfig.chatIdDescription',
+    'canvas.chatConfig.sourceDocumentsDescription',
+    'canvas.chatConfig.usedToolsDescription',
+    'canvas.chatConfig.artifactsDescription',
+    'canvas.chatConfig.fileAnnotationsDescription',
+    'canvas.chatConfig.starterPromptsSaved',
+    'canvas.chatConfig.starterPromptsSaveFailed',
+    'canvas.chatConfig.starterPromptsHint',
+    'canvas.chatConfig.overrideSaved',
+    'canvas.chatConfig.overrideSaveFailed',
+    'canvas.chatConfig.overrideConfiguration',
+    'canvas.chatConfig.overrideHelp',
+    'canvas.chatConfig.enableOverrideConfiguration',
+    'canvas.chatConfig.schema',
+    'canvas.chatConfig.noSchemaAvailable',
+    'canvas.chatConfig.label',
+    'canvas.chatConfig.on',
     'pages.executions.copyId',
     'pages.executions.copied',
     'pages.executions.idCopied',
@@ -1176,5 +1392,216 @@ describe('views long-tail i18n coverage', () => {
         expect(logsSource).not.toContain('Last hour')
         expect(logsSource).not.toContain('No Logs Yet')
         expect(logsSource).not.toContain('<b>To</b>')
+    })
+
+    it('localizes B6 document store residual buttons, notes, and empty states', () => {
+        const detailSource = read('views/docstore/DocumentStoreDetail.jsx')
+        const apiDialogSource = read('views/docstore/DocStoreAPIDialog.jsx')
+        const deleteDialogSource = read('views/docstore/DeleteDocStoreDialog.jsx')
+        const previewChunksSource = read('views/docstore/LoaderConfigPreviewChunks.jsx')
+        const expandedChunkSource = read('views/docstore/ExpandedChunkDialog.jsx')
+        const upsertHistorySource = read('views/docstore/UpsertHistorySideDrawer.jsx')
+        const componentsListSource = read('views/docstore/ComponentsListDialog.jsx')
+        const loaderListSource = read('views/docstore/DocumentLoaderListDialog.jsx')
+        const vectorStorePopUpSource = read('views/vectorstore/VectorStorePopUp.jsx')
+
+        expect(detailSource).toContain("title={t('pages.documentStores.refreshDocumentStore')}")
+        expect(detailSource).toContain("title={t('pages.documentStores.reprocessAllChunks')}")
+        expect(detailSource).toContain("t('pages.documentStores.noDocumentsYet')")
+        expect(detailSource).toContain("t('pages.documentStores.pendingProcessingRefresh')")
+        expect(detailSource).toContain("t('pages.documentStores.noSource')")
+        expect(detailSource).not.toContain('Refresh Document Store')
+        expect(detailSource).not.toContain('Re-process all loaders and upsert all chunks')
+        expect(detailSource).not.toContain('No Document Added Yet')
+        expect(detailSource).not.toContain('Some files are pending processing')
+        expect(detailSource).not.toContain('No source')
+
+        expect(apiDialogSource).toContain("t('pages.documentStores.upsertApiNote')")
+        expect(apiDialogSource).toContain("t('pages.documentStores.overrideExistingConfigurations')")
+        expect(apiDialogSource).not.toContain('Upsert API can only be used')
+        expect(apiDialogSource).not.toContain('You can override existing configurations:')
+
+        expect(deleteDialogSource).toContain("t('pages.documentStores.recordManagerWarning')")
+        expect(deleteDialogSource).toContain("t('common.learnMore')")
+        expect(deleteDialogSource).not.toContain('Without a Record Manager configured')
+        expect(deleteDialogSource).not.toContain('Learn more')
+
+        expect(previewChunksSource).toContain("t('pages.documentStores.previewChunks')")
+        expect(previewChunksSource).toContain("t('pages.documentStores.previewChunkCount'")
+        expect(previewChunksSource).toContain("t('pages.documentStores.showChunksInPreview')")
+        expect(previewChunksSource).not.toContain('Preview Chunks')
+        expect(previewChunksSource).not.toContain('Show Chunks in Preview')
+
+        expect(expandedChunkSource).toContain("title={t('pages.documentStores.editChunk')}")
+        expect(expandedChunkSource).toContain("title={t('pages.documentStores.deleteChunkTitle')}")
+        expect(expandedChunkSource).not.toContain('Edit Chunk')
+        expect(expandedChunkSource).not.toContain('Delete Chunk')
+
+        expect(upsertHistorySource).toContain("t('pages.documentStores.noUpsertHistory')")
+        expect(upsertHistorySource).not.toContain('No Upsert History Yet')
+
+        expect(componentsListSource).toContain("title={t('common.clearSearch')}")
+        expect(loaderListSource).toContain("title={t('common.clearSearch')}")
+        expect(componentsListSource).not.toContain('Clear Search')
+        expect(loaderListSource).not.toContain('Clear Search')
+
+        expect(vectorStorePopUpSource).toContain("title={t('pages.documentStores.upsertVectorDatabase')}")
+        expect(vectorStorePopUpSource).not.toContain('Upsert Vector Database')
+    })
+
+    it('localizes B6 MCP dialogs and role editor residual visible copy', () => {
+        const mcpServerSource = read('ui-component/extended/McpServer.jsx')
+        const customMcpSource = read('views/tools/CustomMcpServerDialog.jsx')
+        const roleDialogSource = read('views/roles/CreateEditRoleDialog.jsx')
+
+        expect(mcpServerSource).toContain("t('pages.tools.mcp.toolNameRequired')")
+        expect(mcpServerSource).toContain("showSuccess(t('pages.tools.mcp.settingsSaved'))")
+        expect(mcpServerSource).toContain("t('pages.tools.mcp.rotateTokenTitle')")
+        expect(mcpServerSource).toContain("t('pages.tools.mcp.loadingConfig')")
+        expect(mcpServerSource).toContain("label={t('pages.tools.mcp.exposeAsServer')}")
+        expect(mcpServerSource).toContain("t('pages.tools.mcp.toolIdentifierHelp')")
+        expect(mcpServerSource).toContain("placeholder={t('pages.tools.mcp.descriptionPlaceholder')}")
+        expect(mcpServerSource).toContain("t('pages.tools.mcp.streamableHttpEndpoint')")
+        expect(mcpServerSource).toContain("title={t('pages.tools.mcp.copyUrlToClipboard')}")
+        expect(mcpServerSource).toContain("t('pages.tools.mcp.authorizationHeaderHelp')")
+        expect(mcpServerSource).toContain("loading ? t('pages.tools.mcp.saving') : t('common.save')")
+        expect(mcpServerSource).not.toContain('Tool name is required')
+        expect(mcpServerSource).not.toContain('MCP Server settings saved')
+        expect(mcpServerSource).not.toContain('Expose as MCP Server')
+        expect(mcpServerSource).not.toContain('Loading MCP Server configuration...')
+        expect(mcpServerSource).not.toContain('Streamable HTTP Endpoint')
+        expect(mcpServerSource).not.toContain('Saving...')
+
+        expect(customMcpSource).toContain("label={t('pages.tools.mcp.readOnly')}")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.parameterCount'")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.parameters')")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.required')")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.failedAddServer'")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.redactedHeaderValue'")
+        expect(customMcpSource).toContain("title: t('pages.tools.mcp.deleteTitle')")
+        expect(customMcpSource).toContain("t('pages.tools.addCustomMcpServer')")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.serverName')")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.noAuthentication')")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.addHeader')")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.discoveredTools')")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.filteredToolsCount'")
+        expect(customMcpSource).toContain("t('pages.tools.mcp.noToolsMatch'")
+        expect(customMcpSource).toContain("authorizing ? t('pages.tools.mcp.connecting') : t('pages.tools.mcp.authorize')")
+        expect(customMcpSource).not.toContain('READ-ONLY')
+        expect(customMcpSource).not.toContain('Failed to add MCP Server')
+        expect(customMcpSource).not.toContain('Delete MCP Server')
+        expect(customMcpSource).not.toContain('Add Custom MCP Server')
+        expect(customMcpSource).not.toContain('No Authentication')
+        expect(customMcpSource).not.toContain('Discovered Tools')
+        expect(customMcpSource).not.toContain('Collapse all')
+        expect(customMcpSource).not.toContain('Add & Connect')
+
+        expect(roleDialogSource).toContain("t('pages.roles.editRole')")
+        expect(roleDialogSource).toContain("t('pages.roles.roleName')")
+        expect(roleDialogSource).toContain("placeholder={t('pages.roles.roleNamePlaceholder')}")
+        expect(roleDialogSource).toContain("t('pages.roles.roleDescription')")
+        expect(roleDialogSource).not.toContain('Edit Role')
+        expect(roleDialogSource).not.toContain('Role Name')
+        expect(roleDialogSource).not.toContain('Enter role name')
+        expect(roleDialogSource).not.toContain('Description of the role')
+    })
+
+    it('localizes B6 chat configuration extension panels', () => {
+        const speechSource = read('ui-component/extended/SpeechToText.jsx')
+        const ttsSource = read('ui-component/extended/TextToSpeech.jsx')
+        const followUpSource = read('ui-component/extended/FollowUpPrompts.jsx')
+        const feedbackSource = read('ui-component/extended/ChatFeedback.jsx')
+        const allowedDomainsSource = read('ui-component/extended/AllowedDomains.jsx')
+        const leadsSource = read('ui-component/extended/Leads.jsx')
+        const fileUploadSource = read('ui-component/extended/FileUpload.jsx')
+        const rateLimitSource = read('ui-component/extended/RateLimit.jsx')
+        const postProcessingSource = read('ui-component/extended/PostProcessing.jsx')
+        const starterPromptsSource = read('ui-component/extended/StarterPrompts.jsx')
+        const overrideSource = read('ui-component/extended/OverrideConfig.jsx')
+
+        expect(speechSource).toContain("message: t('canvas.chatConfig.speechToTextSaved')")
+        expect(speechSource).toContain("t('canvas.chatConfig.speechToTextSaveFailed'")
+        expect(speechSource).toContain("t('canvas.chatConfig.providers')")
+        expect(speechSource).toContain('localizeInputParam')
+        expect(speechSource).not.toContain('Speech To Text Configuration Saved')
+        expect(speechSource).not.toContain('Failed to save Speech To Text Configuration')
+        expect(speechSource).not.toContain('<Typography>Providers</Typography>')
+        expect(speechSource).not.toContain("label: 'Connect Credential'")
+        expect(speechSource).not.toContain("label: 'Language'")
+
+        expect(ttsSource).toContain("message: t('canvas.chatConfig.textToSpeechSaved')")
+        expect(ttsSource).toContain("t('canvas.chatConfig.textToSpeechSaveFailed'")
+        expect(ttsSource).toContain("t('canvas.chatConfig.selectProviderCredentialsFirst')")
+        expect(ttsSource).toContain("t('canvas.chatConfig.loadingVoices')")
+        expect(ttsSource).toContain("t('canvas.chatConfig.automaticallyPlayAudio')")
+        expect(ttsSource).toContain("t('canvas.chatConfig.testVoice')")
+        expect(ttsSource).not.toContain('Text To Speech Configuration Saved')
+        expect(ttsSource).not.toContain('Please select a provider and configure credentials first')
+        expect(ttsSource).not.toContain('Automatically play audio')
+        expect(ttsSource).not.toContain('Test Voice')
+        expect(ttsSource).not.toContain('Loading voices...')
+
+        expect(followUpSource).toContain("message: t('canvas.chatConfig.followUpPromptsSaved')")
+        expect(followUpSource).toContain("t('canvas.chatConfig.enableFollowUpPrompts')")
+        expect(followUpSource).toContain("t('canvas.chatConfig.followUpDefaultPrompt')")
+        expect(followUpSource).not.toContain('Follow-up Prompts configuration saved')
+        expect(followUpSource).not.toContain('Enable Follow-up Prompts')
+        expect(followUpSource).not.toContain('Prompt to generate questions based on the conversation history')
+
+        expect(feedbackSource).toContain("message: t('canvas.chatConfig.chatFeedbackSaved')")
+        expect(feedbackSource).toContain("label={t('canvas.chatConfig.enableChatFeedback')}")
+        expect(feedbackSource).not.toContain('Chat Feedback Settings Saved')
+        expect(feedbackSource).not.toContain('Enable chat feedback')
+
+        expect(allowedDomainsSource).toContain("message: t('canvas.chatConfig.allowedOriginsSaved')")
+        expect(allowedDomainsSource).toContain("t('canvas.chatConfig.allowedDomainsHelp')")
+        expect(allowedDomainsSource).toContain("t('canvas.chatConfig.unauthorizedDomainMessage')")
+        expect(allowedDomainsSource).not.toContain('Allowed Origins Saved')
+        expect(allowedDomainsSource).not.toContain('Your chatbot will only work when used from the following domains.')
+        expect(allowedDomainsSource).not.toContain('Unauthorized domain!')
+
+        expect(leadsSource).toContain("message: t('canvas.chatConfig.leadsSaved')")
+        expect(leadsSource).toContain("label={t('canvas.chatConfig.enableLeadCapture')}")
+        expect(leadsSource).toContain("placeholder={t('canvas.chatConfig.formTitlePlaceholder')}")
+        expect(leadsSource).not.toContain('Leads configuration Saved')
+        expect(leadsSource).not.toContain('Enable Lead Capture')
+        expect(leadsSource).not.toContain('Message after lead captured')
+
+        expect(fileUploadSource).toContain("message: t('canvas.chatConfig.fileUploadSaved')")
+        expect(fileUploadSource).toContain("parser(t('canvas.chatConfig.fileUploadNotice'))")
+        expect(fileUploadSource).toContain("label={t('canvas.chatConfig.enableFullFileUpload')}")
+        expect(fileUploadSource).not.toContain('File Upload Configuration Saved')
+        expect(fileUploadSource).not.toContain('Allow Uploads of Type')
+        expect(fileUploadSource).not.toContain('One document per page')
+
+        expect(rateLimitSource).toContain("throw new Error(t('canvas.chatConfig.rateLimitInputRequired'))")
+        expect(rateLimitSource).toContain("message: t('canvas.chatConfig.rateLimitSaved')")
+        expect(rateLimitSource).toContain("label={t('canvas.chatConfig.enableRateLimit')}")
+        expect(rateLimitSource).not.toContain('Rate Limit Configuration Saved')
+        expect(rateLimitSource).not.toContain('Enable Rate Limit')
+        expect(rateLimitSource).not.toContain('Message Limit per Duration')
+
+        expect(postProcessingSource).toContain("label: t('canvas.chatConfig.postProcessingFunction')")
+        expect(postProcessingSource).toContain("message: t('canvas.chatConfig.postProcessingSaved')")
+        expect(postProcessingSource).toContain("label={t('canvas.chatConfig.enablePostProcessing')}")
+        expect(postProcessingSource).toContain("t('canvas.chatConfig.availableVariables')")
+        expect(postProcessingSource).toContain("t('canvas.chatConfig.rawOutputDescription')")
+        expect(postProcessingSource).not.toContain('Post Processing Settings Saved')
+        expect(postProcessingSource).not.toContain('Enable Post Processing')
+        expect(postProcessingSource).not.toContain('Available Variables')
+        expect(postProcessingSource).not.toContain('The raw output response from the flow')
+
+        expect(starterPromptsSource).toContain("message: t('canvas.chatConfig.starterPromptsSaved')")
+        expect(starterPromptsSource).toContain("t('canvas.chatConfig.starterPromptsHint')")
+        expect(starterPromptsSource).not.toContain('Conversation Starter Prompts Saved')
+        expect(starterPromptsSource).not.toContain('Starter prompts will only be shown when there are no messages on the chat')
+
+        expect(overrideSource).toContain("message: t('canvas.chatConfig.overrideSaved')")
+        expect(overrideSource).toContain("t('canvas.chatConfig.overrideConfiguration')")
+        expect(overrideSource).toContain("label={t('canvas.chatConfig.enableOverrideConfiguration')}")
+        expect(overrideSource).toContain("t('canvas.chatConfig.schema')")
+        expect(overrideSource).not.toContain('Override Configuration Saved')
+        expect(overrideSource).not.toContain('Enable Override Configuration')
+        expect(overrideSource).not.toContain('No schema available')
     })
 })

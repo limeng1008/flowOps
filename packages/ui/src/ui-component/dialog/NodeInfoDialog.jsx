@@ -23,7 +23,7 @@ const NodeInfoDialog = ({ show, dialogProps, onCancel }) => {
     const portalElement = document.getElementById('portal')
     const dispatch = useDispatch()
     const theme = useTheme()
-    const { i18n } = useTranslation()
+    const { t, i18n } = useTranslation()
     const currentLang = i18n.resolvedLanguage || i18n.language
 
     const getNodeConfigApi = useApi(configApi.getNodeConfig)
@@ -205,13 +205,13 @@ const NodeInfoDialog = ({ show, dialogProps, onCancel }) => {
                             <Button
                                 variant='outlined'
                                 color='primary'
-                                title='Open Documentation'
+                                title={t('components.nodeInfo.openDocumentation')}
                                 onClick={() => {
                                     window.open(dialogProps.data.documentation, '_blank', 'noopener,noreferrer')
                                 }}
                                 startIcon={<IconBook2 />}
                             >
-                                Documentation
+                                {t('layout.documentation')}
                             </Button>
                         )}
                     </div>

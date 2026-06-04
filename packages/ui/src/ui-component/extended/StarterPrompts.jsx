@@ -68,7 +68,7 @@ const StarterPrompts = ({ dialogProps, onConfirm }) => {
             })
             if (saveResp.data) {
                 enqueueSnackbar({
-                    message: 'Conversation Starter Prompts Saved',
+                    message: t('canvas.chatConfig.starterPromptsSaved'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -84,9 +84,9 @@ const StarterPrompts = ({ dialogProps, onConfirm }) => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to save Conversation Starter Prompts: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('canvas.chatConfig.starterPromptsSaveFailed', {
+                    message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -150,7 +150,7 @@ const StarterPrompts = ({ dialogProps, onConfirm }) => {
             >
                 <IconBulb size={20} color='#16a34a' style={{ flexShrink: 0 }} />
                 <Typography sx={{ color: 'text.secondary', fontSize: '0.8125rem', lineHeight: 1.5 }}>
-                    Starter prompts will only be shown when there are no messages on the chat
+                    {t('canvas.chatConfig.starterPromptsHint')}
                 </Typography>
             </Box>
             <Box sx={{ '& > :not(style)': { m: 1 }, pt: 2 }}>

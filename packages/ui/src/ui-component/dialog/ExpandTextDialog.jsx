@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 import PerfectScrollbar from 'react-perfect-scrollbar'
+import { useTranslation } from 'react-i18next'
 
 // MUI
 import { Button, Dialog, DialogActions, DialogContent, Typography } from '@mui/material'
@@ -12,6 +13,7 @@ import { useTheme } from '@mui/material/styles'
 import { StyledButton } from '@/ui-component/button/StyledButton'
 import { PermissionLoadingButton } from '@/ui-component/button/RBACButtons'
 import { CodeEditor } from '@/ui-component/editor/CodeEditor'
+import { translateNodeInputPlaceholder, translateNodeLabel } from '@/i18n/nodeI18n'
 
 // Store
 import { HIDE_CANVAS_DIALOG, SHOW_CANVAS_DIALOG } from '@/store/actions'
@@ -24,6 +26,8 @@ import './ExpandTextDialog.css'
 
 const ExpandTextDialog = ({ show, dialogProps, onCancel, onInputHintDialogClicked, onConfirm }) => {
     const portalElement = document.getElementById('portal')
+    const { t, i18n } = useTranslation()
+    const currentLang = i18n.resolvedLanguage || i18n.language
 
     const theme = useTheme()
     const dispatch = useDispatch()
@@ -97,7 +101,7 @@ const ExpandTextDialog = ({ show, dialogProps, onCancel, onInputHintDialogClicke
                     {inputParam && (inputParam.type === 'string' || inputParam.type === 'code') && (
                         <div style={{ flex: 70 }}>
                             <div style={{ marginBottom: '10px', display: 'flex', flexDirection: 'row' }}>
-                                <Typography variant='h4'>{inputParam.label}</Typography>
+                                <Typography variant='h4'>{translateNodeLabel(inputParam.label, currentLang)}</Typography>
                                 <div style={{ flex: 1 }} />
                                 {inputParam.hint && (
                                     <Button
@@ -108,7 +112,7 @@ const ExpandTextDialog = ({ show, dialogProps, onCancel, onInputHintDialogClicke
                                             onInputHintDialogClicked(inputParam.hint)
                                         }}
                                     >
-                                        {inputParam.hint.label}
+                                        {translateNodeLabel(inputParam.hint.label, currentLang)}
                                     </Button>
                                 )}
                             </div>
@@ -129,7 +133,7 @@ const ExpandTextDialog = ({ show, dialogProps, onCancel, onInputHintDialogClicke
                                     height={languageType === 'js' ? 'calc(100vh - 250px)' : 'calc(100vh - 220px)'}
                                     theme={customization.isDarkMode ? 'dark' : 'light'}
                                     lang={languageType}
-                                    placeholder={inputParam.placeholder}
+                                    placeholder={translateNodeInputPlaceholder(inputParam.placeholder, currentLang)}
                                     basicSetup={
                                         languageType !== 'js'
                                             ? {
@@ -169,7 +173,7 @@ const ExpandTextDialog = ({ show, dialogProps, onCancel, onInputHintDialogClicke
                             executeCustomFunctionNodeApi.request({ javascriptFunction: inputValue })
                         }}
                     >
-                        Execute
+                        {t('common.execute')}
                     </PermissionLoadingButton>
                 )}
                 {codeExecutedResult && (
@@ -188,9 +192,9 @@ const ExpandTextDialog = ({ show, dialogProps, onCancel, onInputHintDialogClicke
                 )}
             </DialogContent>
             <DialogActions>
-                <Button onClick={onCancel}>{dialogProps.cancelButtonName}</Button>
+                <Button onClick={onCancel}>{dialogProps.cancelButtonName || t('common.cancel')}</Button>
                 <StyledButton disabled={dialogProps.disabled} variant='contained' onClick={() => onConfirm(inputValue, inputParam.name)}>
-                    {dialogProps.confirmButtonName}
+                    {dialogProps.confirmButtonName || t('common.save')}
                 </StyledButton>
             </DialogActions>
         </Dialog>

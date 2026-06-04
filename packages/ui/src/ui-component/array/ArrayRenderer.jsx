@@ -99,7 +99,7 @@ export const ArrayRenderer = ({ inputParam, data, disabled, isDocStore = false }
                 id: `${data.id}-output-${items.length}`,
                 label: items.length,
                 name: items.length,
-                description: 'Else'
+                description: t('canvas.elseBranch')
             })
         }
         data.outputAnchors = updatedOutputs

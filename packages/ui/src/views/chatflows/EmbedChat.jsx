@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import { Tabs, Tab, Box } from '@mui/material'
 import { CopyBlock, atomOneDark } from 'react-code-blocks'
+import { useTranslation } from 'react-i18next'
 
 // Project import
 import { CheckboxInput } from '@/ui-component/checkbox/Checkbox'
@@ -85,7 +86,7 @@ const App = () => {
 };`
 }
 
-export const defaultThemeConfig = {
+const getDefaultThemeConfig = (t) => ({
     button: {
         backgroundColor: '#3B81F6',
         right: 20,
@@ -102,17 +103,17 @@ export const defaultThemeConfig = {
     },
     tooltip: {
         showTooltip: true,
-        tooltipMessage: 'Hi There 👋!',
+        tooltipMessage: t('pages.chatflows.embedTheme.tooltipMessage'),
         tooltipBackgroundColor: 'black',
         tooltipTextColor: 'white',
         tooltipFontSize: 16
     },
     disclaimer: {
-        title: 'Disclaimer',
-        message: 'By using this chatbot, you agree to the <a target="_blank" href="/terms">Terms & Condition</a>',
+        title: t('pages.chatflows.embedTheme.disclaimerTitle'),
+        message: t('pages.chatflows.embedTheme.disclaimerMessage'),
         textColor: 'black',
         buttonColor: '#3b82f6',
-        buttonText: 'Start Chatting',
+        buttonText: t('pages.chatflows.embedTheme.startChatting'),
         buttonTextColor: 'white',
         blurredBackgroundColor: 'rgba(0, 0, 0, 0.4)',
         backgroundColor: 'white'
@@ -123,17 +124,17 @@ export const defaultThemeConfig = {
         showAgentMessages: true,
         title: 'FlowOps Bot',
         titleAvatarSrc: 'https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/google-messages.svg',
-        welcomeMessage: 'Hello! This is custom welcome message',
-        errorMessage: 'This is a custom error message',
+        welcomeMessage: t('pages.chatflows.embedTheme.welcomeMessage'),
+        errorMessage: t('pages.chatflows.embedTheme.errorMessage'),
         backgroundColor: '#ffffff',
-        backgroundImage: 'enter image path or link',
+        backgroundImage: t('pages.chatflows.embedTheme.backgroundImage'),
         height: 700,
         width: 400,
         fontSize: 16,
-        starterPrompts: ['What is a bot?', 'Who are you?'],
+        starterPrompts: [t('pages.chatflows.embedTheme.starterPromptBot'), t('pages.chatflows.embedTheme.starterPromptWho')],
         starterPromptFontSize: 15,
         clearChatOnReload: false,
-        sourceDocsTitle: 'Sources:',
+        sourceDocsTitle: t('pages.chatflows.embedTheme.sources'),
         renderHTML: true,
         botMessage: {
             backgroundColor: '#f7f8ff',
@@ -148,12 +149,12 @@ export const defaultThemeConfig = {
             avatarSrc: 'https://raw.githubusercontent.com/zahidkhawaja/langchain-chat-nextjs/main/public/usericon.png'
         },
         textInput: {
-            placeholder: 'Type your question',
+            placeholder: t('pages.chatflows.embedTheme.inputPlaceholder'),
             backgroundColor: '#ffffff',
             textColor: '#303235',
             sendButtonColor: '#3B81F6',
             maxChars: 50,
-            maxCharsWarningMessage: 'You exceeded the characters limit. Please input less than 50 characters.',
+            maxCharsWarningMessage: t('pages.chatflows.embedTheme.maxCharsWarning'),
             autoFocus: true,
             sendMessageSound: true,
             sendSoundLocation: 'send_message.mp3',
@@ -169,12 +170,12 @@ export const defaultThemeConfig = {
         },
         footer: {
             textColor: '#303235',
-            text: 'Powered by',
+            text: t('pages.chatflows.embedTheme.poweredBy'),
             company: 'FlowOps',
             companyLink: '/'
         }
     }
-}
+})
 
 const customStringify = (obj) => {
     let stringified = JSON.stringify(obj, null, 4)
@@ -191,7 +192,7 @@ const customStringify = (obj) => {
         .join('\n')
 }
 
-const embedPopupHtmlCodeCustomization = (chatflowid) => {
+const embedPopupHtmlCodeCustomization = (chatflowid, themeConfig) => {
     return `<script type="module">
     import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js"
     Chatbot.init({
@@ -203,12 +204,12 @@ const embedPopupHtmlCodeCustomization = (chatflowid) => {
         observersConfig: {
             /* Observers Config */
         },
-        theme: ${customStringify(defaultThemeConfig)}
+        theme: ${customStringify(themeConfig)}
     })
 </script>`
 }
 
-const embedPopupReactCodeCustomization = (chatflowid) => {
+const embedPopupReactCodeCustomization = (chatflowid, themeConfig) => {
     return `import { BubbleChat } from 'flowise-embed-react'
 
 const App = () => {
@@ -222,7 +223,7 @@ const App = () => {
             observersConfig={{
                 /* Observers Config */
             }}
-            theme={{${customStringify(defaultThemeConfig)
+            theme={{${customStringify(themeConfig)
                 .substring(1)
                 .split('\n')
                 .map((line) => ' '.repeat(4) + line)
@@ -232,18 +233,18 @@ const App = () => {
 }`
 }
 
-const getFullPageThemeConfig = () => {
+const getFullPageThemeConfig = (themeConfig) => {
     return {
-        ...defaultThemeConfig,
+        ...themeConfig,
         chatWindow: {
-            ...defaultThemeConfig.chatWindow,
+            ...themeConfig.chatWindow,
             height: '100%',
             width: '100%'
         }
     }
 }
 
-const embedFullpageHtmlCodeCustomization = (chatflowid) => {
+const embedFullpageHtmlCodeCustomization = (chatflowid, themeConfig) => {
     return `<flowise-fullchatbot></flowise-fullchatbot>
 <script type="module">
     import Chatbot from "https://cdn.jsdelivr.net/npm/flowise-embed/dist/web.js"
@@ -256,12 +257,12 @@ const embedFullpageHtmlCodeCustomization = (chatflowid) => {
         observersConfig: {
             /* Observers Config */
         },
-        theme: ${customStringify(getFullPageThemeConfig())}
+        theme: ${customStringify(getFullPageThemeConfig(themeConfig))}
     })
 </script>`
 }
 
-const embedFullpageReactCodeCustomization = (chatflowid) => {
+const embedFullpageReactCodeCustomization = (chatflowid, themeConfig) => {
     return `import { FullPageChat } from 'flowise-embed-react'
 
 const App = () => {
@@ -275,7 +276,7 @@ const App = () => {
             observersConfig={{
                 /* Observers Config */
             }}
-            theme={{${customStringify(getFullPageThemeConfig())
+            theme={{${customStringify(getFullPageThemeConfig(themeConfig))
                 .substring(1)
                 .split('\n')
                 .map((line) => ' '.repeat(4) + line)
@@ -286,7 +287,14 @@ const App = () => {
 }
 
 const EmbedChat = ({ chatflowid }) => {
-    const codes = ['Popup Html', 'Fullpage Html', 'Popup React', 'Fullpage React']
+    const { t } = useTranslation()
+    const themeConfig = getDefaultThemeConfig(t)
+    const codes = [
+        { value: 'popupHtml', label: t('pages.chatflows.embed.popupHtml') },
+        { value: 'fullpageHtml', label: t('pages.chatflows.embed.fullpageHtml') },
+        { value: 'popupReact', label: t('pages.chatflows.embed.popupReact') },
+        { value: 'fullpageReact', label: t('pages.chatflows.embed.fullpageReact') }
+    ]
     const [value, setValue] = useState(0)
     const [embedChatCheckboxVal, setEmbedChatCheckbox] = useState(false)
 
@@ -298,33 +306,33 @@ const EmbedChat = ({ chatflowid }) => {
         setValue(newValue)
     }
 
-    const getCode = (codeLang) => {
-        switch (codeLang) {
-            case 'Popup Html':
+    const getCode = (codeType) => {
+        switch (codeType) {
+            case 'popupHtml':
                 return embedPopupHtmlCode(chatflowid)
-            case 'Fullpage Html':
+            case 'fullpageHtml':
                 return embedFullpageHtmlCode(chatflowid)
-            case 'Popup React':
+            case 'popupReact':
                 return embedPopupReactCode(chatflowid)
-            case 'Fullpage React':
+            case 'fullpageReact':
                 return embedFullpageReactCode(chatflowid)
             default:
                 return ''
         }
     }
 
-    const getCodeCustomization = (codeLang) => {
-        switch (codeLang) {
-            case 'Popup Html':
-                return embedPopupHtmlCodeCustomization(chatflowid)
-            case 'Fullpage Html':
-                return embedFullpageHtmlCodeCustomization(chatflowid)
-            case 'Popup React':
-                return embedPopupReactCodeCustomization(chatflowid)
-            case 'Fullpage React':
-                return embedFullpageReactCodeCustomization(chatflowid)
+    const getCodeCustomization = (codeType) => {
+        switch (codeType) {
+            case 'popupHtml':
+                return embedPopupHtmlCodeCustomization(chatflowid, themeConfig)
+            case 'fullpageHtml':
+                return embedFullpageHtmlCodeCustomization(chatflowid, themeConfig)
+            case 'popupReact':
+                return embedPopupReactCodeCustomization(chatflowid, themeConfig)
+            case 'fullpageReact':
+                return embedFullpageReactCodeCustomization(chatflowid, themeConfig)
             default:
-                return embedPopupHtmlCodeCustomization(chatflowid)
+                return embedPopupHtmlCodeCustomization(chatflowid, themeConfig)
         }
     }
 
@@ -333,27 +341,27 @@ const EmbedChat = ({ chatflowid }) => {
             <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                 <div style={{ flex: 80 }}>
                     <Tabs value={value} onChange={handleChange} aria-label='tabs'>
-                        {codes.map((codeLang, index) => (
-                            <Tab key={index} label={codeLang} {...a11yProps(index)}></Tab>
+                        {codes.map((code, index) => (
+                            <Tab key={code.value} label={code.label} {...a11yProps(index)}></Tab>
                         ))}
                     </Tabs>
                 </div>
             </div>
             <div style={{ marginTop: 10 }}></div>
-            {codes.map((codeLang, index) => (
-                <TabPanel key={index} value={value} index={index}>
+            {codes.map((code, index) => (
+                <TabPanel key={code.value} value={value} index={index}>
                     {(value === 0 || value === 1) && (
                         <>
                             <span>
-                                Paste this anywhere in the <code>{`<body>`}</code> tag of your html file.
+                                {t('pages.chatflows.embed.pasteInBody')}
                                 <p>
-                                    You can also specify a&nbsp;
+                                    {t('pages.chatflows.embed.versionHelpPrefix')}&nbsp;
                                     <a
                                         rel='noreferrer'
                                         target='_blank'
                                         href='https://www.npmjs.com/package/flowise-embed?activeTab=versions'
                                     >
-                                        version
+                                        {t('pages.chatflows.embed.version')}
                                     </a>
                                     :&nbsp;<code>{`https://cdn.jsdelivr.net/npm/flowise-embed@<version>/dist/web.js`}</code>
                                 </p>
@@ -361,14 +369,18 @@ const EmbedChat = ({ chatflowid }) => {
                             <div style={{ height: 10 }}></div>
                         </>
                     )}
-                    <CopyBlock theme={atomOneDark} text={getCode(codeLang)} language='javascript' showLineNumbers={false} wrapLines />
+                    <CopyBlock theme={atomOneDark} text={getCode(code.value)} language='javascript' showLineNumbers={false} wrapLines />
 
-                    <CheckboxInput label='Show Embed Chat Config' value={embedChatCheckboxVal} onChange={onCheckBoxEmbedChatChanged} />
+                    <CheckboxInput
+                        label={t('pages.chatflows.embed.showConfig')}
+                        value={embedChatCheckboxVal}
+                        onChange={onCheckBoxEmbedChatChanged}
+                    />
 
                     {embedChatCheckboxVal && (
                         <CopyBlock
                             theme={atomOneDark}
-                            text={getCodeCustomization(codeLang)}
+                            text={getCodeCustomization(code.value)}
                             language='javascript'
                             showLineNumbers={false}
                             wrapLines

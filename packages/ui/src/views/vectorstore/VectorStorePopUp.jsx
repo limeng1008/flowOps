@@ -48,7 +48,7 @@ const VectorStorePopUp = ({ chatflowid }) => {
                 size='small'
                 color='teal'
                 aria-label='upsert'
-                title='Upsert Vector Database'
+                title={t('pages.documentStores.upsertVectorDatabase')}
                 onClick={handleToggle}
             >
                 {open ? <IconX /> : <IconDatabaseImport />}

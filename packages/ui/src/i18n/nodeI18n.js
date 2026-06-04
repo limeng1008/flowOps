@@ -307,6 +307,7 @@ const nodeLabelMap = {
     Description: '描述',
     'Allow Image Uploads': '允许上传图片',
     URL: 'URL',
+    Tool: '工具',
     Tools: '工具',
     'Session Id': '会话 ID',
     'Stop Sequence': '停止序列',
@@ -339,6 +340,8 @@ const nodeLabelMap = {
     'Max Tokens to Sample': '最大生成 Token 数',
     'Latency Optimized': '低延迟优化',
     'Use Global Inference Endpoint': '使用全局推理端点',
+    'Cohere Input Type': 'Cohere 输入类型',
+    'Max AWS API retries': 'AWS API 最大重试次数',
     'Base Path to load': '加载路径',
     'Base Path to store': '存储路径',
     'Chunk Size': '块大小',
@@ -567,6 +570,12 @@ const nodeDescriptionMap = {
     'Memory for agentflow to remember the state of the conversation using MySQL database': '使用 MySQL 让 agentflow 记忆对话状态',
     'Memory for agentflow to remember the state of the conversation using Postgres database': '使用 Postgres 让 agentflow 记忆对话状态',
     'Memory for agentflow to remember the state of the conversation using SQLite database': '使用 SQLite 让 agentflow 记忆对话状态',
+    'Give your agent context about different document sources. Document stores must be upserted in advance.':
+        '为智能体提供不同文档来源作为上下文。文档库需要提前完成入库。',
+    'Give your agent context about different document sources from existing vector stores and embeddings':
+        '从现有向量库和嵌入中为智能体提供不同文档来源作为上下文。',
+    'Document stores to retrieve information from. Document stores must be upserted in advance.':
+        '用于检索信息的文档库。文档库需要提前完成入库。',
     'Retrieve chat messages stored in database': '读取数据库中的对话消息',
     'Stores and manages chat memory using Mem0 service': '通过 Mem0 服务存储与管理对话记忆',
     'Stores the conversation in MongoDB Atlas': '将对话存储到 MongoDB Atlas',
@@ -919,6 +928,7 @@ const nodeDescriptionMap = {
     'Describe to LLM when it should use this tool': '向 LLM 说明何时调用此工具',
     'Whether the application supports both My Drives and shared drives': '是否同时支持「我的云端硬盘」和共享云端硬盘',
     'This prompt will be added at the end of the messages as human message': '该提示词将作为用户消息追加到消息列表末尾',
+    'Add an input message as user message at the end of the conversation': '在对话末尾追加一条用户消息作为输入消息。',
     'Temperature parameter may not apply to certain model. Please check available model parameters':
         'Temperature 参数可能不适用于某些模型，请查看模型可用参数',
     'Number of top results to fetch. Default to the TopK of the Base Retriever': '返回结果数，默认与 Base Retriever 的 TopK 相同',
@@ -979,6 +989,14 @@ const nodeTooltipMap = {
     'Force the global cross-region inference profile instead of the region-specific one. Bedrock routes dynamically across regions for maximum availability.':
         '强制使用全局跨区域推理配置，而不是当前区域专属配置。Bedrock 会在多个区域间动态路由，以提高可用性。',
     'Region to use for the model.': '模型使用的云服务区域。',
+    'Custom endpoint host to use for the model. Provide the hostname without scheme. If provided, will override the default endpoint host.':
+        '模型使用的自定义端点 Host。只填写主机名，不需要带 http/https；填写后会覆盖默认端点。',
+    'Specifies the type of input passed to the model. Required for cohere embedding models v3 and higher. <a target="_blank" href="https://docs.cohere.com/reference/embed">Official Docs</a>':
+        '指定传给模型的输入类型。Cohere embedding v3 及以上模型必填。<a target="_blank" href="https://docs.cohere.com/reference/embed">官方文档</a>',
+    'Documents batch size to send to AWS API for Titan model embeddings. Used to avoid throttling.':
+        '发送到 AWS API 的 Titan 向量模型文档批大小，用于降低触发限流的概率。',
+    'This will limit the number of AWS API for Titan model embeddings call retries. Used to avoid throttling.':
+        '限制 Titan 向量模型调用 AWS API 的重试次数，用于降低触发限流的概率。',
     'Whether or not to stream tokens as they are generated.': '是否在模型生成 Token 时实时流式返回。',
     'Whether or not to stream tokens as they are generated': '是否在模型生成 Token 时实时流式返回。',
     'Allow image input. Refer to the <a href="https://docs.flowiseai.com/using-flowise/uploads#image" target="_blank">docs</a> for more details.':
@@ -994,6 +1012,13 @@ const nodeTooltipMap = {
     'Name of the tool': '工具名称。',
     'Whether to return source documents': '是否返回来源文档。',
     'Return source documents': '返回来源文档。',
+    'Add an input message as user message at the end of the conversation': '在对话末尾追加一条用户消息作为输入消息。',
+    'Give your agent context about different document sources. Document stores must be upserted in advance.':
+        '为智能体提供不同文档来源作为上下文。文档库需要提前完成入库。',
+    'Give your agent context about different document sources from existing vector stores and embeddings':
+        '从现有向量库和嵌入中为智能体提供不同文档来源作为上下文。',
+    'Document stores to retrieve information from. Document stores must be upserted in advance.':
+        '用于检索信息的文档库。文档库需要提前完成入库。',
     'Window of size k to surface the last k back-and-forth to use as memory.': '保留最近 k 轮对话作为记忆。',
     'Uses a window of size k to surface the last k back-and-forth to use as memory': '使用大小为 k 的窗口，把最近 k 轮对话作为记忆。',
     'Summarizes the conversation and stores the current summary in memory': '对对话进行摘要，并将当前摘要存入记忆。',

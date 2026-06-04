@@ -95,7 +95,7 @@ const ExpandedChunkDialog = ({ show, dialogProps, onCancel, onChunkEdit, onDelet
                                 onClick={() => setIsEdit(true)}
                                 size='small'
                                 color='primary'
-                                title='Edit Chunk'
+                                title={t('pages.documentStores.editChunk')}
                                 sx={{ ml: 2 }}
                             >
                                 <IconEdit />
@@ -124,7 +124,7 @@ const ExpandedChunkDialog = ({ show, dialogProps, onCancel, onChunkEdit, onDelet
                                 onClick={() => onDeleteChunk(selectedChunk)}
                                 size='small'
                                 color='error'
-                                title='Delete Chunk'
+                                title={t('pages.documentStores.deleteChunkTitle')}
                                 sx={{ ml: 1 }}
                             >
                                 <IconTrash />
