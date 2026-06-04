@@ -19,6 +19,7 @@
         "users": "Users",
         "workspaces": "Workspaces",
         "login-activity": "Login Activity",
+        "billing": "Billing Management",
         "others": "Others",
         "logs": "Logs",
         "account": "Account Settings"
@@ -265,6 +266,7 @@
         "remove": "Remove",
         "apply": "Apply",
         "reset": "Reset",
+        "refresh": "Refresh",
         "close": "Close",
         "clear": "Clear",
         "clearAll": "Clear All",
@@ -2081,6 +2083,14 @@
             "addSeatsProOnly": "Add Seats is available only for PRO plan",
             "predictions": "Predictions",
             "storage": "Storage",
+            "commercialQuota": "Commercial Quotas",
+            "localBillingPlan": "Local billing plan",
+            "tokenUsage": "Token usage",
+            "botUsage": "Bot usage",
+            "seatUsage": "Seat usage",
+            "unlimited": "Unlimited",
+            "notActivated": "Not activated",
+            "currentPeriodEnd": "Valid until {{date}}",
             "failedBillingPortal": "Failed to access billing portal",
             "emailChangePending": "Check your current email ({{currentEmail}}) to confirm the change to {{pendingEmail}}.",
             "failedUpdateProfile": "Failed to update profile: {{message}}",
@@ -2137,6 +2147,27 @@
             "subscriptionUpdated": "Subscription updated successfully!",
             "subscriptionUpdateFailed": "Subscription failed to update",
             "subscriptionVerifyFailed": "Failed to verify subscription"
+        },
+        "billing": {
+            "title": "Billing Management",
+            "addPlan": "Add Plan",
+            "organization": "Organization",
+            "plan": "Plan",
+            "tokens": "Tokens",
+            "bots": "Bots",
+            "seats": "Seats",
+            "periodEnd": "Period End",
+            "configure": "Configure",
+            "deactivate": "Deactivate",
+            "noOrganizations": "No organizations",
+            "noExpiry": "No expiry",
+            "planCode": "Plan code",
+            "planName": "Plan name",
+            "monthlyPriceCents": "Monthly price (cents)",
+            "configureSubscription": "Configure organization plan",
+            "tokensOverride": "Token override",
+            "botsOverride": "Bot override",
+            "seatsOverride": "Seat override"
         }
     }
 }

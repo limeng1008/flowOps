@@ -33,7 +33,13 @@ const createAssistant = async (req: Request, res: Response, next: NextFunction) 
 
         const existingAssistantCount = await assistantsService.getAssistantsCountByOrganization(body.type, orgId)
         const newAssistantCount = 1
-        await checkUsageLimit('flows', subscriptionId, getRunningExpressApp().usageCacheManager, existingAssistantCount + newAssistantCount)
+        await checkUsageLimit(
+            'flows',
+            subscriptionId,
+            getRunningExpressApp().usageCacheManager,
+            existingAssistantCount + newAssistantCount,
+            orgId
+        )
 
         const apiResponse = await assistantsService.createAssistant(body, orgId, workspaceId)
 

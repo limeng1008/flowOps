@@ -52,6 +52,9 @@ const Evaluators = Loadable(lazy(() => import('@/views/evaluators')))
 // account routing
 const Account = Loadable(lazy(() => import('@/views/account')))
 
+// billing routing
+const Billing = Loadable(lazy(() => import('@/views/billing')))
+
 // files routing
 const Files = Loadable(lazy(() => import('@/views/files')))
 
@@ -101,6 +104,14 @@ const MainRoutes = {
             element: (
                 <RequireAuth permission={'executions:view'}>
                     <Executions />
+                </RequireAuth>
+            )
+        },
+        {
+            path: '/billing',
+            element: (
+                <RequireAuth>
+                    <Billing />
                 </RequireAuth>
             )
         },

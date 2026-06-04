@@ -23,7 +23,8 @@ import {
     IconLockCheck,
     IconFileDatabase,
     IconShieldLock,
-    IconListCheck
+    IconListCheck,
+    IconReceipt
 } from '@tabler/icons-react'
 
 // constant
@@ -51,7 +52,8 @@ const icons = {
     IconLockCheck,
     IconFileDatabase,
     IconShieldLock,
-    IconListCheck
+    IconListCheck,
+    IconReceipt
 }
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
@@ -249,6 +251,14 @@ const dashboard = {
                     breadcrumbs: true,
                     display: 'feat:login-activity',
                     permission: 'loginActivity:view'
+                },
+                {
+                    id: 'billing',
+                    title: 'Billing Management',
+                    type: 'item',
+                    url: '/billing',
+                    icon: icons.IconReceipt,
+                    breadcrumbs: true
                 }
             ]
         },

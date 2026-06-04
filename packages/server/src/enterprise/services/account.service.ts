@@ -364,7 +364,13 @@ export class AccountService {
             data.role = role
             const user = await this.userService.readUserByEmail(data.user.email, queryRunner)
             if (!user) {
-                await checkUsageLimit('users', subscriptionId, getRunningExpressApp().usageCacheManager, totalOrgUsers + 1)
+                await checkUsageLimit(
+                    'users',
+                    subscriptionId,
+                    getRunningExpressApp().usageCacheManager,
+                    totalOrgUsers + 1,
+                    data.workspace.organizationId || ''
+                )
 
                 // generate a temporary token
                 data.user.tempToken = generateTempToken()
@@ -419,7 +425,13 @@ export class AccountService {
                 queryRunner
             )
             if (!organizationUser) {
-                await checkUsageLimit('users', subscriptionId, getRunningExpressApp().usageCacheManager, totalOrgUsers + 1)
+                await checkUsageLimit(
+                    'users',
+                    subscriptionId,
+                    getRunningExpressApp().usageCacheManager,
+                    totalOrgUsers + 1,
+                    data.workspace.organizationId || ''
+                )
                 data.organizationUser.organizationId = data.workspace.organizationId
                 data.organizationUser.userId = user.id
                 const roleMember = await this.roleService.readGeneralRoleByName(GeneralRole.MEMBER, queryRunner)
