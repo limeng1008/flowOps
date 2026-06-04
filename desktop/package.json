@@ -1,0 +1,52 @@
+{
+    "name": "flowops-desktop",
+    "version": "0.1.0",
+    "private": true,
+    "description": "FlowOps 桌面端（Electron 封装，单机本地运行 FlowOps 服务）",
+    "author": "FlowOps",
+    "license": "SEE LICENSE IN ../LICENSE.md",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "dist": "electron-builder",
+        "dist:dir": "electron-builder --dir"
+    },
+    "devDependencies": {
+        "electron": "^31.7.0",
+        "electron-builder": "^25.1.8"
+    },
+    "build": {
+        "appId": "com.flowops.desktop",
+        "productName": "FlowOps",
+        "directories": {
+            "output": "dist",
+            "buildResources": "assets"
+        },
+        "files": [
+            "main.js",
+            "preload.js",
+            "loading.html",
+            "server-bootstrap.js",
+            "assets/**/*"
+        ],
+        "mac": {
+            "category": "public.app-category.developer-tools",
+            "target": [
+                "dmg",
+                "zip"
+            ]
+        },
+        "win": {
+            "target": [
+                "nsis"
+            ]
+        },
+        "linux": {
+            "target": [
+                "AppImage",
+                "deb"
+            ],
+            "category": "Development"
+        }
+    }
+}
