@@ -157,7 +157,7 @@ export const ExecutionsListTable = ({ data, isLoading, onExecutionRowClick, onSe
     return (
         <>
             <TableContainer sx={{ border: 1, borderColor: theme.palette.grey[900] + 25, borderRadius: 2 }} component={Paper}>
-                <Table sx={{ minWidth: 650 }} size='small' aria-label='a dense table'>
+                <Table sx={{ minWidth: 650 }} size='small' aria-label={t('pages.executions.executionsTable')}>
                     <TableHead
                         sx={{
                             backgroundColor: customization.isDarkMode ? theme.palette.common.black : theme.palette.grey[100],
@@ -172,7 +172,7 @@ export const ExecutionsListTable = ({ data, isLoading, onExecutionRowClick, onSe
                                     checked={data.length > 0 && selected.length === data.length}
                                     onChange={handleSelectAllClick}
                                     inputProps={{
-                                        'aria-label': 'select all executions'
+                                        'aria-label': t('pages.executions.selectAllExecutions')
                                     }}
                                 />
                             </StyledTableCell>
