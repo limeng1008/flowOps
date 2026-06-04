@@ -5,7 +5,7 @@ import { useSelector, useDispatch } from 'react-redux'
 
 // MUI
 import { RichTreeView } from '@mui/x-tree-view/RichTreeView'
-import { Typography, Box, Drawer, Chip, Button, Tooltip } from '@mui/material'
+import { Typography, Box, Drawer, Chip, Button, Tooltip, Alert } from '@mui/material'
 import { styled, alpha } from '@mui/material/styles'
 import { useTreeItem2 } from '@mui/x-tree-view/useTreeItem2'
 import {
@@ -33,7 +33,10 @@ import {
     IconRelationOneToManyFilled,
     IconShare,
     IconWorld,
-    IconX
+    IconX,
+    IconClock,
+    IconCoins,
+    IconCoin
 } from '@tabler/icons-react'
 
 // Project imports
@@ -43,6 +46,7 @@ import { NodeExecutionDetails } from '@/views/agentexecutions/NodeExecutionDetai
 import ShareExecutionDialog from './ShareExecutionDialog'
 import { enqueueSnackbar as enqueueSnackbarAction, closeSnackbar as closeSnackbarAction } from '@/store/actions'
 import { useTranslation } from 'react-i18next'
+import { FAILED_STATUSES, STATUS_VARIANT, findFirstFailedNode, getNodeTraceBadges } from './executionTraceUtils'
 
 // API
 import executionsApi from '@/api/executions'
@@ -118,16 +122,80 @@ const StyledTreeItemLabelText = styled(Typography)(({ theme }) => ({
     color: theme.palette.text.primary
 }))
 
-function CustomLabel({ icon: Icon, itemStatus, children, name, ...other }) {
+const STATUS_LABEL_KEYS = {
+    FINISHED: 'pages.executions.stateFinished',
+    ERROR: 'pages.executions.stateError',
+    TIMEOUT: 'pages.executions.stateTimeout',
+    TERMINATED: 'pages.executions.stateTerminated',
+    STOPPED: 'pages.executions.stateStopped',
+    INPROGRESS: 'pages.executions.stateInProgress',
+    UNKNOWN: 'pages.executions.stateUnknown'
+}
+
+function CustomLabel({ icon: Icon, itemStatus, children, name, badges = [], ...other }) {
+    const { t } = useTranslation()
     // Check if this is an iteration node
     const isIterationNode = name === 'iterationAgentflow'
+
+    const renderBadge = (badge) => {
+        switch (badge.type) {
+            case 'status':
+                return (
+                    <Chip
+                        key='status'
+                        size='small'
+                        variant='filled'
+                        color={STATUS_VARIANT[badge.status] || 'default'}
+                        label={t(STATUS_LABEL_KEYS[badge.status] || STATUS_LABEL_KEYS.UNKNOWN)}
+                        sx={{ height: 22 }}
+                    />
+                )
+            case 'duration':
+                return (
+                    <Chip
+                        key='duration'
+                        size='small'
+                        variant='outlined'
+                        icon={<IconClock size={14} />}
+                        label={t('pages.executions.seconds', { count: badge.seconds })}
+                        sx={{ height: 22, '& .MuiChip-icon': { ml: 0.6, mr: 0.2 } }}
+                    />
+                )
+            case 'tokens':
+                return (
+                    <Chip
+                        key='tokens'
+                        size='small'
+                        variant='outlined'
+                        icon={<IconCoins size={14} />}
+                        label={t('pages.executions.tokens', { count: badge.tokens })}
+                        sx={{ height: 22, '& .MuiChip-icon': { ml: 0.6, mr: 0.2 } }}
+                    />
+                )
+            case 'cost':
+                return (
+                    <Chip
+                        key='cost'
+                        size='small'
+                        variant='outlined'
+                        icon={<IconCoin size={14} />}
+                        label={`$${badge.cost}`}
+                        sx={{ height: 22, '& .MuiChip-icon': { ml: 0.6, mr: 0.2 } }}
+                    />
+                )
+            default:
+                return null
+        }
+    }
 
     return (
         <TreeItem2Label
             {...other}
             sx={{
                 display: 'flex',
-                alignItems: 'center'
+                alignItems: 'center',
+                gap: 0.5,
+                minWidth: 0
             }}
         >
             {(() => {
@@ -166,7 +234,13 @@ function CustomLabel({ icon: Icon, itemStatus, children, name, ...other }) {
                 return null
             })()}
 
-            <StyledTreeItemLabelText sx={{ flex: 1 }}>{children}</StyledTreeItemLabelText>
+            <StyledTreeItemLabelText sx={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {children}
+            </StyledTreeItemLabelText>
+
+            {badges.length > 0 && (
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5, flexShrink: 0 }}>{badges.map(renderBadge)}</Box>
+            )}
 
             {Icon && <Box component={Icon} className='labelIcon' color={getIconColor(itemStatus)} sx={{ ml: 1, fontSize: '1.2rem' }} />}
         </TreeItem2Label>
@@ -177,7 +251,8 @@ CustomLabel.propTypes = {
     icon: PropTypes.func,
     itemStatus: PropTypes.string,
     children: PropTypes.node,
-    name: PropTypes.string
+    name: PropTypes.string,
+    badges: PropTypes.array
 }
 
 CustomLabel.displayName = 'CustomLabel'
@@ -240,11 +315,27 @@ const CustomTreeItem = forwardRef(function CustomTreeItem(props, ref) {
     if (item.status) {
         icon = getIconFromStatus(item.status, theme)
     }
+    const isFailedNode = FAILED_STATUSES.has(item.status)
+    const traceBadges = getNodeTraceBadges(item)
 
     return (
         <TreeItem2Provider itemId={itemId}>
             <StyledTreeItemRoot {...getRootProps(other)}>
-                <CustomTreeItemContent {...getContentProps()}>
+                <CustomTreeItemContent
+                    {...getContentProps()}
+                    sx={
+                        isFailedNode
+                            ? {
+                                  border: `1px solid ${theme.palette.error.main}`,
+                                  backgroundColor: alpha(theme.palette.error.main, 0.08),
+                                  '&.Mui-selected, &.Mui-selected.Mui-focused': {
+                                      backgroundColor: alpha(theme.palette.error.main, 0.2),
+                                      color: theme.palette.error.contrastText
+                                  }
+                              }
+                            : undefined
+                    }
+                >
                     <TreeItem2IconContainer {...getIconContainerProps()}>
                         <TreeItem2Icon status={status} />
                     </TreeItem2IconContainer>
@@ -254,7 +345,8 @@ const CustomTreeItem = forwardRef(function CustomTreeItem(props, ref) {
                             icon,
                             itemStatus: item.status,
                             expandable: expandable && status.expanded,
-                            name: item.name || item.id?.split('_')[0]
+                            name: item.name || item.id?.split('_')[0],
+                            badges: traceBadges
                         })}
                     />
                     <TreeItem2DragAndDropOverlay {...getDragAndDropOverlayProps()} />
@@ -720,144 +812,168 @@ export const ExecutionDetails = ({ open, isPublic, execution, metadata, onClose,
         setSelectedItem(selectedNode)
     }
 
+    const failedNode = findFirstFailedNode(executionTree)
+    const handleLocateFailedNode = () => {
+        if (!failedNode) return
+        setExpandedItems(getAllNodeIds(executionTree))
+        setSelectedItem(failedNode)
+    }
+
     // Content to be rendered in both drawer and full page modes
     const contentComponent = (
-        <Box sx={{ display: 'flex', height: '100%', flexDirection: 'row' }}>
-            <Box
-                sx={{
-                    flex: '1 1 35%',
-                    padding: 2,
-                    borderRight: 1,
-                    borderColor: 'divider',
-                    overflow: 'auto'
-                }}
-            >
+        <Box sx={{ display: 'flex', height: '100%', flexDirection: 'column' }}>
+            {failedNode && (
+                <Alert
+                    severity='error'
+                    sx={{ m: 2, mb: 0 }}
+                    action={
+                        <Button color='inherit' size='small' onClick={handleLocateFailedNode}>
+                            {t('pages.executions.jumpToFailedStep')}
+                        </Button>
+                    }
+                >
+                    {t('pages.executions.failureSummary', { node: failedNode.label || failedNode.id })}
+                </Alert>
+            )}
+            <Box sx={{ display: 'flex', flex: 1, minHeight: 0, flexDirection: 'row' }}>
                 <Box
                     sx={{
-                        pb: 1,
-                        mb: 2,
-                        backgroundColor: (theme) => theme.palette.background.paper,
-                        borderBottom: 1,
-                        borderColor: 'divider'
+                        flex: '1 1 35%',
+                        padding: 2,
+                        borderRight: 1,
+                        borderColor: 'divider',
+                        overflow: 'auto'
                     }}
                 >
-                    <Box>
-                        {!isPublic && (
-                            <Chip
-                                sx={{ pl: 1 }}
-                                icon={<IconExternalLink size={15} />}
-                                variant='outlined'
-                                label={
-                                    localMetadata?.agentflow?.name || localMetadata?.agentflow?.id || t('pages.executions.goToAgentflow')
-                                }
-                                className={'button'}
-                                onClick={() => window.open(`/v2/agentcanvas/${localMetadata?.agentflow?.id}`, '_blank')}
-                            />
-                        )}
+                    <Box
+                        sx={{
+                            pb: 1,
+                            mb: 2,
+                            backgroundColor: (theme) => theme.palette.background.paper,
+                            borderBottom: 1,
+                            borderColor: 'divider'
+                        }}
+                    >
+                        <Box>
+                            {!isPublic && (
+                                <Chip
+                                    sx={{ pl: 1 }}
+                                    icon={<IconExternalLink size={15} />}
+                                    variant='outlined'
+                                    label={
+                                        localMetadata?.agentflow?.name ||
+                                        localMetadata?.agentflow?.id ||
+                                        t('pages.executions.goToAgentflow')
+                                    }
+                                    className={'button'}
+                                    onClick={() => window.open(`/v2/agentcanvas/${localMetadata?.agentflow?.id}`, '_blank')}
+                                />
+                            )}
 
-                        {!isPublic && (
-                            <Tooltip
-                                title={t('pages.executions.executionId', { id: localMetadata?.id || '' })}
-                                placement='top'
-                                disableHoverListener={!localMetadata?.id}
-                            >
+                            {!isPublic && (
+                                <Tooltip
+                                    title={t('pages.executions.executionId', { id: localMetadata?.id || '' })}
+                                    placement='top'
+                                    disableHoverListener={!localMetadata?.id}
+                                >
+                                    <Chip
+                                        sx={{ ml: 1, pl: 1 }}
+                                        icon={<IconCopy size={15} />}
+                                        variant='outlined'
+                                        label={copied ? t('pages.executions.copied') : t('pages.executions.copyId')}
+                                        className={'button'}
+                                        onClick={copyToClipboard}
+                                    />
+                                </Tooltip>
+                            )}
+
+                            {!isPublic && !localMetadata.isPublic && (
                                 <Chip
                                     sx={{ ml: 1, pl: 1 }}
-                                    icon={<IconCopy size={15} />}
-                                    variant='outlined'
-                                    label={copied ? t('pages.executions.copied') : t('pages.executions.copyId')}
-                                    className={'button'}
-                                    onClick={copyToClipboard}
-                                />
-                            </Tooltip>
-                        )}
-
-                        {!isPublic && !localMetadata.isPublic && (
-                            <Chip
-                                sx={{ ml: 1, pl: 1 }}
-                                icon={
-                                    updateExecutionApi.loading ? (
-                                        <IconLoader size={15} className='spin-animation' />
-                                    ) : (
-                                        <IconShare size={15} />
-                                    )
-                                }
-                                variant='outlined'
-                                label={updateExecutionApi.loading ? t('pages.executions.updating') : t('pages.executions.share')}
-                                className={'button'}
-                                onClick={() => onSharePublicly()}
-                                disabled={updateExecutionApi.loading}
-                            />
-                        )}
-
-                        {!isPublic && localMetadata.isPublic && (
-                            <Chip
-                                sx={{ ml: 1, pl: 1 }}
-                                icon={
-                                    updateExecutionApi.loading ? (
-                                        <IconLoader size={15} className='spin-animation' />
-                                    ) : (
-                                        <IconWorld size={15} />
-                                    )
-                                }
-                                variant='outlined'
-                                label={updateExecutionApi.loading ? t('pages.executions.updating') : t('pages.executions.public')}
-                                className={'button'}
-                                onClick={() => setShowShareDialog(true)}
-                                disabled={updateExecutionApi.loading}
-                            />
-                        )}
-
-                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', alignContent: 'center' }}>
-                            <Typography sx={{ flex: 1, mt: 1 }} color='text.primary'>
-                                {metadata?.updatedDate ? moment(metadata.updatedDate).format(dateTimeFormat) : t('common.notAvailable')}
-                            </Typography>
-                            <IconButton
-                                onClick={() => onRefresh(localMetadata?.id)}
-                                size='small'
-                                sx={{
-                                    color: theme.palette.text.primary,
-                                    '&:hover': {
-                                        backgroundColor: (theme) => theme.palette.primary.main + '20'
+                                    icon={
+                                        updateExecutionApi.loading ? (
+                                            <IconLoader size={15} className='spin-animation' />
+                                        ) : (
+                                            <IconShare size={15} />
+                                        )
                                     }
-                                }}
-                                title={t('pages.executions.refreshExecutionData')}
-                            >
-                                <IconRefresh size={20} />
-                            </IconButton>
+                                    variant='outlined'
+                                    label={updateExecutionApi.loading ? t('pages.executions.updating') : t('pages.executions.share')}
+                                    className={'button'}
+                                    onClick={() => onSharePublicly()}
+                                    disabled={updateExecutionApi.loading}
+                                />
+                            )}
+
+                            {!isPublic && localMetadata.isPublic && (
+                                <Chip
+                                    sx={{ ml: 1, pl: 1 }}
+                                    icon={
+                                        updateExecutionApi.loading ? (
+                                            <IconLoader size={15} className='spin-animation' />
+                                        ) : (
+                                            <IconWorld size={15} />
+                                        )
+                                    }
+                                    variant='outlined'
+                                    label={updateExecutionApi.loading ? t('pages.executions.updating') : t('pages.executions.public')}
+                                    className={'button'}
+                                    onClick={() => setShowShareDialog(true)}
+                                    disabled={updateExecutionApi.loading}
+                                />
+                            )}
+
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', alignContent: 'center' }}>
+                                <Typography sx={{ flex: 1, mt: 1 }} color='text.primary'>
+                                    {metadata?.updatedDate ? moment(metadata.updatedDate).format(dateTimeFormat) : t('common.notAvailable')}
+                                </Typography>
+                                <IconButton
+                                    onClick={() => onRefresh(localMetadata?.id)}
+                                    size='small'
+                                    sx={{
+                                        color: theme.palette.text.primary,
+                                        '&:hover': {
+                                            backgroundColor: (theme) => theme.palette.primary.main + '20'
+                                        }
+                                    }}
+                                    title={t('pages.executions.refreshExecutionData')}
+                                >
+                                    <IconRefresh size={20} />
+                                </IconButton>
+                            </Box>
                         </Box>
                     </Box>
-                </Box>
-                <RichTreeView
-                    expandedItems={expandedItems}
-                    onExpandedItemsChange={handleExpandedItemsChange}
-                    selectedItems={selectedItem ? [selectedItem.id] : []}
-                    onSelectedItemsChange={handleNodeSelect}
-                    items={executionTree}
-                    slots={{
-                        item: CustomTreeItem
-                    }}
-                />
-            </Box>
-            <Box
-                sx={{
-                    flex: '1 1 65%',
-                    padding: 2,
-                    overflow: 'auto'
-                }}
-            >
-                {selectedItem && selectedItem.data ? (
-                    <NodeExecutionDetails
-                        data={selectedItem.data}
-                        label={selectedItem.label}
-                        status={selectedItem.status}
-                        metadata={metadata}
-                        isPublic={isPublic}
-                        onProceedSuccess={onProceedSuccess}
+                    <RichTreeView
+                        expandedItems={expandedItems}
+                        onExpandedItemsChange={handleExpandedItemsChange}
+                        selectedItems={selectedItem ? [selectedItem.id] : []}
+                        onSelectedItemsChange={handleNodeSelect}
+                        items={executionTree}
+                        slots={{
+                            item: CustomTreeItem
+                        }}
                     />
-                ) : (
-                    <Typography color='text.secondary'>{t('pages.executions.noItemData')}</Typography>
-                )}
+                </Box>
+                <Box
+                    sx={{
+                        flex: '1 1 65%',
+                        padding: 2,
+                        overflow: 'auto'
+                    }}
+                >
+                    {selectedItem && selectedItem.data ? (
+                        <NodeExecutionDetails
+                            data={selectedItem.data}
+                            label={selectedItem.label}
+                            status={selectedItem.status}
+                            metadata={metadata}
+                            isPublic={isPublic}
+                            onProceedSuccess={onProceedSuccess}
+                        />
+                    ) : (
+                        <Typography color='text.secondary'>{t('pages.executions.noItemData')}</Typography>
+                    )}
+                </Box>
             </Box>
         </Box>
     )
