@@ -288,7 +288,67 @@ const requiredKeys = [
     'pages.evaluations.skip',
     'pages.evaluations.next',
     'pages.evaluations.pass',
-    'pages.evaluations.fail'
+    'pages.evaluations.fail',
+    'pages.evaluations.details',
+    'pages.evaluations.evaluationId',
+    'pages.evaluations.input',
+    'pages.evaluations.expectedOutput',
+    'pages.evaluations.actualOutput',
+    'pages.evaluations.latencyMetrics',
+    'pages.evaluations.tokens',
+    'pages.evaluations.node',
+    'pages.evaluations.providerModel',
+    'pages.evaluations.total',
+    'pages.evaluations.cost',
+    'pages.evaluations.customEvaluators',
+    'pages.evaluations.evaluatorLabel',
+    'pages.evaluations.llmGraded',
+    'pages.evaluations.apiMetric',
+    'pages.evaluations.chainMetric',
+    'pages.evaluations.retrieverMetric',
+    'pages.evaluations.toolMetric',
+    'pages.evaluations.llmMetric',
+    'pages.evaluations.totalMetric',
+    'pages.evaluations.promptMetric',
+    'pages.evaluations.completionMetric',
+    'pages.evaluations.evaluationTitle',
+    'pages.evaluations.runAgainTitle',
+    'pages.evaluations.runAgainDescription',
+    'pages.evaluations.evaluationRunningRedirect',
+    'pages.evaluations.versionLabel',
+    'pages.evaluations.versionHistory',
+    'pages.evaluations.reRunEvaluation',
+    'pages.evaluations.cannotRerun',
+    'pages.evaluations.outdatedItems',
+    'pages.evaluations.datasetLabel',
+    'pages.evaluations.flowsLabel',
+    'pages.evaluations.flowsUsed',
+    'pages.evaluations.showCharts',
+    'pages.evaluations.charts',
+    'pages.evaluations.showCustomEvaluator',
+    'pages.evaluations.customEvaluator',
+    'pages.evaluations.showCostMetrics',
+    'pages.evaluations.costMetrics',
+    'pages.evaluations.showTokenMetrics',
+    'pages.evaluations.tokenMetrics',
+    'pages.evaluations.showLatencyMetrics',
+    'pages.evaluations.passRateHeader',
+    'pages.evaluations.tokensUsedHeader',
+    'pages.evaluations.latencyHeader',
+    'pages.evaluations.evaluator',
+    'pages.evaluations.llmEvaluation',
+    'pages.evaluations.minimize',
+    'pages.evaluations.totalCostMetric',
+    'pages.evaluations.totalTokensMetric',
+    'pages.evaluations.promptTokensMetric',
+    'pages.evaluations.completionTokensMetric',
+    'pages.evaluations.promptCostMetric',
+    'pages.evaluations.completionCostMetric',
+    'pages.evaluations.apiLatencyMetric',
+    'pages.evaluations.chainLatencyMetric',
+    'pages.evaluations.retrieverLatencyMetric',
+    'pages.evaluations.toolLatencyMetric',
+    'pages.evaluations.llmLatencyMetric'
 ]
 
 const get = (obj, key) => key.split('.').reduce((acc, part) => acc?.[part], obj)
@@ -697,5 +757,139 @@ describe('views long-tail i18n coverage', () => {
         expect(createDialogSource).not.toContain('No Grading')
         expect(createDialogSource).not.toContain('Model Name')
         expect(createDialogSource).not.toContain('Previous Step')
+    })
+
+    it('localizes evaluation result side drawers visible copy and dates', () => {
+        const resultDrawerSource = read('views/evaluations/EvaluationResultSideDrawer.jsx')
+        const versionsDrawerSource = read('views/evaluations/EvaluationResultVersionsSideDrawer.jsx')
+        const metricsCardSource = read('views/evaluations/MetricsItemCard.jsx')
+
+        expect(resultDrawerSource).toContain("t('pages.evaluations.details')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.evaluationId')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.input')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.expectedOutput')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.actualOutput')")
+        expect(resultDrawerSource).toContain("t('common.error')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.latencyMetrics')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.tokens')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.node')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.providerModel')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.total')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.cost')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.customEvaluators')")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.evaluatorLabel'")
+        expect(resultDrawerSource).toContain("t('pages.evaluations.llmGraded')")
+        expect(resultDrawerSource).toContain('getEvaluationMetricLabel')
+        expect(resultDrawerSource).toContain('getEvaluationResultLabel')
+        expect(resultDrawerSource).toContain("'pages.evaluations.apiMetric'")
+        expect(resultDrawerSource).toContain("'pages.evaluations.promptMetric'")
+        expect(resultDrawerSource).toContain("'pages.evaluations.completionMetric'")
+        expect(resultDrawerSource).not.toContain('Evaluation Details')
+        expect(resultDrawerSource).not.toContain('Evaluation Id')
+        expect(resultDrawerSource).not.toContain('Expected Output')
+        expect(resultDrawerSource).not.toContain('Actual Output')
+        expect(resultDrawerSource).not.toContain('Latency Metrics')
+        expect(resultDrawerSource).not.toContain('Provider & Model')
+        expect(resultDrawerSource).not.toContain('Custom Evaluators')
+        expect(resultDrawerSource).not.toContain('LLM Graded')
+        expect(resultDrawerSource).not.toContain("'API: '")
+        expect(resultDrawerSource).not.toContain("'Prompt: '")
+        expect(resultDrawerSource).not.toContain('Evaluator: ${evaluator.name}')
+
+        expect(versionsDrawerSource).toContain('const { t, i18n } = useTranslation()')
+        expect(versionsDrawerSource).toContain('formatEvaluationDate')
+        expect(versionsDrawerSource).not.toContain("format('DD-MMM-YYYY, hh:mm:ss A')")
+
+        expect(metricsCardSource).not.toContain("'PASS RATE'")
+        expect(metricsCardSource).not.toContain("'TOKENS USED'")
+        expect(metricsCardSource).not.toContain("'LATENCY (ms)'")
+    })
+
+    it('localizes evaluation result page and full-screen result dialog visible copy', () => {
+        const resultSource = read('views/evaluations/EvaluationResult.jsx')
+        const resultDialogSource = read('views/evaluations/EvalsResultDialog.jsx')
+
+        expect(resultSource).toContain('const { t, i18n } = useTranslation()')
+        expect(resultSource).toContain('formatEvaluationDate')
+        expect(resultSource).toContain("title={t('pages.evaluations.evaluationTitle'")
+        expect(resultSource).toContain('description={formatEvaluationDate(evaluation?.runDate, i18n)}')
+        expect(resultSource).toContain("confirmButtonName: t('common.yes')")
+        expect(resultSource).toContain("cancelButtonName: t('common.no')")
+        expect(resultSource).toContain("message: t('pages.evaluations.evaluationRunningRedirect'")
+        expect(resultSource).toContain("label={t('pages.evaluations.versionLabel'")
+        expect(resultSource).toContain("t('pages.evaluations.versionHistory')")
+        expect(resultSource).toContain("t('pages.evaluations.reRunEvaluation')")
+        expect(resultSource).toContain("t('pages.evaluations.cannotRerun')")
+        expect(resultSource).toContain("t('pages.evaluations.outdatedItems')")
+        expect(resultSource).toContain("t('pages.evaluations.datasetLabel')")
+        expect(resultSource).toContain("t('pages.evaluations.flowsLabel')")
+        expect(resultSource).toContain("t('pages.evaluations.flowsUsed')")
+        expect(resultSource).toContain("title={t('pages.evaluations.showCharts')}")
+        expect(resultSource).toContain("t('pages.evaluations.charts')")
+        expect(resultSource).toContain("title={t('pages.evaluations.showCustomEvaluator')}")
+        expect(resultSource).toContain("t('pages.evaluations.customEvaluator')")
+        expect(resultSource).toContain("title={t('pages.evaluations.showCostMetrics')}")
+        expect(resultSource).toContain("t('pages.evaluations.costMetrics')")
+        expect(resultSource).toContain("title={t('pages.evaluations.showTokenMetrics')}")
+        expect(resultSource).toContain("t('pages.evaluations.tokenMetrics')")
+        expect(resultSource).toContain("title={t('pages.evaluations.showLatencyMetrics')}")
+        expect(resultSource).toContain("t('pages.evaluations.passRateHeader')")
+        expect(resultSource).toContain("t('pages.evaluations.tokensUsedHeader')")
+        expect(resultSource).toContain("t('pages.evaluations.latencyHeader')")
+        expect(resultSource).toContain("t('pages.evaluations.input')")
+        expect(resultSource).toContain("t('pages.evaluations.expectedOutput')")
+        expect(resultSource).toContain("t('pages.evaluations.actualOutput')")
+        expect(resultSource).toContain("t('pages.evaluations.evaluator')")
+        expect(resultSource).toContain("t('pages.evaluations.llmEvaluation')")
+        expect(resultSource).toContain('getEvaluationMetricLabel')
+        expect(resultSource).toContain('getEvaluationResultLabel')
+        expect(resultSource).toContain("'pages.evaluations.totalCostMetric'")
+        expect(resultSource).toContain("'pages.evaluations.llmLatencyMetric'")
+        expect(resultSource).not.toContain('Run Again')
+        expect(resultSource).not.toContain('Initiate Rerun for Evaluation')
+        expect(resultSource).not.toContain('Redirecting to evaluations page')
+        expect(resultSource).not.toContain('Evaluation: ')
+        expect(resultSource).not.toContain("format('DD-MMM-YYYY, hh:mm:ss A')")
+        expect(resultSource).not.toContain('Version: ')
+        expect(resultSource).not.toContain('Version history')
+        expect(resultSource).not.toContain('Re-run Evaluation')
+        expect(resultSource).not.toContain('This evaluation cannot be re-run')
+        expect(resultSource).not.toContain('The following items are outdated')
+        expect(resultSource).not.toContain('Dataset:')
+        expect(resultSource).not.toContain('Flows:')
+        expect(resultSource).not.toContain('Flows Used:')
+        expect(resultSource).not.toContain('Show Charts')
+        expect(resultSource).not.toContain('Show Custom Evaluator')
+        expect(resultSource).not.toContain('Show Cost Metrics')
+        expect(resultSource).not.toContain('Show Metrics')
+        expect(resultSource).not.toContain('Show Latency Metrics')
+        expect(resultSource).not.toContain('PASS RATE')
+        expect(resultSource).not.toContain('TOKENS USED')
+        expect(resultSource).not.toContain('LATENCY (ms)')
+        expect(resultSource).not.toContain("<TableCell rowSpan='2'>Input</TableCell>")
+        expect(resultSource).not.toContain("<TableCell rowSpan='2'>Expected Output</TableCell>")
+        expect(resultSource).not.toContain('Total Cost:')
+        expect(resultSource).not.toContain('Total Tokens:')
+        expect(resultSource).not.toContain('API Latency:')
+
+        expect(resultDialogSource).toContain('const { t } = useTranslation()')
+        expect(resultDialogSource).toContain("t('pages.evaluations.flowsUsed')")
+        expect(resultDialogSource).toContain("t('pages.evaluations.minimize')")
+        expect(resultDialogSource).toContain("t('pages.evaluations.input')")
+        expect(resultDialogSource).toContain("t('pages.evaluations.expectedOutput')")
+        expect(resultDialogSource).toContain("t('pages.evaluations.actualOutput')")
+        expect(resultDialogSource).toContain("t('pages.evaluations.evaluator')")
+        expect(resultDialogSource).toContain("t('pages.evaluations.llmEvaluation')")
+        expect(resultDialogSource).toContain('getEvaluationMetricLabel')
+        expect(resultDialogSource).toContain('getEvaluationResultLabel')
+        expect(resultDialogSource).toContain("'pages.evaluations.totalCostMetric'")
+        expect(resultDialogSource).toContain("'pages.evaluations.llmLatencyMetric'")
+        expect(resultDialogSource).not.toContain('Flows Used:')
+        expect(resultDialogSource).not.toContain('>Minimize<')
+        expect(resultDialogSource).not.toContain("<TableCell rowSpan='2'>Input</TableCell>")
+        expect(resultDialogSource).not.toContain("<TableCell rowSpan='2'>Expected Output</TableCell>")
+        expect(resultDialogSource).not.toContain('Total Cost:')
+        expect(resultDialogSource).not.toContain('Total Tokens:')
+        expect(resultDialogSource).not.toContain('API Latency:')
     })
 })

@@ -19,8 +19,14 @@ import evaluationApi from '@/api/evaluations'
 import useApi from '@/hooks/useApi'
 import { useTranslation } from 'react-i18next'
 
+const formatEvaluationDate = (date, i18n) => {
+    if (!date) return ''
+    const dateTimeFormat = i18n.language?.startsWith('zh') ? 'YYYY年M月D日 HH:mm:ss' : 'MMMM Do YYYY, h:mm:ss A'
+    return moment(date).format(dateTimeFormat)
+}
+
 const EvaluationResultVersionsSideDrawer = ({ show, dialogProps, onClickFunction, onSelectVersion }) => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const onOpen = () => {}
     const [versions, setVersions] = useState([])
 
@@ -59,7 +65,7 @@ const EvaluationResultVersionsSideDrawer = ({ show, dialogProps, onClickFunction
                         versions.map((version, index) => (
                             <TimelineItem key={index}>
                                 <TimelineOppositeContent color='textSecondary'>
-                                    {moment(version.runDate).format('DD-MMM-YYYY, hh:mm:ss A')}
+                                    {formatEvaluationDate(version.runDate, i18n)}
                                 </TimelineOppositeContent>
                                 <TimelineSeparator style={{ marginTop: 5 }}>
                                     <TimelineDot />

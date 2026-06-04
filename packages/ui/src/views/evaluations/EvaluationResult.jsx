@@ -73,8 +73,31 @@ import { useTranslation } from 'react-i18next'
 
 // ==============================|| EvaluationResults ||============================== //
 
+const formatEvaluationDate = (date, i18n) => {
+    if (!date) return ''
+    const dateTimeFormat = i18n.language?.startsWith('zh') ? 'YYYY年M月D日 HH:mm:ss' : 'DD-MMM-YYYY, hh:mm:ss A'
+    return moment(date).format(dateTimeFormat)
+}
+
+const getEvaluationMetricValue = (t, value) => (value || value === 0 ? value : t('pages.evaluations.notAvailable'))
+
+const getEvaluationMetricLabel = (t, key, value) => t(key, { value: getEvaluationMetricValue(t, value) })
+
+const getEvaluationResultLabel = (t, result) => {
+    switch (result) {
+        case 'Pass':
+            return t('pages.evaluations.pass')
+        case 'Fail':
+            return t('pages.evaluations.fail')
+        case 'Error':
+            return t('pages.evaluations.statusError')
+        default:
+            return result
+    }
+}
+
 const EvalEvaluationRows = () => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
     const navigate = useNavigate()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
@@ -184,17 +207,17 @@ const EvalEvaluationRows = () => {
 
     const runAgain = async () => {
         const confirmPayload = {
-            title: `Run Again`,
-            description: `Initiate Rerun for Evaluation ${evaluation.name}?`,
-            confirmButtonName: 'Yes',
-            cancelButtonName: 'No'
+            title: t('pages.evaluations.runAgainTitle'),
+            description: t('pages.evaluations.runAgainDescription', { name: evaluation.name }),
+            confirmButtonName: t('common.yes'),
+            cancelButtonName: t('common.no')
         }
         const isConfirmed = await confirm(confirmPayload)
 
         if (isConfirmed) {
             runAgainApi.request(evaluation?.id)
             enqueueSnackbar({
-                message: "Evaluation '" + evaluation.name + "' is running. Redirecting to evaluations page.",
+                message: t('pages.evaluations.evaluationRunningRedirect', { name: evaluation.name }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'success',
@@ -301,19 +324,19 @@ const EvalEvaluationRows = () => {
             setShowCustomEvals(data?.average_metrics?.passPcnt >= 0)
             if (data?.average_metrics?.passCount >= 0) {
                 passPntData.push({
-                    name: 'Pass',
+                    name: getEvaluationResultLabel(t, 'Pass'),
                     value: data.average_metrics.passCount
                 })
             }
             if (data?.average_metrics?.failCount >= 0) {
                 passPntData.push({
-                    name: 'Fail',
+                    name: getEvaluationResultLabel(t, 'Fail'),
                     value: data.average_metrics.failCount
                 })
             }
             if (data?.average_metrics?.errorCount >= 0) {
                 passPntData.push({
-                    name: 'Error',
+                    name: getEvaluationResultLabel(t, 'Error'),
                     value: data.average_metrics.errorCount
                 })
             }
@@ -381,14 +404,17 @@ const EvalEvaluationRows = () => {
                             isEditButton={false}
                             onBack={goBack}
                             search={false}
-                            title={'Evaluation: ' + selectedEvaluationName}
-                            description={evaluation?.runDate ? moment(evaluation?.runDate).format('DD-MMM-YYYY, hh:mm:ss A') : ''}
+                            title={t('pages.evaluations.evaluationTitle', { name: selectedEvaluationName })}
+                            description={formatEvaluationDate(evaluation?.runDate, i18n)}
                         >
                             {evaluation?.versionCount > 1 && (
                                 <Chip
                                     variant='outlined'
                                     size='small'
-                                    label={'Version: ' + evaluation.versionNo + '/' + evaluation.versionCount}
+                                    label={t('pages.evaluations.versionLabel', {
+                                        current: evaluation.versionNo,
+                                        total: evaluation.versionCount
+                                    })}
                                 />
                             )}
                             {evaluation?.versionCount > 1 && (
@@ -399,7 +425,7 @@ const EvalEvaluationRows = () => {
                                     color='primary'
                                     onClick={openVersionsDrawer}
                                 >
-                                    Version history
+                                    {t('pages.evaluations.versionHistory')}
                                 </Button>
                             )}
                             <PermissionButton
@@ -411,7 +437,7 @@ const EvalEvaluationRows = () => {
                                 disabled={outdated?.errors?.length > 0}
                                 onClick={runAgain}
                             >
-                                Re-run Evaluation
+                                {t('pages.evaluations.reRunEvaluation')}
                             </PermissionButton>
                         </ViewHeader>
 
@@ -436,17 +462,13 @@ const EvalEvaluationRows = () => {
                                 </Box>
                                 <Stack flexDirection='column'>
                                     <span style={{ color: 'rgb(116,66,16)' }}>
-                                        {outdated?.errors?.length > 0 && (
-                                            <b>This evaluation cannot be re-run, due to the following errors</b>
-                                        )}
-                                        {outdated?.errors?.length === 0 && (
-                                            <b>The following items are outdated, re-run the evaluation for the latest results.</b>
-                                        )}
+                                        {outdated?.errors?.length > 0 && <b>{t('pages.evaluations.cannotRerun')}</b>}
+                                        {outdated?.errors?.length === 0 && <b>{t('pages.evaluations.outdatedItems')}</b>}
                                     </span>
                                     {outdated.dataset && outdated?.errors?.length === 0 && (
                                         <>
                                             <br />
-                                            <b style={{ color: 'rgb(116,66,16)' }}>Dataset:</b>
+                                            <b style={{ color: 'rgb(116,66,16)' }}>{t('pages.evaluations.datasetLabel')}</b>
                                             <Chip
                                                 clickable
                                                 sx={{
@@ -467,7 +489,7 @@ const EvalEvaluationRows = () => {
                                     {outdated.chatflows && outdated?.errors?.length === 0 && outdated.chatflows.length > 0 && (
                                         <>
                                             <br />
-                                            <b style={{ color: 'rgb(116,66,16)' }}>Flows:</b>
+                                            <b style={{ color: 'rgb(116,66,16)' }}>{t('pages.evaluations.flowsLabel')}</b>
                                             <Stack sx={{ mt: 1, alignItems: 'center', flexWrap: 'wrap' }} flexDirection='row' gap={1}>
                                                 {outdated.chatflows.map((chatflow, index) => (
                                                     <Chip
@@ -516,50 +538,50 @@ const EvalEvaluationRows = () => {
                             <Button
                                 variant='outlined'
                                 value={showCharts}
-                                title='Show Charts'
+                                title={t('pages.evaluations.showCharts')}
                                 onClick={handleShowChartsChange}
                                 startIcon={showCharts ? <IconEyeOff /> : <IconEye />}
                             >
-                                {'Charts'}
+                                {t('pages.evaluations.charts')}
                             </Button>
                             {customEvalsDefined && (
                                 <Button
                                     variant='outlined'
                                     value={showCustomEvals}
                                     disabled={!customEvalsDefined}
-                                    title='Show Custom Evaluator'
+                                    title={t('pages.evaluations.showCustomEvaluator')}
                                     onClick={handleCustomEvalsChange}
                                     startIcon={showCustomEvals ? <IconEyeOff /> : <IconEye />}
                                 >
-                                    {'Custom Evaluator'}
+                                    {t('pages.evaluations.customEvaluator')}
                                 </Button>
                             )}
                             <Button
                                 variant='outlined'
                                 value={showCostMetrics}
-                                title='Show Cost Metrics'
+                                title={t('pages.evaluations.showCostMetrics')}
                                 onClick={handleDisplayCostChange}
                                 startIcon={showCostMetrics ? <IconEyeOff /> : <IconEye />}
                             >
-                                {'Cost Metrics'}
+                                {t('pages.evaluations.costMetrics')}
                             </Button>
                             <Button
                                 variant='outlined'
                                 value={showTokenMetrics}
-                                title='Show Metrics'
+                                title={t('pages.evaluations.showTokenMetrics')}
                                 onClick={handleShowTokenChange}
                                 startIcon={showTokenMetrics ? <IconEyeOff /> : <IconEye />}
                             >
-                                {'Token Metrics'}
+                                {t('pages.evaluations.tokenMetrics')}
                             </Button>
                             <Button
                                 variant='outlined'
                                 value={showCustomEvals}
-                                title='Show Latency Metrics'
+                                title={t('pages.evaluations.showLatencyMetrics')}
                                 onClick={handleLatencyMetricsChange}
                                 startIcon={showLatencyMetrics ? <IconEyeOff /> : <IconEye />}
                             >
-                                {'Latency Metrics'}
+                                {t('pages.evaluations.latencyMetrics')}
                             </Button>
                         </ButtonGroup>
                         {showCharts && (
@@ -568,7 +590,7 @@ const EvalEvaluationRows = () => {
                                     <Grid item={true} xs={12} sm={12} md={4} lg={4}>
                                         <MetricsItemCard
                                             data={{
-                                                header: 'PASS RATE',
+                                                header: t('pages.evaluations.passRateHeader'),
                                                 value: (evaluation.average_metrics?.passPcnt ?? '0') + '%',
                                                 icon: <IconPercentage />
                                             }}
@@ -580,7 +602,7 @@ const EvalEvaluationRows = () => {
                                     <Grid item={true} xs={12} sm={12} md={4} lg={4}>
                                         <MetricsItemCard
                                             data={{
-                                                header: 'TOKENS USED',
+                                                header: t('pages.evaluations.tokensUsedHeader'),
                                                 value: avgTokensUsed,
                                                 icon: <TokensIcon />
                                             }}
@@ -598,7 +620,7 @@ const EvalEvaluationRows = () => {
                                     <Grid item={true} xs={12} sm={12} md={4} lg={4}>
                                         <MetricsItemCard
                                             data={{
-                                                header: 'LATENCY (ms)',
+                                                header: t('pages.evaluations.latencyHeader'),
                                                 value: (evaluation.average_metrics?.averageLatency ?? '0') + ' ms',
                                                 icon: <AlarmIcon />
                                             }}
@@ -630,7 +652,7 @@ const EvalEvaluationRows = () => {
                                     }}
                                 >
                                     <IconVectorBezier2 style={{ marginRight: 5 }} size={17} />
-                                    Flows Used:
+                                    {t('pages.evaluations.flowsUsed')}
                                 </div>
                                 {(evaluation.chatflowName || []).map((chatflowUsed, index) => (
                                     <Chip
@@ -667,8 +689,8 @@ const EvalEvaluationRows = () => {
                                 >
                                     <TableRow>
                                         <TableCell rowSpan='2'>&nbsp;</TableCell>
-                                        <TableCell rowSpan='2'>Input</TableCell>
-                                        <TableCell rowSpan='2'>Expected Output</TableCell>
+                                        <TableCell rowSpan='2'>{t('pages.evaluations.input')}</TableCell>
+                                        <TableCell rowSpan='2'>{t('pages.evaluations.expectedOutput')}</TableCell>
                                         {evaluation.chatflowId?.map((chatflowId, index) => (
                                             <React.Fragment key={index}>
                                                 <TableCell
@@ -704,10 +726,14 @@ const EvalEvaluationRows = () => {
                                                 <TableCell
                                                     style={{ borderLeftStyle: 'dashed', borderLeftColor: 'lightgrey', borderLeftWidth: 1 }}
                                                 >
-                                                    Actual Output
+                                                    {t('pages.evaluations.actualOutput')}
                                                 </TableCell>
-                                                {customEvalsDefined && showCustomEvals && <TableCell>Evaluator</TableCell>}
-                                                {evaluation?.evaluationType === 'llm' && <TableCell>LLM Evaluation</TableCell>}
+                                                {customEvalsDefined && showCustomEvals && (
+                                                    <TableCell>{t('pages.evaluations.evaluator')}</TableCell>
+                                                )}
+                                                {evaluation?.evaluationType === 'llm' && (
+                                                    <TableCell>{t('pages.evaluations.llmEvaluation')}</TableCell>
+                                                )}
                                             </React.Fragment>
                                         ))}
                                     </TableRow>
@@ -774,24 +800,22 @@ const EvalEvaluationRows = () => {
                                                                                     variant='outlined'
                                                                                     icon={<PaidIcon />}
                                                                                     size='small'
-                                                                                    label={
+                                                                                    label={getEvaluationMetricLabel(
+                                                                                        t,
+                                                                                        'pages.evaluations.totalCostMetric',
                                                                                         item.metrics[index]?.totalCost
-                                                                                            ? 'Total Cost: ' +
-                                                                                              item.metrics[index]?.totalCost
-                                                                                            : 'Total Cost: N/A'
-                                                                                    }
+                                                                                    )}
                                                                                     sx={{ mr: 1, mb: 1 }}
                                                                                 />
                                                                                 <Chip
                                                                                     variant='outlined'
                                                                                     size='small'
                                                                                     icon={<TokensIcon />}
-                                                                                    label={
+                                                                                    label={getEvaluationMetricLabel(
+                                                                                        t,
+                                                                                        'pages.evaluations.totalTokensMetric',
                                                                                         item.metrics[index]?.totalTokens
-                                                                                            ? 'Total Tokens: ' +
-                                                                                              item.metrics[index]?.totalTokens
-                                                                                            : 'Total Tokens: N/A'
-                                                                                    }
+                                                                                    )}
                                                                                     sx={{ mr: 1, mb: 1 }}
                                                                                 />
                                                                                 {showTokenMetrics && (
@@ -800,24 +824,22 @@ const EvalEvaluationRows = () => {
                                                                                             variant='outlined'
                                                                                             size='small'
                                                                                             icon={<TokensIcon />}
-                                                                                            label={
+                                                                                            label={getEvaluationMetricLabel(
+                                                                                                t,
+                                                                                                'pages.evaluations.promptTokensMetric',
                                                                                                 item.metrics[index]?.promptTokens
-                                                                                                    ? 'Prompt Tokens: ' +
-                                                                                                      item.metrics[index]?.promptTokens
-                                                                                                    : 'Prompt Tokens: N/A'
-                                                                                            }
+                                                                                            )}
                                                                                             sx={{ mr: 1, mb: 1 }}
                                                                                         />{' '}
                                                                                         <Chip
                                                                                             variant='outlined'
                                                                                             size='small'
                                                                                             icon={<TokensIcon />}
-                                                                                            label={
+                                                                                            label={getEvaluationMetricLabel(
+                                                                                                t,
+                                                                                                'pages.evaluations.completionTokensMetric',
                                                                                                 item.metrics[index]?.completionTokens
-                                                                                                    ? 'Completion Tokens: ' +
-                                                                                                      item.metrics[index]?.completionTokens
-                                                                                                    : 'Completion Tokens: N/A'
-                                                                                            }
+                                                                                            )}
                                                                                             sx={{ mr: 1, mb: 1 }}
                                                                                         />{' '}
                                                                                     </>
@@ -828,24 +850,22 @@ const EvalEvaluationRows = () => {
                                                                                             variant='outlined'
                                                                                             size='small'
                                                                                             icon={<PaidIcon />}
-                                                                                            label={
+                                                                                            label={getEvaluationMetricLabel(
+                                                                                                t,
+                                                                                                'pages.evaluations.promptCostMetric',
                                                                                                 item.metrics[index]?.promptCost
-                                                                                                    ? 'Prompt Cost: ' +
-                                                                                                      item.metrics[index]?.promptCost
-                                                                                                    : 'Prompt Cost: N/A'
-                                                                                            }
+                                                                                            )}
                                                                                             sx={{ mr: 1, mb: 1 }}
                                                                                         />{' '}
                                                                                         <Chip
                                                                                             variant='outlined'
                                                                                             size='small'
                                                                                             icon={<PaidIcon />}
-                                                                                            label={
+                                                                                            label={getEvaluationMetricLabel(
+                                                                                                t,
+                                                                                                'pages.evaluations.completionCostMetric',
                                                                                                 item.metrics[index]?.completionCost
-                                                                                                    ? 'Completion Cost: ' +
-                                                                                                      item.metrics[index]?.completionCost
-                                                                                                    : 'Completion Cost: N/A'
-                                                                                            }
+                                                                                            )}
                                                                                             sx={{ mr: 1, mb: 1 }}
                                                                                         />{' '}
                                                                                     </>
@@ -854,12 +874,11 @@ const EvalEvaluationRows = () => {
                                                                                     variant='outlined'
                                                                                     size='small'
                                                                                     icon={<AlarmIcon />}
-                                                                                    label={
+                                                                                    label={getEvaluationMetricLabel(
+                                                                                        t,
+                                                                                        'pages.evaluations.apiLatencyMetric',
                                                                                         item.metrics[index]?.apiLatency
-                                                                                            ? 'API Latency: ' +
-                                                                                              item.metrics[index]?.apiLatency
-                                                                                            : 'API Latency: N/A'
-                                                                                    }
+                                                                                    )}
                                                                                     sx={{ mr: 1, mb: 1 }}
                                                                                 />{' '}
                                                                                 {showLatencyMetrics && (
@@ -869,12 +888,11 @@ const EvalEvaluationRows = () => {
                                                                                                 variant='outlined'
                                                                                                 size='small'
                                                                                                 icon={<AlarmIcon />}
-                                                                                                label={
+                                                                                                label={getEvaluationMetricLabel(
+                                                                                                    t,
+                                                                                                    'pages.evaluations.chainLatencyMetric',
                                                                                                     item.metrics[index]?.chain
-                                                                                                        ? 'Chain Latency: ' +
-                                                                                                          item.metrics[index]?.chain
-                                                                                                        : 'Chain Latency: N/A'
-                                                                                                }
+                                                                                                )}
                                                                                                 sx={{ mr: 1, mb: 1 }}
                                                                                             />
                                                                                         )}{' '}
@@ -884,10 +902,11 @@ const EvalEvaluationRows = () => {
                                                                                                 icon={<AlarmIcon />}
                                                                                                 size='small'
                                                                                                 sx={{ mr: 1, mb: 1 }}
-                                                                                                label={
-                                                                                                    'Retriever Latency: ' +
+                                                                                                label={getEvaluationMetricLabel(
+                                                                                                    t,
+                                                                                                    'pages.evaluations.retrieverLatencyMetric',
                                                                                                     item.metrics[index]?.retriever
-                                                                                                }
+                                                                                                )}
                                                                                             />
                                                                                         )}{' '}
                                                                                         {item.metrics[index]?.tool && (
@@ -896,22 +915,22 @@ const EvalEvaluationRows = () => {
                                                                                                 icon={<AlarmIcon />}
                                                                                                 size='small'
                                                                                                 sx={{ mr: 1, mb: 1 }}
-                                                                                                label={
-                                                                                                    'Tool Latency: ' +
+                                                                                                label={getEvaluationMetricLabel(
+                                                                                                    t,
+                                                                                                    'pages.evaluations.toolLatencyMetric',
                                                                                                     item.metrics[index]?.tool
-                                                                                                }
+                                                                                                )}
                                                                                             />
                                                                                         )}{' '}
                                                                                         <Chip
                                                                                             variant='outlined'
                                                                                             icon={<AlarmIcon />}
                                                                                             size='small'
-                                                                                            label={
+                                                                                            label={getEvaluationMetricLabel(
+                                                                                                t,
+                                                                                                'pages.evaluations.llmLatencyMetric',
                                                                                                 item.metrics[index]?.llm
-                                                                                                    ? 'LLM Latency: ' +
-                                                                                                      item.metrics[index]?.llm
-                                                                                                    : 'LLM Latency: N/A'
-                                                                                            }
+                                                                                            )}
                                                                                             sx={{ mr: 1, mb: 1 }}
                                                                                         />{' '}
                                                                                     </>
@@ -964,6 +983,7 @@ const EvalEvaluationRows = () => {
                                                                                     }}
                                                                                     variant={'contained'}
                                                                                     size='small'
+                                                                                    title={getEvaluationResultLabel(t, evaluator.result)}
                                                                                     label={`${evaluator.name}`}
                                                                                 ></Chip>
                                                                             </Stack>
