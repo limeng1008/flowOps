@@ -57,6 +57,7 @@ describe('canvas node badge i18n coverage', () => {
         expect(translateNodeLabel('Use Global Inference Endpoint', 'zh')).toBe('使用全局推理端点')
         expect(translateNodeLabel('Cohere Input Type', 'zh')).toBe('Cohere 输入类型')
         expect(translateNodeLabel('Max AWS API retries', 'zh')).toBe('AWS API 最大重试次数')
+        expect(translateNodeLabel('Tool', 'zh')).toBe('工具')
         expect(
             translateNodeTooltip(
                 'Custom endpoint host to use for the model. Provide the hostname without scheme. If provided, will override the default endpoint host.',

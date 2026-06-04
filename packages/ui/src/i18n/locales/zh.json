@@ -285,6 +285,7 @@
         "addItemButton": "添加一项",
         "no": "否",
         "chooseOption": "请选择一个选项",
+        "createNewOption": "- 新建 -",
         "chooseFileToUpload": "选择要上传的文件",
         "uploadFile": "上传文件",
         "viewDetails": "查看详情",

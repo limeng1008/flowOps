@@ -307,6 +307,7 @@ const nodeLabelMap = {
     Description: '描述',
     'Allow Image Uploads': '允许上传图片',
     URL: 'URL',
+    Tool: '工具',
     Tools: '工具',
     'Session Id': '会话 ID',
     'Stop Sequence': '停止序列',

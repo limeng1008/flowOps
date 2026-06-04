@@ -13,6 +13,7 @@ const requiredKeys = [
     'common.copied',
     'common.info',
     'common.status',
+    'common.createNewOption',
     'common.new',
     'common.on',
     'auth.rateLimitTooManyRequests',
@@ -205,8 +206,10 @@ describe('final i18n sweep coverage', () => {
         expect(asyncDropdownSource).toContain('getOptionLabel={getTranslatedOptionLabel}')
         expect(multiDropdownSource).toContain("t('common.chooseOption')")
         expect(asyncDropdownSource).toContain("t('common.chooseOption')")
+        expect(asyncDropdownSource).toContain("label: t('common.createNewOption')")
         expect(multiDropdownSource).toContain('isChooseOptionValue')
         expect(asyncDropdownSource).toContain('isChooseOptionValue')
+        expect(asyncDropdownSource).not.toContain("label: '- Create New -'")
         expect(multiDropdownSource).not.toContain('{option.label}')
         expect(asyncDropdownSource).not.toContain('{option.label}')
     })

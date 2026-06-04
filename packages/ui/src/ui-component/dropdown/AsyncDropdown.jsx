@@ -106,7 +106,7 @@ export const AsyncDropdown = ({
         return options.find((option) => option.name === value)
     }
     const getDefaultOptionValue = () => (multiple ? [] : '')
-    const addNewOption = [{ label: '- Create New -', name: '-create-' }]
+    const addNewOption = [{ label: t('common.createNewOption'), name: '-create-' }]
     let [internalValue, setInternalValue] = useState(value ?? 'choose an option')
     const getTranslatedOptionLabel = (option) => {
         if (typeof option === 'string') return translateNodeLabel(option, currentLang)
