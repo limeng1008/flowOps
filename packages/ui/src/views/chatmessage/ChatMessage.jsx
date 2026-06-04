@@ -3004,7 +3004,7 @@ const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setP
                                         <IconCircleDot />
                                     </span>
                                     <Typography id='elapsed-time'>00:00</Typography>
-                                    {isLoadingRecording && <Typography ml={1.5}>Sending...</Typography>}
+                                    {isLoadingRecording && <Typography ml={1.5}>{t('common.sending')}</Typography>}
                                 </div>
                                 <div className='recording-control-buttons-container'>
                                     <IconButton onClick={onRecordingCancelled} size='small'>

@@ -90,9 +90,9 @@ export const MarketplaceTable = ({
                                 {t('pages.marketplaces.filterFramework')}
                             </StyledTableCell>
                             <StyledTableCell sx={{ minWidth: '100px' }} key='4'>
-                                Use cases
+                                {t('pages.marketplaces.useCases')}
                             </StyledTableCell>
-                            <StyledTableCell key='5'>Badges</StyledTableCell>
+                            <StyledTableCell key='5'>{t('pages.marketplaces.badges')}</StyledTableCell>
                             <StyledTableCell component='th' scope='row' key='6'></StyledTableCell>
                         </TableRow>
                     </TableHead>
@@ -235,7 +235,7 @@ export const MarketplaceTable = ({
                                             </StyledTableCell>
                                             <StyledTableCell key='6' colSpan={row.shared ? 2 : undefined}>
                                                 {row.shared ? (
-                                                    <Typography>Shared Template</Typography>
+                                                    <Typography>{t('pages.marketplaces.sharedTemplate')}</Typography>
                                                 ) : (
                                                     <>
                                                         {onShare && (

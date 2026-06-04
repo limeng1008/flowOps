@@ -5,9 +5,13 @@ import { Dialog, DialogContent, DialogTitle, TableContainer, Table, TableHead, T
 import moment from 'moment'
 import axios from 'axios'
 import { baseURL } from '@/store/constant'
+import { useTranslation } from 'react-i18next'
 
 const AboutDialog = ({ show, onCancel }) => {
+    const { t, i18n } = useTranslation()
     const portalElement = document.getElementById('portal')
+    const currentLang = i18n.resolvedLanguage || i18n.language
+    const momentLocale = currentLang?.startsWith('zh') ? 'zh-cn' : 'en'
 
     const [data, setData] = useState({})
 
@@ -45,7 +49,7 @@ const AboutDialog = ({ show, onCancel }) => {
             aria-describedby='alert-dialog-description'
         >
             <DialogTitle sx={{ fontSize: '1rem' }} id='alert-dialog-title'>
-                FlowOps Version
+                FlowOps {t('profile.version')}
             </DialogTitle>
             <DialogContent>
                 {data && (
@@ -53,9 +57,9 @@ const AboutDialog = ({ show, onCancel }) => {
                         <Table aria-label='simple table'>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Current Version</TableCell>
-                                    <TableCell>Latest Version</TableCell>
-                                    <TableCell>Published At</TableCell>
+                                    <TableCell>{t('profile.currentVersion')}</TableCell>
+                                    <TableCell>{t('profile.latestVersion')}</TableCell>
+                                    <TableCell>{t('profile.publishedAt')}</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -68,7 +72,7 @@ const AboutDialog = ({ show, onCancel }) => {
                                             {data.name}
                                         </a>
                                     </TableCell>
-                                    <TableCell>{moment(data.published_at).fromNow()}</TableCell>
+                                    <TableCell>{moment(data.published_at).locale(momentLocale).fromNow()}</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>

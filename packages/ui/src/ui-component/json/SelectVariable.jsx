@@ -13,25 +13,25 @@ import { translateNodeLabel } from '@/i18n/nodeI18n'
 const sequentialStateMessagesSelection = [
     {
         primary: '$flow.state.messages',
-        secondary: `All messages from the start of the conversation till now`
+        secondaryKey: 'allMessages'
     },
     {
         primary: '$flow.state.<replace-with-key>',
-        secondary: `Current value of the state variable with specified key`
+        secondaryKey: 'stateValue'
     },
     {
         primary: '$flow.state.messages[0].content',
-        secondary: `First message content`
+        secondaryKey: 'firstMessageContent'
     },
     {
         primary: '$flow.state.messages[-1].content',
-        secondary: `Last message content`
+        secondaryKey: 'lastMessageContent'
     }
 ]
 
 const SelectVariable = ({ availableNodesForVariable, disabled = false, onSelectAndReturnVal, isSequentialAgent }) => {
     const customization = useSelector((state) => state.customization)
-    const { i18n } = useTranslation()
+    const { t, i18n } = useTranslation()
     const currentLang = i18n.resolvedLanguage || i18n.language
 
     const onSelectOutputResponseClick = (node, prefix) => {
@@ -45,7 +45,7 @@ const SelectVariable = ({ availableNodesForVariable, disabled = false, onSelectA
             {!disabled && (
                 <div style={{ flex: 30 }}>
                     <Stack flexDirection='row' sx={{ mb: 1, ml: 2, mt: 2 }}>
-                        <Typography variant='h5'>Select Variable</Typography>
+                        <Typography variant='h5'>{t('components.selectVariable.title')}</Typography>
                     </Stack>
                     <PerfectScrollbar style={{ height: '100%', maxHeight: 'calc(100vh - 220px)', overflowX: 'hidden' }}>
                         <Box sx={{ pl: 2, pr: 2 }}>
@@ -82,7 +82,11 @@ const SelectVariable = ({ availableNodesForVariable, disabled = false, onSelectA
                                                 />
                                             </div>
                                         </ListItemAvatar>
-                                        <ListItemText sx={{ ml: 1 }} primary='question' secondary={`User's question from chatbox`} />
+                                        <ListItemText
+                                            sx={{ ml: 1 }}
+                                            primary='question'
+                                            secondary={t('components.selectVariable.questionDescription')}
+                                        />
                                     </ListItem>
                                 </ListItemButton>
                                 <ListItemButton
@@ -120,7 +124,7 @@ const SelectVariable = ({ availableNodesForVariable, disabled = false, onSelectA
                                         <ListItemText
                                             sx={{ ml: 1 }}
                                             primary='chat_history'
-                                            secondary={`Past conversation history between user and AI`}
+                                            secondary={t('components.selectVariable.chatHistoryDescription')}
                                         />
                                     </ListItem>
                                 </ListItemButton>
@@ -159,7 +163,7 @@ const SelectVariable = ({ availableNodesForVariable, disabled = false, onSelectA
                                         <ListItemText
                                             sx={{ ml: 1 }}
                                             primary='file_attachment'
-                                            secondary={`Files uploaded from the chat when Full File Upload is enabled on the Configuration`}
+                                            secondary={t('components.selectVariable.fileAttachmentDescription')}
                                         />
                                     </ListItem>
                                 </ListItemButton>
@@ -215,10 +219,12 @@ const SelectVariable = ({ availableNodesForVariable, disabled = false, onSelectA
                                                         secondary={
                                                             node.data.name === 'ifElseFunction'
                                                                 ? `${node.data.description}`
-                                                                : `${selectedOutputAnchor?.label ?? 'output'} from ${translateNodeLabel(
-                                                                      node.data.label,
-                                                                      currentLang
-                                                                  )}`
+                                                                : t('components.selectVariable.outputFrom', {
+                                                                      output: selectedOutputAnchor?.label
+                                                                          ? translateNodeLabel(selectedOutputAnchor.label, currentLang)
+                                                                          : t('common.output'),
+                                                                      node: translateNodeLabel(node.data.label, currentLang)
+                                                                  })
                                                         }
                                                     />
                                                 </ListItem>
@@ -260,7 +266,11 @@ const SelectVariable = ({ availableNodesForVariable, disabled = false, onSelectA
                                                         />
                                                     </div>
                                                 </ListItemAvatar>
-                                                <ListItemText sx={{ ml: 1 }} primary={item.primary} secondary={item.secondary} />
+                                                <ListItemText
+                                                    sx={{ ml: 1 }}
+                                                    primary={item.primary}
+                                                    secondary={t(`components.selectVariable.${item.secondaryKey}`)}
+                                                />
                                             </ListItem>
                                         </ListItemButton>
                                     ))}

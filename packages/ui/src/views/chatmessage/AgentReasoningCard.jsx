@@ -108,13 +108,13 @@ const AgentReasoningCard = ({
                     <div style={{ display: 'block', flexDirection: 'row', width: '100%' }}>
                         <Chip
                             size='small'
-                            label={'State'}
+                            label={t('pages.executions.state')}
                             component='a'
                             sx={{ mr: 1, mt: 1 }}
                             variant='outlined'
                             clickable
                             icon={<IconDeviceSdCard size={15} />}
-                            onClick={() => onSourceDialogClick(agent.state, 'State')}
+                            onClick={() => onSourceDialogClick(agent.state, t('pages.executions.state'))}
                         />
                     </div>
                 )}

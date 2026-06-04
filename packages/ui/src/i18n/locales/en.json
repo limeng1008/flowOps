@@ -31,6 +31,9 @@
         "accountSettings": "Account Settings",
         "logout": "Logout",
         "language": "Language",
+        "currentVersion": "Current Version",
+        "latestVersion": "Latest Version",
+        "publishedAt": "Published At",
         "exportDialogTitle": "Select Data to Export",
         "exporting": "Exporting...",
         "exportingWait": "Exporting data may take a while",
@@ -268,6 +271,10 @@
         "addItemButton": "Add Item",
         "no": "No",
         "chooseOption": "choose an option",
+        "chooseFileToUpload": "Choose a file to upload",
+        "uploadFile": "Upload File",
+        "viewDetails": "View Details",
+        "sending": "Sending...",
         "loading": "Loading...",
         "noData": "No data",
         "noResults": "No results",
@@ -343,6 +350,19 @@
         "specifyMultipleValues": "You can also specify multiple values for a config parameter by specifying the node id",
         "parametersOf": "{{label}} Parameters",
         "beta": "Beta"
+    },
+    "components": {
+        "selectVariable": {
+            "title": "Select Variable",
+            "questionDescription": "User's question from chatbox",
+            "chatHistoryDescription": "Past conversation history between user and AI",
+            "fileAttachmentDescription": "Files uploaded from the chat when Full File Upload is enabled on the Configuration",
+            "allMessages": "All messages from the start of the conversation till now",
+            "stateValue": "Current value of the state variable with specified key",
+            "firstMessageContent": "First message content",
+            "lastMessageContent": "Last message content",
+            "outputFrom": "{{output}} from {{node}}"
+        }
     },
     "permissions": {
         "categories": {
@@ -531,6 +551,17 @@
             "regenerateSecret": "Regenerate secret",
             "removeSecret": "Remove secret",
             "generatedInstructionSetFailed": "Error setting generated instruction"
+        },
+        "promptGenerator": {
+            "placeholder": "Describe your task here",
+            "examples": {
+                "summarizeDocument": "Summarize a document",
+                "translateLanguage": "Translate the language",
+                "writeEmail": "Write me an email",
+                "convertCode": "Convert the code to another language",
+                "researchReport": "Research and generate a report",
+                "planTrip": "Plan a trip"
+            }
         },
         "agentflowGenerator": {
             "open": "Generate Agentflow",
@@ -913,7 +944,9 @@
         "agentflows": {
             "title": "Agentflows",
             "description": "Multi-agent systems, workflow orchestration",
-            "searchPlaceholder": "Search Name or Category"
+            "searchPlaceholder": "Search Name or Category",
+            "v1DeprecatedTitle": "V1 Agentflows are deprecated.",
+            "v1DeprecatedDescription": "We recommend migrating to V2 for improved performance and continued support."
         },
         "executions": {
             "title": "Agent Executions",
@@ -943,6 +976,7 @@
             "public": "Public",
             "refreshExecutionData": "Refresh execution data",
             "noItemData": "No data available for this item",
+            "viewDetails": "View Details",
             "resizeDrawer": "Resize drawer",
             "sharedPublicly": "Execution shared publicly",
             "noLongerPublic": "Execution is no longer public",
@@ -1186,7 +1220,10 @@
             "noSavedTemplates": "No Saved Custom Templates",
             "typeChatflow": "Chatflow",
             "typeAgentflowV2": "AgentflowV2",
-            "typeTool": "Tool"
+            "typeTool": "Tool",
+            "useCases": "Use cases",
+            "badges": "Badges",
+            "sharedTemplate": "Shared Template"
         },
         "tools": {
             "title": "Tools",
@@ -1327,6 +1364,9 @@
                 "serverUrlTooltip": "The HTTP(S) endpoint of the MCP server (SSE or Streamable HTTP)",
                 "authTooltip": "Authentication method to connect to the MCP server"
             }
+        },
+        "vectorstore": {
+            "upsertSuccess": "Successfully upserted vector store. You can start chatting now!"
         },
         "credentials": {
             "title": "Credentials",

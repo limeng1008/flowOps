@@ -31,6 +31,9 @@
         "accountSettings": "账户设置",
         "logout": "退出登录",
         "language": "语言",
+        "currentVersion": "当前版本",
+        "latestVersion": "最新版本",
+        "publishedAt": "发布时间",
         "exportDialogTitle": "选择要导出的数据",
         "exporting": "正在导出…",
         "exportingWait": "导出数据可能需要一点时间",
@@ -268,6 +271,10 @@
         "addItemButton": "添加一项",
         "no": "否",
         "chooseOption": "请选择一个选项",
+        "chooseFileToUpload": "选择要上传的文件",
+        "uploadFile": "上传文件",
+        "viewDetails": "查看详情",
+        "sending": "发送中…",
         "loading": "加载中…",
         "noData": "暂无数据",
         "noResults": "暂无结果",
@@ -343,6 +350,19 @@
         "specifyMultipleValues": "你也可以通过指定 node id 为同一个配置参数指定多个值",
         "parametersOf": "{{label}} 参数",
         "beta": "测试版"
+    },
+    "components": {
+        "selectVariable": {
+            "title": "选择变量",
+            "questionDescription": "来自聊天输入框的用户问题",
+            "chatHistoryDescription": "用户与 AI 的历史对话",
+            "fileAttachmentDescription": "在配置中启用完整文件上传后，聊天中上传的文件",
+            "allMessages": "从对话开始到现在的全部消息",
+            "stateValue": "指定 key 对应的状态变量当前值",
+            "firstMessageContent": "第一条消息内容",
+            "lastMessageContent": "最后一条消息内容",
+            "outputFrom": "{{node}} 的 {{output}}"
+        }
     },
     "permissions": {
         "categories": {
@@ -531,6 +551,17 @@
             "regenerateSecret": "重新生成 secret",
             "removeSecret": "移除 secret",
             "generatedInstructionSetFailed": "写入生成指令失败"
+        },
+        "promptGenerator": {
+            "placeholder": "描述你的任务",
+            "examples": {
+                "summarizeDocument": "总结一份文档",
+                "translateLanguage": "翻译语言",
+                "writeEmail": "帮我写一封邮件",
+                "convertCode": "将代码转换为另一种语言",
+                "researchReport": "调研并生成报告",
+                "planTrip": "规划一次行程"
+            }
         },
         "agentflowGenerator": {
             "open": "生成智能体流",
@@ -913,7 +944,9 @@
         "agentflows": {
             "title": "智能体流",
             "description": "多 Agent 系统与工作流编排",
-            "searchPlaceholder": "搜索名称或分类"
+            "searchPlaceholder": "搜索名称或分类",
+            "v1DeprecatedTitle": "V1 Agentflows 已弃用。",
+            "v1DeprecatedDescription": "建议迁移到 V2，以获得更好的性能和持续支持。"
         },
         "executions": {
             "title": "Agent 执行记录",
@@ -943,6 +976,7 @@
             "public": "公开",
             "refreshExecutionData": "刷新执行数据",
             "noItemData": "该项暂无可用数据",
+            "viewDetails": "查看详情",
             "resizeDrawer": "调整抽屉宽度",
             "sharedPublicly": "执行记录已公开分享",
             "noLongerPublic": "执行记录已取消公开",
@@ -1186,7 +1220,10 @@
             "noSavedTemplates": "暂无已保存的自定义模板",
             "typeChatflow": "对话流",
             "typeAgentflowV2": "AgentflowV2",
-            "typeTool": "工具"
+            "typeTool": "工具",
+            "useCases": "用例",
+            "badges": "徽章",
+            "sharedTemplate": "共享模板"
         },
         "tools": {
             "title": "工具",
@@ -1327,6 +1364,9 @@
                 "serverUrlTooltip": "MCP 服务的 HTTP(S) 端点（SSE 或 Streamable HTTP）",
                 "authTooltip": "连接 MCP 服务时使用的认证方式"
             }
+        },
+        "vectorstore": {
+            "upsertSuccess": "向量库 Upsert 成功，现在可以开始对话了！"
         },
         "credentials": {
             "title": "凭证",

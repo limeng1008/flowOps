@@ -69,6 +69,7 @@
 | `packages/ui/src/ui-component/dropdown/Dropdown.jsx`                          | UI-i18n-hardening |
 | `packages/ui/src/ui-component/extended/Logo.jsx`                              | Branding-shell    |
 | `packages/ui/src/ui-component/extended/TextToSpeech.jsx`                      | UI-i18n-hardening |
+| `packages/ui/src/ui-component/file/File.jsx`                                  | UI-i18n-hardening |
 | `packages/ui/src/ui-component/grid/DataGrid.jsx`                              | UI-i18n-hardening |
 | `packages/ui/src/ui-component/grid/Grid.jsx`                                  | UI-i18n-hardening |
 | `packages/ui/src/ui-component/input/suggestionOption.js`                      | UI-i18n-hardening |
