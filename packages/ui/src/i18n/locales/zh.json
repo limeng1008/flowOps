@@ -20,6 +20,7 @@
         "workspaces": "工作区",
         "login-activity": "登录活动",
         "billing": "计费管理",
+        "support-tickets": "支持工单",
         "others": "其他",
         "logs": "日志",
         "account": "账户设置"
@@ -2168,6 +2169,31 @@
             "tokensOverride": "Token 覆盖额度",
             "botsOverride": "Bot 覆盖额度",
             "seatsOverride": "席位覆盖额度"
+        },
+        "supportTickets": {
+            "title": "支持工单",
+            "myTickets": "我的工单",
+            "adminQueue": "运营队列",
+            "newTicket": "新建工单",
+            "subject": "主题",
+            "description": "问题描述",
+            "priority": "优先级",
+            "category": "分类",
+            "status": "状态",
+            "requester": "提交人",
+            "assignee": "负责人",
+            "updatedAt": "更新时间",
+            "reply": "回复",
+            "replyPlaceholder": "填写回复内容",
+            "noTickets": "暂无工单",
+            "open": "待处理",
+            "pending": "等待回复",
+            "resolved": "已解决",
+            "closed": "已关闭",
+            "low": "低",
+            "normal": "普通",
+            "high": "高",
+            "urgent": "紧急"
         }
     }
 }

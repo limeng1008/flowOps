@@ -55,6 +55,9 @@ const Account = Loadable(lazy(() => import('@/views/account')))
 // billing routing
 const Billing = Loadable(lazy(() => import('@/views/billing')))
 
+// support tickets routing
+const SupportTickets = Loadable(lazy(() => import('@/views/supportTickets')))
+
 // files routing
 const Files = Loadable(lazy(() => import('@/views/files')))
 
@@ -112,6 +115,14 @@ const MainRoutes = {
             element: (
                 <RequireAuth>
                     <Billing />
+                </RequireAuth>
+            )
+        },
+        {
+            path: '/support-tickets',
+            element: (
+                <RequireAuth>
+                    <SupportTickets />
                 </RequireAuth>
             )
         },

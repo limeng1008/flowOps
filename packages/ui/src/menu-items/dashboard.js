@@ -259,6 +259,14 @@ const dashboard = {
                     url: '/billing',
                     icon: icons.IconReceipt,
                     breadcrumbs: true
+                },
+                {
+                    id: 'support-tickets',
+                    title: 'Support Tickets',
+                    type: 'item',
+                    url: '/support-tickets',
+                    icon: icons.IconClipboardList,
+                    breadcrumbs: true
                 }
             ]
         },

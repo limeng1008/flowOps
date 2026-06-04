@@ -20,6 +20,7 @@
         "workspaces": "Workspaces",
         "login-activity": "Login Activity",
         "billing": "Billing Management",
+        "support-tickets": "Support Tickets",
         "others": "Others",
         "logs": "Logs",
         "account": "Account Settings"
@@ -2168,6 +2169,31 @@
             "tokensOverride": "Token override",
             "botsOverride": "Bot override",
             "seatsOverride": "Seat override"
+        },
+        "supportTickets": {
+            "title": "Support Tickets",
+            "myTickets": "My Tickets",
+            "adminQueue": "Admin Queue",
+            "newTicket": "New Ticket",
+            "subject": "Subject",
+            "description": "Description",
+            "priority": "Priority",
+            "category": "Category",
+            "status": "Status",
+            "requester": "Requester",
+            "assignee": "Assignee",
+            "updatedAt": "Updated At",
+            "reply": "Reply",
+            "replyPlaceholder": "Reply",
+            "noTickets": "No tickets",
+            "open": "Open",
+            "pending": "Pending",
+            "resolved": "Resolved",
+            "closed": "Closed",
+            "low": "Low",
+            "normal": "Normal",
+            "high": "High",
+            "urgent": "Urgent"
         }
     }
 }
