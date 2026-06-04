@@ -155,7 +155,7 @@ const VectorStoreConfigure = () => {
 
     const showVectorStoreList = () => {
         const dialogProp = {
-            title: 'Select a Vector Store Provider'
+            title: t('pages.documentStores.selectVectorStoreProvider')
         }
         setDialogProps(dialogProp)
         setShowVectorStoreListDialog(true)
@@ -173,7 +173,7 @@ const VectorStoreConfigure = () => {
 
     const showRecordManagerList = () => {
         const dialogProp = {
-            title: 'Select a Record Manager'
+            title: t('pages.documentStores.selectRecordManager')
         }
         setDialogProps(dialogProp)
         setShowRecordManagerListDialog(true)
@@ -550,7 +550,7 @@ const VectorStoreConfigure = () => {
                                             startIcon={<IconDeviceFloppy />}
                                             onClick={() => saveVectorStoreConfig()}
                                         >
-                                            Save Config
+                                            {t('pages.documentStores.saveConfig')}
                                         </Button>
                                     )}
                                     {Object.keys(selectedEmbeddingsProvider).length > 0 &&
@@ -719,7 +719,7 @@ const VectorStoreConfigure = () => {
                                                 }}
                                                 disabled={isVectorStoreDisabled()}
                                             >
-                                                {t('pages.assistants.selectVectorStore')}
+                                                {t('pages.documentStores.selectVectorStore')}
                                             </Button>
                                         ) : (
                                             <Box>

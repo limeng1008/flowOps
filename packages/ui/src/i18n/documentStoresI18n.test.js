@@ -48,7 +48,27 @@ const documentStoreListKeys = [
     'pages.documentStores.status.new'
 ]
 
-const requiredKeys = [...documentStoreDetailKeys, ...showStoredChunksKeys, ...documentStoreDialogKeys, ...documentStoreListKeys]
+const vectorStoreConfigureKeys = [
+    'pages.documentStores.stepEmbeddings',
+    'pages.documentStores.stepVectorStore',
+    'pages.documentStores.stepRecordManager',
+    'pages.documentStores.selectEmbeddings',
+    'pages.documentStores.selectEmbeddingsProvider',
+    'pages.documentStores.selectVectorStore',
+    'pages.documentStores.selectVectorStoreProvider',
+    'pages.documentStores.selectRecordManager',
+    'pages.documentStores.recordManagerNotApplicable',
+    'pages.documentStores.configureSubtitle',
+    'pages.documentStores.saveConfig'
+]
+
+const requiredKeys = [
+    ...documentStoreDetailKeys,
+    ...showStoredChunksKeys,
+    ...documentStoreDialogKeys,
+    ...documentStoreListKeys,
+    ...vectorStoreConfigureKeys
+]
 
 const menuLabels = [
     'View & Edit Chunks',
@@ -145,5 +165,22 @@ describe('document store i18n coverage', () => {
         expect(tableSource).toContain("t('pages.documentStores.colTotalChars')")
         expect(tableSource).toContain("t('pages.documentStores.colTotalChunks')")
         expect(tableSource).toContain("t('pages.documentStores.colLoaderTypes')")
+    })
+
+    it('translates vector store configuration steps, cards, dialogs, and actions', () => {
+        const source = fs.readFileSync(path.join(__dirname, '../views/docstore/VectorStoreConfigure.jsx'), 'utf8')
+
+        vectorStoreConfigureKeys.forEach((key) => {
+            expect(source).toContain(key)
+        })
+        expect(source).toContain('{t(label)}</StepLabel>')
+        expect(source).toContain("t('pages.documentStores.selectEmbeddingsProvider')")
+        expect(source).toContain("t('pages.documentStores.selectVectorStoreProvider')")
+        expect(source).toContain("t('pages.documentStores.selectRecordManager')")
+        expect(source).toContain("t('pages.documentStores.saveConfig')")
+        expect(source).not.toContain("'Select a Vector Store Provider'")
+        expect(source).not.toContain("'Select a Record Manager'")
+        expect(source).not.toContain('>Save Config<')
+        expect(source).not.toContain("t('pages.assistants.selectVectorStore')")
     })
 })
