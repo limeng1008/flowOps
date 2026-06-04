@@ -614,7 +614,7 @@ const LoaderConfigPreviewChunks = () => {
                                                         onClick={onPreviewChunks}
                                                     >
                                                         <IconEye style={{ marginRight: '5px' }} />
-                                                        Preview Chunks
+                                                        {t('pages.documentStores.previewChunks')}
                                                     </StyledFab>
                                                 </div>
                                             </div>
@@ -622,10 +622,13 @@ const LoaderConfigPreviewChunks = () => {
                                     {documentChunks && documentChunks.length > 0 && (
                                         <>
                                             <Typography sx={{ wordWrap: 'break-word', textAlign: 'left', mb: 2 }} variant='h3'>
-                                                {currentPreviewCount} of {totalChunks} {t('pages.documentStores.colChunks')}
+                                                {t('pages.documentStores.previewChunkCount', {
+                                                    current: currentPreviewCount,
+                                                    total: totalChunks
+                                                })}
                                             </Typography>
                                             <Box sx={{ mb: 3 }}>
-                                                <Typography>Show Chunks in Preview</Typography>
+                                                <Typography>{t('pages.documentStores.showChunksInPreview')}</Typography>
                                                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                                                     <OutlinedInput
                                                         size='small'

@@ -130,6 +130,7 @@
 | `packages/ui/src/views/credentials/index.jsx`                                 | UI-i18n-hardening |
 | `packages/ui/src/views/datasets/index.jsx`                                    | UI-i18n-hardening |
 | `packages/ui/src/views/docstore/AddDocStoreDialog.jsx`                        | UI-i18n-hardening |
+| `packages/ui/src/views/docstore/DocStoreAPIDialog.jsx`                        | UI-i18n-hardening |
 | `packages/ui/src/views/docstore/DocumentStoreDetail.jsx`                      | UI-i18n-hardening |
 | `packages/ui/src/views/docstore/DocumentStoreStatus.jsx`                      | UI-i18n-hardening |
 | `packages/ui/src/views/docstore/LoaderConfigPreviewChunks.jsx`                | UI-i18n-hardening |

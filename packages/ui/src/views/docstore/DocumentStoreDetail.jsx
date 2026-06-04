@@ -490,7 +490,7 @@ const DocumentStoreDetails = () => {
                                     onClick={onConfirm}
                                     size='small'
                                     color='primary'
-                                    title='Refresh Document Store'
+                                    title={t('pages.documentStores.refreshDocumentStore')}
                                 >
                                     <IconRefresh />
                                 </PermissionIconButton>
@@ -567,7 +567,7 @@ const DocumentStoreDetails = () => {
                                         disabled={documentStore?.totalChunks <= 0 || documentStore?.status !== 'UPSERTED'}
                                         onClick={() => onStoreRefresh(documentStore.id)}
                                         disableRipple
-                                        title='Re-process all loaders and upsert all chunks'
+                                        title={t('pages.documentStores.reprocessAllChunks')}
                                     >
                                         <RefreshIcon />
                                         {t('pages.documentStores.refresh')}
@@ -631,7 +631,7 @@ const DocumentStoreDetails = () => {
                                         alt='doc_store_details_emptySVG'
                                     />
                                 </Box>
-                                <div>No Document Added Yet</div>
+                                <div>{t('pages.documentStores.noDocumentsYet')}</div>
                                 <StyledButton
                                     variant='contained'
                                     sx={{ borderRadius: 2, height: '100%', mt: 2, color: 'white' }}
@@ -758,7 +758,7 @@ const DocumentStoreDetails = () => {
                                     color='warning'
                                     style={{ color: 'darkred', fontWeight: 500, fontStyle: 'italic', fontSize: 12 }}
                                 >
-                                    Some files are pending processing. Please Refresh to get the latest status.
+                                    {t('pages.documentStores.pendingProcessingRefresh')}
                                 </Typography>
                             </div>
                         )}
@@ -840,7 +840,7 @@ function LoaderRow(props) {
 
         // Return format: "LoaderName (sourceName)" or just "LoaderName" if no source
         if (!sourceName) {
-            return loaderName || 'No source'
+            return loaderName || t('pages.documentStores.noSource')
         }
         return loaderName ? `${loaderName} (${sourceName})` : sourceName
     }

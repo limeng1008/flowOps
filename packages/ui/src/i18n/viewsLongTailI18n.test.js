@@ -444,6 +444,21 @@ const requiredKeys = [
     'pages.logs.last2Months',
     'pages.logs.last3Months',
     'pages.logs.custom',
+    'pages.documentStores.refreshDocumentStore',
+    'pages.documentStores.reprocessAllChunks',
+    'pages.documentStores.noDocumentsYet',
+    'pages.documentStores.pendingProcessingRefresh',
+    'pages.documentStores.noSource',
+    'pages.documentStores.upsertApiNote',
+    'pages.documentStores.overrideExistingConfigurations',
+    'pages.documentStores.recordManagerWarning',
+    'pages.documentStores.previewChunks',
+    'pages.documentStores.previewChunkCount',
+    'pages.documentStores.showChunksInPreview',
+    'pages.documentStores.editChunk',
+    'pages.documentStores.noUpsertHistory',
+    'pages.documentStores.upsertVectorDatabase',
+    'common.learnMore',
     'pages.executions.copyId',
     'pages.executions.copied',
     'pages.executions.idCopied',
@@ -1176,5 +1191,60 @@ describe('views long-tail i18n coverage', () => {
         expect(logsSource).not.toContain('Last hour')
         expect(logsSource).not.toContain('No Logs Yet')
         expect(logsSource).not.toContain('<b>To</b>')
+    })
+
+    it('localizes B6 document store residual buttons, notes, and empty states', () => {
+        const detailSource = read('views/docstore/DocumentStoreDetail.jsx')
+        const apiDialogSource = read('views/docstore/DocStoreAPIDialog.jsx')
+        const deleteDialogSource = read('views/docstore/DeleteDocStoreDialog.jsx')
+        const previewChunksSource = read('views/docstore/LoaderConfigPreviewChunks.jsx')
+        const expandedChunkSource = read('views/docstore/ExpandedChunkDialog.jsx')
+        const upsertHistorySource = read('views/docstore/UpsertHistorySideDrawer.jsx')
+        const componentsListSource = read('views/docstore/ComponentsListDialog.jsx')
+        const loaderListSource = read('views/docstore/DocumentLoaderListDialog.jsx')
+        const vectorStorePopUpSource = read('views/vectorstore/VectorStorePopUp.jsx')
+
+        expect(detailSource).toContain("title={t('pages.documentStores.refreshDocumentStore')}")
+        expect(detailSource).toContain("title={t('pages.documentStores.reprocessAllChunks')}")
+        expect(detailSource).toContain("t('pages.documentStores.noDocumentsYet')")
+        expect(detailSource).toContain("t('pages.documentStores.pendingProcessingRefresh')")
+        expect(detailSource).toContain("t('pages.documentStores.noSource')")
+        expect(detailSource).not.toContain('Refresh Document Store')
+        expect(detailSource).not.toContain('Re-process all loaders and upsert all chunks')
+        expect(detailSource).not.toContain('No Document Added Yet')
+        expect(detailSource).not.toContain('Some files are pending processing')
+        expect(detailSource).not.toContain('No source')
+
+        expect(apiDialogSource).toContain("t('pages.documentStores.upsertApiNote')")
+        expect(apiDialogSource).toContain("t('pages.documentStores.overrideExistingConfigurations')")
+        expect(apiDialogSource).not.toContain('Upsert API can only be used')
+        expect(apiDialogSource).not.toContain('You can override existing configurations:')
+
+        expect(deleteDialogSource).toContain("t('pages.documentStores.recordManagerWarning')")
+        expect(deleteDialogSource).toContain("t('common.learnMore')")
+        expect(deleteDialogSource).not.toContain('Without a Record Manager configured')
+        expect(deleteDialogSource).not.toContain('Learn more')
+
+        expect(previewChunksSource).toContain("t('pages.documentStores.previewChunks')")
+        expect(previewChunksSource).toContain("t('pages.documentStores.previewChunkCount'")
+        expect(previewChunksSource).toContain("t('pages.documentStores.showChunksInPreview')")
+        expect(previewChunksSource).not.toContain('Preview Chunks')
+        expect(previewChunksSource).not.toContain('Show Chunks in Preview')
+
+        expect(expandedChunkSource).toContain("title={t('pages.documentStores.editChunk')}")
+        expect(expandedChunkSource).toContain("title={t('pages.documentStores.deleteChunkTitle')}")
+        expect(expandedChunkSource).not.toContain('Edit Chunk')
+        expect(expandedChunkSource).not.toContain('Delete Chunk')
+
+        expect(upsertHistorySource).toContain("t('pages.documentStores.noUpsertHistory')")
+        expect(upsertHistorySource).not.toContain('No Upsert History Yet')
+
+        expect(componentsListSource).toContain("title={t('common.clearSearch')}")
+        expect(loaderListSource).toContain("title={t('common.clearSearch')}")
+        expect(componentsListSource).not.toContain('Clear Search')
+        expect(loaderListSource).not.toContain('Clear Search')
+
+        expect(vectorStorePopUpSource).toContain("title={t('pages.documentStores.upsertVectorDatabase')}")
+        expect(vectorStorePopUpSource).not.toContain('Upsert Vector Database')
     })
 })

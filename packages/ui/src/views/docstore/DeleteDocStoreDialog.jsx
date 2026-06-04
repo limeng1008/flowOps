@@ -201,16 +201,14 @@ const DeleteDocStoreDialog = ({ show, dialogProps, onCancel, onDelete }) => {
                     >
                         <IconAlertTriangle size={70} color='orange' />
                         <span style={{ color: 'rgb(116,66,16)', marginLeft: 10 }}>
-                            <strong>Note:</strong> Without a Record Manager configured, only the document chunks will be removed from the
-                            document store. The actual vector embeddings in your vector store database will remain unchanged. To enable
-                            automatic cleanup of vector store data, please configure a Record Manager.{' '}
+                            {t('pages.documentStores.recordManagerWarning')}{' '}
                             <Link
                                 href='https://docs.flowiseai.com/integrations/langchain/record-managers'
                                 target='_blank'
                                 rel='noopener noreferrer'
                                 sx={{ fontWeight: 500, color: 'rgb(116,66,16)', textDecoration: 'underline' }}
                             >
-                                Learn more
+                                {t('common.learnMore')}
                             </Link>
                         </span>
                     </div>

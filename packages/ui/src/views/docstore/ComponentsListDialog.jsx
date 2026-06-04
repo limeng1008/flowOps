@@ -101,7 +101,7 @@ const ComponentsListDialog = ({ show, dialogProps, onCancel, apiCall, onSelected
                                         color: theme.palette.grey[900]
                                     }
                                 }}
-                                title='Clear Search'
+                                title={t('common.clearSearch')}
                             >
                                 <IconX
                                     stroke={1.5}

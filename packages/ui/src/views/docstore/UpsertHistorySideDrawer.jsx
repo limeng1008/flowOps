@@ -95,7 +95,7 @@ const UpsertHistorySideDrawer = ({ show, dialogProps, onClickFunction, onSelectH
                                         alt='HistoryEmptySVG'
                                     />
                                 </Box>
-                                <div>No Upsert History Yet</div>
+                                <div>{t('pages.documentStores.noUpsertHistory')}</div>
                             </Stack>
                         )}
                     </Timeline>
