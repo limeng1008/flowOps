@@ -45,7 +45,7 @@ import { initNode, showHideInputParams, getFileName } from '@/utils/genericHelpe
 import useNotifier from '@/utils/useNotifier'
 
 // const
-const steps = ['Embeddings', 'Vector Store', 'Record Manager']
+const steps = ['pages.documentStores.stepEmbeddings', 'pages.documentStores.stepVectorStore', 'pages.documentStores.stepRecordManager']
 
 const VectorStoreConfigure = () => {
     const { t } = useTranslation()
@@ -131,7 +131,7 @@ const VectorStoreConfigure = () => {
 
     const showEmbeddingsList = () => {
         const dialogProp = {
-            title: 'Select Embeddings Provider'
+            title: t('pages.documentStores.selectEmbeddingsProvider')
         }
         setDialogProps(dialogProp)
         setShowEmbeddingsListDialog(true)
@@ -341,7 +341,7 @@ const VectorStoreConfigure = () => {
                 <Stepper activeStep={getActiveStep()} alternativeLabel>
                     {steps.map((label) => (
                         <Step key={label}>
-                            <StepLabel>{label}</StepLabel>
+                            <StepLabel>{t(label)}</StepLabel>
                         </Step>
                     ))}
                 </Stepper>
@@ -520,7 +520,7 @@ const VectorStoreConfigure = () => {
                                     isBackButton={true}
                                     search={false}
                                     title={getViewHeaderTitle()}
-                                    description='Configure Embeddings, Vector Store and Record Manager'
+                                    description={t('pages.documentStores.configureSubtitle')}
                                     onBack={() => navigate(-1)}
                                 >
                                     {(Object.keys(selectedEmbeddingsProvider).length > 0 ||
@@ -603,7 +603,7 @@ const VectorStoreConfigure = () => {
                                                     }
                                                 }}
                                             >
-                                                Select Embeddings
+                                                {t('pages.documentStores.selectEmbeddings')}
                                             </Button>
                                         ) : (
                                             <Box>
@@ -844,8 +844,8 @@ const VectorStoreConfigure = () => {
                                                 disabled={isRecordManagerDisabled()}
                                             >
                                                 {isRecordManagerUnavailable
-                                                    ? 'Record Manager is not applicable for selected Vector Store'
-                                                    : 'Select Record Manager'}
+                                                    ? t('pages.documentStores.recordManagerNotApplicable')
+                                                    : t('pages.documentStores.selectRecordManager')}
                                             </Button>
                                         ) : (
                                             <Box>
