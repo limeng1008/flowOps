@@ -74,6 +74,9 @@ describe('canvas node badge i18n coverage', () => {
         expect(
             translateNodeTooltip('Documents batch size to send to AWS API for Titan model embeddings. Used to avoid throttling.', 'zh')
         ).toBe('发送到 AWS API 的 Titan 向量模型文档批大小，用于降低触发限流的概率。')
+        expect(translateNodeTooltip('Add an input message as user message at the end of the conversation', 'zh')).toBe(
+            '在对话末尾追加一条用户消息作为输入消息。'
+        )
         expect(
             translateNodeTooltip(
                 'This will limit the number of AWS API for Titan model embeddings call retries. Used to avoid throttling.',

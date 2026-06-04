@@ -921,6 +921,7 @@ const nodeDescriptionMap = {
     'Describe to LLM when it should use this tool': '向 LLM 说明何时调用此工具',
     'Whether the application supports both My Drives and shared drives': '是否同时支持「我的云端硬盘」和共享云端硬盘',
     'This prompt will be added at the end of the messages as human message': '该提示词将作为用户消息追加到消息列表末尾',
+    'Add an input message as user message at the end of the conversation': '在对话末尾追加一条用户消息作为输入消息。',
     'Temperature parameter may not apply to certain model. Please check available model parameters':
         'Temperature 参数可能不适用于某些模型，请查看模型可用参数',
     'Number of top results to fetch. Default to the TopK of the Base Retriever': '返回结果数，默认与 Base Retriever 的 TopK 相同',
@@ -1004,6 +1005,7 @@ const nodeTooltipMap = {
     'Name of the tool': '工具名称。',
     'Whether to return source documents': '是否返回来源文档。',
     'Return source documents': '返回来源文档。',
+    'Add an input message as user message at the end of the conversation': '在对话末尾追加一条用户消息作为输入消息。',
     'Window of size k to surface the last k back-and-forth to use as memory.': '保留最近 k 轮对话作为记忆。',
     'Uses a window of size k to surface the last k back-and-forth to use as memory': '使用大小为 k 的窗口，把最近 k 轮对话作为记忆。',
     'Summarizes the conversation and stores the current summary in memory': '对对话进行摘要，并将当前摘要存入记忆。',

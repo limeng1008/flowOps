@@ -33,6 +33,8 @@
 | `packages/ui/src/index.jsx`                                                   | Branding-shell    |
 | `packages/ui/src/i18n/locales/en.json`                                        | UI-i18n-hardening |
 | `packages/ui/src/i18n/locales/zh.json`                                        | UI-i18n-hardening |
+| `packages/ui/src/i18n/canvasNodeBadgesI18n.test.js`                           | UI-i18n-hardening |
+| `packages/ui/src/i18n/nodeI18n.js`                                            | UI-i18n-hardening |
 | `packages/ui/src/i18n/viewsLongTailI18n.test.js`                              | UI-i18n-hardening |
 | `packages/ui/src/layout/AuthLayout/index.jsx`                                 | UI-i18n-hardening |
 | `packages/ui/src/layout/MainLayout/Header/OrgWorkspaceBreadcrumbs/index.jsx`  | UI-i18n-hardening |
