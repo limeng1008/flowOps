@@ -47,7 +47,7 @@ const ChatFeedback = ({ dialogProps, onConfirm }) => {
             })
             if (saveResp.data) {
                 enqueueSnackbar({
-                    message: 'Chat Feedback Settings Saved',
+                    message: t('canvas.chatConfig.chatFeedbackSaved'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -63,9 +63,9 @@ const ChatFeedback = ({ dialogProps, onConfirm }) => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to save Chat Feedback Settings: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('canvas.chatConfig.chatFeedbackSaveFailed', {
+                    message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -94,7 +94,7 @@ const ChatFeedback = ({ dialogProps, onConfirm }) => {
 
     return (
         <Stack direction='column' spacing={2} sx={{ width: '100%' }}>
-            <SwitchInput label='Enable chat feedback' onChange={handleChange} value={chatFeedbackStatus} />
+            <SwitchInput label={t('canvas.chatConfig.enableChatFeedback')} onChange={handleChange} value={chatFeedbackStatus} />
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', width: '100%', mt: 2 }}>
                 <StyledButton variant='contained' onClick={onSave} sx={{ minWidth: 100 }}>
                     {t('common.save')}

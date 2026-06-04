@@ -62,7 +62,7 @@ const AllowedDomains = ({ dialogProps, onConfirm, hideTitle = false }) => {
             })
             if (saveResp.data) {
                 enqueueSnackbar({
-                    message: 'Allowed Origins Saved',
+                    message: t('canvas.chatConfig.allowedOriginsSaved'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -78,9 +78,9 @@ const AllowedDomains = ({ dialogProps, onConfirm, hideTitle = false }) => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to save Allowed Origins: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('canvas.chatConfig.allowedOriginsSaveFailed', {
+                    message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -125,15 +125,12 @@ const AllowedDomains = ({ dialogProps, onConfirm, hideTitle = false }) => {
             {!hideTitle && (
                 <Typography variant='h3'>
                     {t('permissions.actions.domains')}
-                    <TooltipWithParser
-                        style={{ mb: 1, mt: 2, marginLeft: 10 }}
-                        title={'Your chatbot will only work when used from the following domains.'}
-                    />
+                    <TooltipWithParser style={{ mb: 1, mt: 2, marginLeft: 10 }} title={t('canvas.chatConfig.allowedDomainsHelp')} />
                 </Typography>
             )}
             <Stack direction='column' spacing={2} sx={{ width: '100%' }}>
                 <Stack direction='column' spacing={2}>
-                    <Typography>Domains</Typography>
+                    <Typography>{t('canvas.chatConfig.domains')}</Typography>
                     {inputFields.map((origin, index) => {
                         return (
                             <div key={index} style={{ display: 'flex', width: '100%' }}>
@@ -178,10 +175,10 @@ const AllowedDomains = ({ dialogProps, onConfirm, hideTitle = false }) => {
                 </Stack>
                 <Stack direction='column' spacing={1}>
                     <Typography>
-                        Error Message
+                        {t('canvas.chatConfig.errorMessage')}
                         <TooltipWithParser
                             style={{ mb: 1, mt: 2, marginLeft: 10 }}
-                            title={'Custom error message that will be shown when for unauthorized domain'}
+                            title={t('canvas.chatConfig.unauthorizedDomainErrorHelp')}
                         />
                     </Typography>
                     <OutlinedInput
@@ -189,7 +186,7 @@ const AllowedDomains = ({ dialogProps, onConfirm, hideTitle = false }) => {
                         type='text'
                         size='small'
                         fullWidth
-                        placeholder='Unauthorized domain!'
+                        placeholder={t('canvas.chatConfig.unauthorizedDomainMessage')}
                         value={errorMessage}
                         onChange={(e) => {
                             setErrorMessage(e.target.value)

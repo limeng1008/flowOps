@@ -18,12 +18,6 @@ import useNotifier from '@/utils/useNotifier'
 import chatflowsApi from '@/api/chatflows'
 import { useTranslation } from 'react-i18next'
 
-const formTitle = `Hey 👋 thanks for your interest!
-Let us know where we can reach you`
-
-const endTitle = `Thank you!
-What can I do for you?`
-
 const Leads = ({ dialogProps }) => {
     const { t } = useTranslation()
     const dispatch = useDispatch()
@@ -54,7 +48,7 @@ const Leads = ({ dialogProps }) => {
             })
             if (saveResp.data) {
                 enqueueSnackbar({
-                    message: 'Leads configuration Saved',
+                    message: t('canvas.chatConfig.leadsSaved'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -70,7 +64,7 @@ const Leads = ({ dialogProps }) => {
         } catch (error) {
             const errorData = error.response.data || `${error.response.status}: ${error.response.statusText}`
             enqueueSnackbar({
-                message: `Failed to save Leads configuration: ${errorData}`,
+                message: t('canvas.chatConfig.leadsSaveFailed', { message: errorData }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -110,11 +104,15 @@ const Leads = ({ dialogProps }) => {
                     mb: 2
                 }}
             >
-                <SwitchInput label='Enable Lead Capture' onChange={(value) => handleChange('status', value)} value={leadsConfig.status} />
+                <SwitchInput
+                    label={t('canvas.chatConfig.enableLeadCapture')}
+                    onChange={(value) => handleChange('status', value)}
+                    value={leadsConfig.status}
+                />
                 {leadsConfig && leadsConfig['status'] && (
                     <>
                         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
-                            <Typography>Form Title</Typography>
+                            <Typography>{t('canvas.chatConfig.formTitle')}</Typography>
                             <OutlinedInput
                                 id='form-title'
                                 type='text'
@@ -122,7 +120,7 @@ const Leads = ({ dialogProps }) => {
                                 multiline={true}
                                 minRows={4}
                                 value={leadsConfig.title}
-                                placeholder={formTitle}
+                                placeholder={t('canvas.chatConfig.formTitlePlaceholder')}
                                 name='form-title'
                                 size='small'
                                 onChange={(e) => {
@@ -131,7 +129,7 @@ const Leads = ({ dialogProps }) => {
                             />
                         </Box>
                         <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
-                            <Typography>Message after lead captured</Typography>
+                            <Typography>{t('canvas.chatConfig.leadSuccessMessage')}</Typography>
                             <OutlinedInput
                                 id='success-message'
                                 type='text'
@@ -139,7 +137,7 @@ const Leads = ({ dialogProps }) => {
                                 multiline={true}
                                 minRows={4}
                                 value={leadsConfig.successMessage}
-                                placeholder={endTitle}
+                                placeholder={t('canvas.chatConfig.leadSuccessMessagePlaceholder')}
                                 name='form-title'
                                 size='small'
                                 onChange={(e) => {
@@ -147,7 +145,7 @@ const Leads = ({ dialogProps }) => {
                                 }}
                             />
                         </Box>
-                        <Typography variant='h4'>Form fields</Typography>
+                        <Typography variant='h4'>{t('canvas.chatConfig.formFields')}</Typography>
                         <Box sx={{ width: '100%' }}>
                             <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
                                 <SwitchInput

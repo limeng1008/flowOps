@@ -549,6 +549,117 @@ const requiredKeys = [
     'pages.roles.roleNamePlaceholder',
     'pages.roles.roleDescription',
     'pages.roles.roleDescriptionPlaceholder',
+    'canvas.chatConfig.providers',
+    'canvas.chatConfig.connectCredential',
+    'canvas.chatConfig.language',
+    'canvas.chatConfig.languageDescription',
+    'canvas.chatConfig.prompt',
+    'canvas.chatConfig.sttPromptDescription',
+    'canvas.chatConfig.temperature',
+    'canvas.chatConfig.temperatureDescription',
+    'canvas.chatConfig.baseUrl',
+    'canvas.chatConfig.localAiBaseUrlDescription',
+    'canvas.chatConfig.model',
+    'canvas.chatConfig.sttModelDescription',
+    'canvas.chatConfig.groqSttModelDescription',
+    'canvas.chatConfig.recognitionLanguageDescription',
+    'canvas.chatConfig.profanityFilterMode',
+    'canvas.chatConfig.profanityFilterModeDescription',
+    'canvas.chatConfig.profanityNone',
+    'canvas.chatConfig.profanityMasked',
+    'canvas.chatConfig.profanityRemoved',
+    'canvas.chatConfig.audioChannels',
+    'canvas.chatConfig.audioChannelsDescription',
+    'canvas.chatConfig.voice',
+    'canvas.chatConfig.ttsVoiceDescription',
+    'canvas.chatConfig.elevenLabsVoiceDescription',
+    'canvas.chatConfig.modelName',
+    'canvas.chatConfig.followUpPromptDescription',
+    'canvas.chatConfig.followUpDefaultPrompt',
+    'canvas.chatConfig.ollamaBaseUrlDescription',
+    'canvas.chatConfig.ollamaModelNameDescription',
+    'canvas.chatConfig.speechToTextSaved',
+    'canvas.chatConfig.speechToTextSaveFailed',
+    'canvas.chatConfig.textToSpeechSaved',
+    'canvas.chatConfig.textToSpeechSaveFailed',
+    'canvas.chatConfig.selectProviderCredentialsFirst',
+    'canvas.chatConfig.loadingVoices',
+    'canvas.chatConfig.chooseVoice',
+    'canvas.chatConfig.automaticallyPlayAudio',
+    'canvas.chatConfig.autoPlayHelp',
+    'canvas.chatConfig.testVoice',
+    'canvas.chatConfig.ttsTestText',
+    'canvas.chatConfig.ttsTestFailed',
+    'canvas.chatConfig.noAudioDataReceived',
+    'canvas.chatConfig.followUpPromptsSaved',
+    'canvas.chatConfig.followUpPromptsSaveFailed',
+    'canvas.chatConfig.enableFollowUpPrompts',
+    'canvas.chatConfig.chatFeedbackSaved',
+    'canvas.chatConfig.chatFeedbackSaveFailed',
+    'canvas.chatConfig.enableChatFeedback',
+    'canvas.chatConfig.allowedOriginsSaved',
+    'canvas.chatConfig.allowedOriginsSaveFailed',
+    'canvas.chatConfig.allowedDomainsHelp',
+    'canvas.chatConfig.domains',
+    'canvas.chatConfig.errorMessage',
+    'canvas.chatConfig.unauthorizedDomainErrorHelp',
+    'canvas.chatConfig.unauthorizedDomainMessage',
+    'canvas.chatConfig.leadsSaved',
+    'canvas.chatConfig.leadsSaveFailed',
+    'canvas.chatConfig.enableLeadCapture',
+    'canvas.chatConfig.formTitle',
+    'canvas.chatConfig.formTitlePlaceholder',
+    'canvas.chatConfig.leadSuccessMessage',
+    'canvas.chatConfig.leadSuccessMessagePlaceholder',
+    'canvas.chatConfig.formFields',
+    'canvas.chatConfig.fileUploadSaved',
+    'canvas.chatConfig.fileUploadSaveFailed',
+    'canvas.chatConfig.fileUploadNotice',
+    'canvas.chatConfig.enableFullFileUpload',
+    'canvas.chatConfig.allowUploadsOfType',
+    'canvas.chatConfig.advancedSettings',
+    'canvas.chatConfig.pdfProcessing',
+    'canvas.chatConfig.oneDocumentPerPage',
+    'canvas.chatConfig.oneDocumentPerFile',
+    'canvas.chatConfig.fileTypeText',
+    'canvas.chatConfig.rateLimitSaved',
+    'canvas.chatConfig.rateLimitSaveFailed',
+    'canvas.chatConfig.rateLimitInputRequired',
+    'canvas.chatConfig.rateLimitHelp',
+    'canvas.chatConfig.enableRateLimit',
+    'canvas.chatConfig.messageLimitPerDuration',
+    'canvas.chatConfig.durationInSeconds',
+    'canvas.chatConfig.limitMessage',
+    'canvas.chatConfig.limitMessagePlaceholder',
+    'canvas.chatConfig.postProcessingSaved',
+    'canvas.chatConfig.postProcessingSaveFailed',
+    'canvas.chatConfig.postProcessingFunction',
+    'canvas.chatConfig.enablePostProcessing',
+    'canvas.chatConfig.jsFunction',
+    'canvas.chatConfig.availableVariables',
+    'canvas.chatConfig.variable',
+    'canvas.chatConfig.rawOutputDescription',
+    'canvas.chatConfig.inputDescription',
+    'canvas.chatConfig.chatHistoryDescription',
+    'canvas.chatConfig.chatflowIdDescription',
+    'canvas.chatConfig.sessionIdDescription',
+    'canvas.chatConfig.chatIdDescription',
+    'canvas.chatConfig.sourceDocumentsDescription',
+    'canvas.chatConfig.usedToolsDescription',
+    'canvas.chatConfig.artifactsDescription',
+    'canvas.chatConfig.fileAnnotationsDescription',
+    'canvas.chatConfig.starterPromptsSaved',
+    'canvas.chatConfig.starterPromptsSaveFailed',
+    'canvas.chatConfig.starterPromptsHint',
+    'canvas.chatConfig.overrideSaved',
+    'canvas.chatConfig.overrideSaveFailed',
+    'canvas.chatConfig.overrideConfiguration',
+    'canvas.chatConfig.overrideHelp',
+    'canvas.chatConfig.enableOverrideConfiguration',
+    'canvas.chatConfig.schema',
+    'canvas.chatConfig.noSchemaAvailable',
+    'canvas.chatConfig.label',
+    'canvas.chatConfig.on',
     'pages.executions.copyId',
     'pages.executions.copied',
     'pages.executions.idCopied',
@@ -1393,5 +1504,104 @@ describe('views long-tail i18n coverage', () => {
         expect(roleDialogSource).not.toContain('Role Name')
         expect(roleDialogSource).not.toContain('Enter role name')
         expect(roleDialogSource).not.toContain('Description of the role')
+    })
+
+    it('localizes B6 chat configuration extension panels', () => {
+        const speechSource = read('ui-component/extended/SpeechToText.jsx')
+        const ttsSource = read('ui-component/extended/TextToSpeech.jsx')
+        const followUpSource = read('ui-component/extended/FollowUpPrompts.jsx')
+        const feedbackSource = read('ui-component/extended/ChatFeedback.jsx')
+        const allowedDomainsSource = read('ui-component/extended/AllowedDomains.jsx')
+        const leadsSource = read('ui-component/extended/Leads.jsx')
+        const fileUploadSource = read('ui-component/extended/FileUpload.jsx')
+        const rateLimitSource = read('ui-component/extended/RateLimit.jsx')
+        const postProcessingSource = read('ui-component/extended/PostProcessing.jsx')
+        const starterPromptsSource = read('ui-component/extended/StarterPrompts.jsx')
+        const overrideSource = read('ui-component/extended/OverrideConfig.jsx')
+
+        expect(speechSource).toContain("message: t('canvas.chatConfig.speechToTextSaved')")
+        expect(speechSource).toContain("t('canvas.chatConfig.speechToTextSaveFailed'")
+        expect(speechSource).toContain("t('canvas.chatConfig.providers')")
+        expect(speechSource).toContain('localizeInputParam')
+        expect(speechSource).not.toContain('Speech To Text Configuration Saved')
+        expect(speechSource).not.toContain('Failed to save Speech To Text Configuration')
+        expect(speechSource).not.toContain('<Typography>Providers</Typography>')
+        expect(speechSource).not.toContain("label: 'Connect Credential'")
+        expect(speechSource).not.toContain("label: 'Language'")
+
+        expect(ttsSource).toContain("message: t('canvas.chatConfig.textToSpeechSaved')")
+        expect(ttsSource).toContain("t('canvas.chatConfig.textToSpeechSaveFailed'")
+        expect(ttsSource).toContain("t('canvas.chatConfig.selectProviderCredentialsFirst')")
+        expect(ttsSource).toContain("t('canvas.chatConfig.loadingVoices')")
+        expect(ttsSource).toContain("t('canvas.chatConfig.automaticallyPlayAudio')")
+        expect(ttsSource).toContain("t('canvas.chatConfig.testVoice')")
+        expect(ttsSource).not.toContain('Text To Speech Configuration Saved')
+        expect(ttsSource).not.toContain('Please select a provider and configure credentials first')
+        expect(ttsSource).not.toContain('Automatically play audio')
+        expect(ttsSource).not.toContain('Test Voice')
+        expect(ttsSource).not.toContain('Loading voices...')
+
+        expect(followUpSource).toContain("message: t('canvas.chatConfig.followUpPromptsSaved')")
+        expect(followUpSource).toContain("t('canvas.chatConfig.enableFollowUpPrompts')")
+        expect(followUpSource).toContain("t('canvas.chatConfig.followUpDefaultPrompt')")
+        expect(followUpSource).not.toContain('Follow-up Prompts configuration saved')
+        expect(followUpSource).not.toContain('Enable Follow-up Prompts')
+        expect(followUpSource).not.toContain('Prompt to generate questions based on the conversation history')
+
+        expect(feedbackSource).toContain("message: t('canvas.chatConfig.chatFeedbackSaved')")
+        expect(feedbackSource).toContain("label={t('canvas.chatConfig.enableChatFeedback')}")
+        expect(feedbackSource).not.toContain('Chat Feedback Settings Saved')
+        expect(feedbackSource).not.toContain('Enable chat feedback')
+
+        expect(allowedDomainsSource).toContain("message: t('canvas.chatConfig.allowedOriginsSaved')")
+        expect(allowedDomainsSource).toContain("t('canvas.chatConfig.allowedDomainsHelp')")
+        expect(allowedDomainsSource).toContain("t('canvas.chatConfig.unauthorizedDomainMessage')")
+        expect(allowedDomainsSource).not.toContain('Allowed Origins Saved')
+        expect(allowedDomainsSource).not.toContain('Your chatbot will only work when used from the following domains.')
+        expect(allowedDomainsSource).not.toContain('Unauthorized domain!')
+
+        expect(leadsSource).toContain("message: t('canvas.chatConfig.leadsSaved')")
+        expect(leadsSource).toContain("label={t('canvas.chatConfig.enableLeadCapture')}")
+        expect(leadsSource).toContain("placeholder={t('canvas.chatConfig.formTitlePlaceholder')}")
+        expect(leadsSource).not.toContain('Leads configuration Saved')
+        expect(leadsSource).not.toContain('Enable Lead Capture')
+        expect(leadsSource).not.toContain('Message after lead captured')
+
+        expect(fileUploadSource).toContain("message: t('canvas.chatConfig.fileUploadSaved')")
+        expect(fileUploadSource).toContain("parser(t('canvas.chatConfig.fileUploadNotice'))")
+        expect(fileUploadSource).toContain("label={t('canvas.chatConfig.enableFullFileUpload')}")
+        expect(fileUploadSource).not.toContain('File Upload Configuration Saved')
+        expect(fileUploadSource).not.toContain('Allow Uploads of Type')
+        expect(fileUploadSource).not.toContain('One document per page')
+
+        expect(rateLimitSource).toContain("throw new Error(t('canvas.chatConfig.rateLimitInputRequired'))")
+        expect(rateLimitSource).toContain("message: t('canvas.chatConfig.rateLimitSaved')")
+        expect(rateLimitSource).toContain("label={t('canvas.chatConfig.enableRateLimit')}")
+        expect(rateLimitSource).not.toContain('Rate Limit Configuration Saved')
+        expect(rateLimitSource).not.toContain('Enable Rate Limit')
+        expect(rateLimitSource).not.toContain('Message Limit per Duration')
+
+        expect(postProcessingSource).toContain("label: t('canvas.chatConfig.postProcessingFunction')")
+        expect(postProcessingSource).toContain("message: t('canvas.chatConfig.postProcessingSaved')")
+        expect(postProcessingSource).toContain("label={t('canvas.chatConfig.enablePostProcessing')}")
+        expect(postProcessingSource).toContain("t('canvas.chatConfig.availableVariables')")
+        expect(postProcessingSource).toContain("t('canvas.chatConfig.rawOutputDescription')")
+        expect(postProcessingSource).not.toContain('Post Processing Settings Saved')
+        expect(postProcessingSource).not.toContain('Enable Post Processing')
+        expect(postProcessingSource).not.toContain('Available Variables')
+        expect(postProcessingSource).not.toContain('The raw output response from the flow')
+
+        expect(starterPromptsSource).toContain("message: t('canvas.chatConfig.starterPromptsSaved')")
+        expect(starterPromptsSource).toContain("t('canvas.chatConfig.starterPromptsHint')")
+        expect(starterPromptsSource).not.toContain('Conversation Starter Prompts Saved')
+        expect(starterPromptsSource).not.toContain('Starter prompts will only be shown when there are no messages on the chat')
+
+        expect(overrideSource).toContain("message: t('canvas.chatConfig.overrideSaved')")
+        expect(overrideSource).toContain("t('canvas.chatConfig.overrideConfiguration')")
+        expect(overrideSource).toContain("label={t('canvas.chatConfig.enableOverrideConfiguration')}")
+        expect(overrideSource).toContain("t('canvas.chatConfig.schema')")
+        expect(overrideSource).not.toContain('Override Configuration Saved')
+        expect(overrideSource).not.toContain('Enable Override Configuration')
+        expect(overrideSource).not.toContain('No schema available')
     })
 })
