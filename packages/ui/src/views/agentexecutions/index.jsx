@@ -21,11 +21,12 @@ import {
     Stack,
     TextField,
     Tooltip,
-    useTheme
+    useTheme,
+    Alert,
+    CircularProgress
 } from '@mui/material'
 
 // project imports
-import ErrorBoundary from '@/ErrorBoundary'
 import ViewHeader from '@/layout/MainLayout/ViewHeader'
 import MainCard from '@/ui-component/cards/MainCard'
 import { Available } from '@/ui-component/rbac/available'
@@ -235,7 +236,10 @@ const AgentExecutions = () => {
     return (
         <MainCard>
             {error ? (
-                <ErrorBoundary error={error} />
+                <Alert severity='error'>
+                    <strong>{t('pages.executions.loadFailed')}</strong>
+                    <Box sx={{ mt: 0.5 }}>{error?.message || t('pages.executions.loadFailedDescription')}</Box>
+                </Alert>
             ) : (
                 <Stack flexDirection='column' sx={{ gap: 3 }}>
                     <ViewHeader title={t('pages.executions.title')} description={t('pages.executions.description')} />
@@ -379,6 +383,13 @@ const AgentExecutions = () => {
                             </Grid>
                         </Grid>
                     </Box>
+
+                    {isLoading && (!executions || executions.length === 0) && (
+                        <Stack sx={{ alignItems: 'center', justifyContent: 'center', py: 6, gap: 2 }} flexDirection='column'>
+                            <CircularProgress size={42} />
+                            <Box color='text.secondary'>{t('pages.executions.loadingExecutions')}</Box>
+                        </Stack>
+                    )}
 
                     {executions?.length > 0 && (
                         <>

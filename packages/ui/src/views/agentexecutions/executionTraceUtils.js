@@ -48,3 +48,38 @@ export const getNodeTraceBadges = (node = {}) => {
 
     return badges
 }
+
+const flattenExecutionNodes = (nodes = []) => {
+    const flattened = []
+
+    nodes.forEach((node) => {
+        flattened.push({
+            id: node.id,
+            label: node.label,
+            name: node.name || node.data?.name,
+            status: node.status,
+            input: node.data?.input,
+            output: node.data?.output,
+            error: node.data?.error,
+            state: node.data?.state
+        })
+
+        flattened.push(...flattenExecutionNodes(node.children || []))
+    })
+
+    return flattened
+}
+
+export const buildExecutionExportPayload = ({ metadata = {}, executionTree = [], exportedAt = new Date().toISOString() } = {}) => ({
+    exportedAt,
+    execution: {
+        id: metadata.id,
+        state: metadata.state,
+        agentflowId: metadata.agentflowId || metadata.agentflow?.id,
+        agentflowName: metadata.agentflowName || metadata.agentflow?.name,
+        sessionId: metadata.sessionId,
+        createdDate: metadata.createdDate,
+        updatedDate: metadata.updatedDate
+    },
+    nodes: flattenExecutionNodes(executionTree)
+})

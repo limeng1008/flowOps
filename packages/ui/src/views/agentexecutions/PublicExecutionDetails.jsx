@@ -59,8 +59,20 @@ const PublicExecutionDetails = () => {
     return (
         <>
             {isLoading ? (
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '80vh' }}>
+                <Box
+                    sx={{
+                        display: 'flex',
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flexDirection: 'column',
+                        gap: 2,
+                        height: '80vh'
+                    }}
+                >
                     <CircularProgress size={60} />
+                    <Typography variant='body1' color='text.secondary'>
+                        {t('pages.executions.loadingExecution')}
+                    </Typography>
                 </Box>
             ) : (
                 <>

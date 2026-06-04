@@ -36,7 +36,8 @@ import {
     IconX,
     IconClock,
     IconCoins,
-    IconCoin
+    IconCoin,
+    IconDownload
 } from '@tabler/icons-react'
 
 // Project imports
@@ -46,7 +47,13 @@ import { NodeExecutionDetails } from '@/views/agentexecutions/NodeExecutionDetai
 import ShareExecutionDialog from './ShareExecutionDialog'
 import { enqueueSnackbar as enqueueSnackbarAction, closeSnackbar as closeSnackbarAction } from '@/store/actions'
 import { useTranslation } from 'react-i18next'
-import { FAILED_STATUSES, STATUS_VARIANT, findFirstFailedNode, getNodeTraceBadges } from './executionTraceUtils'
+import {
+    FAILED_STATUSES,
+    STATUS_VARIANT,
+    buildExecutionExportPayload,
+    findFirstFailedNode,
+    getNodeTraceBadges
+} from './executionTraceUtils'
 
 // API
 import executionsApi from '@/api/executions'
@@ -430,6 +437,38 @@ export const ExecutionDetails = ({ open, isPublic, execution, metadata, onClose,
         setTimeout(() => {
             setCopied(false)
         }, 2000)
+    }
+
+    const buildExportJson = () => JSON.stringify(buildExecutionExportPayload({ metadata: localMetadata, executionTree }), null, 2)
+
+    const copyExecutionJson = () => {
+        navigator.clipboard.writeText(buildExportJson())
+        dispatch(
+            enqueueSnackbarAction({
+                message: t('pages.executions.executionJsonCopied'),
+                options: {
+                    key: new Date().getTime() + Math.random(),
+                    variant: 'success',
+                    action: (key) => (
+                        <Button style={{ color: 'white' }} onClick={() => dispatch(closeSnackbarAction(key))}>
+                            <IconX />
+                        </Button>
+                    )
+                }
+            })
+        )
+    }
+
+    const exportExecutionJson = () => {
+        const blob = new Blob([buildExportJson()], { type: 'application/json' })
+        const downloadUrl = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = downloadUrl
+        link.download = `execution-${localMetadata?.id || 'trace'}.json`
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        window.URL.revokeObjectURL(downloadUrl)
     }
 
     const handleMouseDown = () => {
@@ -921,6 +960,27 @@ export const ExecutionDetails = ({ open, isPublic, execution, metadata, onClose,
                                     onClick={() => setShowShareDialog(true)}
                                     disabled={updateExecutionApi.loading}
                                 />
+                            )}
+
+                            {executionTree.length > 0 && (
+                                <>
+                                    <Chip
+                                        sx={{ ml: 1, pl: 1 }}
+                                        icon={<IconCopy size={15} />}
+                                        variant='outlined'
+                                        label={t('pages.executions.copyExecutionJson')}
+                                        className={'button'}
+                                        onClick={copyExecutionJson}
+                                    />
+                                    <Chip
+                                        sx={{ ml: 1, pl: 1 }}
+                                        icon={<IconDownload size={15} />}
+                                        variant='outlined'
+                                        label={t('pages.executions.exportExecutionJson')}
+                                        className={'button'}
+                                        onClick={exportExecutionJson}
+                                    />
+                                </>
                             )}
 
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', alignContent: 'center' }}>
