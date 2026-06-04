@@ -58,10 +58,10 @@ const Files = () => {
 
     const handleDeleteFile = async (file) => {
         const confirmPayload = {
-            title: `Delete`,
-            description: `Delete ${file.name}? This process cannot be undone.`,
-            confirmButtonName: 'Delete',
-            cancelButtonName: 'Cancel'
+            title: t('pages.files.deleteTitle'),
+            description: t('pages.files.deleteConfirm', { name: file.name }),
+            confirmButtonName: t('common.delete'),
+            cancelButtonName: t('common.cancel')
         }
         const isConfirmed = await confirm(confirmPayload)
 
@@ -70,7 +70,7 @@ const Files = () => {
                 const deleteResponse = await filesApi.deleteFile(file.path)
                 if (deleteResponse?.data) {
                     enqueueSnackbar({
-                        message: 'File deleted',
+                        message: t('pages.files.deleted'),
                         options: {
                             key: new Date().getTime() + Math.random(),
                             variant: 'success',
@@ -145,7 +145,7 @@ const Files = () => {
                                     alt='WorkflowEmptySVG'
                                 />
                             </Box>
-                            <div>No Files Yet</div>
+                            <div>{t('pages.files.noFiles')}</div>
                         </Stack>
                     )}
                 </Stack>

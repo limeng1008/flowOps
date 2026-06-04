@@ -316,7 +316,7 @@ function ShowRoleRow(props) {
                         permissionId={'roles:manage'}
                         disabled={props.role.userCount > 0}
                         color='error'
-                        title={props.role.userCount > 0 ? 'Remove users with the role from Workspace first' : 'Delete'}
+                        title={props.role.userCount > 0 ? t('pages.roles.deleteDisabledTooltip') : t('common.delete')}
                         onClick={() => props.onDeleteClick(props.role)}
                     >
                         <IconTrash />
@@ -326,7 +326,7 @@ function ShowRoleRow(props) {
             <Drawer anchor='right' open={openAssignedUsersDrawer} onClose={() => setOpenAssignedUsersDrawer(false)} sx={{ minWidth: 320 }}>
                 <Box sx={{ p: 4, height: 'auto', width: 650 }}>
                     <Typography sx={{ textAlign: 'left', mb: 2 }} variant='h2'>
-                        Assigned Users
+                        {t('pages.roles.assignedUsers')}
                     </Typography>
                     <TableContainer
                         style={{ display: 'flex', flexDirection: 'row' }}
@@ -556,7 +556,7 @@ const Roles = () => {
                                 startIcon={<IconPlus />}
                                 id='btn_createUser'
                             >
-                                Add Role
+                                {t('pages.roles.addRole')}
                             </StyledPermissionButton>
                         </ViewHeader>
                         {!isLoading && roles.length === 0 ? (
@@ -568,7 +568,7 @@ const Roles = () => {
                                         alt='roles_emptySVG'
                                     />
                                 </Box>
-                                <div>No Roles Yet</div>
+                                <div>{t('pages.roles.noRoles')}</div>
                             </Stack>
                         ) : (
                             <>
@@ -592,7 +592,7 @@ const Roles = () => {
                                                         <StyledTableCell>{t('common.name')}</StyledTableCell>
                                                         <StyledTableCell>{t('common.description')}</StyledTableCell>
                                                         <StyledTableCell>{t('pages.apikey.permissions')}</StyledTableCell>
-                                                        <StyledTableCell>Assigned Users</StyledTableCell>
+                                                        <StyledTableCell>{t('pages.roles.assignedUsers')}</StyledTableCell>
                                                         <StyledTableCell> </StyledTableCell>
                                                     </TableRow>
                                                 </TableHead>

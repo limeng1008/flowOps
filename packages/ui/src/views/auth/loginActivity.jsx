@@ -51,13 +51,13 @@ import { IconChevronLeft, IconChevronRight, IconCircleX, IconLogin, IconLogout }
 import { useError } from '@/store/context/ErrorContext'
 
 const activityTypes = [
-    'Login Success',
-    'Logout Success',
-    'Unknown User',
-    'Incorrect Credential',
-    'User Disabled',
-    'No Assigned Workspace',
-    'Unknown Activity'
+    { code: 0, labelKey: 'pages.loginActivity.loginSuccess' },
+    { code: 1, labelKey: 'pages.loginActivity.logoutSuccess' },
+    { code: -1, labelKey: 'pages.loginActivity.unknownUser' },
+    { code: -2, labelKey: 'pages.loginActivity.incorrectCredential' },
+    { code: -3, labelKey: 'pages.loginActivity.userDisabled' },
+    { code: -4, labelKey: 'pages.loginActivity.noAssignedWorkspace' },
+    { code: -99, labelKey: 'pages.loginActivity.unknownActivity' }
 ]
 const MenuProps = {
     PaperProps: {
@@ -116,17 +116,11 @@ const LoginActivity = () => {
     }
 
     const refreshData = (_page, _start, _end, _filter) => {
-        const activityCodes = []
-        if (_filter.length > 0) {
-            _filter.forEach((type) => {
-                activityCodes.push(getActivityCode(type))
-            })
-        }
         getLoginActivityApi.request({
             pageNo: _page,
             startDate: _start,
             endDate: _end,
-            activityCodes: activityCodes
+            activityCodes: _filter
         })
     }
 
@@ -145,41 +139,22 @@ const LoginActivity = () => {
         refreshData(currentPage, startDate, endDate, newVar)
     }
 
-    function getActivityDescription(activityCode) {
+    function getActivityDescription(t, activityCode) {
         switch (activityCode) {
             case 0:
-                return 'Login Success'
+                return t('pages.loginActivity.loginSuccess')
             case 1:
-                return 'Logout Success'
+                return t('pages.loginActivity.logoutSuccess')
             case -1:
-                return 'Unknown User'
+                return t('pages.loginActivity.unknownUser')
             case -2:
-                return 'Incorrect Credential'
+                return t('pages.loginActivity.incorrectCredential')
             case -3:
-                return 'User Disabled'
+                return t('pages.loginActivity.userDisabled')
             case -4:
-                return 'No Assigned Workspace'
+                return t('pages.loginActivity.noAssignedWorkspace')
             default:
-                return 'Unknown Activity'
-        }
-    }
-
-    function getActivityCode(activityDescription) {
-        switch (activityDescription) {
-            case 'Login Success':
-                return 0
-            case 'Logout Success':
-                return 1
-            case 'Unknown User':
-                return -1
-            case 'Incorrect Credential':
-                return -2
-            case 'User Disabled':
-                return -3
-            case 'No Assigned Workspace':
-                return -4
-            default:
-                return -99
+                return t('pages.loginActivity.unknownActivity')
         }
     }
 
@@ -240,7 +215,7 @@ const LoginActivity = () => {
                                         }}
                                     >
                                         <div style={{ marginRight: 10 }}>
-                                            <b style={{ marginRight: 10 }}>From: </b>
+                                            <b style={{ marginRight: 10 }}>{t('pages.loginActivity.from')} </b>
                                             <DatePicker
                                                 selected={startDate}
                                                 onChange={(date) => onStartDateSelected(date)}
@@ -251,7 +226,7 @@ const LoginActivity = () => {
                                             />
                                         </div>
                                         <div style={{ marginRight: 10 }}>
-                                            <b style={{ marginRight: 10 }}>To: </b>
+                                            <b style={{ marginRight: 10 }}>{t('pages.loginActivity.to')} </b>
                                             <DatePicker
                                                 selected={endDate}
                                                 onChange={(date) => onEndDateSelected(date)}
@@ -275,7 +250,7 @@ const LoginActivity = () => {
                                                 }}
                                             >
                                                 <InputLabel size='small' id='type-label'>
-                                                    Filter By
+                                                    {t('pages.loginActivity.filterBy')}
                                                 </InputLabel>
                                                 <Select
                                                     size='small'
@@ -284,19 +259,21 @@ const LoginActivity = () => {
                                                     value={typeFilter}
                                                     onChange={handleTypeFilterChange}
                                                     id='type-checkbox'
-                                                    input={<OutlinedInput label={t('common.badge')} />}
-                                                    renderValue={(selected) => selected.join(', ')}
+                                                    input={<OutlinedInput label={t('pages.loginActivity.filterBy')} />}
+                                                    renderValue={(selected) =>
+                                                        selected.map((activityCode) => getActivityDescription(t, activityCode)).join(', ')
+                                                    }
                                                     MenuProps={MenuProps}
                                                     sx={SelectStyles}
                                                 >
-                                                    {activityTypes.map((name) => (
+                                                    {activityTypes.map((type) => (
                                                         <MenuItem
-                                                            key={name}
-                                                            value={name}
+                                                            key={type.code}
+                                                            value={type.code}
                                                             sx={{ display: 'flex', alignItems: 'center', gap: 1, p: 1 }}
                                                         >
-                                                            <Checkbox checked={typeFilter.indexOf(name) > -1} sx={{ p: 0 }} />
-                                                            <ListItemText primary={name} />
+                                                            <Checkbox checked={typeFilter.indexOf(type.code) > -1} sx={{ p: 0 }} />
+                                                            <ListItemText primary={getActivityDescription(t, type.code)} />
                                                         </MenuItem>
                                                     ))}
                                                 </Select>
@@ -336,7 +313,11 @@ const LoginActivity = () => {
                                                     }
                                                 />
                                             </IconButton>
-                                            Showing {Math.min(start, totalRecords)}-{end} of {totalRecords} Records
+                                            {t('pages.loginActivity.showingRecords', {
+                                                start: Math.min(start, totalRecords),
+                                                end,
+                                                total: totalRecords
+                                            })}
                                             <IconButton
                                                 size='small'
                                                 onClick={() => changePage(currentPage + 1)}
@@ -374,11 +355,11 @@ const LoginActivity = () => {
                                             }}
                                         >
                                             <TableRow>
-                                                <StyledTableCell>Activity</StyledTableCell>
+                                                <StyledTableCell>{t('pages.loginActivity.activity')}</StyledTableCell>
                                                 <StyledTableCell>{t('profile.user')}</StyledTableCell>
                                                 <StyledTableCell>{t('common.date')}</StyledTableCell>
-                                                <StyledTableCell>Method</StyledTableCell>
-                                                <StyledTableCell>Message</StyledTableCell>
+                                                <StyledTableCell>{t('pages.loginActivity.method')}</StyledTableCell>
+                                                <StyledTableCell>{t('pages.loginActivity.message')}</StyledTableCell>
                                             </TableRow>
                                         </TableHead>
                                         <TableBody>
@@ -477,7 +458,7 @@ const LoginActivity = () => {
                                                                             />
                                                                         )}
                                                                     </div>
-                                                                    <div>{getActivityDescription(item.activityCode)}</div>
+                                                                    <div>{getActivityDescription(t, item.activityCode)}</div>
                                                                 </div>
                                                             </StyledTableCell>
                                                             <StyledTableCell>{item.username}</StyledTableCell>
@@ -485,7 +466,7 @@ const LoginActivity = () => {
                                                                 {moment(item.attemptedDateTime).format('MMMM Do, YYYY, HH:mm')}
                                                             </StyledTableCell>
                                                             <StyledTableCell>
-                                                                {item.loginMode ? item.loginMode : 'Email/Password'}
+                                                                {item.loginMode ? item.loginMode : t('pages.loginActivity.emailPassword')}
                                                             </StyledTableCell>
                                                             <StyledTableCell>{item.message}</StyledTableCell>
                                                         </StyledTableRow>

@@ -36,17 +36,18 @@ import { useTranslation } from 'react-i18next'
 
 // IMPORTANT: when updating this schema, update the schema on the server as well
 // packages/server/src/enterprise/Interface.Enterprise.ts
-const OrgSetupSchema = z
-    .object({
-        username: z.string().min(1, 'Name is required'),
-        email: z.string().min(1, 'Email is required').email('Invalid email address'),
-        password: passwordSchema,
-        confirmPassword: z.string().min(1, 'Confirm Password is required')
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-        message: "Passwords don't match",
-        path: ['confirmPassword']
-    })
+const createOrgSetupSchema = (t) =>
+    z
+        .object({
+            username: z.string().min(1, t('auth.validation.nameRequired')),
+            email: z.string().min(1, t('auth.validation.emailRequired')).email(t('auth.validation.invalidEmail')),
+            password: passwordSchema,
+            confirmPassword: z.string().min(1, t('auth.validation.confirmPasswordRequired'))
+        })
+        .refine((data) => data.password === data.confirmPassword, {
+            message: t('auth.validation.passwordsDontMatch'),
+            path: ['confirmPassword']
+        })
 
 const OrganizationSetupPage = () => {
     const { t } = useTranslation()
@@ -54,35 +55,35 @@ const OrganizationSetupPage = () => {
     const { isEnterpriseLicensed, isOpenSource } = useConfig()
 
     const orgNameInput = {
-        label: 'Organization',
+        label: t('auth.organization'),
         name: 'organization',
         type: 'text',
-        placeholder: 'Acme'
+        placeholder: t('auth.organizationName')
     }
 
     const usernameInput = {
-        label: 'Username',
+        label: t('auth.administratorName'),
         name: 'username',
         type: 'text',
         placeholder: 'John Doe'
     }
 
     const passwordInput = {
-        label: 'Password',
+        label: t('auth.password'),
         name: 'password',
         type: 'password',
         placeholder: '********'
     }
 
     const confirmPasswordInput = {
-        label: 'Confirm Password',
+        label: t('auth.confirmPassword'),
         name: 'confirmPassword',
         type: 'password',
         placeholder: '********'
     }
 
     const emailInput = {
-        label: 'EMail',
+        label: t('auth.email'),
         name: 'email',
         type: 'email',
         placeholder: 'user@company.com'
@@ -107,7 +108,7 @@ const OrganizationSetupPage = () => {
 
     const register = async (event) => {
         event.preventDefault()
-        const result = OrgSetupSchema.safeParse({
+        const result = createOrgSetupSchema(t).safeParse({
             orgName,
             username,
             email,
@@ -147,9 +148,9 @@ const OrganizationSetupPage = () => {
                     : registerAccountApi.error.response.data
             let finalErrMessage = ''
             if (isEnterpriseLicensed) {
-                finalErrMessage = `Error in registering organization. Please contact your administrator. (${errMessage})`
+                finalErrMessage = t('auth.registerOrganizationFailed', { message: errMessage })
             } else {
-                finalErrMessage = `Error in registering account: ${errMessage}`
+                finalErrMessage = t('auth.registerAccountFailed', { message: errMessage })
             }
             setAuthError(finalErrMessage)
             setLoading(false)
@@ -238,12 +239,10 @@ const OrganizationSetupPage = () => {
                         </Alert>
                     )}
                     <Stack sx={{ gap: 1 }}>
-                        <Typography variant='h1'>Setup Account</Typography>
+                        <Typography variant='h1'>{t('auth.setupAccount')}</Typography>
                     </Stack>
                     {(isOpenSource || isEnterpriseLicensed) && (
-                        <Typography variant='caption'>
-                            Account setup does not make any external connections, your data stays securely on your locally hosted server.
-                        </Typography>
+                        <Typography variant='caption'>{t('auth.accountSetupLocalNotice')}</Typography>
                     )}
                     <form onSubmit={register}>
                         <Stack sx={{ width: '100%', flexDirection: 'column', alignItems: 'left', justifyContent: 'center', gap: 2 }}>
@@ -252,13 +251,14 @@ const OrganizationSetupPage = () => {
                                     <Box>
                                         <div style={{ display: 'flex', flexDirection: 'row' }}>
                                             <Typography>
-                                                Organization Name:<span style={{ color: 'red' }}>&nbsp;*</span>
+                                                {t('auth.organizationName')}
+                                                <span style={{ color: 'red' }}>&nbsp;*</span>
                                             </Typography>
                                             <div style={{ flexGrow: 1 }}></div>
                                         </div>
                                         <Input
                                             inputParam={orgNameInput}
-                                            placeholder='Organization Name'
+                                            placeholder={t('auth.organizationName')}
                                             onChange={(newValue) => setOrgName(newValue)}
                                             value={orgName}
                                             showDialog={false}
@@ -266,7 +266,7 @@ const OrganizationSetupPage = () => {
                                     </Box>
                                     <Box>
                                         <Divider>
-                                            <Chip label='Account Administrator' size='small' />
+                                            <Chip label={t('auth.accountAdministrator')} size='small' />
                                         </Divider>
                                     </Box>
                                 </>
@@ -274,7 +274,8 @@ const OrganizationSetupPage = () => {
                             <Box>
                                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                                     <Typography>
-                                        Administrator Name<span style={{ color: 'red' }}>&nbsp;*</span>
+                                        {t('auth.administratorName')}
+                                        <span style={{ color: 'red' }}>&nbsp;*</span>
                                     </Typography>
                                     <div style={{ flexGrow: 1 }}></div>
                                 </div>
@@ -292,7 +293,8 @@ const OrganizationSetupPage = () => {
                             <Box>
                                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                                     <Typography>
-                                        Administrator Email<span style={{ color: 'red' }}>&nbsp;*</span>
+                                        {t('auth.administratorEmail')}
+                                        <span style={{ color: 'red' }}>&nbsp;*</span>
                                     </Typography>
                                     <div style={{ flexGrow: 1 }}></div>
                                 </div>
@@ -334,13 +336,15 @@ const OrganizationSetupPage = () => {
                                     value={confirmPassword}
                                 />
                                 <Typography variant='caption'>
-                                    <i>Reconfirm your password. Must match the password typed above.</i>
+                                    <i>{t('auth.confirmPasswordHint')}</i>
                                 </Typography>
                             </Box>
                             <StyledButton variant='contained' style={{ borderRadius: 12, height: 40, marginRight: 5 }} type='submit'>
                                 {t('auth.signUp')}
                             </StyledButton>
-                            {configuredSsoProviders && configuredSsoProviders.length > 0 && <Divider sx={{ width: '100%' }}>OR</Divider>}
+                            {configuredSsoProviders && configuredSsoProviders.length > 0 && (
+                                <Divider sx={{ width: '100%' }}>{t('auth.or')}</Divider>
+                            )}
                             {configuredSsoProviders &&
                                 configuredSsoProviders.map(
                                     (ssoProvider) =>
@@ -357,7 +361,7 @@ const OrganizationSetupPage = () => {
                                                     </Icon>
                                                 }
                                             >
-                                                Sign Up With Microsoft
+                                                {t('auth.signUpWithMicrosoft')}
                                             </Button>
                                         )
                                 )}
@@ -376,7 +380,7 @@ const OrganizationSetupPage = () => {
                                                     </Icon>
                                                 }
                                             >
-                                                Sign Up With Google
+                                                {t('auth.signUpWithGoogle')}
                                             </Button>
                                         )
                                 )}
@@ -395,7 +399,7 @@ const OrganizationSetupPage = () => {
                                                     </Icon>
                                                 }
                                             >
-                                                Sign Up With Auth0 by Okta
+                                                {t('auth.signUpWithAuth0')}
                                             </Button>
                                         )
                                 )}

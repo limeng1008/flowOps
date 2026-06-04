@@ -40,17 +40,22 @@ DatePickerCustomInput.propTypes = {
 }
 
 const searchTimeRanges = [
-    'Last hour',
-    'Last 4 hours',
-    'Last 24 hours',
-    'Last 2 days',
-    'Last 7 days',
-    'Last 14 days',
-    'Last 1 month',
-    'Last 2 months',
-    'Last 3 months',
-    'Custom'
+    { value: 'lastHour', labelKey: 'pages.logs.lastHour' },
+    { value: 'last4Hours', labelKey: 'pages.logs.last4Hours' },
+    { value: 'last24Hours', labelKey: 'pages.logs.last24Hours' },
+    { value: 'last2Days', labelKey: 'pages.logs.last2Days' },
+    { value: 'last7Days', labelKey: 'pages.logs.last7Days' },
+    { value: 'last14Days', labelKey: 'pages.logs.last14Days' },
+    { value: 'last1Month', labelKey: 'pages.logs.last1Month' },
+    { value: 'last2Months', labelKey: 'pages.logs.last2Months' },
+    { value: 'last3Months', labelKey: 'pages.logs.last3Months' },
+    { value: 'custom', labelKey: 'pages.logs.custom' }
 ]
+
+const getSearchTimeRangeLabel = (t, value) => {
+    const range = searchTimeRanges.find((item) => item.value === value)
+    return range ? t(range.labelKey) : value
+}
 
 const getDateBefore = (unit, value) => {
     const now = new Date()
@@ -127,41 +132,41 @@ const Logs = () => {
 
     const [isLoading, setLoading] = useState(true)
     const [logData, setLogData] = useState('')
-    const [selectedTimeSearch, setSelectedTimeSearch] = useState('Last hour')
+    const [selectedTimeSearch, setSelectedTimeSearch] = useState('lastHour')
     const [startDate, setStartDate] = useState(getDateBefore('hours', 1))
     const [endDate, setEndDate] = useState(new Date())
 
     const handleTimeSelectionChange = (event) => {
         setSelectedTimeSearch(event.target.value)
         switch (event.target.value) {
-            case 'Last hour':
+            case 'lastHour':
                 getLogsApi.request(subtractTime(0, 0, 1), getDateTimeFormatted())
                 break
-            case 'Last 4 hours':
+            case 'last4Hours':
                 getLogsApi.request(subtractTime(0, 0, 4), getDateTimeFormatted())
                 break
-            case 'Last 24 hours':
+            case 'last24Hours':
                 getLogsApi.request(subtractTime(0, 0, 24), getDateTimeFormatted())
                 break
-            case 'Last 2 days':
+            case 'last2Days':
                 getLogsApi.request(subtractTime(0, 2, 0), getDateTimeFormatted())
                 break
-            case 'Last 7 days':
+            case 'last7Days':
                 getLogsApi.request(subtractTime(0, 7, 0), getDateTimeFormatted())
                 break
-            case 'Last 14 days':
+            case 'last14Days':
                 getLogsApi.request(subtractTime(0, 14, 0), getDateTimeFormatted())
                 break
-            case 'Last 1 month':
+            case 'last1Month':
                 getLogsApi.request(subtractTime(1, 0, 0), getDateTimeFormatted())
                 break
-            case 'Last 2 months':
+            case 'last2Months':
                 getLogsApi.request(subtractTime(2, 0, 0), getDateTimeFormatted())
                 break
-            case 'Last 3 months':
+            case 'last3Months':
                 getLogsApi.request(subtractTime(3, 0, 0), getDateTimeFormatted())
                 break
-            case 'Custom':
+            case 'custom':
                 setStartDate(getDateBefore('hours', 1))
                 setEndDate(new Date())
                 getLogsApi.request(subtractTime(0, 0, 1), getDateTimeFormatted())
@@ -236,12 +241,12 @@ const Logs = () => {
                                     onChange={handleTimeSelectionChange}
                                 >
                                     {searchTimeRanges.map((range) => (
-                                        <MenuItem key={range} value={range}>
-                                            {range}
+                                        <MenuItem key={range.value} value={range.value}>
+                                            {getSearchTimeRangeLabel(t, range.value)}
                                         </MenuItem>
                                     ))}
                                 </Select>
-                                {selectedTimeSearch === 'Custom' && (
+                                {selectedTimeSearch === 'custom' && (
                                     <>
                                         <Stack sx={{ alignItems: 'center', justifyContent: 'flex-start', gap: 2 }} flexDirection='row'>
                                             <b>{t('canvas.dialogs.fromDate')}</b>
@@ -260,7 +265,7 @@ const Logs = () => {
                                             />
                                         </Stack>
                                         <Stack sx={{ alignItems: 'center', justifyContent: 'flex-start', gap: 2 }} flexDirection='row'>
-                                            <b>To</b>
+                                            <b>{t('canvas.dialogs.toDate')}</b>
                                             <DatePicker
                                                 selected={endDate}
                                                 onChange={(date) => onEndDateSelected(date)}
@@ -303,7 +308,7 @@ const Logs = () => {
                                             alt='LogsEmptySVG'
                                         />
                                     </Box>
-                                    <div>No Logs Yet</div>
+                                    <div>{t('pages.logs.noLogs')}</div>
                                 </Stack>
                             )}
                         </>

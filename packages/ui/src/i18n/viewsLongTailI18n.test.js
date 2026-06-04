@@ -349,6 +349,101 @@ const requiredKeys = [
     'pages.evaluations.retrieverLatencyMetric',
     'pages.evaluations.toolLatencyMetric',
     'pages.evaluations.llmLatencyMetric',
+    'auth.forbidden',
+    'auth.noPagePermission',
+    'auth.backToHome',
+    'auth.setupAccount',
+    'auth.accountSetupLocalNotice',
+    'auth.organization',
+    'auth.organizationName',
+    'auth.accountAdministrator',
+    'auth.administratorName',
+    'auth.administratorEmail',
+    'auth.confirmPasswordHint',
+    'auth.or',
+    'auth.signUpWithMicrosoft',
+    'auth.signUpWithGoogle',
+    'auth.signUpWithAuth0',
+    'auth.validation.nameRequired',
+    'auth.validation.emailRequired',
+    'auth.validation.invalidEmail',
+    'auth.validation.confirmPasswordRequired',
+    'auth.validation.passwordsDontMatch',
+    'auth.registerOrganizationFailed',
+    'auth.registerAccountFailed',
+    'pages.loginActivity.from',
+    'pages.loginActivity.to',
+    'pages.loginActivity.filterBy',
+    'pages.loginActivity.showingRecords',
+    'pages.loginActivity.activity',
+    'pages.loginActivity.method',
+    'pages.loginActivity.message',
+    'pages.loginActivity.emailPassword',
+    'pages.loginActivity.loginSuccess',
+    'pages.loginActivity.logoutSuccess',
+    'pages.loginActivity.unknownUser',
+    'pages.loginActivity.incorrectCredential',
+    'pages.loginActivity.userDisabled',
+    'pages.loginActivity.noAssignedWorkspace',
+    'pages.loginActivity.unknownActivity',
+    'pages.ssoConfig.enableSsoLogin',
+    'pages.ssoConfig.copyCallbackUrl',
+    'pages.ssoConfig.tenantId',
+    'pages.ssoConfig.clientId',
+    'pages.ssoConfig.clientSecret',
+    'pages.ssoConfig.auth0Domain',
+    'pages.ssoConfig.tenantRequired',
+    'pages.ssoConfig.clientIdRequired',
+    'pages.ssoConfig.clientSecretRequired',
+    'pages.ssoConfig.domainRequired',
+    'pages.ssoConfig.updated',
+    'pages.ssoConfig.updateFailed',
+    'pages.ssoConfig.valid',
+    'pages.ssoConfig.verifyFailed',
+    'pages.ssoConfig.testConfiguration',
+    'pages.roles.addRole',
+    'pages.roles.noRoles',
+    'pages.roles.assignedUsers',
+    'pages.roles.deleteDisabledTooltip',
+    'pages.users.inviteUser',
+    'pages.users.sendInvite',
+    'pages.users.updateInvite',
+    'pages.users.save',
+    'pages.users.deleteTitle',
+    'pages.users.deleteConfirm',
+    'pages.users.removed',
+    'pages.users.deleteFailed',
+    'pages.users.noUsers',
+    'pages.users.emailName',
+    'pages.users.assignedRoles',
+    'pages.users.status',
+    'pages.users.lastLogin',
+    'pages.users.never',
+    'pages.users.organizationOwner',
+    'pages.users.role',
+    'pages.users.editUser',
+    'pages.users.accountStatus',
+    'pages.users.cannotChangeOrgOwnerStatus',
+    'pages.users.updated',
+    'pages.users.updateFailed',
+    'pages.users.statusActive',
+    'pages.users.statusInactive',
+    'pages.users.statusInvited',
+    'pages.files.noFiles',
+    'pages.files.deleteTitle',
+    'pages.files.deleteConfirm',
+    'pages.files.deleted',
+    'pages.logs.noLogs',
+    'pages.logs.lastHour',
+    'pages.logs.last4Hours',
+    'pages.logs.last24Hours',
+    'pages.logs.last2Days',
+    'pages.logs.last7Days',
+    'pages.logs.last14Days',
+    'pages.logs.last1Month',
+    'pages.logs.last2Months',
+    'pages.logs.last3Months',
+    'pages.logs.custom',
     'pages.executions.copyId',
     'pages.executions.copied',
     'pages.executions.idCopied',
@@ -939,5 +1034,147 @@ describe('views long-tail i18n coverage', () => {
         expect(resultDialogSource).not.toContain('Total Cost:')
         expect(resultDialogSource).not.toContain('Total Tokens:')
         expect(resultDialogSource).not.toContain('API Latency:')
+    })
+
+    it('localizes B6 admin residual pages: auth, users, roles, files, logs, and SSO', () => {
+        const unauthorizedSource = read('views/auth/unauthorized.jsx')
+        const loginActivitySource = read('views/auth/loginActivity.jsx')
+        const ssoSource = read('views/auth/ssoConfig.jsx')
+        const organizationSource = read('views/organization/index.jsx')
+        const usersSource = read('views/users/index.jsx')
+        const editUserSource = read('views/users/EditUserDialog.jsx')
+        const rolesSource = read('views/roles/index.jsx')
+        const filesSource = read('views/files/index.jsx')
+        const logsSource = read('views/serverlogs/index.jsx')
+
+        expect(unauthorizedSource).toContain("t('auth.forbidden')")
+        expect(unauthorizedSource).toContain("t('auth.noPagePermission')")
+        expect(unauthorizedSource).toContain("t('auth.backToHome')")
+        expect(unauthorizedSource).not.toContain('403 Forbidden')
+        expect(unauthorizedSource).not.toContain('You do not have permission to access this page.')
+        expect(unauthorizedSource).not.toContain('Back to Home')
+
+        expect(loginActivitySource).toContain('activityTypes')
+        expect(loginActivitySource).toContain('getActivityDescription(t, item.activityCode)')
+        expect(loginActivitySource).toContain("t('pages.loginActivity.from')")
+        expect(loginActivitySource).toContain("t('pages.loginActivity.to')")
+        expect(loginActivitySource).toContain("t('pages.loginActivity.filterBy')")
+        expect(loginActivitySource).toContain("t('pages.loginActivity.showingRecords'")
+        expect(loginActivitySource).toContain("t('pages.loginActivity.activity')")
+        expect(loginActivitySource).toContain("t('pages.loginActivity.method')")
+        expect(loginActivitySource).toContain("t('pages.loginActivity.message')")
+        expect(loginActivitySource).toContain("t('pages.loginActivity.emailPassword')")
+        expect(loginActivitySource).not.toContain('Login Success')
+        expect(loginActivitySource).not.toContain('Filter By')
+        expect(loginActivitySource).not.toContain('Showing {Math.min')
+        expect(loginActivitySource).not.toContain('<StyledTableCell>Activity</StyledTableCell>')
+        expect(loginActivitySource).not.toContain('Email/Password')
+
+        expect(ssoSource).toContain("t('pages.ssoConfig.enableSsoLogin')")
+        expect(ssoSource).toContain("t('pages.ssoConfig.copyCallbackUrl')")
+        expect(ssoSource).toContain("t('pages.ssoConfig.tenantId')")
+        expect(ssoSource).toContain("t('pages.ssoConfig.clientId')")
+        expect(ssoSource).toContain("t('pages.ssoConfig.clientSecret')")
+        expect(ssoSource).toContain("t('pages.ssoConfig.auth0Domain')")
+        expect(ssoSource).toContain("t('pages.ssoConfig.tenantRequired'")
+        expect(ssoSource).toContain("t('pages.ssoConfig.clientIdRequired'")
+        expect(ssoSource).toContain("t('pages.ssoConfig.clientSecretRequired'")
+        expect(ssoSource).toContain("t('pages.ssoConfig.domainRequired'")
+        expect(ssoSource).toContain("message: t('pages.ssoConfig.updated')")
+        expect(ssoSource).toContain("message: t('pages.ssoConfig.updateFailed')")
+        expect(ssoSource).toContain("message: t('pages.ssoConfig.valid'")
+        expect(ssoSource).toContain("message: t('pages.ssoConfig.verifyFailed'")
+        expect(ssoSource).toContain("t('pages.ssoConfig.testConfiguration'")
+        expect(ssoSource).not.toContain('Enable SSO Login')
+        expect(ssoSource).not.toContain('Copy Callback URL')
+        expect(ssoSource).not.toContain('cannot be left blank')
+        expect(ssoSource).not.toContain('SSO Configuration Updated!')
+        expect(ssoSource).not.toContain('Failed to update SSO Configuration.')
+        expect(ssoSource).not.toContain('SSO Configuration is Valid!')
+        expect(ssoSource).not.toContain('Failed to verify')
+        expect(ssoSource).not.toContain("'Test ' + getSelectedProviderName() + ' Configuration'")
+
+        expect(organizationSource).toContain("t('auth.setupAccount')")
+        expect(organizationSource).toContain("t('auth.accountSetupLocalNotice')")
+        expect(organizationSource).toContain("t('auth.organization')")
+        expect(organizationSource).toContain("t('auth.organizationName')")
+        expect(organizationSource).toContain("t('auth.accountAdministrator')")
+        expect(organizationSource).toContain("t('auth.administratorName')")
+        expect(organizationSource).toContain("t('auth.administratorEmail')")
+        expect(organizationSource).toContain("t('auth.confirmPasswordHint')")
+        expect(organizationSource).toContain("t('auth.or')")
+        expect(organizationSource).toContain("t('auth.signUpWithMicrosoft')")
+        expect(organizationSource).toContain("t('auth.signUpWithGoogle')")
+        expect(organizationSource).toContain("t('auth.signUpWithAuth0')")
+        expect(organizationSource).not.toContain('Setup Account')
+        expect(organizationSource).not.toContain('Account setup does not make any external connections')
+        expect(organizationSource).not.toContain('Organization Name:')
+        expect(organizationSource).not.toContain('Account Administrator')
+        expect(organizationSource).not.toContain('Reconfirm your password')
+        expect(organizationSource).not.toContain('Sign Up With Microsoft')
+
+        expect(usersSource).toContain("t('pages.users.inviteUser')")
+        expect(usersSource).toContain("cancelButtonName: t('common.cancel')")
+        expect(usersSource).toContain("confirmButtonName: t('pages.users.sendInvite')")
+        expect(usersSource).toContain("confirmButtonName: t('pages.users.updateInvite')")
+        expect(usersSource).toContain("confirmButtonName: t('pages.users.save')")
+        expect(usersSource).toContain("t('pages.users.deleteConfirm'")
+        expect(usersSource).toContain("message: t('pages.users.removed')")
+        expect(usersSource).toContain("t('pages.users.deleteFailed'")
+        expect(usersSource).toContain("t('pages.users.noUsers')")
+        expect(usersSource).toContain("t('pages.users.emailName')")
+        expect(usersSource).toContain("t('pages.users.assignedRoles')")
+        expect(usersSource).toContain("t('pages.users.status')")
+        expect(usersSource).toContain("t('pages.users.lastLogin')")
+        expect(usersSource).toContain("t('pages.users.never')")
+        expect(usersSource).toContain("t('pages.users.organizationOwner')")
+        expect(usersSource).toContain("t('pages.users.role')")
+        expect(usersSource).toContain('getUserStatusLabel')
+        expect(usersSource).not.toContain('Invite User')
+        expect(usersSource).not.toContain('Send Invite')
+        expect(usersSource).not.toContain('Update Invite')
+        expect(usersSource).not.toContain('Remove ${user.name')
+        expect(usersSource).not.toContain('User removed from organization successfully')
+        expect(usersSource).not.toContain('No Users Yet')
+        expect(usersSource).not.toContain('ORGANIZATION OWNER')
+        expect(usersSource).not.toContain('Assigned Roles')
+        expect(usersSource).not.toContain('Email/Name')
+        expect(usersSource).not.toContain('Last Login')
+        expect(usersSource).not.toContain('Never')
+
+        expect(editUserSource).toContain('getStatusOptions(t)')
+        expect(editUserSource).toContain("message: t('pages.users.updated')")
+        expect(editUserSource).toContain("t('pages.users.updateFailed'")
+        expect(editUserSource).toContain("t('pages.users.editUser')")
+        expect(editUserSource).toContain("t('pages.users.accountStatus')")
+        expect(editUserSource).toContain("t('pages.users.cannotChangeOrgOwnerStatus')")
+        expect(editUserSource).not.toContain('User Details Updated')
+        expect(editUserSource).not.toContain('Edit User')
+        expect(editUserSource).not.toContain('Account Status')
+        expect(editUserSource).not.toContain('Cannot change status of the organization owner!')
+
+        expect(rolesSource).toContain("t('pages.roles.addRole')")
+        expect(rolesSource).toContain("t('pages.roles.noRoles')")
+        expect(rolesSource).toContain("t('pages.roles.assignedUsers')")
+        expect(rolesSource).toContain("t('pages.roles.deleteDisabledTooltip')")
+        expect(rolesSource).not.toContain('Add Role')
+        expect(rolesSource).not.toContain('No Roles Yet')
+        expect(rolesSource).not.toContain('Assigned Users')
+        expect(rolesSource).not.toContain('Remove users with the role from Workspace first')
+
+        expect(filesSource).toContain("t('pages.files.deleteTitle')")
+        expect(filesSource).toContain("t('pages.files.deleteConfirm'")
+        expect(filesSource).toContain("message: t('pages.files.deleted')")
+        expect(filesSource).toContain("t('pages.files.noFiles')")
+        expect(filesSource).not.toContain('No Files Yet')
+        expect(filesSource).not.toContain('File deleted')
+        expect(filesSource).not.toContain('This process cannot be undone.')
+
+        expect(logsSource).toContain('getSearchTimeRangeLabel')
+        expect(logsSource).toContain("t('pages.logs.noLogs')")
+        expect(logsSource).toContain("t('canvas.dialogs.toDate')")
+        expect(logsSource).not.toContain('Last hour')
+        expect(logsSource).not.toContain('No Logs Yet')
+        expect(logsSource).not.toContain('<b>To</b>')
     })
 })

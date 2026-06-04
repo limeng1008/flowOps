@@ -51,6 +51,19 @@ import users_emptySVG from '@/assets/images/users_empty.svg'
 import { useError } from '@/store/context/ErrorContext'
 import { enqueueSnackbar as enqueueSnackbarAction, closeSnackbar as closeSnackbarAction } from '@/store/actions'
 
+const getUserStatusLabel = (t, status) => {
+    switch (status?.toUpperCase()) {
+        case 'ACTIVE':
+            return t('pages.users.statusActive')
+        case 'INVITED':
+            return t('pages.users.statusInvited')
+        case 'INACTIVE':
+            return t('pages.users.statusInactive')
+        default:
+            return status || ''
+    }
+}
+
 function ShowUserRow(props) {
     const { t } = useTranslation()
     const customization = useSelector((state) => state.customization)
@@ -136,7 +149,7 @@ function ShowUserRow(props) {
                         <>
                             {' '}
                             <br />
-                            <Chip size='small' label={'ORGANIZATION OWNER'} />{' '}
+                            <Chip size='small' label={t('pages.users.organizationOwner')} />{' '}
                         </>
                     )}
                 </StyledTableCell>
@@ -153,11 +166,19 @@ function ShowUserRow(props) {
                     </PermissionIconButton>
                 </StyledTableCell>
                 <StyledTableCell>
-                    {'ACTIVE' === props.row.status.toUpperCase() && <Chip color={'success'} label={props.row.status.toUpperCase()} />}
-                    {'INVITED' === props.row.status.toUpperCase() && <Chip color={'warning'} label={props.row.status.toUpperCase()} />}
-                    {'INACTIVE' === props.row.status.toUpperCase() && <Chip color={'error'} label={props.row.status.toUpperCase()} />}
+                    {'ACTIVE' === props.row.status.toUpperCase() && (
+                        <Chip color={'success'} label={getUserStatusLabel(t, props.row.status)} />
+                    )}
+                    {'INVITED' === props.row.status.toUpperCase() && (
+                        <Chip color={'warning'} label={getUserStatusLabel(t, props.row.status)} />
+                    )}
+                    {'INACTIVE' === props.row.status.toUpperCase() && (
+                        <Chip color={'error'} label={getUserStatusLabel(t, props.row.status)} />
+                    )}
                 </StyledTableCell>
-                <StyledTableCell>{!props.row.lastLogin ? 'Never' : moment(props.row.lastLogin).format('DD/MM/YYYY HH:mm')}</StyledTableCell>
+                <StyledTableCell>
+                    {!props.row.lastLogin ? t('pages.users.never') : moment(props.row.lastLogin).format('DD/MM/YYYY HH:mm')}
+                </StyledTableCell>
                 <StyledTableCell>
                     {props.row.status.toUpperCase() === 'INVITED' && (
                         <PermissionIconButton
@@ -188,7 +209,7 @@ function ShowUserRow(props) {
             <Drawer anchor='right' open={open} onClose={() => setOpen(false)} sx={{ minWidth: 320 }}>
                 <Box sx={{ p: 4, height: 'auto', width: 650 }}>
                     <Typography sx={{ textAlign: 'left', mb: 2 }} variant='h2'>
-                        Assigned Roles
+                        {t('pages.users.assignedRoles')}
                     </Typography>
                     <TableContainer
                         style={{ display: 'flex', flexDirection: 'row' }}
@@ -203,7 +224,7 @@ function ShowUserRow(props) {
                                 }}
                             >
                                 <TableRow>
-                                    <StyledTableCell sx={{ width: '50%' }}>Role</StyledTableCell>
+                                    <StyledTableCell sx={{ width: '50%' }}>{t('pages.users.role')}</StyledTableCell>
                                     <StyledTableCell sx={{ width: '50%' }}>{t('permissions.categories.workspace')}</StyledTableCell>
                                 </TableRow>
                             </TableHead>
@@ -275,8 +296,8 @@ const Users = () => {
     const addNew = () => {
         const dialogProp = {
             type: 'ADD',
-            cancelButtonName: 'Cancel',
-            confirmButtonName: 'Send Invite',
+            cancelButtonName: t('common.cancel'),
+            confirmButtonName: t('pages.users.sendInvite'),
             data: null
         }
         setInviteDialogProps(dialogProp)
@@ -294,8 +315,8 @@ const Users = () => {
     const editInvite = (user) => {
         const dialogProp = {
             type: 'EDIT',
-            cancelButtonName: 'Cancel',
-            confirmButtonName: 'Update Invite',
+            cancelButtonName: t('common.cancel'),
+            confirmButtonName: t('pages.users.updateInvite'),
             data: user
         }
         setInviteDialogProps(dialogProp)
@@ -305,8 +326,8 @@ const Users = () => {
     const editUser = (user) => {
         const dialogProp = {
             type: 'EDIT',
-            cancelButtonName: 'Cancel',
-            confirmButtonName: 'Save',
+            cancelButtonName: t('common.cancel'),
+            confirmButtonName: t('pages.users.save'),
             data: user
         }
         setInviteDialogProps(dialogProp)
@@ -315,10 +336,10 @@ const Users = () => {
 
     const deleteUser = async (user) => {
         const confirmPayload = {
-            title: `Delete`,
-            description: `Remove ${user.name ?? user.email} from organization?`,
-            confirmButtonName: 'Delete',
-            cancelButtonName: 'Cancel'
+            title: t('pages.users.deleteTitle'),
+            description: t('pages.users.deleteConfirm', { name: user.name ?? user.email }),
+            confirmButtonName: t('common.delete'),
+            cancelButtonName: t('common.cancel')
         }
         const isConfirmed = await confirm(confirmPayload)
 
@@ -328,7 +349,7 @@ const Users = () => {
                 const deleteResp = await userApi.deleteOrganizationUser(currentUser.activeOrganizationId, user.id)
                 if (deleteResp.data) {
                     enqueueSnackbar({
-                        message: 'User removed from organization successfully',
+                        message: t('pages.users.removed'),
                         options: {
                             key: new Date().getTime() + Math.random(),
                             variant: 'success',
@@ -343,9 +364,9 @@ const Users = () => {
                 }
             } catch (error) {
                 enqueueSnackbar({
-                    message: `Failed to delete User: ${
-                        typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                    }`,
+                    message: t('pages.users.deleteFailed', {
+                        message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                    }),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'error',
@@ -417,7 +438,7 @@ const Users = () => {
                                 startIcon={<IconPlus />}
                                 id='btn_createUser'
                             >
-                                Invite User
+                                {t('pages.users.inviteUser')}
                             </StyledPermissionButton>
                         </ViewHeader>
                         {!isLoading && users.length === 0 ? (
@@ -429,7 +450,7 @@ const Users = () => {
                                         alt='users_emptySVG'
                                     />
                                 </Box>
-                                <div>No Users Yet</div>
+                                <div>{t('pages.users.noUsers')}</div>
                             </Stack>
                         ) : (
                             <>
@@ -451,10 +472,10 @@ const Users = () => {
                                                 >
                                                     <TableRow>
                                                         <StyledTableCell>&nbsp;</StyledTableCell>
-                                                        <StyledTableCell>Email/Name</StyledTableCell>
-                                                        <StyledTableCell>Assigned Roles</StyledTableCell>
-                                                        <StyledTableCell>Status</StyledTableCell>
-                                                        <StyledTableCell>Last Login</StyledTableCell>
+                                                        <StyledTableCell>{t('pages.users.emailName')}</StyledTableCell>
+                                                        <StyledTableCell>{t('pages.users.assignedRoles')}</StyledTableCell>
+                                                        <StyledTableCell>{t('pages.users.status')}</StyledTableCell>
+                                                        <StyledTableCell>{t('pages.users.lastLogin')}</StyledTableCell>
                                                         <StyledTableCell> </StyledTableCell>
                                                     </TableRow>
                                                 </TableHead>

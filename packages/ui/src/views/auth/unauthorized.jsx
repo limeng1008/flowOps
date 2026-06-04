@@ -38,14 +38,14 @@ const UnauthorizedPage = () => {
                             />
                         </Box>
                         <Typography sx={{ mb: 2 }} variant='h4' component='div' fontWeight='bold'>
-                            403 Forbidden
+                            {t('auth.forbidden')}
                         </Typography>
                         <Typography variant='body1' component='div' sx={{ mb: 2 }}>
-                            You do not have permission to access this page.
+                            {t('auth.noPagePermission')}
                         </Typography>
                         {currentUser ? (
                             <Link to='/'>
-                                <StyledButton sx={{ px: 2, py: 1 }}>Back to Home</StyledButton>
+                                <StyledButton sx={{ px: 2, py: 1 }}>{t('auth.backToHome')}</StyledButton>
                             </Link>
                         ) : (
                             <Link to='/login'>
