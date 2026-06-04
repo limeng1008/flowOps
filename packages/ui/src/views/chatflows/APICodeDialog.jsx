@@ -143,7 +143,7 @@ const APICodeDialog = ({ show, dialogProps, onCancel }) => {
 
         const options = [
             {
-                label: 'No Authorization',
+                label: t('pages.chatflows.api.noAuthorization'),
                 name: ''
             }
         ]
@@ -157,13 +157,13 @@ const APICodeDialog = ({ show, dialogProps, onCancel }) => {
 
         if (isGlobal || hasPermission('apikeys:create')) {
             options.push({
-                label: '- Add New Key -',
+                label: t('pages.chatflows.api.addNewKey'),
                 name: 'addnewkey'
             })
         }
 
         return options
-    }, [getAllAPIKeysApi.data, isGlobal, hasPermission])
+    }, [getAllAPIKeysApi.data, isGlobal, hasPermission, t])
 
     const onCheckBoxChanged = (newVal) => {
         setCheckbox(newVal)
@@ -795,11 +795,10 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                         }}
                     >
                         <IconExclamationCircle size={28} color='rgb(116,66,16)' style={{ flexShrink: 0 }} />
-                        <span style={{ color: 'rgb(116,66,16)', marginLeft: 10, fontWeight: 500 }}>
-                            This flow is configured as a <b>Scheduled Trigger</b>. It is fired automatically by the in-process scheduler on
-                            its cron schedule and cannot be invoked via the prediction API. To call this flow from an API, change the Start
-                            node Input Type to <b>Chat Input</b>, <b>Form Input</b>, or <b>Webhook Trigger</b>.
-                        </span>
+                        <span
+                            style={{ color: 'rgb(116,66,16)', marginLeft: 10, fontWeight: 500 }}
+                            dangerouslySetInnerHTML={{ __html: t('pages.chatflows.api.scheduledTriggerNotice') }}
+                        />
                     </div>
                 ) : (
                     <>
@@ -817,21 +816,30 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                                 <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                                     <IconBulb size={28} color='#2d6a4f' />
                                     <span style={{ color: '#2d6a4f', marginLeft: 10, fontWeight: 500 }}>
-                                        This flow is configured as a <b>Webhook Trigger</b>. Send <b>{webhookMethod}</b> requests to{' '}
-                                        <code>/api/v1/webhook/{dialogProps.chatflowid}</code> with Content-Type{' '}
-                                        <code>{webhookContentType}</code>.
+                                        <span
+                                            dangerouslySetInnerHTML={{
+                                                __html: t('pages.chatflows.api.webhookTriggerNotice', {
+                                                    method: webhookMethod,
+                                                    endpoint: `/api/v1/webhook/${dialogProps.chatflowid}`,
+                                                    contentType: webhookContentType
+                                                })
+                                            }}
+                                        />
                                         {webhookEnableAuth && (
                                             <>
                                                 {' '}
-                                                Each request must include a valid signature in the <code>
-                                                    {webhookSignatureHeader}
-                                                </code>{' '}
-                                                header.
+                                                <span
+                                                    dangerouslySetInnerHTML={{
+                                                        __html: t('pages.chatflows.api.webhookSignatureNotice', {
+                                                            header: webhookSignatureHeader
+                                                        })
+                                                    }}
+                                                />
                                             </>
                                         )}{' '}
-                                        Response mode: <b>{webhookResponseMode}</b>
-                                        {webhookResponseMode === 'async' && ' (returns 202 immediately, optional callback POST when done)'}
-                                        {webhookResponseMode === 'stream' && ' (Server-Sent Events stream)'}.
+                                        {t('pages.chatflows.api.responseMode')}: <b>{webhookResponseMode}</b>
+                                        {webhookResponseMode === 'async' && t('pages.chatflows.api.webhookAsyncModeNotice')}
+                                        {webhookResponseMode === 'stream' && t('pages.chatflows.api.webhookStreamModeNotice')}.
                                     </span>
                                 </div>
                             </div>
@@ -863,7 +871,7 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                                         disableClearable={true}
                                         options={keyOptions}
                                         onSelect={(newValue) => onApiKeySelected(newValue)}
-                                        value={dialogProps.chatflowApiKeyId ?? chatflowApiKeyId ?? 'Choose an API key'}
+                                        value={dialogProps.chatflowApiKeyId ?? chatflowApiKeyId ?? t('pages.chatflows.api.chooseApiKey')}
                                     />
                                 </Available>
                             </div>
@@ -873,10 +881,8 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                             <TabPanel key={index} value={value} index={index}>
                                 {(codeLang === 'Embed' || codeLang === 'Share Chatbot') && chatflowApiKeyId && (
                                     <>
-                                        <p>You cannot use API key while embedding/sharing chatbot.</p>
-                                        <p>
-                                            Please select <b>&quot;No Authorization&quot;</b> from the dropdown at the top right corner.
-                                        </p>
+                                        <p>{t('pages.chatflows.api.apiKeyEmbedWarning')}</p>
+                                        <p dangerouslySetInnerHTML={{ __html: t('pages.chatflows.api.selectNoAuthorization') }} />
                                     </>
                                 )}
                                 {codeLang === 'Embed' && !chatflowApiKeyId && <EmbedChat chatflowid={dialogProps.chatflowid} />}
@@ -889,13 +895,14 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                                             showLineNumbers={false}
                                             wrapLines
                                         />
-                                        <CheckboxInput label='Show Override Config' value={checkboxVal} onChange={onCheckBoxChanged} />
+                                        <CheckboxInput
+                                            label={t('pages.chatflows.api.showOverrideConfig')}
+                                            value={checkboxVal}
+                                            onChange={onCheckBoxChanged}
+                                        />
                                         {checkboxVal && getConfigApi.data && getConfigApi.data.length > 0 && (
                                             <>
-                                                <Typography sx={{ mt: 2 }}>
-                                                    You can override existing input configuration of the chatflow with overrideConfig
-                                                    property.
-                                                </Typography>
+                                                <Typography sx={{ mt: 2 }}>{t('pages.chatflows.api.overrideConfigHelp')}</Typography>
                                                 <div
                                                     style={{
                                                         display: 'flex',
@@ -1068,7 +1075,7 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                                         )}
                                         {getIsChatflowStreamingApi.data?.isStreaming && (
                                             <p>
-                                                Read&nbsp;
+                                                {t('pages.chatflows.api.read')}&nbsp;
                                                 <a
                                                     rel='noreferrer'
                                                     target='_blank'
@@ -1076,7 +1083,7 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                                                 >
                                                     {t('common.here')}
                                                 </a>
-                                                &nbsp;on how to stream response back to application
+                                                &nbsp;{t('pages.chatflows.api.streamingHelp')}
                                             </p>
                                         )}
                                     </>

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 
 import { Tabs, Tab, Box } from '@mui/material'
 import { CopyBlock, atomOneDark } from 'react-code-blocks'
+import { useTranslation } from 'react-i18next'
 
 // Project import
 import { CheckboxInput } from '@/ui-component/checkbox/Checkbox'
@@ -286,6 +287,7 @@ const App = () => {
 }
 
 const EmbedChat = ({ chatflowid }) => {
+    const { t } = useTranslation()
     const codes = ['Popup Html', 'Fullpage Html', 'Popup React', 'Fullpage React']
     const [value, setValue] = useState(0)
     const [embedChatCheckboxVal, setEmbedChatCheckbox] = useState(false)
@@ -345,15 +347,15 @@ const EmbedChat = ({ chatflowid }) => {
                     {(value === 0 || value === 1) && (
                         <>
                             <span>
-                                Paste this anywhere in the <code>{`<body>`}</code> tag of your html file.
+                                {t('pages.chatflows.embed.pasteInBody')}
                                 <p>
-                                    You can also specify a&nbsp;
+                                    {t('pages.chatflows.embed.versionHelpPrefix')}&nbsp;
                                     <a
                                         rel='noreferrer'
                                         target='_blank'
                                         href='https://www.npmjs.com/package/flowise-embed?activeTab=versions'
                                     >
-                                        version
+                                        {t('pages.chatflows.embed.version')}
                                     </a>
                                     :&nbsp;<code>{`https://cdn.jsdelivr.net/npm/flowise-embed@<version>/dist/web.js`}</code>
                                 </p>
@@ -363,7 +365,11 @@ const EmbedChat = ({ chatflowid }) => {
                     )}
                     <CopyBlock theme={atomOneDark} text={getCode(codeLang)} language='javascript' showLineNumbers={false} wrapLines />
 
-                    <CheckboxInput label='Show Embed Chat Config' value={embedChatCheckboxVal} onChange={onCheckBoxEmbedChatChanged} />
+                    <CheckboxInput
+                        label={t('pages.chatflows.embed.showConfig')}
+                        value={embedChatCheckboxVal}
+                        onChange={onCheckBoxEmbedChatChanged}
+                    />
 
                     {embedChatCheckboxVal && (
                         <CopyBlock
