@@ -224,7 +224,7 @@ const NodeOutputHandler = ({ outputAnchor, data, disabled = false }) => {
                                     setDropdownValue(newValue)
                                     data.outputs[outputAnchor.name] = newValue
                                 }}
-                                value={data.outputs[outputAnchor.name] ?? outputAnchor.default ?? 'choose an option'}
+                                value={data.outputs[outputAnchor.name] ?? outputAnchor.default ?? t('common.chooseOption')}
                             />
                         </Box>
                     </>

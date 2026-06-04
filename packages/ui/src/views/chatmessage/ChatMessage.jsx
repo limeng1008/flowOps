@@ -204,7 +204,7 @@ const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setP
     const [loading, setLoading] = useState(false)
     const [messages, setMessages] = useState([
         {
-            message: 'Hi there! How can I help?',
+            message: t('pages.chatMessage.defaultGreeting'),
             type: 'apiMessage'
         }
     ])
@@ -829,7 +829,7 @@ const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setP
             inputRef.current?.focus()
         }, 100)
         enqueueSnackbar({
-            message: 'Message stopped',
+            message: t('pages.chatMessage.messageStopped'),
             options: {
                 key: new Date().getTime() + Math.random(),
                 variant: 'success',
@@ -1567,7 +1567,7 @@ const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setP
             setLoading(false)
             setMessages([
                 {
-                    message: 'Hi there! How can I help?',
+                    message: t('pages.chatMessage.defaultGreeting'),
                     type: 'apiMessage'
                 }
             ])

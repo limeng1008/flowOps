@@ -48,21 +48,21 @@ const analyticProviders = [
         url: 'https://smith.langchain.com',
         inputs: [
             {
-                label: 'Connect Credential',
+                labelKey: 'components.analytics.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['langsmithApi']
             },
             {
-                label: 'Project Name',
+                labelKey: 'components.analytics.projectName',
                 name: 'projectName',
                 type: 'string',
                 optional: true,
-                description: 'If not provided, default will be used',
+                descriptionKey: 'components.analytics.defaultDescription',
                 placeholder: 'default'
             },
             {
-                label: 'On/Off',
+                labelKey: 'components.analytics.onOff',
                 name: 'status',
                 type: 'boolean',
                 optional: true
@@ -76,20 +76,20 @@ const analyticProviders = [
         url: 'https://langfuse.com',
         inputs: [
             {
-                label: 'Connect Credential',
+                labelKey: 'components.analytics.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['langfuseApi']
             },
             {
-                label: 'Release',
+                labelKey: 'components.analytics.release',
                 name: 'release',
                 type: 'string',
                 optional: true,
-                description: 'The release number/hash of the application to provide analytics grouped by release'
+                descriptionKey: 'components.analytics.releaseDescription'
             },
             {
-                label: 'On/Off',
+                labelKey: 'components.analytics.onOff',
                 name: 'status',
                 type: 'boolean',
                 optional: true
@@ -103,13 +103,13 @@ const analyticProviders = [
         url: 'https://lunary.ai',
         inputs: [
             {
-                label: 'Connect Credential',
+                labelKey: 'components.analytics.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['lunaryApi']
             },
             {
-                label: 'On/Off',
+                labelKey: 'components.analytics.onOff',
                 name: 'status',
                 type: 'boolean',
                 optional: true
@@ -123,13 +123,13 @@ const analyticProviders = [
         url: 'https://langwatch.ai',
         inputs: [
             {
-                label: 'Connect Credential',
+                labelKey: 'components.analytics.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['langwatchApi']
             },
             {
-                label: 'On/Off',
+                labelKey: 'components.analytics.onOff',
                 name: 'status',
                 type: 'boolean',
                 optional: true
@@ -143,21 +143,21 @@ const analyticProviders = [
         url: 'https://arize.com',
         inputs: [
             {
-                label: 'Connect Credential',
+                labelKey: 'components.analytics.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['arizeApi']
             },
             {
-                label: 'Project Name',
+                labelKey: 'components.analytics.projectName',
                 name: 'projectName',
                 type: 'string',
                 optional: true,
-                description: 'If not provided, default will be used.',
+                descriptionKey: 'components.analytics.defaultDescription',
                 placeholder: 'default'
             },
             {
-                label: 'On/Off',
+                labelKey: 'components.analytics.onOff',
                 name: 'status',
                 type: 'boolean',
                 optional: true
@@ -171,21 +171,21 @@ const analyticProviders = [
         url: 'https://phoenix.arize.com',
         inputs: [
             {
-                label: 'Connect Credential',
+                labelKey: 'components.analytics.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['phoenixApi']
             },
             {
-                label: 'Project Name',
+                labelKey: 'components.analytics.projectName',
                 name: 'projectName',
                 type: 'string',
                 optional: true,
-                description: 'If not provided, default will be used.',
+                descriptionKey: 'components.analytics.defaultDescription',
                 placeholder: 'default'
             },
             {
-                label: 'On/Off',
+                labelKey: 'components.analytics.onOff',
                 name: 'status',
                 type: 'boolean',
                 optional: true
@@ -199,20 +199,20 @@ const analyticProviders = [
         url: 'https://www.comet.com/opik',
         inputs: [
             {
-                label: 'Connect Credential',
+                labelKey: 'components.analytics.connectCredential',
                 name: 'credential',
                 type: 'credential',
                 credentialNames: ['opikApi']
             },
             {
-                label: 'Project Name',
+                labelKey: 'components.analytics.projectName',
                 name: 'opikProjectName',
                 type: 'string',
-                description: 'Name of your Opik project',
+                descriptionKey: 'components.analytics.opikProjectDescription',
                 placeholder: 'default'
             },
             {
-                label: 'On/Off',
+                labelKey: 'components.analytics.onOff',
                 name: 'status',
                 type: 'boolean',
                 optional: true
@@ -241,7 +241,7 @@ const AnalyseFlow = ({ dialogProps }) => {
             })
             if (saveResp.data) {
                 enqueueSnackbar({
-                    message: 'Analytic Configuration Saved',
+                    message: t('components.analytics.configurationSaved'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -256,9 +256,9 @@ const AnalyseFlow = ({ dialogProps }) => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to save Analytic Configuration: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('components.analytics.configurationSaveFailed', {
+                    message: typeof error.response.data === 'object' ? error.response.data.message : error.response.data
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -386,10 +386,13 @@ const AnalyseFlow = ({ dialogProps }) => {
                             <Box key={index} sx={{ p: 2 }}>
                                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                                     <Typography>
-                                        {inputParam.label}
+                                        {inputParam.labelKey ? t(inputParam.labelKey) : inputParam.label}
                                         {!inputParam.optional && <span style={{ color: 'red' }}>&nbsp;*</span>}
-                                        {inputParam.description && (
-                                            <TooltipWithParser style={{ marginLeft: 10 }} title={inputParam.description} />
+                                        {(inputParam.descriptionKey || inputParam.description) && (
+                                            <TooltipWithParser
+                                                style={{ marginLeft: 10 }}
+                                                title={inputParam.descriptionKey ? t(inputParam.descriptionKey) : inputParam.description}
+                                            />
                                         )}
                                     </Typography>
                                 </div>

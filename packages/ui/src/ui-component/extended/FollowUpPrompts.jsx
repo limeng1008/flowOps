@@ -605,7 +605,7 @@ const FollowUpPrompts = ({ dialogProps }) => {
                                                                 followUpPromptsConfig[selectedProvider] &&
                                                                 followUpPromptsConfig[selectedProvider][localizedInputParam.name]
                                                                     ? followUpPromptsConfig[selectedProvider][localizedInputParam.name]
-                                                                    : localizedInputParam.default ?? 'choose an option'
+                                                                    : localizedInputParam.default ?? t('common.chooseOption')
                                                             }
                                                             onSelect={(newValue) =>
                                                                 setValue(newValue, selectedProvider, localizedInputParam.name)
@@ -624,7 +624,7 @@ const FollowUpPrompts = ({ dialogProps }) => {
                                                         followUpPromptsConfig[selectedProvider] &&
                                                         followUpPromptsConfig[selectedProvider][localizedInputParam.name]
                                                             ? followUpPromptsConfig[selectedProvider][localizedInputParam.name]
-                                                            : localizedInputParam.default ?? 'choose an option'
+                                                            : localizedInputParam.default ?? t('common.chooseOption')
                                                     }
                                                 />
                                             )}

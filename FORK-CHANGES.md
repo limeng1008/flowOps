@@ -74,6 +74,7 @@
 | `packages/ui/src/ui-component/grid/Grid.jsx`                                  | UI-i18n-hardening |
 | `packages/ui/src/ui-component/input/suggestionOption.js`                      | UI-i18n-hardening |
 | `packages/ui/src/ui-component/json/SelectVariable.jsx`                        | UI-i18n-hardening |
+| `packages/ui/src/ui-component/markdown/CodeBlock.jsx`                         | UI-i18n-hardening |
 | `packages/ui/src/ui-component/pagination/TablePagination.jsx`                 | UI-i18n-hardening |
 | `packages/ui/src/ui-component/table/DocumentStoreTable.jsx`                   | UI-i18n-hardening |
 | `packages/ui/src/ui-component/table/FlowListTable.jsx`                        | UI-i18n-hardening |
@@ -88,6 +89,7 @@
 | `packages/ui/src/views/agentflowsv2/AgentFlowNode.jsx`                        | UI-i18n-hardening |
 | `packages/ui/src/views/agentflowsv2/ConfigInput.jsx`                          | UI-i18n-hardening |
 | `packages/ui/src/views/agentflowsv2/IterationNode.jsx`                        | UI-i18n-hardening |
+| `packages/ui/src/views/agentflowsv2/MarketplaceCanvas.jsx`                    | UI-i18n-hardening |
 | `packages/ui/src/views/agentflowsv2/index.css`                                | UI-i18n-hardening |
 | `packages/ui/src/views/apikey/APIKeyDialog.jsx`                               | UI-i18n-hardening |
 | `packages/ui/src/views/apikey/index.jsx`                                      | UI-i18n-hardening |
@@ -127,6 +129,7 @@
 | `packages/ui/src/views/chatmessage/ChatMessage.css`                           | UI-i18n-hardening |
 | `packages/ui/src/views/chatmessage/ChatMessage.jsx`                           | UI-i18n-hardening |
 | `packages/ui/src/views/chatmessage/ChatPopUp.jsx`                             | UI-i18n-hardening |
+| `packages/ui/src/views/chatmessage/ValidationPopUp.jsx`                       | UI-i18n-hardening |
 | `packages/ui/src/views/credentials/AddEditCredentialDialog.jsx`               | UI-i18n-hardening |
 | `packages/ui/src/views/credentials/CredentialListDialog.jsx`                  | UI-i18n-hardening |
 | `packages/ui/src/views/credentials/index.jsx`                                 | UI-i18n-hardening |
@@ -144,6 +147,7 @@
 | `packages/ui/src/views/evaluators/evaluatorConstant.js`                       | UI-i18n-hardening |
 | `packages/ui/src/views/evaluators/index.jsx`                                  | UI-i18n-hardening |
 | `packages/ui/src/views/files/index.jsx`                                       | UI-i18n-hardening |
+| `packages/ui/src/views/marketplaces/MarketplaceCanvas.jsx`                    | UI-i18n-hardening |
 | `packages/ui/src/views/marketplaces/MarketplaceCanvasHeader.jsx`              | UI-i18n-hardening |
 | `packages/ui/src/views/marketplaces/MarketplaceCanvasNode.jsx`                | UI-i18n-hardening |
 | `packages/ui/src/views/marketplaces/index.jsx`                                | UI-i18n-hardening |

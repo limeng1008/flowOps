@@ -227,7 +227,7 @@ const AddEditVariableDialog = ({ show, dialogProps, onCancel, onConfirm, setErro
                         name='variableType'
                         options={variableTypes}
                         onSelect={(newValue) => setVariableType(newValue)}
-                        value={variableType ?? 'choose an option'}
+                        value={variableType ?? t('common.chooseOption')}
                         id='dropdown_variableType'
                     />
                 </Box>

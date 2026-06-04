@@ -273,8 +273,8 @@ const NodeInputHandler = ({
             nodes: reactFlowInstance?.getNodes() || [],
             edges: reactFlowInstance?.getEdges() || [],
             nodeId: data.id,
-            confirmButtonName: 'Save',
-            cancelButtonName: 'Cancel'
+            confirmButtonName: t('common.save'),
+            cancelButtonName: t('common.cancel')
         }
         if (inputParam.acceptVariable) {
             setExpandRichDialogProps(dialogProps)
@@ -290,8 +290,8 @@ const NodeInputHandler = ({
             data,
             inputParam,
             disabled,
-            confirmButtonName: 'Save',
-            cancelButtonName: 'Cancel'
+            confirmButtonName: t('common.save'),
+            cancelButtonName: t('common.cancel')
         }
         setConditionDialogProps(dialogProps)
         setShowConditionDialog(true)
@@ -317,8 +317,8 @@ const NodeInputHandler = ({
             relativeLinksMethod,
             limit,
             selectedLinks,
-            confirmButtonName: 'Save',
-            cancelButtonName: 'Cancel'
+            confirmButtonName: t('common.save'),
+            cancelButtonName: t('common.cancel')
         }
         setManageScrapedLinksDialogProps(dialogProps)
         setShowManageScrapedLinksDialog(true)
@@ -567,18 +567,18 @@ const NodeInputHandler = ({
     const editAsyncOption = (inputParamName, inputValue) => {
         if (inputParamName === 'selectedTool') {
             setAsyncOptionEditDialogProps({
-                title: 'Edit Tool',
+                title: t('pages.tools.editTitle'),
                 type: 'EDIT',
-                cancelButtonName: 'Cancel',
-                confirmButtonName: 'Save',
+                cancelButtonName: t('common.cancel'),
+                confirmButtonName: t('common.save'),
                 toolId: inputValue
             })
         } else if (inputParamName === 'selectedAssistant') {
             setAsyncOptionEditDialogProps({
-                title: 'Edit Assistant',
+                title: t('pages.assistants.editTitle'),
                 type: 'EDIT',
-                cancelButtonName: 'Cancel',
-                confirmButtonName: 'Save',
+                cancelButtonName: t('common.cancel'),
+                confirmButtonName: t('common.save'),
                 assistantId: inputValue
             })
         }
@@ -588,17 +588,17 @@ const NodeInputHandler = ({
     const addAsyncOption = (inputParamName) => {
         if (inputParamName === 'selectedTool') {
             setAsyncOptionEditDialogProps({
-                title: 'Add New Tool',
+                title: t('pages.tools.addNewTitle'),
                 type: 'ADD',
-                cancelButtonName: 'Cancel',
-                confirmButtonName: 'Add'
+                cancelButtonName: t('common.cancel'),
+                confirmButtonName: t('common.add')
             })
         } else if (inputParamName === 'selectedAssistant') {
             setAsyncOptionEditDialogProps({
-                title: 'Add New Assistant',
+                title: t('pages.assistants.addNewTitle'),
                 type: 'ADD',
-                cancelButtonName: 'Cancel',
-                confirmButtonName: 'Add'
+                cancelButtonName: t('common.cancel'),
+                confirmButtonName: t('common.add')
             })
         }
         setAsyncOptionEditDialog(inputParamName)
@@ -951,7 +951,7 @@ const NodeInputHandler = ({
                                     variant='outlined'
                                     onClick={() => setIsNvidiaNIMDialogOpen(true)}
                                 >
-                                    Setup NIM Locally
+                                    {t('canvas.nodeInput.setupNimLocally')}
                                 </Button>
                             </>
                         )}
@@ -1380,7 +1380,7 @@ const NodeInputHandler = ({
                                     options={getDropdownOptions(inputParam)}
                                     freeSolo={inputParam.freeSolo}
                                     onSelect={(newValue) => handleDataChange({ inputParam, newValue })}
-                                    value={data.inputs[inputParam.name] ?? inputParam.default ?? 'choose an option'}
+                                    value={data.inputs[inputParam.name] ?? inputParam.default ?? t('common.chooseOption')}
                                 />
                             </div>
                         )}
@@ -1391,7 +1391,7 @@ const NodeInputHandler = ({
                                     name={inputParam.name}
                                     options={getDropdownOptions(inputParam)}
                                     onSelect={(newValue) => handleDataChange({ inputParam, newValue })}
-                                    value={data.inputs[inputParam.name] ?? inputParam.default ?? 'choose an option'}
+                                    value={data.inputs[inputParam.name] ?? inputParam.default ?? []}
                                 />
                             </div>
                         )}
@@ -1406,7 +1406,11 @@ const NodeInputHandler = ({
                                         disabled={disabled}
                                         name={inputParam.name}
                                         nodeData={data}
-                                        value={data.inputs[inputParam.name] ?? inputParam.default ?? 'choose an option'}
+                                        value={
+                                            data.inputs[inputParam.name] ??
+                                            inputParam.default ??
+                                            (inputParam.type === 'asyncMultiOptions' ? [] : t('common.chooseOption'))
+                                        }
                                         freeSolo={inputParam.freeSolo}
                                         multiple={inputParam.type === 'asyncMultiOptions'}
                                         isCreateNewOption={EDITABLE_OPTIONS.includes(inputParam.name)}
@@ -1511,7 +1515,7 @@ const NodeInputHandler = ({
                                             )
                                         }
                                     >
-                                        Manage Links
+                                        {t('pages.documentStores.manageLinks')}
                                     </Button>
                                     <ManageScrapedLinksDialog
                                         show={showManageScrapedLinksDialog}
@@ -1613,7 +1617,7 @@ const NodeInputHandler = ({
                                         }
                                     }
                                 }}
-                                value={selectedTempChatModel?.name ?? 'choose an option'}
+                                value={selectedTempChatModel?.name ?? t('common.chooseOption')}
                             />
                         </Box>
                         {selectedTempChatModel && Object.keys(selectedTempChatModel).length > 0 && (

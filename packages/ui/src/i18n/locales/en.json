@@ -258,6 +258,11 @@
         "apply": "Apply",
         "reset": "Reset",
         "close": "Close",
+        "clear": "Clear",
+        "clearAll": "Clear All",
+        "copy": "Copy",
+        "copied": "Copied!",
+        "info": "Info",
         "date": "Date",
         "selectAll": "Select all",
         "submit": "Submit",
@@ -362,6 +367,34 @@
             "firstMessageContent": "First message content",
             "lastMessageContent": "Last message content",
             "outputFrom": "{{output}} from {{node}}"
+        },
+        "markdown": {
+            "copied": "Copied!"
+        },
+        "feedback": {
+            "additionalTitle": "Provide additional feedback",
+            "responsePlaceholder": "What do you think of the response?",
+            "submit": "Submit Feedback"
+        },
+        "nodeInfo": {
+            "openDocumentation": "Open Documentation"
+        },
+        "analytics": {
+            "connectCredential": "Connect Credential",
+            "projectName": "Project Name",
+            "release": "Release",
+            "onOff": "On/Off",
+            "defaultDescription": "If not provided, default will be used",
+            "releaseDescription": "The release number/hash of the application to provide analytics grouped by release",
+            "opikProjectDescription": "Name of your Opik project",
+            "configurationSaved": "Analytic Configuration Saved",
+            "configurationSaveFailed": "Failed to save Analytic Configuration: {{message}}"
+        },
+        "validation": {
+            "validateNodes": "Validate Nodes",
+            "noIssuesFound": "No issues found in your flow!",
+            "failed": "Failed to validate flow",
+            "checklist": "Checklist ({{count}})"
         }
     },
     "permissions": {
@@ -463,6 +496,10 @@
         "searchNodes": "Search nodes",
         "clearSearch": "Clear Search",
         "syncNodes": "Sync Nodes",
+        "toggleSnapping": "Toggle snapping",
+        "toggleBackground": "Toggle background",
+        "byAuthor": "By {{author}}",
+        "elseBranch": "Else",
         "tabUtilities": "Utilities",
         "untitledChatflow": "Untitled Chatflow",
         "untitledAgentflow": "Untitled Agentflow",
@@ -505,6 +542,9 @@
         "renameDialog": "Rename {{type}}",
         "deleteConfirmTitle": "Delete",
         "deleteConfirmDesc": "Delete {{type}} {{name}}?",
+        "confirmChangeTitle": "Confirm Change",
+        "changedOverwriteConfirm": "{{type}} {{name}} has changed since you opened it. Overwrite changes?",
+        "failedRetrieve": "Failed to retrieve {{type}}: {{message}}",
         "starterPromptsDialog": "Starter Prompts - {{name}}",
         "chatFeedbackDialog": "Chat Feedback - {{name}}",
         "allowedDomainsDialog": "Allowed Domains - {{name}}",
@@ -550,7 +590,8 @@
             "secretCopyFailed": "Failed to copy secret.",
             "regenerateSecret": "Regenerate secret",
             "removeSecret": "Remove secret",
-            "generatedInstructionSetFailed": "Error setting generated instruction"
+            "generatedInstructionSetFailed": "Error setting generated instruction",
+            "setupNimLocally": "Setup NIM Locally"
         },
         "promptGenerator": {
             "placeholder": "Describe your task here",
@@ -921,7 +962,26 @@
                 "pasteInBody": "Paste this anywhere in the <body> tag of your html file.",
                 "versionHelpPrefix": "You can also specify a",
                 "version": "version",
-                "showConfig": "Show Embed Chat Config"
+                "showConfig": "Show Embed Chat Config",
+                "popupHtml": "Popup HTML",
+                "fullpageHtml": "Full-page HTML",
+                "popupReact": "Popup React",
+                "fullpageReact": "Full-page React"
+            },
+            "embedTheme": {
+                "tooltipMessage": "Hi there!",
+                "disclaimerTitle": "Disclaimer",
+                "disclaimerMessage": "By using this chatbot, you agree to the <a target=\"_blank\" href=\"/terms\">Terms & Condition</a>",
+                "startChatting": "Start Chatting",
+                "welcomeMessage": "Hello! This is a custom welcome message",
+                "errorMessage": "This is a custom error message",
+                "backgroundImage": "enter image path or link",
+                "starterPromptBot": "What is a bot?",
+                "starterPromptWho": "Who are you?",
+                "sources": "Sources:",
+                "inputPlaceholder": "Type your question",
+                "maxCharsWarning": "You exceeded the characters limit. Please input less than 50 characters.",
+                "poweredBy": "Powered by"
             },
             "api": {
                 "noAuthorization": "No Authorization",
@@ -940,6 +1000,12 @@
                 "read": "Read",
                 "streamingHelp": "on how to stream response back to application"
             }
+        },
+        "chatMessage": {
+            "defaultGreeting": "Hi there! How can I help?",
+            "messageStopped": "Message stopped",
+            "clearHistoryConfirm": "Are you sure you want to clear all chat history?",
+            "clearHistorySuccess": "Successfully cleared all chat history"
         },
         "agentflows": {
             "title": "Agentflows",
@@ -1223,7 +1289,12 @@
             "typeTool": "Tool",
             "useCases": "Use cases",
             "badges": "Badges",
-            "sharedTemplate": "Shared Template"
+            "sharedTemplate": "Shared Template",
+            "shareCustomTemplate": "Share Custom Template",
+            "deleteCustomTemplateTitle": "Delete",
+            "deleteCustomTemplateConfirm": "Delete Custom Template {{name}}?",
+            "customTemplateDeleted": "Custom Template deleted successfully!",
+            "customTemplateDeleteFailed": "Failed to delete custom template: {{message}}"
         },
         "tools": {
             "title": "Tools",
@@ -1478,6 +1549,10 @@
             "upsertAllChunks": "Upsert All Chunks",
             "retrievalQuery": "Retrieval Query",
             "refresh": "Refresh",
+            "refreshAllLoadersTitle": "Refresh all loaders and upsert all chunks?",
+            "refreshAllLoadersConfirm": "This will re-process all loaders and upsert all chunks. This action might take some time.",
+            "deleteStoreLoadersConfirm": "Delete Store {{name}}? This will delete all the associated loaders and document chunks from the document store.",
+            "deleteStoreLoadersWithVectorConfirm": "Delete Store {{name}}? This will delete all the associated loaders and document chunks from the document store, and remove the actual data from the vector store database.",
             "reprocessAllChunks": "Re-process all loaders and upsert all chunks",
             "previewProcess": "Preview & Process",
             "upsertChunks": "Upsert Chunks",
@@ -1761,7 +1836,11 @@
             "roleNameNoSpaces": "Role name cannot contain spaces.",
             "roleNamePlaceholder": "Enter role name",
             "roleDescription": "Role Description",
-            "roleDescriptionPlaceholder": "Description of the role"
+            "roleDescriptionPlaceholder": "Description of the role",
+            "invite": "Invite",
+            "deleteTitle": "Delete",
+            "deleteConfirm": "Delete Role {{name}}?",
+            "deleted": "Role deleted"
         },
         "workspaces": {
             "title": "Workspaces",

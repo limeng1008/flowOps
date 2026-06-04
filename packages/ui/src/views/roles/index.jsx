@@ -428,8 +428,8 @@ const Roles = () => {
     const addNew = () => {
         const dialogProp = {
             type: 'ADD',
-            cancelButtonName: 'Cancel',
-            confirmButtonName: 'Invite',
+            cancelButtonName: t('common.cancel'),
+            confirmButtonName: t('pages.roles.invite'),
             data: {}
         }
         setDialogProps(dialogProp)
@@ -439,8 +439,8 @@ const Roles = () => {
     const edit = (role) => {
         const dialogProp = {
             type: 'EDIT',
-            cancelButtonName: 'Cancel',
-            confirmButtonName: 'Invite',
+            cancelButtonName: t('common.cancel'),
+            confirmButtonName: t('pages.roles.invite'),
             data: {
                 ...role
             }
@@ -452,8 +452,8 @@ const Roles = () => {
     const view = (role) => {
         const dialogProp = {
             type: 'VIEW',
-            cancelButtonName: 'Cancel',
-            confirmButtonName: 'Invite',
+            cancelButtonName: t('common.cancel'),
+            confirmButtonName: t('pages.roles.invite'),
             data: {
                 ...role
             }
@@ -464,10 +464,10 @@ const Roles = () => {
 
     const deleteRole = async (role) => {
         const confirmPayload = {
-            title: `Delete`,
-            description: `Delete Role ${role.name}?`,
-            confirmButtonName: 'Delete',
-            cancelButtonName: 'Cancel'
+            title: t('pages.roles.deleteTitle'),
+            description: t('pages.roles.deleteConfirm', { name: role.name }),
+            confirmButtonName: t('common.delete'),
+            cancelButtonName: t('common.cancel')
         }
         const isConfirmed = await confirm(confirmPayload)
 
@@ -476,7 +476,7 @@ const Roles = () => {
                 const deleteResp = await roleApi.deleteRole(role.id, currentUser.activeOrganizationId)
                 if (deleteResp.data) {
                     enqueueSnackbar({
-                        message: 'Role deleted',
+                        message: t('pages.roles.deleted'),
                         options: {
                             key: new Date().getTime() + Math.random(),
                             variant: 'success',

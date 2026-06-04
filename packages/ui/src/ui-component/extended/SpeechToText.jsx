@@ -482,7 +482,7 @@ const SpeechToText = ({ dialogProps, onConfirm }) => {
                                         value={
                                             speechToText[selectedProvider]
                                                 ? speechToText[selectedProvider][localizedInputParam.name]
-                                                : localizedInputParam.default ?? 'choose an option'
+                                                : localizedInputParam.default ?? t('common.chooseOption')
                                         }
                                     />
                                 )}

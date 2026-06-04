@@ -388,7 +388,7 @@ const AgentflowGeneratorDialog = ({ show, dialogProps, onCancel, onConfirm }) =>
                                             }
                                         }
                                     }}
-                                    value={selectedChatModel ? selectedChatModel?.name : 'choose an option'}
+                                    value={selectedChatModel?.name ?? t('common.chooseOption')}
                                 />
                             </Box>
                             {selectedChatModel && Object.keys(selectedChatModel).length > 0 && (

@@ -777,7 +777,9 @@ const AddNodes = ({ nodesData, node, isAgentCanvas, isAgentflowv2, onFlowGenerat
                                                                                                         fontWeight: 700
                                                                                                     }}
                                                                                                 >
-                                                                                                    By {node.author}
+                                                                                                    {t('canvas.byAuthor', {
+                                                                                                        author: node.author
+                                                                                                    })}
                                                                                                 </span>
                                                                                             )}
                                                                                         </>

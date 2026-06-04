@@ -88,10 +88,10 @@ const ChatPopUp = ({ chatflowid, isAgentCanvas, onOpenChange }) => {
 
     const clearChat = async () => {
         const confirmPayload = {
-            title: `Clear Chat History`,
-            description: `Are you sure you want to clear all chat history?`,
-            confirmButtonName: 'Clear',
-            cancelButtonName: 'Cancel'
+            title: t('canvas.clearChatHistory'),
+            description: t('pages.chatMessage.clearHistoryConfirm'),
+            confirmButtonName: t('common.clear'),
+            cancelButtonName: t('common.cancel')
         }
         const isConfirmed = await confirm(confirmPayload)
 
@@ -103,7 +103,7 @@ const ChatPopUp = ({ chatflowid, isAgentCanvas, onOpenChange }) => {
                 removeLocalStorageChatHistory(chatflowid)
                 resetChatDialog()
                 enqueueSnackbar({
-                    message: 'Successfully cleared all chat history',
+                    message: t('pages.chatMessage.clearHistorySuccess'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',

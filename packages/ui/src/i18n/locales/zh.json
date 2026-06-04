@@ -258,6 +258,11 @@
         "apply": "应用",
         "reset": "重置",
         "close": "关闭",
+        "clear": "清空",
+        "clearAll": "全部清除",
+        "copy": "复制",
+        "copied": "已复制！",
+        "info": "信息",
         "date": "日期",
         "selectAll": "全选",
         "submit": "提交",
@@ -362,6 +367,34 @@
             "firstMessageContent": "第一条消息内容",
             "lastMessageContent": "最后一条消息内容",
             "outputFrom": "{{node}} 的 {{output}}"
+        },
+        "markdown": {
+            "copied": "已复制！"
+        },
+        "feedback": {
+            "additionalTitle": "补充反馈",
+            "responsePlaceholder": "你觉得这个回复怎么样？",
+            "submit": "提交反馈"
+        },
+        "nodeInfo": {
+            "openDocumentation": "打开文档"
+        },
+        "analytics": {
+            "connectCredential": "连接凭证",
+            "projectName": "项目名称",
+            "release": "版本发布号",
+            "onOff": "开关",
+            "defaultDescription": "未填写时将使用默认值",
+            "releaseDescription": "用于按发布版本聚合分析数据的应用版本号或哈希",
+            "opikProjectDescription": "你的 Opik 项目名称",
+            "configurationSaved": "分析配置已保存",
+            "configurationSaveFailed": "保存分析配置失败：{{message}}"
+        },
+        "validation": {
+            "validateNodes": "校验节点",
+            "noIssuesFound": "当前流程未发现问题！",
+            "failed": "流程校验失败",
+            "checklist": "检查项（{{count}}）"
         }
     },
     "permissions": {
@@ -463,6 +496,10 @@
         "searchNodes": "搜索节点",
         "clearSearch": "清空搜索",
         "syncNodes": "同步节点",
+        "toggleSnapping": "切换网格吸附",
+        "toggleBackground": "切换背景",
+        "byAuthor": "作者：{{author}}",
+        "elseBranch": "否则",
         "tabUtilities": "实用工具",
         "untitledChatflow": "未命名对话流",
         "untitledAgentflow": "未命名智能体流",
@@ -505,6 +542,9 @@
         "renameDialog": "重命名{{type}}",
         "deleteConfirmTitle": "删除",
         "deleteConfirmDesc": "确定删除 {{type}} {{name}} 吗？",
+        "confirmChangeTitle": "确认变更",
+        "changedOverwriteConfirm": "{{type}} {{name}} 在你打开后已经发生变化，是否覆盖这些变更？",
+        "failedRetrieve": "获取{{type}}失败：{{message}}",
         "starterPromptsDialog": "开场提示 - {{name}}",
         "chatFeedbackDialog": "对话反馈 - {{name}}",
         "allowedDomainsDialog": "允许的域名 - {{name}}",
@@ -550,7 +590,8 @@
             "secretCopyFailed": "复制 secret 失败。",
             "regenerateSecret": "重新生成 secret",
             "removeSecret": "移除 secret",
-            "generatedInstructionSetFailed": "写入生成指令失败"
+            "generatedInstructionSetFailed": "写入生成指令失败",
+            "setupNimLocally": "本地设置 NIM"
         },
         "promptGenerator": {
             "placeholder": "描述你的任务",
@@ -921,7 +962,26 @@
                 "pasteInBody": "将这段代码粘贴到 HTML 文件的 <body> 标签内任意位置。",
                 "versionHelpPrefix": "你也可以指定",
                 "version": "版本",
-                "showConfig": "显示嵌入聊天配置"
+                "showConfig": "显示嵌入聊天配置",
+                "popupHtml": "弹窗 HTML",
+                "fullpageHtml": "全页 HTML",
+                "popupReact": "弹窗 React",
+                "fullpageReact": "全页 React"
+            },
+            "embedTheme": {
+                "tooltipMessage": "你好！",
+                "disclaimerTitle": "免责声明",
+                "disclaimerMessage": "使用此聊天机器人即表示你同意 <a target=\"_blank\" href=\"/terms\">条款与条件</a>",
+                "startChatting": "开始对话",
+                "welcomeMessage": "你好！这是自定义欢迎语",
+                "errorMessage": "这是一条自定义错误提示",
+                "backgroundImage": "输入图片路径或链接",
+                "starterPromptBot": "什么是机器人？",
+                "starterPromptWho": "你是谁？",
+                "sources": "来源：",
+                "inputPlaceholder": "输入你的问题",
+                "maxCharsWarning": "你已超出字符限制，请输入少于 50 个字符。",
+                "poweredBy": "技术支持"
             },
             "api": {
                 "noAuthorization": "无需授权",
@@ -940,6 +1000,12 @@
                 "read": "阅读",
                 "streamingHelp": "了解如何将流式响应返回到应用"
             }
+        },
+        "chatMessage": {
+            "defaultGreeting": "你好，有什么我可以帮你？",
+            "messageStopped": "消息已停止",
+            "clearHistoryConfirm": "确定要清空全部聊天历史吗？",
+            "clearHistorySuccess": "聊天历史已清空"
         },
         "agentflows": {
             "title": "智能体流",
@@ -1223,7 +1289,12 @@
             "typeTool": "工具",
             "useCases": "用例",
             "badges": "徽章",
-            "sharedTemplate": "共享模板"
+            "sharedTemplate": "共享模板",
+            "shareCustomTemplate": "分享自定义模板",
+            "deleteCustomTemplateTitle": "删除",
+            "deleteCustomTemplateConfirm": "确定删除自定义模板「{{name}}」吗？",
+            "customTemplateDeleted": "自定义模板已删除！",
+            "customTemplateDeleteFailed": "删除自定义模板失败：{{message}}"
         },
         "tools": {
             "title": "工具",
@@ -1478,6 +1549,10 @@
             "upsertAllChunks": "Upsert 全部片段",
             "retrievalQuery": "检索测试",
             "refresh": "刷新",
+            "refreshAllLoadersTitle": "刷新全部加载器并 Upsert 所有分块？",
+            "refreshAllLoadersConfirm": "这会重新处理所有加载器并 Upsert 所有分块，可能需要一些时间。",
+            "deleteStoreLoadersConfirm": "确定删除文档库 {{name}} 吗？这会删除该文档库下所有关联的加载器和文档分块。",
+            "deleteStoreLoadersWithVectorConfirm": "确定删除文档库 {{name}} 吗？这会删除该文档库下所有关联的加载器和文档分块，并从向量库数据库中移除实际数据。",
             "reprocessAllChunks": "重新处理所有加载器并 Upsert 全部片段",
             "previewProcess": "预览并处理",
             "upsertChunks": "Upsert 片段",
@@ -1761,7 +1836,11 @@
             "roleNameNoSpaces": "角色名称不能包含空格。",
             "roleNamePlaceholder": "输入角色名称",
             "roleDescription": "角色描述",
-            "roleDescriptionPlaceholder": "填写角色描述"
+            "roleDescriptionPlaceholder": "填写角色描述",
+            "invite": "邀请",
+            "deleteTitle": "删除",
+            "deleteConfirm": "确定删除角色「{{name}}」吗？",
+            "deleted": "角色已删除"
         },
         "workspaces": {
             "title": "工作区",

@@ -331,7 +331,7 @@ const DocumentStoreDetails = () => {
     }
 
     const onStoreDelete = (vectorStoreConfig, recordManagerConfig) => {
-        let description = `Delete Store ${getSpecificDocumentStore.data?.name}? This will delete all the associated loaders and document chunks from the document store.`
+        let description = t('pages.documentStores.deleteStoreLoadersConfirm', { name: getSpecificDocumentStore.data?.name })
 
         if (
             recordManagerConfig &&
@@ -339,11 +339,11 @@ const DocumentStoreDetails = () => {
             Object.keys(recordManagerConfig).length > 0 &&
             Object.keys(vectorStoreConfig).length > 0
         ) {
-            description = `Delete Store ${getSpecificDocumentStore.data?.name}? This will delete all the associated loaders and document chunks from the document store, and remove the actual data from the vector store database.`
+            description = t('pages.documentStores.deleteStoreLoadersWithVectorConfirm', { name: getSpecificDocumentStore.data?.name })
         }
 
         const props = {
-            title: `Delete`,
+            title: t('common.delete'),
             description,
             vectorStoreConfig,
             recordManagerConfig,
@@ -356,10 +356,10 @@ const DocumentStoreDetails = () => {
 
     const onStoreRefresh = async (storeId) => {
         const confirmPayload = {
-            title: `Refresh all loaders and upsert all chunks?`,
-            description: `This will re-process all loaders and upsert all chunks. This action might take some time.`,
-            confirmButtonName: 'Refresh',
-            cancelButtonName: 'Cancel'
+            title: t('pages.documentStores.refreshAllLoadersTitle'),
+            description: t('pages.documentStores.refreshAllLoadersConfirm'),
+            confirmButtonName: t('pages.documentStores.refresh'),
+            cancelButtonName: t('common.cancel')
         }
         const isConfirmed = await confirm(confirmPayload)
 
