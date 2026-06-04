@@ -117,6 +117,7 @@
 | `packages/ui/src/views/canvas/NodeOutputHandler.jsx`                          | UI-i18n-hardening |
 | `packages/ui/src/views/canvas/index.css`                                      | UI-i18n-hardening |
 | `packages/ui/src/views/canvas/index.jsx`                                      | UI-i18n-hardening |
+| `packages/ui/src/views/agentflowsv2/Canvas.jsx`                               | UI-i18n-hardening |
 | `packages/ui/src/views/chatflows/APICodeDialog.jsx`                           | UI-i18n-hardening |
 | `packages/ui/src/views/chatflows/EmbedChat.jsx`                               | UI-i18n-hardening |
 | `packages/ui/src/views/chatflows/ShareChatbot.jsx`                            | UI-i18n-hardening |

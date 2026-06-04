@@ -6,6 +6,7 @@ import { useReward } from 'react-rewards'
 
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import {
     REMOVE_DIRTY,
     SET_DIRTY,
@@ -69,6 +70,7 @@ const edgeTypes = { agentFlow: AgentFlowEdge }
 const AgentflowCanvas = () => {
     const theme = useTheme()
     const navigate = useNavigate()
+    const { t } = useTranslation()
     const customization = useSelector((state) => state.customization)
 
     const { state } = useLocation()
@@ -319,7 +321,7 @@ const AgentflowCanvas = () => {
 
             if (nodeData.name === 'startAgentflow' && nodes.find((node) => node.data.name === 'startAgentflow')) {
                 enqueueSnackbar({
-                    message: 'Only one start node is allowed',
+                    message: t('canvas.agentflowErrors.onlyOneStartNode'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'error',
@@ -373,7 +375,7 @@ const AgentflowCanvas = () => {
                     // We can't have nested iteration nodes
                     if (nodeData.name === 'iterationAgentflow') {
                         enqueueSnackbar({
-                            message: 'Nested iteration node is not supported yet',
+                            message: t('canvas.agentflowErrors.nestedIterationUnsupported'),
                             options: {
                                 key: new Date().getTime() + Math.random(),
                                 variant: 'error',
@@ -391,7 +393,7 @@ const AgentflowCanvas = () => {
                     // We can't have human input node inside iteration node
                     if (nodeData.name === 'humanInputAgentflow') {
                         enqueueSnackbar({
-                            message: 'Human input node is not supported inside Iteration node',
+                            message: t('canvas.agentflowErrors.humanInputInsideIterationUnsupported'),
                             options: {
                                 key: new Date().getTime() + Math.random(),
                                 variant: 'error',
@@ -804,7 +806,7 @@ const AgentflowCanvas = () => {
                                         }}
                                         size='small'
                                         aria-label='sync'
-                                        title='Sync Nodes'
+                                        title={t('canvas.syncNodes')}
                                         onClick={() => syncNodes()}
                                     >
                                         <IconRefreshAlert />
