@@ -57,7 +57,9 @@ const calculatePercentage = (count, total) => {
 }
 
 const AccountSettings = () => {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
+    const dateLocale = i18n.resolvedLanguage?.startsWith('zh') || i18n.language?.startsWith('zh') ? 'zh-CN' : 'en-US'
+    const deleteConfirmationValue = t('pages.account.deleteConfirmationText')
     const theme = useTheme()
     const dispatch = useDispatch()
     useNotifier()
@@ -98,6 +100,11 @@ const AccountSettings = () => {
 
     const enqueueSnackbar = (...args) => dispatch(enqueueSnackbarAction(...args))
     const closeSnackbar = (...args) => dispatch(closeSnackbarAction(...args))
+    const resolveApiErrorMessage = (error) => {
+        const responseData = error?.response?.data
+        if (responseData && typeof responseData === 'object') return responseData.message
+        return responseData || error?.message || t('common.error')
+    }
 
     const getUserByIdApi = useApi(userApi.getUserById)
     const getPricingPlansApi = useApi(pricingApi.getPricingPlans)
@@ -209,7 +216,7 @@ const AccountSettings = () => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: 'Failed to access billing portal',
+                message: t('pages.account.failedBillingPortal'),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -238,9 +245,12 @@ const AccountSettings = () => {
                 store.dispatch(userProfileUpdated(payload.user))
                 const pendingMsg =
                     payload.emailChangePending &&
-                    `Check your current email (${payload.user.email}) to confirm the change to ${payload.pendingEmail}.`
+                    t('pages.account.emailChangePending', {
+                        currentEmail: payload.user.email,
+                        pendingEmail: payload.pendingEmail
+                    })
                 enqueueSnackbar({
-                    message: pendingMsg || 'Profile updated',
+                    message: pendingMsg || t('pages.account.profileUpdated'),
                     options: {
                         key: new Date().getTime() + Math.random(),
                         variant: 'success',
@@ -274,9 +284,9 @@ const AccountSettings = () => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to update profile: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('pages.account.failedUpdateProfile', {
+                    message: resolveApiErrorMessage(error)
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -295,10 +305,10 @@ const AccountSettings = () => {
         try {
             const validationErrors = []
             if (!oldPassword) {
-                validationErrors.push('Old Password cannot be left blank')
+                validationErrors.push(t('pages.account.oldPasswordRequired'))
             }
             if (newPassword !== confirmPassword) {
-                validationErrors.push('New Password and Confirm Password do not match')
+                validationErrors.push(t('pages.account.passwordMismatch'))
             }
             const passwordErrors = validatePassword(newPassword)
             if (passwordErrors.length > 0) {
@@ -351,9 +361,9 @@ const AccountSettings = () => {
             }
         } catch (error) {
             enqueueSnackbar({
-                message: `Failed to update password: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('pages.account.failedUpdatePassword', {
+                    message: resolveApiErrorMessage(error)
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -373,7 +383,7 @@ const AccountSettings = () => {
             setIsUpdatingSeats(true)
 
             if (!prorationInfo?.prorationDate) {
-                throw new Error('No proration date available')
+                throw new Error(t('pages.account.noProrationDate'))
             }
 
             await updateAdditionalSeatsApi.request(
@@ -382,7 +392,7 @@ const AccountSettings = () => {
                 prorationInfo.prorationDate
             )
             enqueueSnackbar({
-                message: 'Seats updated successfully',
+                message: t('pages.account.seatsUpdated'),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'success',
@@ -398,9 +408,9 @@ const AccountSettings = () => {
         } catch (error) {
             console.error('Error updating seats:', error)
             enqueueSnackbar({
-                message: `Failed to update seats: ${
-                    typeof error.response.data === 'object' ? error.response.data.message : error.response.data
-                }`,
+                message: t('pages.account.failedUpdateSeats', {
+                    message: resolveApiErrorMessage(error)
+                }),
                 options: {
                     key: new Date().getTime() + Math.random(),
                     variant: 'error',
@@ -473,7 +483,7 @@ const AccountSettings = () => {
                     <>
                         {isCloud && (
                             <>
-                                <SettingsSection title='Subscription & Billing'>
+                                <SettingsSection title={t('pages.account.subscriptionBilling')}>
                                     <Box
                                         sx={{
                                             width: '100%',
@@ -495,7 +505,7 @@ const AccountSettings = () => {
                                         >
                                             {currentPlanTitle && (
                                                 <Stack sx={{ alignItems: 'center' }} flexDirection='row'>
-                                                    <Typography variant='body2'>Current Organization Plan:</Typography>
+                                                    <Typography variant='body2'>{t('pages.account.currentOrganizationPlan')}</Typography>
                                                     <Typography sx={{ ml: 1, color: theme.palette.success.dark }} variant='h3'>
                                                         {currentPlanTitle.toUpperCase()}
                                                     </Typography>
@@ -506,7 +516,7 @@ const AccountSettings = () => {
                                                 variant='body2'
                                                 color='text.secondary'
                                             >
-                                                Update your billing details and subscription
+                                                {t('pages.account.billingSubtitle')}
                                             </Typography>
                                         </Box>
                                         <Box
@@ -529,10 +539,10 @@ const AccountSettings = () => {
                                                 {isBillingLoading ? (
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                         <CircularProgress size={16} color='inherit' />
-                                                        Loading
+                                                        {t('common.loading')}
                                                     </Box>
                                                 ) : (
-                                                    'Billing'
+                                                    t('pages.account.billing')
                                                 )}
                                             </Button>
                                             <Button
@@ -561,12 +571,12 @@ const AccountSettings = () => {
                                                 disabled={!currentUser.isOrganizationAdmin}
                                                 onClick={() => setOpenPricingDialog(true)}
                                             >
-                                                Change Plan
+                                                {t('pages.account.changePlan')}
                                             </Button>
                                         </Box>
                                     </Box>
                                 </SettingsSection>
-                                <SettingsSection title='Seats'>
+                                <SettingsSection title={t('pages.account.seats')}>
                                     <Box
                                         sx={{
                                             width: '100%',
@@ -587,13 +597,13 @@ const AccountSettings = () => {
                                             }}
                                         >
                                             <Stack sx={{ alignItems: 'center' }} flexDirection='row'>
-                                                <Typography variant='body2'>Seats Included in Plan:</Typography>
+                                                <Typography variant='body2'>{t('pages.account.seatsIncludedInPlan')}</Typography>
                                                 <Typography sx={{ ml: 1, color: 'inherit' }} variant='h3'>
                                                     {getAdditionalSeatsQuantityApi.loading ? <CircularProgress size={16} /> : includedSeats}
                                                 </Typography>
                                             </Stack>
                                             <Stack sx={{ alignItems: 'center' }} flexDirection='row'>
-                                                <Typography variant='body2'>Additional Seats Purchased:</Typography>
+                                                <Typography variant='body2'>{t('pages.account.additionalSeatsPurchased')}</Typography>
                                                 <Typography sx={{ ml: 1, color: theme.palette.success.dark }} variant='h3'>
                                                     {getAdditionalSeatsQuantityApi.loading ? (
                                                         <CircularProgress size={16} />
@@ -603,7 +613,7 @@ const AccountSettings = () => {
                                                 </Typography>
                                             </Stack>
                                             <Stack sx={{ alignItems: 'center' }} flexDirection='row'>
-                                                <Typography variant='body2'>Occupied Seats:</Typography>
+                                                <Typography variant='body2'>{t('pages.account.occupiedSeats')}:</Typography>
                                                 <Typography sx={{ ml: 1, color: 'inherit' }} variant='h3'>
                                                     {getAdditionalSeatsQuantityApi.loading ? (
                                                         <CircularProgress size={16} />
@@ -637,7 +647,7 @@ const AccountSettings = () => {
                                                         color='error'
                                                         sx={{ borderRadius: 2, height: 40 }}
                                                     >
-                                                        Remove Seats
+                                                        {t('pages.account.removeSeats')}
                                                     </Button>
                                                 )}
                                             <StyledButton
@@ -650,10 +660,10 @@ const AccountSettings = () => {
                                                         setOpenPricingDialog(true)
                                                     }
                                                 }}
-                                                title='Add Seats is available only for PRO plan'
+                                                title={t('pages.account.addSeatsProOnly')}
                                                 sx={{ borderRadius: 2, height: 40 }}
                                             >
-                                                Add Seats
+                                                {t('pages.account.addSeats')}
                                             </StyledButton>
                                         </Box>
                                     </Box>
@@ -668,7 +678,7 @@ const AccountSettings = () => {
                                     >
                                         <Box sx={{ p: 2.5, borderRight: 1, borderColor: theme.palette.grey[900] + 25 }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                <Typography variant='h3'>Predictions</Typography>
+                                                <Typography variant='h3'>{t('pages.account.predictions')}</Typography>
                                                 <Typography variant='body2' color='text.secondary'>
                                                     {`${usage?.predictions?.usage || 0} / ${usage?.predictions?.limit || 0}`}
                                                 </Typography>
@@ -699,7 +709,7 @@ const AccountSettings = () => {
                                         </Box>
                                         <Box sx={{ p: 2.5 }}>
                                             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                                                <Typography variant='h3'>Storage</Typography>
+                                                <Typography variant='h3'>{t('pages.account.storage')}</Typography>
                                                 <Typography variant='body2' color='text.secondary'>
                                                     {`${(usage?.storage?.usage || 0).toFixed(2)}MB / ${(usage?.storage?.limit || 0).toFixed(
                                                         2
@@ -886,8 +896,7 @@ const AccountSettings = () => {
                                             }}
                                         >
                                             <Typography variant='body2' color='text.secondary'>
-                                                Permanently deletes all your data and cancels your subscription. This action cannot be
-                                                undone.
+                                                {t('pages.account.deleteAccountDescription')}
                                             </Typography>
                                         </Box>
                                         <Box
@@ -910,10 +919,10 @@ const AccountSettings = () => {
                                                 {deleteAccountApi.loading ? (
                                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                                         <CircularProgress size={16} color='inherit' />
-                                                        Deleting...
+                                                        {t('pages.account.deleting')}
                                                     </Box>
                                                 ) : (
-                                                    'Delete your account'
+                                                    t('pages.account.deleteYourAccount')
                                                 )}
                                             </Button>
                                         </Box>
@@ -938,7 +947,7 @@ const AccountSettings = () => {
             )}
             {/* Remove Seats Dialog */}
             <Dialog fullWidth maxWidth='sm' open={openRemoveSeatsDialog} onClose={handleRemoveSeatsDialogClose}>
-                <DialogTitle variant='h4'>Remove Additional Seats</DialogTitle>
+                <DialogTitle variant='h4'>{t('pages.account.removeAdditionalSeats')}</DialogTitle>
                 <DialogContent>
                     <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
                         {emptySeats === 0 ? (
@@ -953,7 +962,7 @@ const AccountSettings = () => {
                                 }}
                             >
                                 <IconAlertCircle size={20} />
-                                You must remove users from your organization before removing seats.
+                                {t('pages.account.removeUsersBeforeSeats')}
                             </Typography>
                         ) : (
                             <Box
@@ -968,18 +977,18 @@ const AccountSettings = () => {
                             >
                                 {/* Occupied Seats */}
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Typography variant='body2'>Occupied Seats</Typography>
+                                    <Typography variant='body2'>{t('pages.account.occupiedSeats')}</Typography>
                                     <Typography variant='body2'>{occupiedSeats}</Typography>
                                 </Box>
 
                                 {/* Empty Seats */}
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Typography variant='body2'>Empty Seats</Typography>
+                                    <Typography variant='body2'>{t('pages.account.emptySeats')}</Typography>
                                     <Typography variant='body2'>{emptySeats}</Typography>
                                 </Box>
 
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                    <Typography variant='body2'>Number of Empty Seats to Remove</Typography>
+                                    <Typography variant='body2'>{t('pages.account.emptySeatsToRemove')}</Typography>
                                     <TextField
                                         size='small'
                                         type='number'
@@ -1015,7 +1024,7 @@ const AccountSettings = () => {
                                         borderTop: `1px solid ${theme.palette.divider}`
                                     }}
                                 >
-                                    <Typography variant='h5'>New Total Seats</Typography>
+                                    <Typography variant='h5'>{t('pages.account.newTotalSeats')}</Typography>
                                     <Typography variant='h5'>{totalSeats - seatsQuantity}</Typography>
                                 </Box>
                             </Box>
@@ -1031,7 +1040,7 @@ const AccountSettings = () => {
                             <CircularProgress size={20} />
                         ) : getCustomerDefaultSourceApi.data?.invoice_settings?.default_payment_method ? (
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, p: 2 }}>
-                                <Typography variant='subtitle2'>Payment Method</Typography>
+                                <Typography variant='subtitle2'>{t('pages.account.paymentMethod')}</Typography>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     {getCustomerDefaultSourceApi.data.invoice_settings.default_payment_method.card && (
                                         <>
@@ -1045,13 +1054,13 @@ const AccountSettings = () => {
                                                     {getCustomerDefaultSourceApi.data.invoice_settings.default_payment_method.card.last4}
                                                 </Typography>
                                                 <Typography color='text.secondary'>
-                                                    (expires{' '}
-                                                    {
-                                                        getCustomerDefaultSourceApi.data.invoice_settings.default_payment_method.card
-                                                            .exp_month
-                                                    }
-                                                    /
-                                                    {getCustomerDefaultSourceApi.data.invoice_settings.default_payment_method.card.exp_year}
+                                                    (
+                                                    {t('pages.account.expires', {
+                                                        month: getCustomerDefaultSourceApi.data.invoice_settings.default_payment_method.card
+                                                            .exp_month,
+                                                        year: getCustomerDefaultSourceApi.data.invoice_settings.default_payment_method.card
+                                                            .exp_year
+                                                    })}
                                                     )
                                                 </Typography>
                                             </Box>
@@ -1063,7 +1072,7 @@ const AccountSettings = () => {
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2 }}>
                                 <Typography color='error' sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <IconAlertCircle size={20} />
-                                    No payment method found
+                                    {t('pages.account.noPaymentMethod')}
                                 </Typography>
                                 <Button
                                     variant='contained'
@@ -1073,7 +1082,7 @@ const AccountSettings = () => {
                                         handleBillingPortalClick()
                                     }}
                                 >
-                                    Add Payment Method in Billing Portal
+                                    {t('pages.account.addPaymentMethodBillingPortal')}
                                 </Button>
                             </Box>
                         )}
@@ -1092,12 +1101,12 @@ const AccountSettings = () => {
                             >
                                 {/* Date Range */}
                                 <Typography variant='body2' color='text.secondary'>
-                                    {new Date(prorationInfo.currentPeriodStart * 1000).toLocaleDateString('en-US', {
+                                    {new Date(prorationInfo.currentPeriodStart * 1000).toLocaleDateString(dateLocale, {
                                         month: 'short',
                                         day: 'numeric'
                                     })}{' '}
                                     -{' '}
-                                    {new Date(prorationInfo.currentPeriodEnd * 1000).toLocaleDateString('en-US', {
+                                    {new Date(prorationInfo.currentPeriodEnd * 1000).toLocaleDateString(dateLocale, {
                                         month: 'short',
                                         day: 'numeric',
                                         year: 'numeric'
@@ -1127,9 +1136,9 @@ const AccountSettings = () => {
                                     }}
                                 >
                                     <Box>
-                                        <Typography variant='body2'>Additional Seats Left (Prorated)</Typography>
+                                        <Typography variant='body2'>{t('pages.account.additionalSeatsLeftProrated')}</Typography>
                                         <Typography variant='caption' color='text.secondary'>
-                                            Qty {purchasedSeats - seatsQuantity}
+                                            {t('pages.account.qty', { count: purchasedSeats - seatsQuantity })}
                                         </Typography>
                                     </Box>
                                     <Box sx={{ textAlign: 'right' }}>
@@ -1137,7 +1146,9 @@ const AccountSettings = () => {
                                             {prorationInfo.currency} {Math.max(0, prorationInfo.additionalSeatsProratedAmount).toFixed(2)}
                                         </Typography>
                                         <Typography variant='caption' color='text.secondary'>
-                                            {prorationInfo.currency} {prorationInfo.seatPerUnitPrice.toFixed(2)} each
+                                            {t('pages.account.each', {
+                                                price: `${prorationInfo.currency} ${prorationInfo.seatPerUnitPrice.toFixed(2)}`
+                                            })}
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -1150,7 +1161,7 @@ const AccountSettings = () => {
                                             alignItems: 'center'
                                         }}
                                     >
-                                        <Typography variant='body2'>Credit balance</Typography>
+                                        <Typography variant='body2'>{t('pages.account.creditBalance')}</Typography>
                                         <Typography
                                             variant='body2'
                                             color={prorationInfo.prorationAmount < 0 ? 'success.main' : 'error.main'}
@@ -1171,7 +1182,7 @@ const AccountSettings = () => {
                                         borderTop: `1px solid ${theme.palette.divider}`
                                     }}
                                 >
-                                    <Typography variant='h5'>Due today</Typography>
+                                    <Typography variant='h5'>{t('pages.account.dueToday')}</Typography>
                                     <Typography variant='h5'>
                                         {prorationInfo.currency} {Math.max(0, prorationInfo.prorationAmount).toFixed(2)}
                                     </Typography>
@@ -1185,7 +1196,7 @@ const AccountSettings = () => {
                                             fontStyle: 'italic'
                                         }}
                                     >
-                                        Your available credit will automatically apply to your next invoice.
+                                        {t('pages.account.creditNextInvoice')}
                                     </Typography>
                                 )}
                             </Box>
@@ -1213,10 +1224,10 @@ const AccountSettings = () => {
                             {isUpdatingSeats ? (
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <CircularProgress size={16} color='inherit' />
-                                    Updating...
+                                    {t('pages.account.updating')}
                                 </Box>
                             ) : (
-                                'Remove Seats'
+                                t('pages.account.removeSeats')
                             )}
                         </Button>
                     </DialogActions>
@@ -1224,7 +1235,7 @@ const AccountSettings = () => {
             </Dialog>
             {/* Add Seats Dialog */}
             <Dialog fullWidth maxWidth='sm' open={openAddSeatsDialog} onClose={handleAddSeatsDialogClose}>
-                <DialogTitle variant='h4'>Add Additional Seats</DialogTitle>
+                <DialogTitle variant='h4'>{t('pages.account.addAdditionalSeats')}</DialogTitle>
                 <DialogContent>
                     <Box sx={{ mt: 2, display: 'flex', flexDirection: 'column', gap: 3 }}>
                         <Box
@@ -1239,24 +1250,24 @@ const AccountSettings = () => {
                         >
                             {/* Occupied Seats */}
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Typography variant='body2'>Occupied Seats</Typography>
+                                <Typography variant='body2'>{t('pages.account.occupiedSeats')}</Typography>
                                 <Typography variant='body2'>{occupiedSeats}</Typography>
                             </Box>
 
                             {/* Included Seats */}
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Typography variant='body2'>Seats Included with Plan</Typography>
+                                <Typography variant='body2'>{t('pages.account.seatsIncludedWithPlan')}</Typography>
                                 <Typography variant='body2'>{includedSeats}</Typography>
                             </Box>
 
                             {/* Additional Seats */}
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Typography variant='body2'>Additional Seats Purchased</Typography>
+                                <Typography variant='body2'>{t('pages.account.additionalSeatsPurchased')}</Typography>
                                 <Typography variant='body2'>{purchasedSeats}</Typography>
                             </Box>
 
                             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Typography variant='body2'>Number of Additional Seats to Add</Typography>
+                                <Typography variant='body2'>{t('pages.account.additionalSeatsToAdd')}</Typography>
                                 <TextField
                                     size='small'
                                     type='number'
@@ -1290,7 +1301,7 @@ const AccountSettings = () => {
                                     borderTop: `1px solid ${theme.palette.divider}`
                                 }}
                             >
-                                <Typography variant='h5'>New Total Seats</Typography>
+                                <Typography variant='h5'>{t('pages.account.newTotalSeats')}</Typography>
                                 <Typography variant='h5'>{totalSeats + seatsQuantity}</Typography>
                             </Box>
                         </Box>
@@ -1305,7 +1316,7 @@ const AccountSettings = () => {
                             <CircularProgress size={20} />
                         ) : getCustomerDefaultSourceApi.data?.invoice_settings?.default_payment_method ? (
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1, p: 2 }}>
-                                <Typography variant='subtitle2'>Payment Method</Typography>
+                                <Typography variant='subtitle2'>{t('pages.account.paymentMethod')}</Typography>
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     {getCustomerDefaultSourceApi.data.invoice_settings.default_payment_method.card && (
                                         <>
@@ -1319,13 +1330,13 @@ const AccountSettings = () => {
                                                     {getCustomerDefaultSourceApi.data.invoice_settings.default_payment_method.card.last4}
                                                 </Typography>
                                                 <Typography color='text.secondary'>
-                                                    (expires{' '}
-                                                    {
-                                                        getCustomerDefaultSourceApi.data.invoice_settings.default_payment_method.card
-                                                            .exp_month
-                                                    }
-                                                    /
-                                                    {getCustomerDefaultSourceApi.data.invoice_settings.default_payment_method.card.exp_year}
+                                                    (
+                                                    {t('pages.account.expires', {
+                                                        month: getCustomerDefaultSourceApi.data.invoice_settings.default_payment_method.card
+                                                            .exp_month,
+                                                        year: getCustomerDefaultSourceApi.data.invoice_settings.default_payment_method.card
+                                                            .exp_year
+                                                    })}
                                                     )
                                                 </Typography>
                                             </Box>
@@ -1337,7 +1348,7 @@ const AccountSettings = () => {
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2 }}>
                                 <Typography color='error' sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <IconAlertCircle size={20} />
-                                    No payment method found
+                                    {t('pages.account.noPaymentMethod')}
                                 </Typography>
                                 <Button
                                     variant='contained'
@@ -1347,7 +1358,7 @@ const AccountSettings = () => {
                                         handleBillingPortalClick()
                                     }}
                                 >
-                                    Add Payment Method in Billing Portal
+                                    {t('pages.account.addPaymentMethodBillingPortal')}
                                 </Button>
                             </Box>
                         )}
@@ -1366,12 +1377,12 @@ const AccountSettings = () => {
                             >
                                 {/* Date Range */}
                                 <Typography variant='body2' color='text.secondary'>
-                                    {new Date(prorationInfo.currentPeriodStart * 1000).toLocaleDateString('en-US', {
+                                    {new Date(prorationInfo.currentPeriodStart * 1000).toLocaleDateString(dateLocale, {
                                         month: 'short',
                                         day: 'numeric'
                                     })}{' '}
                                     -{' '}
-                                    {new Date(prorationInfo.currentPeriodEnd * 1000).toLocaleDateString('en-US', {
+                                    {new Date(prorationInfo.currentPeriodEnd * 1000).toLocaleDateString(dateLocale, {
                                         month: 'short',
                                         day: 'numeric',
                                         year: 'numeric'
@@ -1389,9 +1400,9 @@ const AccountSettings = () => {
                                 {/* Additional Seats */}
                                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <Box>
-                                        <Typography variant='body2'>Additional Seats (Prorated)</Typography>
+                                        <Typography variant='body2'>{t('pages.account.additionalSeatsProrated')}</Typography>
                                         <Typography variant='caption' color='text.secondary'>
-                                            Qty {seatsQuantity + purchasedSeats}
+                                            {t('pages.account.qty', { count: seatsQuantity + purchasedSeats })}
                                         </Typography>
                                     </Box>
                                     <Box sx={{ textAlign: 'right' }}>
@@ -1399,7 +1410,9 @@ const AccountSettings = () => {
                                             {prorationInfo.currency} {prorationInfo.additionalSeatsProratedAmount.toFixed(2)}
                                         </Typography>
                                         <Typography variant='caption' color='text.secondary'>
-                                            {prorationInfo.currency} {prorationInfo.seatPerUnitPrice.toFixed(2)} each
+                                            {t('pages.account.each', {
+                                                price: `${prorationInfo.currency} ${prorationInfo.seatPerUnitPrice.toFixed(2)}`
+                                            })}
                                         </Typography>
                                     </Box>
                                 </Box>
@@ -1407,7 +1420,7 @@ const AccountSettings = () => {
                                 {/* Credit Balance */}
                                 {prorationInfo.creditBalance !== 0 && (
                                     <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                        <Typography variant='body2'>Applied account balance</Typography>
+                                        <Typography variant='body2'>{t('pages.account.appliedAccountBalance')}</Typography>
                                         <Typography variant='body2' color={prorationInfo.creditBalance < 0 ? 'success.main' : 'error.main'}>
                                             {prorationInfo.currency} {prorationInfo.creditBalance.toFixed(2)}
                                         </Typography>
@@ -1424,7 +1437,7 @@ const AccountSettings = () => {
                                         borderTop: `1px solid ${theme.palette.divider}`
                                     }}
                                 >
-                                    <Typography variant='h5'>Due today</Typography>
+                                    <Typography variant='h5'>{t('pages.account.dueToday')}</Typography>
                                     <Typography variant='h5'>
                                         {prorationInfo.currency}{' '}
                                         {Math.max(0, prorationInfo.prorationAmount + prorationInfo.creditBalance).toFixed(2)}
@@ -1439,7 +1452,7 @@ const AccountSettings = () => {
                                             fontStyle: 'italic'
                                         }}
                                     >
-                                        Your available credit will automatically apply to your next invoice.
+                                        {t('pages.account.creditNextInvoice')}
                                     </Typography>
                                 )}
                             </Box>
@@ -1465,10 +1478,10 @@ const AccountSettings = () => {
                             {isUpdatingSeats ? (
                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
                                     <CircularProgress size={16} color='inherit' />
-                                    Updating...
+                                    {t('pages.account.updating')}
                                 </Box>
                             ) : (
-                                'Add Seats'
+                                t('pages.account.addSeats')
                             )}
                         </Button>
                     </DialogActions>
@@ -1489,19 +1502,16 @@ const AccountSettings = () => {
                 <DialogTitle>{t('pages.account.deleteAccount')}</DialogTitle>
                 <DialogContent>
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
-                        <Typography>
-                            This will permanently delete your account and all associated data. Your subscription will be cancelled
-                            immediately and you will be logged out. This action cannot be undone and there is no way to recover your data.
-                        </Typography>
+                        <Typography>{t('pages.account.deleteAccountConfirmDescription')}</Typography>
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
                             <Typography variant='body2'>
-                                To confirm, please type <strong>permanently delete</strong> below:
+                                {t('pages.account.deleteAccountTypePrompt', { confirmation: deleteConfirmationValue })}
                             </Typography>
                             <OutlinedInput
                                 id='deleteConfirmation'
                                 type='text'
                                 fullWidth
-                                placeholder='permanently delete'
+                                placeholder={deleteConfirmationValue}
                                 value={deleteConfirmationText}
                                 onChange={(e) => setDeleteConfirmationText(e.target.value)}
                                 disabled={deleteAccountApi.loading}
@@ -1523,9 +1533,9 @@ const AccountSettings = () => {
                         variant='contained'
                         color='error'
                         onClick={() => deleteAccountApi.request({ confirmationText: deleteConfirmationText })}
-                        disabled={deleteAccountApi.loading || deleteConfirmationText !== 'permanently delete'}
+                        disabled={deleteAccountApi.loading || deleteConfirmationText !== deleteConfirmationValue}
                     >
-                        {deleteAccountApi.loading ? <CircularProgress size={24} color='inherit' /> : 'Confirm'}
+                        {deleteAccountApi.loading ? <CircularProgress size={24} color='inherit' /> : t('pages.account.confirm')}
                     </Button>
                 </DialogActions>
             </Dialog>
