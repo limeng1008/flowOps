@@ -47,3 +47,9 @@
 -   **真机验证通过**：用智谱 `glm-4-flash` 实跑，产出结构化中文营销文案（主题 + 多条 标题/正文/CTA + 话题标签 + AB 建议）——端到端打通（智谱端点/鉴权/请求/结构化输出全对）。
 -   **踩坑修复**：AgentflowV2 表单变量必须 `{{ $form.字段 }}`，裸 `{{ 字段 }}` 静默传空 → LLM 输出空壳；修正营销文案 + PPT Deck Agent（同 bug），测试加 `$form` 守卫。教训：模板结构测试绿 ≠ 运行对，新模板须真机跑一次。
 -   产出《Codex Phase 2 行业模板执行计划》`codex-phase2-templates-plan.md`：4 个 form→LLM 模板（报告 / 会议纪要 / 招聘 JD / 客户邮件），把 `$form` 铁律 + 测试守卫写死；RAG 知识库问答与合同审阅留作单独任务。
+
+## 2026-06-04
+
+-   商业化补全 T3 占位 VI 启动：从 `codex/billing-v1` 切出 `codex/commercialization-v1`，只执行品牌视觉统一，不碰 T1 支付 / T2 工单。
+-   新增 FlowOps 占位 VI：SVG 字标、方形 mark、favicon/PWA 图标、主题品牌 token、全局中文优先字体栈和 `BrandLogo` 统一入口。
+-   新增 `docs/brand/FlowOps-VI.md`，记录色彩、字体、logo 用法、露出点清单和正式 VI 替换步骤。

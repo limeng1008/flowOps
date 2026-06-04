@@ -32,7 +32,7 @@ import AzureSSOLoginIcon from '@/assets/images/microsoft-azure.svg'
 import GoogleSSOLoginIcon from '@/assets/images/google.svg'
 import Auth0SSOLoginIcon from '@/assets/images/auth0.svg'
 import GithubSSOLoginIcon from '@/assets/images/github.svg'
-import FlowOpsLogo from '@/assets/images/flowops_dark.svg'
+import BrandLogo from '@/ui-component/extended/BrandLogo'
 
 // ==============================|| design tokens (FlowOps) ||============================== //
 
@@ -345,12 +345,7 @@ const SignInPage = () => {
                     }}
                 />
                 <Box sx={{ position: 'relative', zIndex: 1 }}>
-                    <img
-                        className='auth-brand-item'
-                        src={FlowOpsLogo}
-                        alt='FlowOps'
-                        style={{ width: 164, height: 'auto', display: 'block' }}
-                    />
+                    <BrandLogo className='auth-brand-item' tone='onDark' width={164} />
                     <Typography
                         className='auth-brand-item'
                         sx={{ mt: 5, color: C.teal, fontSize: '0.82rem', fontWeight: 800, letterSpacing: '0.12em' }}
@@ -452,12 +447,7 @@ const SignInPage = () => {
                     className='auth-anim-item'
                     sx={{ textAlign: 'center', mb: 4, mt: successMessage || authError || authRateLimitError ? 2 : 0 }}
                 >
-                    <Box
-                        component='img'
-                        src={FlowOpsLogo}
-                        alt='FlowOps'
-                        sx={{ width: 156, mb: 2, display: { xs: 'inline-block', md: 'none' } }}
-                    />
+                    <BrandLogo tone='onDark' width={156} sx={{ mb: 2, display: { xs: 'inline-block', md: 'none' } }} />
                     <Typography component='h1' sx={{ fontSize: '2rem', fontWeight: 800, color: C.text }}>
                         {t('auth.welcomeBack')}
                     </Typography>

@@ -15,9 +15,11 @@
 | T1-model-loader   | 让 FlowOps 自有模型列表从 `models.flowops.json` 加载期合并，减少直接改上游 `models.json` 的冲突。       | 保留 `modelLoader.ts` 的本地/URL 加载逻辑，再叠加 FlowOps merge；跑 `cd packages/components && npx jest modelLoader`。                |
 | T4-theme-entry    | 让主题入口读取 fork-owned `_flowops-vars.module.scss`，并尽量保持上游 `_themes-vars.module.scss` 干净。 | 合并上游主题后确认 `packages/ui/src/themes/index.js` 仍导入 `_flowops-vars.module.scss`；跑 `npx jest flowopsThemeVars` 和 UI build。 |
 | Branding-shell    | FlowOps 品牌壳、Logo、HTML 元信息、PWA manifest、启动入口与认证/欢迎体验。                              | 上游更新页面壳时，先取上游结构，再重放 FlowOps Logo/产品名/入口/i18n provider。                                                       |
+| Commercial-brand  | 商业化占位 VI：统一 Logo 入口、favicon/PWA 图标、品牌 token 和官网/登录页露出点。                       | 正式 VI 到位后优先替换 `BrandLogo` 引用的 SVG 与 `_flowops-vars` token，再跑 UI build 与页面截图。                                    |
 | UI-i18n-hardening | 面向中文用户的全量 i18n 包裹、日期/按钮/弹窗/表格/节点文案本地化。                                      | 上游合并后以 locale 为事实源重放 codemod，随后跑 UI i18n tests 和 `pnpm --filter flowise-ui build`。                                  |
 | UI-dependencies   | UI 换皮、动画和 i18n 运行时依赖引入导致的 package/lockfile 变更。                                       | 合并上游依赖时用 pnpm 重新解锁，保留 FlowOps 所需运行时依赖并跑 UI build。                                                            |
 | Components-deps   | 国产模型/导出节点（docx/exceljs 等）引入的 components package 依赖变更。                                | 合并上游依赖时用 pnpm 重新解锁，保留 FlowOps 运行时依赖（docx/exceljs 等），跑 `pnpm --filter flowise-components build` 与节点 jest。 |
+| Billing-center-v1 | 本地计费中台：套餐、订阅、用量、三维度额度拦截、账号页/运营后台入口。                                   | 上游合并后保留 billing service 作为本地权益来源，重跑 `cd packages/server && npx jest billing` 与 UI build。                          |
 
 ## Modified File Ledger
 
@@ -25,10 +27,31 @@
 | ----------------------------------------------------------------------------- | ----------------- |
 | `packages/components/package.json`                                            | Components-deps   |
 | `packages/components/src/modelLoader.ts`                                      | T1-model-loader   |
+| `packages/server/src/controllers/assistants/index.ts`                         | Billing-center-v1 |
+| `packages/server/src/controllers/chatflows/index.ts`                          | Billing-center-v1 |
+| `packages/server/src/database/entities/index.ts`                              | Billing-center-v1 |
+| `packages/server/src/database/migrations/mariadb/index.ts`                    | Billing-center-v1 |
+| `packages/server/src/database/migrations/mysql/index.ts`                      | Billing-center-v1 |
+| `packages/server/src/database/migrations/postgres/index.ts`                   | Billing-center-v1 |
+| `packages/server/src/database/migrations/sqlite/index.ts`                     | Billing-center-v1 |
+| `packages/server/src/enterprise/controllers/organization-user.controller.ts`  | Billing-center-v1 |
+| `packages/server/src/enterprise/services/account.service.ts`                  | Billing-center-v1 |
+| `packages/server/src/routes/index.ts`                                         | Billing-center-v1 |
+| `packages/server/src/services/assistants/index.ts`                            | Billing-center-v1 |
+| `packages/server/src/services/export-import/index.ts`                         | Billing-center-v1 |
+| `packages/server/src/services/predictions/index.ts`                           | Billing-center-v1 |
+| `packages/server/src/utils/buildChatflow.ts`                                  | Billing-center-v1 |
+| `packages/server/src/utils/quotaUsage.ts`                                     | Billing-center-v1 |
 | `packages/ui/index.html`                                                      | Branding-shell    |
 | `packages/ui/package.json`                                                    | UI-dependencies   |
+| `packages/ui/public/favicon-16x16.png`                                        | Commercial-brand  |
+| `packages/ui/public/favicon-32x32.png`                                        | Commercial-brand  |
+| `packages/ui/public/favicon.ico`                                              | Commercial-brand  |
 | `packages/ui/public/index.html`                                               | Branding-shell    |
+| `packages/ui/public/logo192.png`                                              | Commercial-brand  |
+| `packages/ui/public/logo512.png`                                              | Commercial-brand  |
 | `packages/ui/public/manifest.json`                                            | Branding-shell    |
+| `packages/ui/src/config.js`                                                   | Commercial-brand  |
 | `packages/ui/src/ErrorBoundary.jsx`                                           | UI-i18n-hardening |
 | `packages/ui/src/index.jsx`                                                   | Branding-shell    |
 | `packages/ui/src/i18n/locales/en.json`                                        | UI-i18n-hardening |
@@ -51,7 +74,9 @@
 | `packages/ui/src/layout/MainLayout/ViewHeader.jsx`                            | UI-i18n-hardening |
 | `packages/ui/src/menu-items/agentsettings.js`                                 | UI-i18n-hardening |
 | `packages/ui/src/menu-items/customassistant.js`                               | UI-i18n-hardening |
+| `packages/ui/src/menu-items/dashboard.js`                                     | Billing-center-v1 |
 | `packages/ui/src/menu-items/settings.js`                                      | UI-i18n-hardening |
+| `packages/ui/src/routes/MainRoutes.jsx`                                       | Billing-center-v1 |
 | `packages/ui/src/routes/index.jsx`                                            | UI-i18n-hardening |
 | `packages/ui/src/store/context/ErrorContext.jsx`                              | UI-i18n-hardening |
 | `packages/ui/src/themes/index.js`                                             | T4-theme-entry    |

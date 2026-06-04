@@ -1,7 +1,6 @@
-import logo from '@/assets/images/flowops_white.svg'
-import logoDark from '@/assets/images/flowops_dark.svg'
-
 import { useSelector } from 'react-redux'
+
+import BrandLogo from '@/ui-component/extended/BrandLogo'
 
 // ==============================|| LOGO ||============================== //
 
@@ -10,11 +9,7 @@ const Logo = () => {
 
     return (
         <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'row', marginLeft: '10px' }}>
-            <img
-                style={{ objectFit: 'contain', height: 'auto', width: 150 }}
-                src={customization.isDarkMode ? logoDark : logo}
-                alt='FlowOps'
-            />
+            <BrandLogo tone={customization.isDarkMode ? 'onDark' : 'onLight'} width={150} />
         </div>
     )
 }

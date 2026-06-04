@@ -15,7 +15,7 @@ import {
 } from '@tabler/icons-react'
 
 import { SUPPORTED_LANGUAGES } from '@/i18n'
-import FlowOpsLogo from '@/assets/images/flowops_dark.svg'
+import BrandLogo from '@/ui-component/extended/BrandLogo'
 import AgentGraphImage from '@/assets/images/agentgraph.png'
 import ChatHistoryImage from '@/assets/images/chathistory.png'
 import SharingImage from '@/assets/images/sharing.png'
@@ -328,7 +328,7 @@ const LandingPage = () => {
                     WebkitBackdropFilter: 'blur(14px)'
                 }}
             >
-                <Box component='img' src={FlowOpsLogo} alt='FlowOps' sx={{ width: { xs: 136, md: 158 }, height: 'auto' }} />
+                <BrandLogo tone='onDark' width={{ xs: 136, md: 158 }} />
                 <Stack direction='row' spacing={{ xs: 1, md: 2 }} sx={{ alignItems: 'center' }}>
                     <Button
                         onClick={scrollToCases}

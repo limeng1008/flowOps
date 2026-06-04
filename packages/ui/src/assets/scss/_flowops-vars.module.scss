@@ -1,15 +1,33 @@
-// FlowOps fork-owned theme palette.
+// FlowOps fork-owned theme palette and placeholder VI tokens.
 // Keep upstream _themes-vars.module.scss as close to pristine as possible.
+
+// brand
+$brandPrimary: #7c3aed;
+$brandPrimaryHover: #6d28d9;
+$brandPrimaryActive: #5b21b6;
+$brandPrimarySoft: #ede9fe;
+$brandSecondary: #14b8a6;
+$brandSecondaryHover: #0f766e;
+$brandAccent: #fbbf24;
+$brandSuccess: #16a34a;
+$brandWarning: #f59e0b;
+$brandDanger: #dc2626;
+$brandInk: #0f172a;
+$brandCanvas: #08111f;
+$brandRadiusSm: 6px;
+$brandRadiusMd: 8px;
+$brandRadiusLg: 12px;
+$brandFontFamily: 'Inter', 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
 
 // paper & background
 $paper: #ffffff;
 
 // primary
-$primaryLight: #e0f2fe;
-$primaryMain: #0284c7;
-$primaryDark: #0369a1;
-$primary200: #7dd3fc;
-$primary800: #075985;
+$primaryLight: #ede9fe;
+$primaryMain: #7c3aed;
+$primaryDark: #6d28d9;
+$primary200: #c4b5fd;
+$primary800: #4c1d95;
 
 // secondary
 $secondaryLight: #ccfbf1;
@@ -19,30 +37,30 @@ $secondary200: #5eead4;
 $secondary800: #115e59;
 
 // success Colors
-$successLight: #cdf5d8;
-$success200: #69f0ae;
-$successMain: #00e676;
-$successDark: #00c853;
+$successLight: #dcfce7;
+$success200: #86efac;
+$successMain: #16a34a;
+$successDark: #15803d;
 
 // error
-$errorLight: #f3d2d2;
-$errorMain: #f44336;
-$errorDark: #c62828;
+$errorLight: #fee2e2;
+$errorMain: #dc2626;
+$errorDark: #991b1b;
 
 // orange
 $orangeLight: #fbe9e7;
 $orangeMain: #ffab91;
 $orangeDark: #d84315;
 
-// brown
+// teal
 $tealLight: #99f6e4;
 $tealMain: #14b8a6;
 $tealDark: #0f766e;
 
 // warning
-$warningLight: #fff8e1;
-$warningMain: #ffe57f;
-$warningDark: #ffc107;
+$warningLight: #fef3c7;
+$warningMain: #f59e0b;
+$warningDark: #b45309;
 
 // grey
 $grey50: #fafafa;
@@ -69,11 +87,11 @@ $darkLevel1: #111827; // level 1
 $darkLevel2: #172033; // level 2
 
 // primary dark
-$darkPrimaryLight: #101827;
-$darkPrimaryMain: #101827;
+$darkPrimaryLight: #111827;
+$darkPrimaryMain: #111827;
 $darkPrimaryDark: #08111f;
-$darkPrimary200: #c8d7ee;
-$darkPrimary800: #1e293b;
+$darkPrimary200: #c4b5fd;
+$darkPrimary800: #312e81;
 
 // secondary dark
 $darkSecondaryLight: #115e59;
@@ -92,6 +110,24 @@ $darkTextSecondary: #8492c4;
 :export {
     // paper & background
     paper: $paper;
+
+    // brand
+    brandPrimary: $brandPrimary;
+    brandPrimaryHover: $brandPrimaryHover;
+    brandPrimaryActive: $brandPrimaryActive;
+    brandPrimarySoft: $brandPrimarySoft;
+    brandSecondary: $brandSecondary;
+    brandSecondaryHover: $brandSecondaryHover;
+    brandAccent: $brandAccent;
+    brandSuccess: $brandSuccess;
+    brandWarning: $brandWarning;
+    brandDanger: $brandDanger;
+    brandInk: $brandInk;
+    brandCanvas: $brandCanvas;
+    brandRadiusSm: $brandRadiusSm;
+    brandRadiusMd: $brandRadiusMd;
+    brandRadiusLg: $brandRadiusLg;
+    brandFontFamily: $brandFontFamily;
 
     // primary
     primaryLight: $primaryLight;

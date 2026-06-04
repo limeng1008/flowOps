@@ -11,7 +11,9 @@ describe('FlowOps theme variables', () => {
         expect(fs.existsSync(flowopsVarsPath)).toBe(true)
 
         const flowopsVars = fs.readFileSync(flowopsVarsPath, 'utf8')
-        expect(flowopsVars).toContain('$primaryMain: #0284c7;')
+        expect(flowopsVars).toContain('$brandPrimary: #7c3aed;')
+        expect(flowopsVars).toContain('$brandFontFamily:')
+        expect(flowopsVars).toContain('$primaryMain: #7c3aed;')
         expect(flowopsVars).toContain('$secondaryMain: #14b8a6;')
         expect(flowopsVars).toContain('$darkBackground: #08111f;')
     })

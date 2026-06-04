@@ -26,7 +26,7 @@ import {
 } from '@tabler/icons-react'
 
 import { SUPPORTED_LANGUAGES } from '@/i18n'
-import FlowOpsLogo from '@/assets/images/flowops_dark.svg'
+import BrandLogo from '@/ui-component/extended/BrandLogo'
 import AgentImage from '@/assets/images/agentgraph.png'
 import DocumentImage from '@/assets/images/doc_store_empty.svg'
 import RobotImage from '@/assets/images/robot.png'
@@ -334,7 +334,7 @@ const PublicNav = ({ t, navItems, currentLang, handleChangeLanguage }) => (
         }}
     >
         <Box component={RouterLink} to='/' sx={{ display: 'inline-flex', alignItems: 'center' }}>
-            <Box component='img' src={FlowOpsLogo} alt='FlowOps' sx={{ width: { xs: 104, sm: 128, md: 150 }, height: 'auto' }} />
+            <BrandLogo tone='onDark' width={{ xs: 104, sm: 128, md: 150 }} />
         </Box>
         <Stack direction='row' spacing={{ xs: 0.25, md: 1.5 }} sx={{ minWidth: 0, alignItems: 'center' }}>
             {navItems.map((item) => (
