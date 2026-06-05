@@ -71,6 +71,7 @@
 | `packages/ui/src/layout/MainLayout/Header/ProfileSection/index.jsx`           | UI-i18n-hardening  |
 | `packages/ui/src/layout/MainLayout/Header/WorkspaceSwitcher/index.jsx`        | UI-i18n-hardening  |
 | `packages/ui/src/layout/MainLayout/Header/index.jsx`                          | UI-i18n-hardening  |
+| `packages/ui/src/layout/MainLayout/LogoSection/index.jsx`                     | Branding-shell     |
 | `packages/ui/src/layout/MainLayout/Sidebar/index.jsx`                         | Liquid-glass-theme |
 | `packages/ui/src/layout/MainLayout/index.jsx`                                 | Liquid-glass-theme |
 | `packages/ui/src/layout/MainLayout/Sidebar/CloudMenuList.jsx`                 | UI-i18n-hardening  |
