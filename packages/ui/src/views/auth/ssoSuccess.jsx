@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { store } from '@/store'
 import { loginSuccess } from '@/store/reducers/authSlice'
 import authApi from '@/api/auth'
+import { getPostLoginRedirectPath } from './loginRedirect'
 
 const SSOSuccess = () => {
     const location = useLocation()
@@ -21,7 +22,7 @@ const SSOSuccess = () => {
                     if (user) {
                         if (user.status === 200) {
                             store.dispatch(loginSuccess(user.data))
-                            navigate('/')
+                            navigate(getPostLoginRedirectPath())
                         } else {
                             navigate('/login')
                         }

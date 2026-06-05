@@ -146,6 +146,14 @@
         "registrationSuccessful": "Registration Successful. You will be redirected to the sign in page shortly.",
         "registrationVerifyEmail": "To complete your registration, please click on the verification link we sent to your email address",
         "rateLimitTooManyRequests": "You're making a lot of requests. Please wait and try again later.",
+        "errors": {
+            "incorrectEmailOrPassword": "Incorrect email or password",
+            "userEmailUnverified": "User email is not verified",
+            "inactiveUser": "This user is inactive",
+            "invalidWorkspace": "No workspace is assigned",
+            "forbidden": "You do not have permission to sign in",
+            "invitedUser": "This invited user has not registered yet"
+        },
         "validation": {
             "nameRequired": "Name is required",
             "emailRequired": "Email is required",
