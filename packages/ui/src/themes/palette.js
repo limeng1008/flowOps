@@ -83,7 +83,20 @@ export default function themePalette(theme) {
             surfaceStrong: theme.customization.isDarkMode ? theme.colors?.glassDarkSurfaceStrong : theme.colors?.glassLightSurfaceStrong,
             border: theme.customization.isDarkMode ? theme.colors?.glassDarkBorder : theme.colors?.glassBorder,
             highlight: theme.customization.isDarkMode ? theme.colors?.glassDarkHighlight : theme.colors?.glassHighlight,
+            control: theme.customization.isDarkMode ? theme.colors?.glassDarkControlSurface : theme.colors?.glassControlSurface,
+            controlHover: theme.customization.isDarkMode
+                ? theme.colors?.glassDarkControlSurfaceHover
+                : theme.colors?.glassControlSurfaceHover,
+            controlActive: theme.customization.isDarkMode
+                ? theme.colors?.glassDarkControlSurfaceActive
+                : theme.colors?.glassControlSurfaceActive,
+            accent: theme.colors?.glassAccent,
+            accentAlt: theme.colors?.glassAccentAlt,
+            accentSoft: theme.colors?.glassAccentSoft,
+            accentStrong: theme.colors?.glassAccentStrong,
+            accentText: theme.customization.isDarkMode ? theme.colors?.glassDarkAccentText : theme.colors?.glassAccentText,
             shadow: theme.customization.isDarkMode ? theme.colors?.glassShadowDark : theme.colors?.glassShadowLight,
+            controlShadow: theme.customization.isDarkMode ? theme.colors?.glassControlShadowDark : theme.colors?.glassControlShadowLight,
             blur: theme.colors?.glassBlur
         },
         textBackground: {

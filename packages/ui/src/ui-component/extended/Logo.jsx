@@ -8,7 +8,7 @@ const Logo = () => {
     const customization = useSelector((state) => state.customization)
 
     return (
-        <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'row', marginLeft: '10px' }}>
+        <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'row' }}>
             <BrandLogo tone={customization.isDarkMode ? 'onDark' : 'onLight'} width={150} />
         </div>
     )

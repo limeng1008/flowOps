@@ -1,19 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 56" fill="none" role="img" aria-label="FlowOps">
-    <rect x="4" y="8" width="40" height="40" rx="12" fill="#0F172A" />
+    <rect x="4" y="8" width="40" height="40" rx="12" fill="#EAF6FF" />
+    <rect x="4.5" y="8.5" width="39" height="39" rx="11.5" stroke="#FFFFFF" stroke-opacity="0.78" />
     <rect x="10" y="14" width="28" height="28" rx="9" fill="url(#flowops-logo-bg)" />
     <circle cx="21" cy="23" r="3.6" fill="#F8FAFC" />
     <circle cx="21" cy="33" r="3.6" fill="#F8FAFC" />
     <circle cx="31" cy="28" r="3.6" fill="#F8FAFC" />
     <path d="M24 24.5L28 26.6M24 31.5L28 29.4" stroke="#F8FAFC" stroke-width="2.4" stroke-linecap="round" />
-    <text x="56" y="36" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="25" font-weight="850" letter-spacing="-0.3">
+    <text x="56" y="36" font-family="Inter, 'Segoe UI', Arial, sans-serif" font-size="25" font-weight="850" letter-spacing="0">
         <tspan fill="#0F172A">Flow</tspan>
-        <tspan fill="#7C3AED">Ops</tspan>
+        <tspan fill="#0A84FF">Ops</tspan>
     </text>
     <defs>
         <linearGradient id="flowops-logo-bg" x1="11" y1="15" x2="38" y2="42" gradientUnits="userSpaceOnUse">
-            <stop stop-color="#7C3AED" />
-            <stop offset="0.58" stop-color="#8B5CF6" />
-            <stop offset="1" stop-color="#14B8A6" />
+            <stop stop-color="#0A84FF" />
+            <stop offset="0.58" stop-color="#5AC8FA" />
+            <stop offset="1" stop-color="#00C7BE" />
         </linearGradient>
     </defs>
 </svg>

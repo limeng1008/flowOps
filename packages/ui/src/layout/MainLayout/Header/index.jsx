@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 
 // material-ui
 import { Button, Avatar, Box, ButtonBase, Switch, Typography, Link } from '@mui/material'
-import { useTheme, styled, darken } from '@mui/material/styles'
+import { useTheme, styled } from '@mui/material/styles'
 
 // project imports
 import LogoSection from '../LogoSection'
@@ -14,6 +14,7 @@ import ProfileSection from './ProfileSection'
 import WorkspaceSwitcher from '@/layout/MainLayout/Header/WorkspaceSwitcher'
 import OrgWorkspaceBreadcrumbs from '@/layout/MainLayout/Header/OrgWorkspaceBreadcrumbs'
 import PricingDialog from '@/ui-component/subscription/PricingDialog'
+import { getLiquidGlassControlSx } from '@/ui-component/utils/liquidGlassStyles'
 
 // assets
 import { IconMenu2, IconX, IconSparkles } from '@tabler/icons-react'
@@ -35,13 +36,12 @@ import useNotifier from '@/utils/useNotifier'
 // ==============================|| MAIN NAVBAR / HEADER ||============================== //
 
 const MaterialUISwitch = styled(Switch)(({ theme }) => ({
-    width: 62,
+    width: 56,
     height: 34,
-    padding: 7,
+    padding: 0,
     '& .MuiSwitch-switchBase': {
-        margin: 1,
-        padding: 0,
-        transform: 'translateX(6px)',
+        padding: 3,
+        transform: 'translateX(0)',
         '&.Mui-checked': {
             color: '#fff',
             transform: 'translateX(22px)',
@@ -52,14 +52,18 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
             },
             '& + .MuiSwitch-track': {
                 opacity: 1,
-                backgroundColor: theme.palette.mode === 'dark' ? '#8796A5' : '#aab4be'
+                background: `linear-gradient(145deg, ${theme.palette.glass.highlight}, transparent 30%), ${theme.palette.glass.controlHover}`,
+                borderColor: theme.palette.glass.accentStrong
             }
         }
     },
     '& .MuiSwitch-thumb': {
-        backgroundColor: theme.palette.mode === 'dark' ? '#003892' : '#001e3c',
-        width: 32,
-        height: 32,
+        background: `linear-gradient(145deg, rgba(255,255,255,0.24), transparent 38%), ${
+            theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.18)' : 'rgba(6,18,34,0.92)'
+        }`,
+        boxShadow: '0 8px 18px rgba(15, 23, 42, 0.22), inset 0 1px 0 rgba(255,255,255,0.25)',
+        width: 28,
+        height: 28,
         '&:before': {
             content: "''",
             position: 'absolute',
@@ -76,8 +80,12 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
     },
     '& .MuiSwitch-track': {
         opacity: 1,
-        backgroundColor: theme.palette.mode === 'dark' ? '#8796A5' : '#aab4be',
-        borderRadius: 20 / 2
+        borderRadius: 999,
+        background: `linear-gradient(145deg, ${theme.palette.glass.highlight}, transparent 34%), ${theme.palette.glass.control}`,
+        border: `1px solid ${theme.palette.glass.border}`,
+        boxShadow: theme.palette.glass.controlShadow,
+        backdropFilter: `blur(${theme.palette.glass.blur}) saturate(1.45)`,
+        WebkitBackdropFilter: `blur(${theme.palette.glass.blur}) saturate(1.45)`
     }
 }))
 
@@ -93,13 +101,16 @@ const GitHubStarButton = ({ starCount, isDark }) => {
                 sx={{
                     display: 'flex',
                     alignItems: 'center',
-                    borderRadius: '3px',
+                    borderRadius: '14px',
                     overflow: 'hidden',
-                    border: `1px solid ${isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'}`,
+                    minHeight: 36,
                     fontSize: '12px',
                     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif',
                     fontWeight: 600,
-                    lineHeight: 1
+                    lineHeight: 1,
+                    ...getLiquidGlassControlSx(theme, {
+                        boxShadow: 'none'
+                    })
                 }}
             >
                 <Box
@@ -107,18 +118,23 @@ const GitHubStarButton = ({ starCount, isDark }) => {
                         display: 'flex',
                         alignItems: 'center',
                         padding: '3px 10px',
-                        backgroundColor: isDark ? darken(theme.palette.background.paper, 0.2) : '#f6f8fa',
-                        color: isDark ? '#c9d1d9' : '#24292e',
-                        borderRight: `1px solid ${isDark ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.1)'}`
+                        backgroundColor: 'transparent',
+                        color: isDark ? theme.palette.glass.accentText : theme.palette.text.primary,
+                        borderRight: `1px solid ${theme.palette.glass.border}`
                     }}
                 >
-                    <svg height='16' width='16' viewBox='0 0 16 16' style={{ marginRight: '4px', fill: isDark ? '#c9d1d9' : '#24292e' }}>
+                    <svg
+                        height='16'
+                        width='16'
+                        viewBox='0 0 16 16'
+                        style={{ marginRight: '4px', fill: isDark ? theme.palette.glass.accentText : theme.palette.text.primary }}
+                    >
                         <path
                             fillRule='evenodd'
                             d='M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z'
                         ></path>
                     </svg>
-                    <Typography variant='caption' sx={{ fontWeight: 600, color: isDark ? 'white' : theme.palette.text.primary }}>
+                    <Typography variant='caption' sx={{ fontWeight: 600, color: 'inherit' }}>
                         {t('layout.githubStar')}
                     </Typography>
                 </Box>
@@ -127,10 +143,13 @@ const GitHubStarButton = ({ starCount, isDark }) => {
                         display: 'flex',
                         alignItems: 'center',
                         padding: '3px 10px',
-                        backgroundColor: isDark ? theme.palette.background.paper : 'white'
+                        backgroundColor: 'transparent'
                     }}
                 >
-                    <Typography variant='caption' sx={{ fontWeight: 600, color: isDark ? 'white' : theme.palette.text.primary }}>
+                    <Typography
+                        variant='caption'
+                        sx={{ fontWeight: 600, color: isDark ? theme.palette.glass.accentText : theme.palette.text.primary }}
+                    >
                         {formattedStarCount}
                     </Typography>
                 </Box>
@@ -231,19 +250,16 @@ const Header = ({ handleLeftDrawerToggle }) => {
                     <LogoSection />
                 </Box>
                 {isAuthenticated && (
-                    <ButtonBase sx={{ borderRadius: '12px', overflow: 'hidden' }}>
+                    <ButtonBase sx={{ borderRadius: '18px', overflow: 'hidden' }}>
                         <Avatar
                             variant='rounded'
                             sx={{
                                 ...theme.typography.commonAvatar,
                                 ...theme.typography.mediumAvatar,
-                                transition: 'all .2s ease-in-out',
-                                background: theme.palette.secondary.light,
-                                color: theme.palette.secondary.dark,
-                                '&:hover': {
-                                    background: theme.palette.secondary.dark,
-                                    color: theme.palette.secondary.light
-                                }
+                                width: 48,
+                                height: 48,
+                                borderRadius: '16px',
+                                ...getLiquidGlassControlSx(theme)
                             }}
                             onClick={handleLeftDrawerToggle}
                             color='inherit'
@@ -279,20 +295,9 @@ const Header = ({ handleLeftDrawerToggle }) => {
                     sx={{
                         mr: 1,
                         ml: 2,
-                        borderRadius: 15,
-                        background: (theme) =>
-                            `linear-gradient(90deg, ${theme.palette.primary.main} 10%, ${theme.palette.secondary.main} 100%)`,
-                        color: (theme) => theme.palette.secondary.contrastText,
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                        transition: 'all 0.3s ease',
-                        '&:hover': {
-                            background: (theme) =>
-                                `linear-gradient(90deg, ${darken(theme.palette.primary.main, 0.1)} 10%, ${darken(
-                                    theme.palette.secondary.main,
-                                    0.1
-                                )} 100%)`,
-                            boxShadow: '0 4px 8px rgba(0,0,0,0.3)'
-                        }
+                        borderRadius: '18px',
+                        px: 2,
+                        ...getLiquidGlassControlSx(theme)
                     }}
                     onClick={() => setIsPricingOpen(true)}
                     startIcon={<IconSparkles size={20} />}

@@ -4,15 +4,25 @@ export default function componentStyleOverrides(theme) {
     const glassBlur = theme.colors?.glassBlur || '22px'
     const glassSurface = isDark ? theme.colors?.glassDarkSurface : theme.colors?.glassLightSurface
     const glassSurfaceStrong = isDark ? theme.colors?.glassDarkSurfaceStrong : theme.colors?.glassLightSurfaceStrong
+    const glassControl = isDark ? theme.colors?.glassDarkControlSurface : theme.colors?.glassControlSurface
+    const glassControlHover = isDark ? theme.colors?.glassDarkControlSurfaceHover : theme.colors?.glassControlSurfaceHover
+    const glassControlActive = isDark ? theme.colors?.glassDarkControlSurfaceActive : theme.colors?.glassControlSurfaceActive
     const glassBorder = isDark ? theme.colors?.glassDarkBorder : theme.colors?.glassBorder
     const glassHighlight = isDark ? theme.colors?.glassDarkHighlight : theme.colors?.glassHighlight
     const glassShadow = isDark ? theme.colors?.glassShadowDark : theme.colors?.glassShadowLight
+    const glassControlShadow = isDark ? theme.colors?.glassControlShadowDark : theme.colors?.glassControlShadowLight
+    const glassAccent = theme.colors?.glassAccent || theme.colors?.primaryMain
+    const glassAccentSoft = theme.colors?.glassAccentSoft || 'rgba(10, 132, 255, 0.16)'
+    const glassAccentStrong = theme.colors?.glassAccentStrong || 'rgba(10, 132, 255, 0.28)'
+    const glassAccentText = isDark ? theme.colors?.glassDarkAccentText : theme.colors?.glassAccentText
     const glassBackdrop = `blur(${glassBlur}) saturate(1.45)`
     const appBackground = isDark
         ? 'radial-gradient(900px 520px at 12% 8%, rgba(9,124,255,0.18), transparent 58%), radial-gradient(820px 500px at 88% 16%, rgba(20,184,166,0.14), transparent 56%), linear-gradient(135deg, #07101d 0%, #111827 46%, #0f172a 100%)'
         : 'radial-gradient(900px 520px at 12% 8%, rgba(9,124,255,0.20), transparent 58%), radial-gradient(820px 500px at 88% 16%, rgba(20,184,166,0.18), transparent 56%), linear-gradient(135deg, #eef7ff 0%, #f8fbff 46%, #f1fff9 100%)'
     const glassBackground = `linear-gradient(145deg, ${glassHighlight}, transparent 34%), ${glassSurface}`
     const strongGlassBackground = `linear-gradient(145deg, ${glassHighlight}, transparent 30%), ${glassSurfaceStrong}`
+    const controlGlassBackground = `linear-gradient(145deg, ${glassHighlight}, transparent 34%), linear-gradient(135deg, ${glassAccentSoft}, rgba(255,255,255,0.10)), ${glassControl}`
+    const controlGlassHoverBackground = `linear-gradient(145deg, ${glassHighlight}, transparent 28%), linear-gradient(135deg, ${glassAccentStrong}, rgba(255,255,255,0.16)), ${glassControlHover}`
 
     return {
         MuiCssBaseline: {
@@ -88,23 +98,62 @@ export default function componentStyleOverrides(theme) {
                     fontWeight: 650,
                     borderRadius: '999px',
                     textTransform: 'none',
-                    transition: 'transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease',
+                    transition: 'transform 180ms ease, box-shadow 180ms ease, background 180ms ease, border-color 180ms ease',
                     '&:active': {
                         transform: 'scale(0.98)'
                     }
                 },
                 contained: {
-                    backgroundImage: `linear-gradient(145deg, rgba(255,255,255,0.28), transparent 42%)`,
-                    boxShadow: `0 14px 30px ${isDark ? 'rgba(0,0,0,0.28)' : 'rgba(2,132,199,0.22)'}`,
+                    color: glassAccentText || (isDark ? theme.colors?.paper : glassAccent),
+                    background: controlGlassBackground,
+                    border: `1px solid ${glassBorder}`,
+                    boxShadow: glassControlShadow,
+                    backdropFilter: glassBackdrop,
+                    WebkitBackdropFilter: glassBackdrop,
                     '&:hover': {
-                        boxShadow: `0 18px 36px ${isDark ? 'rgba(0,0,0,0.34)' : 'rgba(2,132,199,0.28)'}`
+                        background: controlGlassHoverBackground,
+                        borderColor: glassAccentStrong,
+                        boxShadow: glassControlShadow
+                    },
+                    '&.Mui-disabled': {
+                        color: isDark ? theme.colors?.grey500 : theme.colors?.grey600,
+                        background: glassSurface,
+                        borderColor: glassBorder,
+                        boxShadow: 'none'
                     }
                 },
                 outlined: {
-                    background: glassBackground,
+                    background: controlGlassBackground,
                     borderColor: glassBorder,
+                    color: glassAccentText || (isDark ? theme.colors?.paper : glassAccent),
+                    boxShadow: 'none',
                     backdropFilter: glassBackdrop,
                     WebkitBackdropFilter: glassBackdrop
+                }
+            }
+        },
+        MuiToggleButton: {
+            styleOverrides: {
+                root: {
+                    color: isDark ? theme.colors?.paper : theme.colors?.grey700,
+                    background: `linear-gradient(145deg, ${glassHighlight}, transparent 34%), ${glassControl}`,
+                    borderColor: glassBorder,
+                    backdropFilter: glassBackdrop,
+                    WebkitBackdropFilter: glassBackdrop,
+                    transition: 'background 180ms ease, box-shadow 180ms ease, color 180ms ease',
+                    '&:hover': {
+                        color: glassAccentText || glassAccent,
+                        background: controlGlassHoverBackground
+                    },
+                    '&.Mui-selected, &.Mui-selected:hover': {
+                        color: glassAccentText || glassAccent,
+                        background: controlGlassHoverBackground,
+                        boxShadow: `inset 0 0 0 1px ${glassAccentStrong}`
+                    },
+                    '&.Mui-disabled': {
+                        color: isDark ? theme.colors?.grey500 : theme.colors?.grey400,
+                        background: glassSurface
+                    }
                 }
             }
         },
@@ -208,22 +257,29 @@ export default function componentStyleOverrides(theme) {
                     color: theme.darkTextPrimary,
                     paddingTop: '10px',
                     paddingBottom: '10px',
+                    transition: 'background 180ms ease, box-shadow 180ms ease, color 180ms ease',
                     '&.Mui-selected': {
-                        color: theme.menuSelected,
-                        background: isDark ? 'rgba(94, 234, 212, 0.14)' : 'rgba(20, 184, 166, 0.14)',
-                        boxShadow: `inset 0 0 0 1px ${glassBorder}`,
+                        color: glassAccentText || theme.menuSelected,
+                        background: controlGlassBackground,
+                        boxShadow: `${glassControlShadow}, inset 0 0 0 1px ${glassAccentStrong}`,
+                        backdropFilter: glassBackdrop,
+                        WebkitBackdropFilter: glassBackdrop,
                         '&:hover': {
-                            background: isDark ? 'rgba(94, 234, 212, 0.18)' : 'rgba(20, 184, 166, 0.18)'
+                            background: controlGlassHoverBackground,
+                            backdropFilter: glassBackdrop,
+                            WebkitBackdropFilter: glassBackdrop
                         },
                         '& .MuiListItemIcon-root': {
-                            color: theme.menuSelected
+                            color: glassAccentText || theme.menuSelected
                         }
                     },
                     '&:hover': {
-                        background: isDark ? 'rgba(255, 255, 255, 0.08)' : 'rgba(255, 255, 255, 0.50)',
-                        color: theme.menuSelected,
+                        background: isDark ? 'rgba(255, 255, 255, 0.08)' : glassControl,
+                        color: glassAccentText || theme.menuSelected,
+                        backdropFilter: glassBackdrop,
+                        WebkitBackdropFilter: glassBackdrop,
                         '& .MuiListItemIcon-root': {
-                            color: theme.menuSelected
+                            color: glassAccentText || theme.menuSelected
                         }
                     }
                 }

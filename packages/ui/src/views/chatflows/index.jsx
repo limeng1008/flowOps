@@ -18,6 +18,7 @@ import ConfirmDialog from '@/ui-component/dialog/ConfirmDialog'
 import TablePagination, { DEFAULT_ITEMS_PER_PAGE } from '@/ui-component/pagination/TablePagination'
 import { FlowListTable } from '@/ui-component/table/FlowListTable'
 import { translateNodeLabel } from '@/i18n/nodeI18n'
+import { getLiquidGlassControlSx } from '@/ui-component/utils/liquidGlassStyles'
 
 // API
 import chatflowsApi from '@/api/chatflows'
@@ -147,7 +148,28 @@ const Chatflows = () => {
                         description={t('pages.chatflows.description')}
                     >
                         <ToggleButtonGroup
-                            sx={{ borderRadius: 2, maxHeight: 40 }}
+                            sx={{
+                                height: 44,
+                                maxHeight: 44,
+                                borderRadius: '18px',
+                                overflow: 'hidden',
+                                background: `linear-gradient(145deg, ${theme.palette.glass.highlight}, transparent 34%), ${theme.palette.glass.control}`,
+                                border: `1px solid ${theme.palette.glass.border}`,
+                                boxShadow: 'none',
+                                backdropFilter: `blur(${theme.palette.glass.blur}) saturate(1.45)`,
+                                WebkitBackdropFilter: `blur(${theme.palette.glass.blur}) saturate(1.45)`,
+                                '& .MuiToggleButtonGroup-grouped': {
+                                    width: 46,
+                                    height: 42,
+                                    border: 0,
+                                    borderRadius: 0,
+                                    margin: 0,
+                                    color: theme.palette.text.secondary
+                                },
+                                '& .MuiToggleButtonGroup-grouped:not(:last-of-type)': {
+                                    borderRight: `1px solid ${theme.palette.glass.border}`
+                                }
+                            }}
                             value={view}
                             color='primary'
                             disabled={total === 0}
@@ -156,9 +178,9 @@ const Chatflows = () => {
                         >
                             <ToggleButton
                                 sx={{
-                                    borderColor: theme.palette.grey[900] + 25,
-                                    borderRadius: 2,
-                                    color: theme?.customization?.isDarkMode ? 'white' : 'inherit'
+                                    '&.Mui-selected': {
+                                        color: theme.palette.glass.accentText
+                                    }
                                 }}
                                 variant='contained'
                                 value='card'
@@ -168,9 +190,9 @@ const Chatflows = () => {
                             </ToggleButton>
                             <ToggleButton
                                 sx={{
-                                    borderColor: theme.palette.grey[900] + 25,
-                                    borderRadius: 2,
-                                    color: theme?.customization?.isDarkMode ? 'white' : 'inherit'
+                                    '&.Mui-selected': {
+                                        color: theme.palette.glass.accentText
+                                    }
                                 }}
                                 variant='contained'
                                 value='list'
@@ -184,7 +206,13 @@ const Chatflows = () => {
                             variant='contained'
                             onClick={addNew}
                             startIcon={<IconPlus />}
-                            sx={{ borderRadius: 2, height: 40 }}
+                            sx={{
+                                ...getLiquidGlassControlSx(theme),
+                                borderRadius: '18px',
+                                height: 44,
+                                minWidth: 112,
+                                px: 2.25
+                            }}
                         >
                             {t('common.addNew')}
                         </StyledPermissionButton>

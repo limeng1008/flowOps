@@ -42,6 +42,7 @@ import { PermissionListItemButton } from '@/ui-component/button/RBACButtons'
 import MainCard from '@/ui-component/cards/MainCard'
 import AboutDialog from '@/ui-component/dialog/AboutDialog'
 import Transitions from '@/ui-component/extended/Transitions'
+import { getLiquidGlassControlSx } from '@/ui-component/utils/liquidGlassStyles'
 
 // assets
 import ExportingGIF from '@/assets/images/Exporting.gif'
@@ -408,19 +409,16 @@ const ProfileSection = ({ handleLogout }) => {
 
     return (
         <>
-            <ButtonBase ref={anchorRef} sx={{ borderRadius: '12px', overflow: 'hidden' }}>
+            <ButtonBase ref={anchorRef} sx={{ borderRadius: '18px', overflow: 'hidden' }}>
                 <Avatar
                     variant='rounded'
                     sx={{
                         ...theme.typography.commonAvatar,
                         ...theme.typography.mediumAvatar,
-                        transition: 'all .2s ease-in-out',
-                        background: theme.palette.secondary.light,
-                        color: theme.palette.secondary.dark,
-                        '&:hover': {
-                            background: theme.palette.secondary.dark,
-                            color: theme.palette.secondary.light
-                        }
+                        width: 48,
+                        height: 48,
+                        borderRadius: '16px',
+                        ...getLiquidGlassControlSx(theme)
                     }}
                     onClick={handleToggle}
                     color='inherit'
@@ -473,7 +471,7 @@ const ProfileSection = ({ handleLogout }) => {
                                                     width: '100%',
                                                     maxWidth: 250,
                                                     minWidth: 200,
-                                                    backgroundColor: theme.palette.background.paper,
+                                                    backgroundColor: 'transparent',
                                                     borderRadius: '10px',
                                                     [theme.breakpoints.down('md')]: {
                                                         minWidth: '100%'
