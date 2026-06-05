@@ -291,6 +291,7 @@ const nodeLabelMap = {
     Key: '键',
     'Base Options': '基础选项',
     'System Message': '系统消息',
+    'Custom Pandas Read_CSV Code': '自定义 Pandas read_csv 代码',
     'Presence Penalty': '存在惩罚',
     Database: '数据库',
     Value: '值',
@@ -957,6 +958,8 @@ const nodeDescriptionMap = {
 
 const nodeTooltipMap = {
     // ---------- Common node input help ----------
+    'Custom Pandas <a target="_blank" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html">read_csv</a> function. Takes in an input: "csv_data"':
+        '自定义 Pandas <a target="_blank" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html">read_csv</a> 函数。输入参数为 "csv_data"。',
     'Override existing prompt with Chat Prompt Template. Human Message must includes {input} variable':
         '使用 Chat Prompt Template 覆盖默认提示词；其中 Human Message 必须包含 {input} 变量。',
     'If Chat Prompt Template is provided, this will be ignored': '如果已提供 Chat Prompt Template，将忽略这里的系统消息。',
@@ -1029,7 +1032,9 @@ const nodeTooltipMap = {
 // Only generic ones are translated.
 const nodeInputPlaceholderMap = {
     'Email Subject': '邮件主题',
-    'Email content': '邮件内容'
+    'Email content': '邮件内容',
+    'I want you to act as a document that I am having a conversation with. Your name is "AI Assistant". You will provide me with answers from the given info. If the answer is not included, say exactly "Hmm, I am not sure." and stop after that. Refuse to answer any question not about the info. Never break character.':
+        '请你扮演一份正在与我对话的文档。你的名字是 "AI Assistant"。你需要基于给定信息回答我的问题。如果答案不在信息中，请只说 "Hmm, I am not sure."，然后停止回答。拒绝回答任何与给定信息无关的问题，并始终保持角色设定。'
 }
 
 const isZh = (lang) => !!lang && (lang === 'zh' || lang.startsWith('zh-'))

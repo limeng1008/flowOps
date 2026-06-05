@@ -102,6 +102,25 @@ describe('canvas node badge i18n coverage', () => {
         expect(translateNodeTooltip(tooltip, 'en')).toBe(tooltip)
     })
 
+    it('translates CSV agent input label, tooltip, and placeholder copy', async () => {
+        const { translateNodeInputPlaceholder, translateNodeLabel, translateNodeTooltip } = await import('./nodeI18n.js')
+        const prompt =
+            'I want you to act as a document that I am having a conversation with. Your name is "AI Assistant". You will provide me with answers from the given info. If the answer is not included, say exactly "Hmm, I am not sure." and stop after that. Refuse to answer any question not about the info. Never break character.'
+        const tooltip =
+            'Custom Pandas <a target="_blank" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html">read_csv</a> function. Takes in an input: "csv_data"'
+
+        expect(translateNodeLabel('Custom Pandas Read_CSV Code', 'zh')).toBe('自定义 Pandas read_csv 代码')
+        expect(translateNodeTooltip(tooltip, 'zh')).toBe(
+            '自定义 Pandas <a target="_blank" href="https://pandas.pydata.org/pandas-docs/stable/reference/api/pandas.read_csv.html">read_csv</a> 函数。输入参数为 "csv_data"。'
+        )
+        expect(translateNodeInputPlaceholder(prompt, 'zh')).toBe(
+            '请你扮演一份正在与我对话的文档。你的名字是 "AI Assistant"。你需要基于给定信息回答我的问题。如果答案不在信息中，请只说 "Hmm, I am not sure."，然后停止回答。拒绝回答任何与给定信息无关的问题，并始终保持角色设定。'
+        )
+        expect(translateNodeLabel('Custom Pandas Read_CSV Code', 'en')).toBe('Custom Pandas Read_CSV Code')
+        expect(translateNodeTooltip(tooltip, 'en')).toBe(tooltip)
+        expect(translateNodeInputPlaceholder(prompt, 'en')).toBe(prompt)
+    })
+
     it('translates node list badges in AddNodes', () => {
         const source = fs.readFileSync(path.join(__dirname, '../views/canvas/AddNodes.jsx'), 'utf8')
 

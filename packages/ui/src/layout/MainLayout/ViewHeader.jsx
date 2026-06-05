@@ -44,11 +44,14 @@ const ViewHeader = ({
                 sx={{
                     p: 0,
                     display: 'flex',
+                    flexDirection: { xs: 'column', md: 'row' },
+                    alignItems: { xs: 'flex-start', md: 'center' },
+                    gap: { xs: 2, md: 1 },
                     justifyContent: 'space-between',
                     width: '100%'
                 }}
             >
-                <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', flexDirection: 'row', width: { xs: '100%', md: 'auto' } }}>
                     {isBackButton && (
                         <StyledFab
                             sx={{ mr: 3 }}
@@ -72,7 +75,7 @@ const ViewHeader = ({
                                 textOverflow: 'ellipsis',
                                 overflow: 'hidden',
                                 flex: 1,
-                                maxWidth: 'calc(100vh - 100px)'
+                                maxWidth: { xs: '100%', md: 'calc(100vh - 100px)' }
                             }}
                             variant='h1'
                         >
@@ -90,7 +93,7 @@ const ViewHeader = ({
                                     textOverflow: 'ellipsis',
                                     overflow: 'hidden',
                                     flex: 1,
-                                    maxWidth: 'calc(100vh - 100px)'
+                                    maxWidth: { xs: '100%', md: 'calc(100vh - 100px)' }
                                 }}
                             >
                                 {description}
@@ -103,19 +106,29 @@ const ViewHeader = ({
                         </IconButton>
                     )}
                 </Box>
-                <Box sx={{ height: 40, display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Box
+                    sx={{
+                        minHeight: 44,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: { xs: 'flex-start', md: 'flex-end' },
+                        flexWrap: 'wrap',
+                        gap: 1,
+                        width: { xs: '100%', md: 'auto' }
+                    }}
+                >
                     {search && (
                         <OutlinedInput
                             inputRef={searchInputRef}
                             size='small'
                             sx={{
                                 width: '325px',
-                                height: '100%',
+                                height: 44,
                                 display: { xs: 'none', sm: 'flex' },
-                                borderRadius: 2,
+                                borderRadius: '18px',
 
                                 '& .MuiOutlinedInput-notchedOutline': {
-                                    borderRadius: 2
+                                    borderRadius: '18px'
                                 }
                             }}
                             variant='outlined'

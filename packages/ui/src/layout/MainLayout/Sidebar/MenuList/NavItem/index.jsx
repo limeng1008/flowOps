@@ -102,10 +102,14 @@ const NavItem = ({ item, level, navType, onClick, onUploadFile }) => {
             {...listItemProps}
             disabled={item.disabled}
             sx={{
-                borderRadius: `${customization.borderRadius}px`,
-                alignItems: 'flex-start',
-                backgroundColor: level > 1 ? 'transparent !important' : 'inherit',
+                borderRadius: level > 1 ? `${customization.borderRadius}px` : '18px',
+                alignItems: 'center',
+                ...(level > 1 && { backgroundColor: 'transparent !important' }),
+                minHeight: level > 1 ? 42 : 56,
+                mx: level > 1 ? 0 : 1.5,
+                mb: level > 1 ? 0 : 0.5,
                 py: level > 1 ? 1 : 1.25,
+                pr: 1.5,
                 pl: `${level * 24}px`
             }}
             selected={customization.isOpen.findIndex((id) => id === item.id) > -1}

@@ -11,10 +11,10 @@ describe('FlowOps theme variables', () => {
         expect(fs.existsSync(flowopsVarsPath)).toBe(true)
 
         const flowopsVars = fs.readFileSync(flowopsVarsPath, 'utf8')
-        expect(flowopsVars).toContain('$brandPrimary: #7c3aed;')
+        expect(flowopsVars).toContain('$brandPrimary: #0a84ff;')
         expect(flowopsVars).toContain('$brandFontFamily:')
-        expect(flowopsVars).toContain('$primaryMain: #7c3aed;')
-        expect(flowopsVars).toContain('$secondaryMain: #14b8a6;')
+        expect(flowopsVars).toContain('$primaryMain: #0a84ff;')
+        expect(flowopsVars).toContain('$secondaryMain: #00c7be;')
         expect(flowopsVars).toContain('$darkBackground: #08111f;')
     })
 
@@ -30,10 +30,14 @@ describe('FlowOps theme variables', () => {
         expect(flowopsVars).toContain('$glassLightSurface:')
         expect(flowopsVars).toContain('$glassDarkSurface:')
         expect(flowopsVars).toContain('$glassBorder:')
+        expect(flowopsVars).toContain('$glassControlSurface:')
+        expect(flowopsVars).toContain('$glassAccent:')
         expect(flowopsVars).toContain('$glassBlur:')
 
         expect(palette).toContain('glass:')
         expect(palette).toContain('surface:')
+        expect(palette).toContain('control:')
+        expect(palette).toContain('accent:')
         expect(palette).toContain('blur:')
 
         expect(overrides).toContain('backdropFilter')
