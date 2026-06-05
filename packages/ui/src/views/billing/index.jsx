@@ -173,6 +173,23 @@ const BillingAdmin = () => {
                         </StyledButton>
                     </Stack>
                 </ViewHeader>
+                <Box
+                    sx={{
+                        border: 1,
+                        borderColor: theme.palette.primary.main + 35,
+                        borderRadius: 2,
+                        px: 2,
+                        py: 1.5,
+                        backgroundColor: theme.palette.primary.main + 8
+                    }}
+                >
+                    <Typography variant='body2' sx={{ fontWeight: 600 }}>
+                        {t('pages.billing.manualActivationNotice')}
+                    </Typography>
+                    <Typography variant='body2' color='text.secondary' sx={{ mt: 0.5 }}>
+                        {t('pages.billing.manualActivationDetail')}
+                    </Typography>
+                </Box>
                 <TableContainer
                     component={Paper}
                     sx={{ border: 1, borderColor: theme.palette.grey[900] + 25, borderRadius: 2, overflowX: 'auto' }}
