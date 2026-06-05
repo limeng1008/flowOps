@@ -43,10 +43,13 @@ export const createBaseNodeData = (name: string, overrides: Record<string, any> 
         textField: 'content',
         vectorField: 'vector',
         metadataField: 'metadata',
+        embeddingPreset: 'text-embedding-v4',
         topK: '3',
         batchSize: '2',
-        vectorDimension: '3',
+        vectorDimension: '',
         metric: 'cosine',
+        retryCount: '2',
+        retryDelayMs: '1',
         metadataFilter: '{"source":"manual.md"}',
         autoCreate: true,
         fileUpload: true,
@@ -74,6 +77,7 @@ export const expectCommonNodeShape = (node: any, credentialName: string) => {
             'textField',
             'vectorField',
             'metadataField',
+            'embeddingPreset',
             'topK',
             'batchSize',
             'metadataFilter',
@@ -81,9 +85,19 @@ export const expectCommonNodeShape = (node: any, credentialName: string) => {
             'includeVector',
             'autoCreate',
             'vectorDimension',
-            'metric'
+            'metric',
+            'recordManager',
+            'retryCount',
+            'retryDelayMs'
         ])
     )
+    const metadataFilter = node.inputs.find((input: any) => input.name === 'metadataFilter')
+    expect(metadataFilter.description).toContain('示例')
+    expect(metadataFilter.description).toContain('自动建集合')
+
+    const credentialHelp = node.inputs.find((input: any) => input.name === 'credentialGuide')
+    expect(credentialHelp.description).toContain('开通')
+    expect(credentialHelp.description).toContain('API Key')
 }
 
 export const expectNodeLifecycle = async (node: any, nodeData: any) => {
@@ -125,3 +139,15 @@ export const expectNodeLifecycle = async (node: any, nodeData: any) => {
         })
     )
 }
+
+export const createFakeRecordManager = () => ({
+    cleanup: 'incremental',
+    sourceIdKey: 'source',
+    namespace: 'cloud_vector_test',
+    createSchema: jest.fn(async () => undefined),
+    getTime: jest.fn(async () => 100),
+    exists: jest.fn(async () => [false]),
+    update: jest.fn(async () => undefined),
+    listKeys: jest.fn(async (): Promise<string[]> => []),
+    deleteKeys: jest.fn(async () => undefined)
+})

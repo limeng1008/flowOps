@@ -10,19 +10,19 @@
 
 ## Category Replay Notes
 
-| Category           | Reason                                                                                                  | Upstream replay notes                                                                                                                           |
-| ------------------ | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| T1-model-loader    | 让 FlowOps 自有模型列表从 `models.flowops.json` 加载期合并，减少直接改上游 `models.json` 的冲突。       | 保留 `modelLoader.ts` 的本地/URL 加载逻辑，再叠加 FlowOps merge；跑 `cd packages/components && npx jest modelLoader`。                          |
-| T4-theme-entry     | 让主题入口读取 fork-owned `_flowops-vars.module.scss`，并尽量保持上游 `_themes-vars.module.scss` 干净。 | 合并上游主题后确认 `packages/ui/src/themes/index.js` 仍导入 `_flowops-vars.module.scss`；跑 `npx jest flowopsThemeVars` 和 UI build。           |
-| Branding-shell     | FlowOps 品牌壳、Logo、HTML 元信息、PWA manifest、启动入口与认证/欢迎体验。                              | 上游更新页面壳时，先取上游结构，再重放 FlowOps Logo/产品名/入口/i18n provider。                                                                 |
-| Liquid-glass-theme | 将 FlowOps 前端视觉系统升级为克制版 Apple 液态玻璃风格，覆盖全局主题、布局壳和共享 UI surface。         | 合并上游主题/布局后重放 `_flowops-vars`、MUI overrides、主壳和共享组件 surface；跑 `npx jest flowopsThemeVars` 与 UI build。                    |
-| Commercial-brand   | 商业化占位 VI：统一 Logo 入口、favicon/PWA 图标、品牌 token 和官网/登录页露出点。                       | 正式 VI 到位后优先替换 `BrandLogo` 引用的 SVG 与 `_flowops-vars` token，再跑 UI build 与页面截图。                                              |
-| Billing-center-v1  | 本地计费中台：套餐、订阅、用量、三维度额度拦截、账号页/运营后台入口。                                   | 上游合并后保留 billing service 作为本地权益来源，重跑 `cd packages/server && npx jest billing` 与 UI build。                                    |
-| Commercial-payment | 支付宝/微信支付沙箱骨架：下单、扫码链接、回调验签、订单状态和订阅激活。                                 | 合并上游路由/配置时保留 `/api/v1/payment/notify/*` 公开回调、env 占位和 payment service；跑 `cd packages/server && npx jest services/payment`。 |
-| Commercial-support | 自建轻量工单：工单实体、接口、前端入口、权限隔离和中英 i18n。                                           | 合并上游账号/路由时保留 support-tickets route、白名单管理员判断和工单前端入口；跑 `cd packages/server && npx jest services/support-tickets`。   |
-| UI-i18n-hardening  | 面向中文用户的全量 i18n 包裹、日期/按钮/弹窗/表格/节点文案本地化。                                      | 上游合并后以 locale 为事实源重放 codemod，随后跑 UI i18n tests 和 `pnpm --filter flowise-ui build`。                                            |
-| UI-dependencies    | UI 换皮、动画和 i18n 运行时依赖引入导致的 package/lockfile 变更。                                       | 合并上游依赖时用 pnpm 重新解锁，保留 FlowOps 所需运行时依赖并跑 UI build。                                                                      |
-| Components-deps    | 国产模型/导出节点（docx/exceljs 等）引入的 components package 依赖变更。                                | 合并上游依赖时用 pnpm 重新解锁，保留 FlowOps 运行时依赖（docx/exceljs 等），跑 `pnpm --filter flowise-components build` 与节点 jest。           |
+| Category           | Reason                                                                                                  | Upstream replay notes                                                                                                                            |
+| ------------------ | ------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| T1-model-loader    | 让 FlowOps 自有模型列表从 `models.flowops.json` 加载期合并，减少直接改上游 `models.json` 的冲突。       | 保留 `modelLoader.ts` 的本地/URL 加载逻辑，再叠加 FlowOps merge；跑 `cd packages/components && npx jest modelLoader`。                           |
+| T4-theme-entry     | 让主题入口读取 fork-owned `_flowops-vars.module.scss`，并尽量保持上游 `_themes-vars.module.scss` 干净。 | 合并上游主题后确认 `packages/ui/src/themes/index.js` 仍导入 `_flowops-vars.module.scss`；跑 `npx jest flowopsThemeVars` 和 UI build。            |
+| Branding-shell     | FlowOps 品牌壳、Logo、HTML 元信息、PWA manifest、启动入口与认证/欢迎体验。                              | 上游更新页面壳时，先取上游结构，再重放 FlowOps Logo/产品名/入口/i18n provider。                                                                  |
+| Liquid-glass-theme | 将 FlowOps 前端视觉系统升级为克制版 Apple 液态玻璃风格，覆盖全局主题、布局壳和共享 UI surface。         | 合并上游主题/布局后重放 `_flowops-vars`、MUI overrides、主壳和共享组件 surface；跑 `npx jest flowopsThemeVars` 与 UI build。                     |
+| Commercial-brand   | 商业化占位 VI：统一 Logo 入口、favicon/PWA 图标、品牌 token 和官网/登录页露出点。                       | 正式 VI 到位后优先替换 `BrandLogo` 引用的 SVG 与 `_flowops-vars` token，再跑 UI build 与页面截图。                                               |
+| Billing-center-v1  | 本地计费中台：套餐、订阅、用量、三维度额度拦截、账号页/运营后台入口。                                   | 上游合并后保留 billing service 作为本地权益来源，重跑 `cd packages/server && npx jest billing` 与 UI build。                                     |
+| Commercial-payment | 支付宝/微信支付沙箱骨架：下单、扫码链接、回调验签、订单状态和订阅激活。                                 | 合并上游路由/配置时保留 `/api/v1/payment/notify/*` 公开回调、env 占位和 payment service；跑 `cd packages/server && npx jest services/payment`。  |
+| Commercial-support | 自建轻量工单：工单实体、接口、前端入口、权限隔离和中英 i18n。                                           | 合并上游账号/路由时保留 support-tickets route、白名单管理员判断和工单前端入口；跑 `cd packages/server && npx jest services/support-tickets`。    |
+| UI-i18n-hardening  | 面向中文用户的全量 i18n 包裹、日期/按钮/弹窗/表格/节点文案本地化。                                      | 上游合并后以 locale 为事实源重放 codemod，随后跑 UI i18n tests 和 `pnpm --filter flowise-ui build`。                                             |
+| UI-dependencies    | UI 换皮、动画和 i18n 运行时依赖引入导致的 package/lockfile 变更。                                       | 合并上游依赖时用 pnpm 重新解锁，保留 FlowOps 所需运行时依赖并跑 UI build。                                                                       |
+| Components-deps    | 国产模型/导出节点/国产云向量库（docx/exceljs/Mochow/VikingDB 等）引入的 components package 依赖变更。   | 合并上游依赖时用 pnpm 重新解锁，保留 FlowOps 运行时依赖（docx/exceljs/国产云 SDK 等），跑 `pnpm --filter flowise-components build` 与节点 jest。 |
 
 ## Modified File Ledger
 

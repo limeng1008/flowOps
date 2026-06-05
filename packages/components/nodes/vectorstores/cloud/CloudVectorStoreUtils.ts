@@ -5,6 +5,7 @@ import { Embeddings } from '@langchain/core/embeddings'
 import { VectorStore } from '@langchain/core/vectorstores'
 import { ICommonObject, INodeData, INodeOptionsValue, INodeOutputsValue, INodeParams, IndexingResult } from '../../../src/Interface'
 import { FLOWISE_CHATID, getBaseClasses, parseJsonBody } from '../../../src/utils'
+import { index } from '../../../src/indexing'
 import { howToUseFileUpload } from '../VectorStoreUtils'
 
 export const CLOUD_VECTOR_ERROR_CODES = {
@@ -97,6 +98,8 @@ export type CloudVectorStoreArgs = {
     includeMetadata?: boolean
     includeVector?: boolean
     scoreType?: CloudVectorScoreType
+    retryCount?: number
+    retryDelayMs?: number
 }
 
 export class CloudVectorStore extends VectorStore {
@@ -113,6 +116,8 @@ export class CloudVectorStore extends VectorStore {
     private readonly includeMetadata: boolean
     private readonly includeVector: boolean
     private readonly scoreType: CloudVectorScoreType
+    private readonly retryCount: number
+    private readonly retryDelayMs: number
 
     constructor(embeddings: Embeddings, args: CloudVectorStoreArgs) {
         super(embeddings, args)
@@ -129,6 +134,8 @@ export class CloudVectorStore extends VectorStore {
         this.includeMetadata = args.includeMetadata ?? true
         this.includeVector = args.includeVector ?? false
         this.scoreType = args.scoreType ?? 'similarity'
+        this.retryCount = args.retryCount ?? 2
+        this.retryDelayMs = args.retryDelayMs ?? 250
     }
 
     _vectorstoreType(): string {
@@ -136,9 +143,10 @@ export class CloudVectorStore extends VectorStore {
     }
 
     async addDocuments(documents: Document[], options?: ICommonObject): Promise<string[]> {
-        const texts = documents.map((doc) => doc.pageContent)
+        const validDocs = (documents ?? []).filter((doc) => doc?.pageContent)
+        const texts = validDocs.map((doc) => doc.pageContent)
         const vectors = texts.length ? await this.embeddings.embedDocuments(texts) : []
-        return await this.addVectors(vectors, documents, options)
+        return await this.addVectors(vectors, validDocs, options)
     }
 
     async addVectors(vectors: number[][], documents: Document[], options?: ICommonObject): Promise<string[]> {
@@ -157,7 +165,12 @@ export class CloudVectorStore extends VectorStore {
                 )
             }
 
+            const explicitIds = Array.isArray(options?.ids) ? (options?.ids as string[]) : undefined
             finalDocs.forEach((doc, index) => {
+                if (explicitIds?.[index]) {
+                    doc.id = explicitIds[index]
+                    doc.metadata[this.fields.idField] = explicitIds[index]
+                }
                 if (!vectors[index]?.length) {
                     throw buildCloudVectorError(
                         CLOUD_VECTOR_ERROR_CODES.DIMENSION_MISMATCH,
@@ -168,23 +181,39 @@ export class CloudVectorStore extends VectorStore {
             })
 
             if (this.client.ensureCollection) {
-                await this.client.ensureCollection({
-                    ...this.resource,
-                    vectorDimension: this.vectorDimension,
-                    metric: this.metric,
-                    fields: this.fields,
-                    autoCreate: this.autoCreate,
-                    indexParams: this.indexParams
-                })
+                await retryCloudVectorOperation(
+                    this.providerName,
+                    () =>
+                        this.client.ensureCollection!({
+                            ...this.resource,
+                            vectorDimension: this.vectorDimension,
+                            metric: this.metric,
+                            fields: this.fields,
+                            autoCreate: this.autoCreate,
+                            indexParams: this.indexParams
+                        }),
+                    {
+                        retryCount: this.retryCount,
+                        retryDelayMs: this.retryDelayMs
+                    }
+                )
             }
 
             const batches = chunkArray(finalDocs, this.batchSize || finalDocs.length)
             for (const batch of batches) {
-                await this.client.upsert({
-                    ...this.resource,
-                    documents: batch,
-                    fields: this.fields
-                })
+                await retryCloudVectorOperation(
+                    this.providerName,
+                    () =>
+                        this.client.upsert({
+                            ...this.resource,
+                            documents: batch,
+                            fields: this.fields
+                        }),
+                    {
+                        retryCount: this.retryCount,
+                        retryDelayMs: this.retryDelayMs
+                    }
+                )
             }
 
             return finalDocs.map((doc) => doc.id)
@@ -195,15 +224,23 @@ export class CloudVectorStore extends VectorStore {
 
     async similaritySearchVectorWithScore(query: number[], k: number, filter?: this['FilterType']): Promise<[Document, number][]> {
         try {
-            const results = await this.client.search({
-                ...this.resource,
-                vector: query,
-                topK: k,
-                filter: (filter ?? (this as any).filter) as object | string | undefined,
-                fields: this.fields,
-                includeMetadata: this.includeMetadata,
-                includeVector: this.includeVector
-            })
+            const results = await retryCloudVectorOperation(
+                this.providerName,
+                () =>
+                    this.client.search({
+                        ...this.resource,
+                        vector: query,
+                        topK: k,
+                        filter: (filter ?? (this as any).filter) as object | string | undefined,
+                        fields: this.fields,
+                        includeMetadata: this.includeMetadata,
+                        includeVector: this.includeVector
+                    }),
+                {
+                    retryCount: this.retryCount,
+                    retryDelayMs: this.retryDelayMs
+                }
+            )
 
             return results.map((result) => {
                 const metadata = {
@@ -229,14 +266,66 @@ export class CloudVectorStore extends VectorStore {
         if (!Array.isArray(ids) || !ids.length) return
 
         try {
-            await this.client.delete({
-                ...this.resource,
-                ids
-            })
+            await retryCloudVectorOperation(
+                this.providerName,
+                () =>
+                    this.client.delete!({
+                        ...this.resource,
+                        ids
+                    }),
+                {
+                    retryCount: this.retryCount,
+                    retryDelayMs: this.retryDelayMs
+                }
+            )
         } catch (e) {
             throw normalizeCloudVectorError(this.providerName, e)
         }
     }
+}
+
+export const CLOUD_VECTOR_EMBEDDING_PRESETS = {
+    custom: undefined,
+    'text-embedding-v4': 1024,
+    'bge-m3': 1024,
+    'bge-large-zh': 1024,
+    'm3e-base': 768,
+    'text-embedding-v3': 1024
+} as const
+
+export const resolveCloudVectorDimension = (dimension?: unknown, preset?: unknown): number => {
+    const parsed = dimension ? parseInt(String(dimension), 10) : Number.NaN
+    if (Number.isFinite(parsed) && parsed > 0) return parsed
+    const presetDimension = CLOUD_VECTOR_EMBEDDING_PRESETS[String(preset || 'custom') as keyof typeof CLOUD_VECTOR_EMBEDDING_PRESETS]
+    return presetDimension ?? 1536
+}
+
+export const retryCloudVectorOperation = async <T>(
+    providerName: string,
+    operation: () => Promise<T>,
+    options: {
+        retryCount?: number
+        retryDelayMs?: number
+    } = {}
+): Promise<T> => {
+    const retryCount = Math.max(0, options.retryCount ?? 2)
+    const retryDelayMs = Math.max(0, options.retryDelayMs ?? 250)
+    let lastError: unknown
+
+    for (let attempt = 0; attempt <= retryCount; attempt += 1) {
+        try {
+            return await operation()
+        } catch (e) {
+            lastError = e
+            const normalized = normalizeCloudVectorError(providerName, e)
+            if (normalized.code !== CLOUD_VECTOR_ERROR_CODES.RATE_LIMIT || attempt >= retryCount) {
+                throw normalized
+            }
+            await new Promise((resolve) => setTimeout(resolve, retryDelayMs * Math.pow(2, attempt)))
+        }
+    }
+
+    throw normalizeCloudVectorError(providerName, lastError)
 }
 
 export const prepareCloudVectorDocuments = (
@@ -387,12 +476,14 @@ export const getCloudVectorStoreArgs = (
         },
         fields: getCloudVectorFields(nodeData),
         autoCreate: Boolean(nodeData.inputs?.autoCreate),
-        vectorDimension: nodeData.inputs?.vectorDimension ? parseInt(nodeData.inputs.vectorDimension as string, 10) : 1536,
+        vectorDimension: resolveCloudVectorDimension(nodeData.inputs?.vectorDimension, nodeData.inputs?.embeddingPreset),
         metric: ((nodeData.inputs?.metric as string) || 'cosine') as CloudVectorMetric,
         batchSize: Number.isFinite(batchSize) ? batchSize : undefined,
         indexParams: parseOptionalJson(nodeData.inputs?.indexParams) as Record<string, any> | undefined,
         includeMetadata: nodeData.inputs?.includeMetadata !== false,
-        includeVector: Boolean(nodeData.inputs?.includeVector)
+        includeVector: Boolean(nodeData.inputs?.includeVector),
+        retryCount: nodeData.inputs?.retryCount ? parseInt(nodeData.inputs.retryCount as string, 10) : 2,
+        retryDelayMs: nodeData.inputs?.retryDelayMs ? parseInt(nodeData.inputs.retryDelayMs as string, 10) : 250
     }
 }
 
@@ -416,6 +507,22 @@ export const getCommonCloudVectorInputs = (databaseLoadMethod: string, collectio
         label: 'Embeddings',
         name: 'embeddings',
         type: 'Embeddings'
+    },
+    {
+        label: 'Record Manager',
+        name: 'recordManager',
+        type: 'RecordManager',
+        description: '开启后按文档 hash 做去重、重建和清理，适合知识库持续增量同步。',
+        optional: true
+    },
+    {
+        label: '开通与凭证说明',
+        name: 'credentialGuide',
+        type: 'string',
+        description:
+            '先在对应云厂商控制台开通向量数据库服务，创建实例并获取 Endpoint / API Key / AK-SK，再回到凭证页填写。腾讯云：VectorDB；阿里云：DashVector；百度智能云：VectorDB/Mochow；火山引擎：VikingDB。',
+        optional: true,
+        additionalParams: true
     },
     {
         label: 'Database Name',
@@ -495,7 +602,8 @@ export const getCommonCloudVectorInputs = (databaseLoadMethod: string, collectio
     {
         label: 'Metadata Filter',
         name: 'metadataFilter',
-        description: 'Provider native metadata filter. JSON is parsed automatically; plain strings are passed through as-is.',
+        description:
+            '厂商原生 metadata 过滤条件。示例：{"source":"manual.md"}。JSON 会自动解析，非 JSON 字符串原样传给厂商 API。自动建集合时请确认过滤字段已在云端 schema / index 中可检索。',
         type: 'json',
         optional: true,
         additionalParams: true,
@@ -518,10 +626,48 @@ export const getCommonCloudVectorInputs = (databaseLoadMethod: string, collectio
         optional: true
     },
     {
+        label: 'Embedding Preset',
+        name: 'embeddingPreset',
+        description:
+            '常用 embedding 维度预设。text-embedding-v4 常用 1024 维，bge-m3 常用 1024 维；如果手动填写 Vector Dimension，则优先使用手动值。',
+        type: 'options',
+        default: 'custom',
+        options: [
+            { label: 'Custom / 手动填写', name: 'custom' },
+            { label: 'Qwen text-embedding-v4 (1024)', name: 'text-embedding-v4' },
+            { label: 'BAAI bge-m3 (1024)', name: 'bge-m3' },
+            { label: 'bge-large-zh (1024)', name: 'bge-large-zh' },
+            { label: 'm3e-base (768)', name: 'm3e-base' },
+            { label: 'text-embedding-v3 (1024)', name: 'text-embedding-v3' }
+        ],
+        additionalParams: true,
+        optional: true
+    },
+    {
         label: 'Auto Create If Not Exists',
         name: 'autoCreate',
         type: 'boolean',
+        description:
+            '开启后会按 Vector Dimension、Metric 和 Index Params 自动创建集合/表。生产环境建议先在云控制台确认字段 schema、维度和计费规格。',
         default: false,
+        additionalParams: true,
+        optional: true
+    },
+    {
+        label: 'Retry Count',
+        name: 'retryCount',
+        description: '云 API 遇到限流时的重试次数。默认 2 次。',
+        placeholder: '2',
+        type: 'number',
+        additionalParams: true,
+        optional: true
+    },
+    {
+        label: 'Retry Delay (ms)',
+        name: 'retryDelayMs',
+        description: '云 API 限流重试的初始等待时间，之后按指数退避。默认 250ms。',
+        placeholder: '250',
+        type: 'number',
         additionalParams: true,
         optional: true
     },
@@ -569,6 +715,16 @@ export const getCloudVectorOutputs = (providerLabel: string, type: string): INod
     }
 ]
 
+const getCloudVectorRecordManagerName = (nodeData: INodeData, typeName: string): string =>
+    `${typeName}_${nodeData.inputs?.databaseName ?? 'default'}_${nodeData.inputs?.collectionName ?? 'default'}`
+
+const scopeCloudVectorRecordManager = (recordManager: ICommonObject, vectorStoreName: string): void => {
+    const namespace = String(recordManager.namespace ?? '')
+    if (namespace && !namespace.endsWith(`_${vectorStoreName}`)) {
+        recordManager.namespace = `${namespace}_${vectorStoreName}`
+    }
+}
+
 export const runCloudVectorUpsert = async (
     nodeData: INodeData,
     options: ICommonObject,
@@ -578,14 +734,30 @@ export const runCloudVectorUpsert = async (
 ): Promise<Partial<IndexingResult>> => {
     const embeddings = nodeData.inputs?.embeddings as Embeddings
     const docs = nodeData.inputs?.document as Document[]
+    const recordManager = nodeData.inputs?.recordManager
     const store = createCloudVectorStore(nodeData, embeddings, client, providerName, typeName)
-    const ids = await store.addDocuments(docs ?? [], {
-        chatId: nodeData.inputs?.fileUpload ? options?.chatId : undefined
-    })
     const addedDocs = prepareCloudVectorDocuments(docs ?? [], {
         ...getCloudVectorFields(nodeData),
         chatId: nodeData.inputs?.fileUpload ? options?.chatId : undefined
     }).map((doc) => new Document({ pageContent: doc.text, metadata: doc.metadata }))
+
+    if (recordManager) {
+        await recordManager.createSchema()
+        return await index({
+            docsSource: addedDocs,
+            recordManager,
+            vectorStore: store,
+            options: {
+                cleanup: recordManager?.cleanup,
+                sourceIdKey: recordManager?.sourceIdKey ?? 'source',
+                vectorStoreName: getCloudVectorRecordManagerName(nodeData, typeName)
+            }
+        })
+    }
+
+    const ids = await store.addDocuments(docs ?? [], {
+        chatId: nodeData.inputs?.fileUpload ? options?.chatId : undefined
+    })
     return {
         numAdded: ids.length,
         addedDocs
@@ -595,12 +767,29 @@ export const runCloudVectorUpsert = async (
 export const runCloudVectorDelete = async (
     nodeData: INodeData,
     ids: string[],
+    options: ICommonObject,
     client: CloudVectorProviderClient,
     providerName: string,
     typeName: string
 ): Promise<void> => {
     const embeddings = nodeData.inputs?.embeddings as Embeddings
+    const recordManager = nodeData.inputs?.recordManager
     const store = createCloudVectorStore(nodeData, embeddings, client, providerName, typeName)
+
+    if (recordManager) {
+        const vectorStoreName = getCloudVectorRecordManagerName(nodeData, typeName)
+        await recordManager.createSchema()
+        scopeCloudVectorRecordManager(recordManager, vectorStoreName)
+        const filterKeys: ICommonObject = {}
+        if (options.docId) {
+            filterKeys.docId = options.docId
+        }
+        const keys: string[] = await recordManager.listKeys(filterKeys)
+        await store.delete({ ids: keys })
+        await recordManager.deleteKeys(keys)
+        return
+    }
+
     await store.delete({ ids })
 }
 

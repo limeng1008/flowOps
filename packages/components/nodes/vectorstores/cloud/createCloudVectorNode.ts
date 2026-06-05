@@ -92,7 +92,7 @@ export abstract class CloudVectorNode implements INode {
         },
         delete: async (nodeData: INodeData, ids: string[], options?: ICommonObject): Promise<void> => {
             const client = await this.config.createClient(nodeData, options)
-            await runCloudVectorDelete(nodeData, ids, client, this.config.providerDisplayName, this.type)
+            await runCloudVectorDelete(nodeData, ids, options ?? {}, client, this.config.providerDisplayName, this.type)
         }
     }
 
