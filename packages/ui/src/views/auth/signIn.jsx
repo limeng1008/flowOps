@@ -22,6 +22,8 @@ import ssoApi from '@/api/sso'
 
 // utils
 import useNotifier from '@/utils/useNotifier'
+import { getPostLoginRedirectPath } from './loginRedirect'
+import { translateAuthErrorMessage } from './authErrorMessage'
 
 // store
 import { loginSuccess, logoutSuccess } from '@/store/reducers/authSlice'
@@ -152,7 +154,7 @@ const SignInPage = () => {
         if (loginApi.data) {
             setLoading(false)
             store.dispatch(loginSuccess(loginApi.data))
-            navigate(location.state?.path || '/')
+            navigate(getPostLoginRedirectPath(location.state))
             //navigate(0)
         }
 
@@ -162,7 +164,7 @@ const SignInPage = () => {
     useEffect(() => {
         if (ssoLoginApi.data) {
             store.dispatch(loginSuccess(ssoLoginApi.data))
-            navigate(location.state?.path || '/')
+            navigate(getPostLoginRedirectPath(location.state))
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -441,7 +443,7 @@ const SignInPage = () => {
                     )}
                     {authError && (
                         <Alert icon={<IconExclamationCircle />} variant='filled' severity='error'>
-                            {authError}
+                            {translateAuthErrorMessage(authError, t)}
                         </Alert>
                     )}
                     {showResendButton && (

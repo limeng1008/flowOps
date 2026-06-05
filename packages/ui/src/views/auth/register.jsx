@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import { z } from 'zod/v3'
 import { useTranslation } from 'react-i18next'
 
@@ -24,6 +24,7 @@ import { useError } from '@/store/context/ErrorContext'
 // utils
 import useNotifier from '@/utils/useNotifier'
 import { passwordSchema } from '@/utils/validation'
+import { getPostLoginRedirectPath } from './loginRedirect'
 
 // Icons
 import Auth0SSOLoginIcon from '@/assets/images/auth0.svg'
@@ -127,6 +128,7 @@ const RegisterPage = () => {
     const ssoLoginApi = useApi(ssoApi.ssoLogin)
     const getDefaultProvidersApi = useApi(loginMethodApi.getDefaultLoginMethods)
     const navigate = useNavigate()
+    const location = useLocation()
 
     const validationMessage = (message) =>
         ({
@@ -227,7 +229,7 @@ const RegisterPage = () => {
     useEffect(() => {
         if (ssoLoginApi.data) {
             store.dispatch(loginSuccess(ssoLoginApi.data))
-            navigate(location.state?.path || '/')
+            navigate(getPostLoginRedirectPath(location.state))
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
