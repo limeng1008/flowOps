@@ -74,3 +74,5 @@
 
 -   完成统一上线检查报告 `go-live-readiness-audit.md`：结论为当前适合内部演示/POC/封闭内测，但不满足正式生产商业上线；P0 阻断项包括工作树不干净、功能分支未合主线、支付未形成真实收款闭环、缺真实环境联调、合规/运维材料不足。
 -   从 `codex/china-cloud-vectorstores` 切出 `codex/go-live-hardening`，按 P0 顺序开始逐项整改；第一项目标是清理并分组提交当前工作树改动，让发布物可复现。
+-   P0#1 完成：`codex/go-live-hardening` 已按审计/认证/市场工具/UI 视觉/FORK 账本分组提交并推送，工作树清理为干净状态。
+-   P0#2 完成：从 `codex/go-live-hardening` 创建 `release/flowops-commercialization-v1` 作为候选发布源，并在 release 分支重跑商业化后端测试、市场模板测试、导出/国产云向量库测试、server 类型检查、三包构建、UI i18n 与 fork divergence，全部通过；UI build 的大 chunk 警告保留为 P1 性能项。

@@ -11,6 +11,30 @@
 
 更准确地说：代码层面的主要构建和关键单测能通过，适合继续做内部演示、POC、封闭内测；但还不适合对外正式商业化上线。核心原因不是“跑不起来”，而是发布状态、真实支付闭环、真实云服务联调、人工 E2E 验收、合规与运维准备还没有闭环。
 
+## 整改记录
+
+### 2026-06-05：P0#1 发布物可复现
+
+-   已从 `codex/china-cloud-vectorstores` 切出 `codex/go-live-hardening`，并把上线前混杂改动拆成可审计提交。
+-   已提交并推送 `codex/go-live-hardening`；本地工作树确认干净。
+-   本地非发布素材通过 `.git/info/exclude` 排除，不进入 release 构建物。
+
+### 2026-06-05：P0#2 release 候选分支
+
+-   已从干净的 `codex/go-live-hardening` 创建 `release/flowops-commercialization-v1`，用于固定商业化 V1 候选发布源。
+-   release 分支基线来源为 `codex/go-live-hardening` 的 `51797576`，包含国产云向量库增强、商业化整理、auth 修复、授权网页抓取工具、UI 视觉/i18n 收尾和 fork ledger 登记。
+-   已在 `release/flowops-commercialization-v1` 上重跑关键门禁：
+    -   `node -v && pnpm -v`：Node `v20.20.2`，pnpm `10.26.0`
+    -   `cd packages/server && npx jest src/services/billing/index.test.ts src/services/payment/index.test.ts src/services/support-tickets/index.test.ts --runInBand`：20/20 通过
+    -   `cd packages/server && npx jest src/services/marketplaces --runInBand`：13/13 通过
+    -   `cd packages/components && npx jest DocumentExport SpreadsheetExport PptxExport TencentCloudVectorDB DashVector BaiduVectorDB VikingDB cloudVectorStore httpClient --runInBand`：44/44 通过
+    -   `cd packages/server && npx tsc --noEmit`：通过
+    -   `pnpm --filter flowise-components build`：通过
+    -   `pnpm --filter flowise build`：通过
+    -   `pnpm --filter flowise-ui build`：通过，仍保留 Vite dynamic/static import 与大 chunk 警告
+    -   `cd packages/ui && npx jest i18n --runInBand`：1502/1502 通过
+    -   `bash scripts/fork-divergence.sh`：通过
+
 ## 已通过的技术门禁
 
 本次检查实际执行过以下命令：
