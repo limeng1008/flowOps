@@ -51,6 +51,15 @@
 -   已把本次自动门禁登记为 PASS：商业化后端测试、市场模板测试、导出/国产云向量库 mock 测试、server 类型检查、三包构建、UI i18n、fork divergence。
 -   真实浏览器 E2E、真实国产云向量库 upsert/search/delete、支付沙箱扫码和公网回调仍需人工凭证/环境后执行；当前台账中均标为 `BLOCKED`，不能作为正式公网商业化 PASS。
 
+### 2026-06-05：部署优先级调整
+
+-   当前阶段从“正式上线”调整为“先能部署”，暂缓 P0#5 法务合规材料与 P0#6 生产运维完善。
+-   已修复 `deploy/docker-compose.yml`：为 `flowops` 增加 `/api/v1/ping` 应用健康检查，并把 PostgreSQL healthcheck 改为使用容器真实的 `POSTGRES_USER/POSTGRES_DB`。
+-   已补齐 `deploy/.env.example` 的 `APP_URL`、`SECRETKEY_PATH`、`BLOB_STORAGE_PATH`、`LOG_PATH`、`FLOWISE_FILE_SIZE_LIMIT` 部署默认项。
+-   已新增 `docs/runbooks/FlowOps-deployment-runbook.md`，覆盖源码构建、Compose 启动、健康检查、首次注册、migration 观察、文件卷验证、停止/重启、备份恢复、离线部署和故障排查。
+-   部署完成标准调整为：`docker compose config` 通过、`docker compose up -d --build` 可启动、`flowops/flowops-db` healthy、`/api/v1/ping` 返回 200、`/signin` 可首次注册、重启后数据保留。
+-   本机已验证 `docker compose config` 与 `docker compose --dry-run build flowops`；真实 `docker compose up -d --build` 未执行，因为当前 Docker context 指向的 Docker Desktop socket 不可达，需 Docker daemon 恢复后继续验收。
+
 ## 已通过的技术门禁
 
 本次检查实际执行过以下命令：

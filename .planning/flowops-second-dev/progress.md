@@ -78,3 +78,4 @@
 -   P0#2 完成：从 `codex/go-live-hardening` 创建 `release/flowops-commercialization-v1` 作为候选发布源，并在 release 分支重跑商业化后端测试、市场模板测试、导出/国产云向量库测试、server 类型检查、三包构建、UI i18n 与 fork divergence，全部通过；UI build 的大 chunk 警告保留为 P1 性能项。
 -   P0#3 完成：商业化 V1 明确不开放自助支付，采用“后台手动开通套餐 + 硬性额度拦截”；账号页和 `/billing` 运营后台补充手动开通提示，`deploy/.env.example` 标注支付 env 仅用于沙箱/公网回调联调，新增 i18n 测试守卫避免本地计费后台出现自助支付入口。
 -   P0#4 机制完成：新增 `docs/runbooks/FlowOps-go-live-smoke-checklist.md` 与 `.planning/flowops-second-dev/go-live-smoke-evidence.md`，把登录权限、Agent 运行、模板导入、导出、计费拦截、工单、国产模型 token、四家国产云向量库和支付沙箱回调拆成可执行 smoke；已登记自动门禁为 PASS，真实浏览器/云服务/支付联调因缺凭证或外部环境标为 BLOCKED，后续人工执行时填回台账。
+-   根据“先不上线，先能部署”调整优先级：暂缓法务/正式公网商业化材料，先补部署闭环。修复 `deploy/docker-compose.yml` 健康检查，补 `deploy/.env.example` 部署默认项，新增 `docs/runbooks/FlowOps-deployment-runbook.md`，并在 `deploy/README.md` 增加部署验收命令；`docker compose config` 与 `docker compose --dry-run build flowops` 已通过，真实启动因当前 Docker Desktop socket 不可达未执行。

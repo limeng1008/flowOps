@@ -13,6 +13,15 @@ docker compose up -d --build      # 首次构建较久（拉依赖+编译，约 
 
 启动后访问 `http://服务器IP:3000` → **首次进入 /signin 注册的第一个账号即为管理员**（FlowOps 3.x 是账号体系，不再用 basic auth）。
 
+部署验收：
+
+```bash
+docker compose ps
+curl -fsS http://localhost:${PORT:-3000}/api/v1/ping
+```
+
+通过标准：`flowops-db` 和 `flowops` 均为 `healthy`，`/api/v1/ping` 返回 200。更完整的部署、备份、恢复和排障流程见 `docs/runbooks/FlowOps-deployment-runbook.md`。
+
 常用命令：
 
 ```bash

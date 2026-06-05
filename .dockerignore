@@ -1,10 +1,16 @@
 node_modules
 dist
 build
+.git
+.github
+.planning
+docs
+marketing
 
 **/node_modules
 **/build
 **/dist
+**/.env
 
 packages/server/.env
 packages/ui/.env
