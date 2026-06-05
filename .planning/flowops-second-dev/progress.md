@@ -69,3 +69,8 @@
 -   在 `codex/china-cloud-vectorstores` 上完成四家国产云向量库节点 P1/P2 增强：中文配置示例、API Key/开通指引、自动建集合说明、embedding 维度预设、Record Manager 去重/重建/cleanup、限流重试/指数退避。
 -   新增 4 个应用市场 AgentflowV2 RAG 模板：腾讯云 VectorDB、阿里云 DashVector、百度智能云 VectorDB/Mochow、火山引擎 VikingDB；模板默认 `chatZhipuAI + glm-4.5` 与 `embeddingQwen`。
 -   新增 mock HTTP server 集成测试，覆盖资源发现、自动建集合、429 重试、写入、检索和删除；真实云端联调记录落在 `china-cloud-vectorstores-commercialization.md`，因当前无四家云测试凭证，真实云 smoke 待人工凭证到位后执行。
+
+### 上线 readiness 整改启动（2026-06-05）
+
+-   完成统一上线检查报告 `go-live-readiness-audit.md`：结论为当前适合内部演示/POC/封闭内测，但不满足正式生产商业上线；P0 阻断项包括工作树不干净、功能分支未合主线、支付未形成真实收款闭环、缺真实环境联调、合规/运维材料不足。
+-   从 `codex/china-cloud-vectorstores` 切出 `codex/go-live-hardening`，按 P0 顺序开始逐项整改；第一项目标是清理并分组提交当前工作树改动，让发布物可复现。
