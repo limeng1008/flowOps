@@ -1,5 +1,6 @@
 import {
     createBaseNodeData,
+    createFakeRecordManager,
     expectCommonNodeShape,
     expectNodeLifecycle,
     fakeProviderClient,
@@ -44,5 +45,44 @@ describe('TencentCloudVectorDB', () => {
     it('upserts, searches and deletes through the shared cloud vector lifecycle', async () => {
         const node = new TencentCloudVectorDB()
         await expectNodeLifecycle(node, createBaseNodeData('tencentCloudVectorDB'))
+    })
+
+    it('uses Record Manager for dedupe and cleanup when configured', async () => {
+        const node = new TencentCloudVectorDB()
+        const recordManager = createFakeRecordManager()
+
+        const result = await node.vectorStoreMethods.upsert(
+            createBaseNodeData('tencentCloudVectorDB', {
+                recordManager
+            }),
+            {}
+        )
+
+        expect(recordManager.createSchema).toHaveBeenCalled()
+        expect(recordManager.update).toHaveBeenCalled()
+        expect(result.numAdded).toBe(1)
+    })
+
+    it('cleans cloud vectors and Record Manager keys by document id', async () => {
+        const node = new TencentCloudVectorDB()
+        const recordManager = createFakeRecordManager()
+        recordManager.listKeys.mockResolvedValueOnce(['record-uid-1', 'record-uid-2'])
+
+        await node.vectorStoreMethods.delete(
+            createBaseNodeData('tencentCloudVectorDB', {
+                recordManager
+            }),
+            [],
+            { docId: 'doc-source-1' }
+        )
+
+        expect(recordManager.createSchema).toHaveBeenCalled()
+        expect(recordManager.listKeys).toHaveBeenCalledWith({ docId: 'doc-source-1' })
+        expect(fakeProviderClient.delete).toHaveBeenCalledWith(
+            expect.objectContaining({
+                ids: ['record-uid-1', 'record-uid-2']
+            })
+        )
+        expect(recordManager.deleteKeys).toHaveBeenCalledWith(['record-uid-1', 'record-uid-2'])
     })
 })

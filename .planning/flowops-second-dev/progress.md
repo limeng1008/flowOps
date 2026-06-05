@@ -63,3 +63,9 @@
 -   新增 `docs/brand/FlowOps-VI.md`，记录色彩、字体、logo 用法、露出点清单和正式 VI 替换步骤。
 -   商业化补全 T1 支付沙箱骨架：新增 `PaymentOrder`、支付宝/微信 provider、支付 service/controller/route、四库 migration（`1777100000000`）和 env 占位；验签失败拒绝并记录，金额按整数分处理。
 -   商业化补全 T2 自建轻量工单：新增 `SupportTicket`、工单 service/controller/route、四库 migration（`1777200000000`）、前端工单入口和中英 i18n；普通用户按组织+本人隔离，管理员走 `SUPPORT_ADMIN_EMAILS`/`BILLING_ADMIN_EMAILS` 白名单。
+
+### 国产云向量库节点商业化增强（2026-06-05）
+
+-   在 `codex/china-cloud-vectorstores` 上完成四家国产云向量库节点 P1/P2 增强：中文配置示例、API Key/开通指引、自动建集合说明、embedding 维度预设、Record Manager 去重/重建/cleanup、限流重试/指数退避。
+-   新增 4 个应用市场 AgentflowV2 RAG 模板：腾讯云 VectorDB、阿里云 DashVector、百度智能云 VectorDB/Mochow、火山引擎 VikingDB；模板默认 `chatZhipuAI + glm-4.5` 与 `embeddingQwen`。
+-   新增 mock HTTP server 集成测试，覆盖资源发现、自动建集合、429 重试、写入、检索和删除；真实云端联调记录落在 `china-cloud-vectorstores-commercialization.md`，因当前无四家云测试凭证，真实云 smoke 待人工凭证到位后执行。

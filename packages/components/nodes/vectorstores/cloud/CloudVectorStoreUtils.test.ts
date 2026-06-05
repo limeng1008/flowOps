@@ -3,8 +3,10 @@ import {
     CLOUD_VECTOR_ERROR_CODES,
     CloudVectorStore,
     chunkArray,
+    getCloudVectorStoreArgs,
     normalizeCloudVectorError,
     prepareCloudVectorDocuments,
+    retryCloudVectorOperation,
     scoreToRelevance
 } from './CloudVectorStoreUtils'
 
@@ -66,6 +68,42 @@ describe('CloudVectorStoreUtils', () => {
         })
         expect(rateLimitError.code).toBe(CLOUD_VECTOR_ERROR_CODES.RATE_LIMIT)
         expect(rateLimitError.message).toContain('请求过于频繁')
+    })
+
+    it('applies commercial embedding presets and retries rate limited operations', async () => {
+        const nodeData = {
+            inputs: {
+                databaseName: 'db1',
+                collectionName: 'col1',
+                embeddingPreset: 'bge-m3',
+                idField: 'id',
+                textField: 'content',
+                vectorField: 'vector',
+                metadataField: 'metadata',
+                retryCount: '2',
+                retryDelayMs: '1'
+            }
+        } as any
+
+        const client = {
+            upsert: jest.fn(),
+            search: jest.fn()
+        }
+
+        expect(getCloudVectorStoreArgs(nodeData, client as any, '测试向量库', 'TestVector').vectorDimension).toBe(1024)
+
+        const operation = jest
+            .fn()
+            .mockRejectedValueOnce({ response: { status: 429, data: { message: 'Too many requests' } } })
+            .mockResolvedValueOnce('ok')
+
+        await expect(
+            retryCloudVectorOperation('测试向量库', () => operation(), {
+                retryCount: 2,
+                retryDelayMs: 1
+            })
+        ).resolves.toBe('ok')
+        expect(operation).toHaveBeenCalledTimes(2)
     })
 
     it('adds, searches and deletes documents through a provider client', async () => {
@@ -150,5 +188,89 @@ describe('CloudVectorStoreUtils', () => {
             collectionName: 'col1',
             ids: ['a', 'b']
         })
+    })
+
+    it('uses explicit ids from Record Manager when indexing documents', async () => {
+        const client = {
+            ensureCollection: jest.fn(async () => undefined),
+            upsert: jest.fn(async () => undefined),
+            search: jest.fn(async () => []),
+            delete: jest.fn(async () => undefined)
+        }
+
+        const store = new CloudVectorStore(embeddings as any, {
+            providerName: '测试向量库',
+            typeName: 'TestCloudVector',
+            client,
+            resource: { databaseName: 'db1', collectionName: 'col1' },
+            fields: {
+                idField: 'id',
+                textField: 'content',
+                vectorField: 'vector',
+                metadataField: 'metadata'
+            },
+            autoCreate: true,
+            vectorDimension: 3,
+            metric: 'cosine',
+            batchSize: 10
+        })
+
+        await store.addDocuments([new Document({ pageContent: '需要重建的内容', metadata: { source: 'source-a' } })], {
+            ids: ['record-uid-1']
+        })
+
+        expect(client.upsert).toHaveBeenCalledWith(
+            expect.objectContaining({
+                documents: [
+                    expect.objectContaining({
+                        id: 'record-uid-1',
+                        metadata: expect.objectContaining({ id: 'record-uid-1' })
+                    })
+                ]
+            })
+        )
+    })
+
+    it('filters empty documents before embedding so vectors stay aligned', async () => {
+        const client = {
+            ensureCollection: jest.fn(async () => undefined),
+            upsert: jest.fn(async () => undefined),
+            search: jest.fn(async () => []),
+            delete: jest.fn(async () => undefined)
+        }
+        const localEmbeddings = {
+            embedDocuments: jest.fn(async (texts: string[]) => texts.map(() => [1, 2, 3])),
+            embedQuery: jest.fn(async () => [1, 2, 3])
+        }
+
+        const store = new CloudVectorStore(localEmbeddings as any, {
+            providerName: '测试向量库',
+            typeName: 'TestCloudVector',
+            client,
+            resource: { databaseName: 'db1', collectionName: 'col1' },
+            fields: {
+                idField: 'id',
+                textField: 'content',
+                vectorField: 'vector',
+                metadataField: 'metadata'
+            },
+            autoCreate: true,
+            vectorDimension: 3,
+            metric: 'cosine',
+            batchSize: 10
+        })
+
+        await expect(
+            store.addDocuments([
+                new Document({ pageContent: '有效内容', metadata: { docId: 'doc-1' } }),
+                new Document({ pageContent: '', metadata: { docId: 'empty-doc' } })
+            ])
+        ).resolves.toEqual(['doc-1'])
+        expect(localEmbeddings.embedDocuments).toHaveBeenCalledWith(['有效内容'])
+        expect(client.upsert).toHaveBeenCalledWith(
+            expect.objectContaining({
+                documents: [expect.objectContaining({ id: 'doc-1', text: '有效内容' })]
+            })
+        )
     })
 })
