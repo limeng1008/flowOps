@@ -44,6 +44,13 @@
 -   新增 UI i18n 守卫，确保本地计费后台不出现 `createOrder`、`getOrderStatus`、`paymentApi`、`扫码`、`购买` 等自助支付入口痕迹。
 -   支付服务代码仍保留为沙箱/后续真实支付接入骨架；在真机扫码和公网回调验收前，不计入正式收款闭环。
 
+### 2026-06-05：P0#4 Smoke 证据机制
+
+-   已新增 `docs/runbooks/FlowOps-go-live-smoke-checklist.md`，覆盖登录权限、Agent 创建运行、应用市场模板、文档/表格/PPT 导出、计费手动开通与 402 拦截、工单、国产模型 token 计量、四家国产云向量库真实实例、支付沙箱回调。
+-   已新增 `.planning/flowops-second-dev/go-live-smoke-evidence.md`，作为本次 release 的 smoke 证据台账，固定记录日期、执行人、环境、账号/组织、commit、结果、截图/日志/订单号/云资源 ID 和备注。
+-   已把本次自动门禁登记为 PASS：商业化后端测试、市场模板测试、导出/国产云向量库 mock 测试、server 类型检查、三包构建、UI i18n、fork divergence。
+-   真实浏览器 E2E、真实国产云向量库 upsert/search/delete、支付沙箱扫码和公网回调仍需人工凭证/环境后执行；当前台账中均标为 `BLOCKED`，不能作为正式公网商业化 PASS。
+
 ## 已通过的技术门禁
 
 本次检查实际执行过以下命令：
