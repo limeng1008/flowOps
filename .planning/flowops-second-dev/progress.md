@@ -55,3 +55,11 @@
 -   **商业化 5 项现状盘点**：计费模块 ✅（billing v1，三维度 token/bot/seat 配额已挂请求入口，幂等去重+权限+UTC 周期）、官网/文档/帮助中心 ✅（`publicSite/index.jsx` 903 行真内容）、支付集成 ⚠️ 半成品（仅 402 拦截，无真实收款渠道）、客服/工单系统 ❌、品牌 logo/VI ❌。
 -   **billing v1 待补点**（验收挑刺）：支付断头路（升级无下单流程）、前端 billing 页未真机验证、还在 `codex/billing-v1` 未并主干、国产模型 token usage 字段格式与 OpenAI 不一致需校准计费口径。
 -   产出《商业化补全执行计划》`codex-commercialization-plan.md`（不含已做的计费/官网）：T1 支付宝/微信**沙箱对接骨架**（零新依赖手写 `crypto` 验签，接 billing 升级出口）、T2 **自建轻量工单**（Ticket+TicketMessage，复用账号体系+权限隔离）、T3 **占位 VI**（SVG 字标/favicon/VI 令牌/BrandLogo 收口+替换指引）。钉死铁律：4 库 migration、不 `pnpm add`、钱按分存整数、密钥只读 env、回调验签失败即拒、订单状态机只进不退、i18n en+zh 同步。边界：真实收款仍需营业执照+商户号+公网回调+ICP 备案，Codex 不碰。
+
+### 商业化补全落地（2026-06-04）
+
+-   商业化补全 T3 占位 VI 启动：从 `codex/billing-v1` 切出 `codex/commercialization-v1`，只执行品牌视觉统一，不碰 T1 支付 / T2 工单。
+-   新增 FlowOps 占位 VI：SVG 字标、方形 mark、favicon/PWA 图标、主题品牌 token、全局中文优先字体栈和 `BrandLogo` 统一入口。
+-   新增 `docs/brand/FlowOps-VI.md`，记录色彩、字体、logo 用法、露出点清单和正式 VI 替换步骤。
+-   商业化补全 T1 支付沙箱骨架：新增 `PaymentOrder`、支付宝/微信 provider、支付 service/controller/route、四库 migration（`1777100000000`）和 env 占位；验签失败拒绝并记录，金额按整数分处理。
+-   商业化补全 T2 自建轻量工单：新增 `SupportTicket`、工单 service/controller/route、四库 migration（`1777200000000`）、前端工单入口和中英 i18n；普通用户按组织+本人隔离，管理员走 `SUPPORT_ADMIN_EMAILS`/`BILLING_ADMIN_EMAILS` 白名单。

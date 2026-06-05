@@ -72,6 +72,7 @@ import { OMIT_QUEUE_JOB_DATA } from './constants'
 import { executeAgentFlow } from './buildAgentflow'
 import { Workspace } from '../enterprise/database/entities/workspace.entity'
 import { Organization } from '../enterprise/database/entities/organization.entity'
+import BillingService, { BillingUsageSource, extractTokenUsage } from '../services/billing'
 
 const shouldAutoPlayTTS = (textToSpeechConfig: string | undefined | null): boolean => {
     if (!textToSpeechConfig) return false
@@ -1056,6 +1057,7 @@ export const utilBuildChatflow = async (req: Request, isInternal: boolean = fals
         const subscriptionId = org.subscriptionId as string
         const productId = await appServer.identityManager.getProductIdFromSubscription(subscriptionId)
 
+        await BillingService.assertTokenAllowance(orgId)
         await checkPredictions(orgId, subscriptionId, appServer.usageCacheManager)
 
         const executeData: IExecuteFlowParams = {
@@ -1093,6 +1095,7 @@ export const utilBuildChatflow = async (req: Request, isInternal: boolean = fals
                 throw new Error('Job execution failed')
             }
             await updatePredictionsUsage(orgId, subscriptionId, workspaceId, appServer.usageCacheManager)
+            await recordBillingTokenUsage(result, orgId, workspaceId, chatflow.id)
             incrementSuccessMetricCounter(appServer.metricsProvider, isInternal, isAgentFlow)
             return result
         } else {
@@ -1105,6 +1108,7 @@ export const utilBuildChatflow = async (req: Request, isInternal: boolean = fals
 
             appServer.abortControllerPool.remove(abortControllerId)
             await updatePredictionsUsage(orgId, subscriptionId, workspaceId, appServer.usageCacheManager)
+            await recordBillingTokenUsage(result, orgId, workspaceId, chatflow.id)
             incrementSuccessMetricCounter(appServer.metricsProvider, isInternal, isAgentFlow)
             return result
         }
@@ -1112,12 +1116,27 @@ export const utilBuildChatflow = async (req: Request, isInternal: boolean = fals
         logger.error(`[server]:${organizationId}/${chatflow.id}/${chatId} Error:`, e)
         appServer.abortControllerPool.remove(`${chatflow.id}_${chatId}`)
         incrementFailedMetricCounter(appServer.metricsProvider, isInternal, isAgentFlow)
-        if (e instanceof InternalFlowiseError && e.statusCode === StatusCodes.UNAUTHORIZED) {
+        if (e instanceof InternalFlowiseError) {
             throw e
         } else {
             throw new InternalFlowiseError(StatusCodes.INTERNAL_SERVER_ERROR, getErrorMessage(e))
         }
     }
+}
+
+const recordBillingTokenUsage = async (result: ICommonObject, orgId: string, workspaceId: string, chatflowId: string) => {
+    const usage = extractTokenUsage(result)
+    const sourceId = (result?.executionId || result?.chatMessageId || result?.chatId) as string | undefined
+    const dedupeKey = sourceId ? `prediction:${sourceId}` : `prediction:${orgId}:${chatflowId}:${Date.now()}`
+    await BillingService.recordTokenUsage({
+        organizationId: orgId,
+        workspaceId,
+        chatflowId,
+        source: BillingUsageSource.PREDICTION,
+        sourceId,
+        dedupeKey,
+        usage
+    })
 }
 
 /**

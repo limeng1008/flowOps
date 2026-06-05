@@ -3,6 +3,7 @@ import agentflowv2GeneratorRouter from './agentflowv2-generator'
 import apikeyRouter from './apikey'
 import assistantsRouter from './assistants'
 import attachmentsRouter from './attachments'
+import billingRouter from './billing'
 import chatMessageRouter from './chat-messages'
 import chatflowsRouter from './chatflows'
 import chatflowsStreamingRouter from './chatflows-streaming'
@@ -40,6 +41,7 @@ import openaiAssistantsRouter from './openai-assistants'
 import openaiAssistantsFileRouter from './openai-assistants-files'
 import openaiAssistantsVectorStoreRouter from './openai-assistants-vector-store'
 import openaiRealtimeRouter from './openai-realtime'
+import paymentRouter from './payment'
 import pingRouter from './ping'
 import predictionRouter from './predictions'
 import pricingRouter from './pricing'
@@ -49,6 +51,7 @@ import publicChatflowsRouter from './public-chatflows'
 import publicExecutionsRouter from './public-executions'
 import settingsRouter from './settings'
 import statsRouter from './stats'
+import supportTicketsRouter from './support-tickets'
 import textToSpeechRouter from './text-to-speech'
 import toolsRouter from './tools'
 import upsertHistoryRouter from './upsert-history'
@@ -78,6 +81,7 @@ router.use('/ping', pingRouter)
 router.use('/apikey', apikeyRouter)
 router.use('/assistants', assistantsRouter)
 router.use('/attachments', attachmentsRouter)
+router.use('/billing', billingRouter)
 router.use('/chatflows', chatflowsRouter)
 router.use('/chatflows-streaming', chatflowsStreamingRouter)
 router.use('/chatmessage', chatMessageRouter)
@@ -109,12 +113,14 @@ router.use('/openai-assistants', openaiAssistantsRouter)
 router.use('/openai-assistants-file', openaiAssistantsFileRouter)
 router.use('/openai-assistants-vector-store', openaiAssistantsVectorStoreRouter)
 router.use('/openai-realtime', openaiRealtimeRouter)
+router.use('/payment', paymentRouter)
 router.use('/prediction', predictionRouter)
 router.use('/prompts-list', promptListsRouter)
 router.use('/public-chatbotConfig', publicChatbotRouter)
 router.use('/public-chatflows', publicChatflowsRouter)
 router.use('/public-executions', publicExecutionsRouter)
 router.use('/stats', statsRouter)
+router.use('/support-tickets', supportTicketsRouter)
 router.use('/tools', toolsRouter)
 router.use('/variables', variablesRouter)
 router.use('/vector', vectorRouter)

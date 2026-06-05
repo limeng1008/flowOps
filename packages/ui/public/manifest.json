@@ -8,21 +8,21 @@
             "type": "image/svg+xml"
         },
         {
-            "src": "flowops-icon.svg",
-            "type": "image/svg+xml",
+            "src": "logo192.png",
+            "type": "image/png",
             "sizes": "192x192",
             "purpose": "any maskable"
         },
         {
-            "src": "flowops-icon.svg",
-            "type": "image/svg+xml",
+            "src": "logo512.png",
+            "type": "image/png",
             "sizes": "512x512",
             "purpose": "any maskable"
         }
     ],
     "start_url": ".",
     "display": "standalone",
-    "theme_color": "#14b8a6",
+    "theme_color": "#7c3aed",
     "background_color": "#08111f",
     "orientation": "any",
     "scope": "/",

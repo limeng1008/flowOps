@@ -37,6 +37,7 @@ import { IconAlertCircle, IconCreditCard, IconExternalLink, IconSparkles, IconX 
 
 // API
 import accountApi from '@/api/account.api'
+import billingApi from '@/api/billing'
 import pricingApi from '@/api/pricing'
 import userApi from '@/api/user'
 
@@ -77,6 +78,7 @@ const AccountSettings = () => {
     const [newPassword, setNewPassword] = useState('')
     const [confirmPassword, setConfirmPassword] = useState('')
     const [usage, setUsage] = useState(null)
+    const [billingOverview, setBillingOverview] = useState(null)
     const [isBillingLoading, setIsBillingLoading] = useState(false)
     const [seatsQuantity, setSeatsQuantity] = useState(0)
     const [prorationInfo, setProrationInfo] = useState(null)
@@ -97,6 +99,32 @@ const AccountSettings = () => {
     const storageUsageInPercent = useMemo(() => {
         return usage ? calculatePercentage(usage.storage?.usage, usage.storage?.limit) : 0
     }, [usage])
+    const billingUsageItems = useMemo(() => {
+        if (!billingOverview) return []
+        return [
+            {
+                key: 'tokens',
+                label: t('pages.account.tokenUsage'),
+                usage: billingOverview.usage?.tokens ?? 0,
+                limit: billingOverview.quotas?.tokens ?? 0,
+                exceeded: billingOverview.exceeded?.tokens
+            },
+            {
+                key: 'bots',
+                label: t('pages.account.botUsage'),
+                usage: billingOverview.usage?.bots ?? 0,
+                limit: billingOverview.quotas?.bots ?? 0,
+                exceeded: billingOverview.exceeded?.bots
+            },
+            {
+                key: 'seats',
+                label: t('pages.account.seatUsage'),
+                usage: billingOverview.usage?.seats ?? 0,
+                limit: billingOverview.quotas?.seats ?? 0,
+                exceeded: billingOverview.exceeded?.seats
+            }
+        ]
+    }, [billingOverview, t])
 
     const enqueueSnackbar = (...args) => dispatch(enqueueSnackbarAction(...args))
     const closeSnackbar = (...args) => dispatch(closeSnackbarAction(...args))
@@ -113,12 +141,14 @@ const AccountSettings = () => {
     const getCustomerDefaultSourceApi = useApi(userApi.getCustomerDefaultSource)
     const updateAdditionalSeatsApi = useApi(userApi.updateAdditionalSeats)
     const getCurrentUsageApi = useApi(userApi.getCurrentUsage)
+    const getBillingOverviewApi = useApi(billingApi.getMyBillingOverview)
     const logoutApi = useApi(accountApi.logout)
     const deleteAccountApi = useApi(accountApi.deleteAccount)
 
     useEffect(() => {
         if (currentUser) {
             getUserByIdApi.request(currentUser.id)
+            getBillingOverviewApi.request()
         } else {
             window.location.href = '/login'
         }
@@ -154,6 +184,12 @@ const AccountSettings = () => {
             setUsage(getCurrentUsageApi.data)
         }
     }, [getCurrentUsageApi.data])
+
+    useEffect(() => {
+        if (getBillingOverviewApi.data) {
+            setBillingOverview(getBillingOverviewApi.data)
+        }
+    }, [getBillingOverviewApi.data])
 
     useEffect(() => {
         try {
@@ -458,6 +494,12 @@ const AccountSettings = () => {
 
     // Calculate empty seats
     const emptySeats = Math.min(purchasedSeats, totalSeats - occupiedSeats)
+    const formatQuota = (value) => (value === -1 ? t('pages.account.unlimited') : Number(value || 0).toLocaleString())
+    const getBillingPercent = (usageValue, limitValue) => {
+        if (limitValue === -1) return 0
+        if (!limitValue || limitValue <= 0) return usageValue > 0 ? 100 : 0
+        return calculatePercentage(usageValue || 0, limitValue)
+    }
 
     return (
         <MainCard maxWidth='md'>
@@ -481,6 +523,61 @@ const AccountSettings = () => {
                     </Box>
                 ) : (
                     <>
+                        <SettingsSection title={t('pages.account.commercialQuota')}>
+                            <Box sx={{ px: 2.5, py: 2, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                                <Stack
+                                    direction={{ xs: 'column', sm: 'row' }}
+                                    sx={{ justifyContent: 'space-between', alignItems: { xs: 'start', sm: 'center' }, gap: 1 }}
+                                >
+                                    <Box>
+                                        <Typography variant='body2' color='text.secondary'>
+                                            {t('pages.account.localBillingPlan')}
+                                        </Typography>
+                                        <Typography variant='h3'>
+                                            {getBillingOverviewApi.loading
+                                                ? t('common.loading')
+                                                : billingOverview?.plan?.name || t('pages.account.notActivated')}
+                                        </Typography>
+                                    </Box>
+                                    {billingOverview?.subscription?.currentPeriodEnd && (
+                                        <Typography variant='body2' color='text.secondary'>
+                                            {t('pages.account.currentPeriodEnd', {
+                                                date: new Date(billingOverview.subscription.currentPeriodEnd).toLocaleDateString(dateLocale)
+                                            })}
+                                        </Typography>
+                                    )}
+                                </Stack>
+                                <Stack sx={{ gap: 2 }}>
+                                    {getBillingOverviewApi.loading ? (
+                                        <>
+                                            <Skeleton variant='rounded' height={52} />
+                                            <Skeleton variant='rounded' height={52} />
+                                            <Skeleton variant='rounded' height={52} />
+                                        </>
+                                    ) : (
+                                        billingUsageItems.map((item) => (
+                                            <Box key={item.key}>
+                                                <Stack direction='row' sx={{ justifyContent: 'space-between', mb: 0.75, gap: 2 }}>
+                                                    <Typography variant='body2'>{item.label}</Typography>
+                                                    <Typography
+                                                        variant='body2'
+                                                        color={item.exceeded ? theme.palette.error.main : 'text.secondary'}
+                                                    >
+                                                        {formatQuota(item.usage)} / {formatQuota(item.limit)}
+                                                    </Typography>
+                                                </Stack>
+                                                <LinearProgress
+                                                    variant='determinate'
+                                                    value={getBillingPercent(item.usage, item.limit)}
+                                                    color={item.exceeded ? 'error' : 'primary'}
+                                                    sx={{ height: 8, borderRadius: 1 }}
+                                                />
+                                            </Box>
+                                        ))
+                                    )}
+                                </Stack>
+                            </Box>
+                        </SettingsSection>
                         {isCloud && (
                             <>
                                 <SettingsSection title={t('pages.account.subscriptionBilling')}>

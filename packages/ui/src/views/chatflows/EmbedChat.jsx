@@ -88,13 +88,13 @@ const App = () => {
 
 const getDefaultThemeConfig = (t) => ({
     button: {
-        backgroundColor: '#3B81F6',
+        backgroundColor: '#7C3AED',
         right: 20,
         bottom: 20,
         size: 48,
         dragAndDrop: true,
         iconColor: 'white',
-        customIconSrc: 'https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/google-messages.svg',
+        customIconSrc: '/flowops-icon.svg',
         autoWindowOpen: {
             autoOpen: true,
             openDelay: 2,
@@ -112,7 +112,7 @@ const getDefaultThemeConfig = (t) => ({
         title: t('pages.chatflows.embedTheme.disclaimerTitle'),
         message: t('pages.chatflows.embedTheme.disclaimerMessage'),
         textColor: 'black',
-        buttonColor: '#3b82f6',
+        buttonColor: '#7C3AED',
         buttonText: t('pages.chatflows.embedTheme.startChatting'),
         buttonTextColor: 'white',
         blurredBackgroundColor: 'rgba(0, 0, 0, 0.4)',
@@ -123,7 +123,7 @@ const getDefaultThemeConfig = (t) => ({
         showTitle: true,
         showAgentMessages: true,
         title: 'FlowOps Bot',
-        titleAvatarSrc: 'https://raw.githubusercontent.com/walkxcode/dashboard-icons/main/svg/google-messages.svg',
+        titleAvatarSrc: '/flowops-icon.svg',
         welcomeMessage: t('pages.chatflows.embedTheme.welcomeMessage'),
         errorMessage: t('pages.chatflows.embedTheme.errorMessage'),
         backgroundColor: '#ffffff',
@@ -140,10 +140,10 @@ const getDefaultThemeConfig = (t) => ({
             backgroundColor: '#f7f8ff',
             textColor: '#303235',
             showAvatar: true,
-            avatarSrc: 'https://raw.githubusercontent.com/zahidkhawaja/langchain-chat-nextjs/main/public/parroticon.png'
+            avatarSrc: '/flowops-icon.svg'
         },
         userMessage: {
-            backgroundColor: '#3B81F6',
+            backgroundColor: '#7C3AED',
             textColor: '#ffffff',
             showAvatar: true,
             avatarSrc: 'https://raw.githubusercontent.com/zahidkhawaja/langchain-chat-nextjs/main/public/usericon.png'
@@ -152,7 +152,7 @@ const getDefaultThemeConfig = (t) => ({
             placeholder: t('pages.chatflows.embedTheme.inputPlaceholder'),
             backgroundColor: '#ffffff',
             textColor: '#303235',
-            sendButtonColor: '#3B81F6',
+            sendButtonColor: '#7C3AED',
             maxChars: 50,
             maxCharsWarningMessage: t('pages.chatflows.embedTheme.maxCharsWarning'),
             autoFocus: true,

@@ -12,5 +12,5 @@ import ExecutionRoutes from './ExecutionRoutes'
 // ==============================|| ROUTING RENDER ||============================== //
 
 export default function ThemeRoutes() {
-    return useRoutes([MainRoutes, AuthRoutes, LandingRoutes, CanvasRoutes, ChatbotRoutes, ExecutionRoutes], config.basename)
+    return useRoutes([LandingRoutes, MainRoutes, AuthRoutes, CanvasRoutes, ChatbotRoutes, ExecutionRoutes], config.basename)
 }

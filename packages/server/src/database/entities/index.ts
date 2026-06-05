@@ -18,6 +18,11 @@ import { ApiKey } from './ApiKey'
 import { CustomTemplate } from './CustomTemplate'
 import { Execution } from './Execution'
 import { CustomMcpServer } from './CustomMcpServer'
+import { BillingPlan } from './BillingPlan'
+import { BillingSubscription } from './BillingSubscription'
+import { BillingUsage } from './BillingUsage'
+import { PaymentOrder } from './PaymentOrder'
+import { SupportTicket } from './SupportTicket'
 import { LoginActivity, WorkspaceShared, WorkspaceUsers } from '../../enterprise/database/entities/EnterpriseEntities'
 import { User } from '../../enterprise/database/entities/user.entity'
 import { Organization } from '../../enterprise/database/entities/organization.entity'
@@ -55,6 +60,11 @@ export const entities = {
     CustomTemplate,
     Execution,
     CustomMcpServer,
+    BillingPlan,
+    BillingSubscription,
+    BillingUsage,
+    PaymentOrder,
+    SupportTicket,
     Organization,
     Role,
     OrganizationUser,

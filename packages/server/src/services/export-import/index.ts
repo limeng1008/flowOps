@@ -651,7 +651,8 @@ const importData = async (importData: ExportData, orgId: string, activeWorkspace
                     'flows',
                     subscriptionId,
                     getRunningExpressApp().usageCacheManager,
-                    existingChatflowCount + newChatflowCount
+                    existingChatflowCount + newChatflowCount,
+                    orgId
                 )
                 importData = await replaceDuplicateIdsForChatFlow(queryRunner, importData, importData.AgentFlow)
             }
@@ -664,7 +665,8 @@ const importData = async (importData: ExportData, orgId: string, activeWorkspace
                     'flows',
                     subscriptionId,
                     getRunningExpressApp().usageCacheManager,
-                    existingChatflowCount + newChatflowCount
+                    existingChatflowCount + newChatflowCount,
+                    orgId
                 )
                 importData = await replaceDuplicateIdsForChatFlow(queryRunner, importData, importData.AgentFlowV2)
             }
@@ -676,7 +678,8 @@ const importData = async (importData: ExportData, orgId: string, activeWorkspace
                     'flows',
                     subscriptionId,
                     getRunningExpressApp().usageCacheManager,
-                    existingAssistantCount + newAssistantCount
+                    existingAssistantCount + newAssistantCount,
+                    orgId
                 )
                 importData = await replaceDuplicateIdsForAssistant(queryRunner, importData, importData.AssistantCustom)
             }
@@ -689,7 +692,8 @@ const importData = async (importData: ExportData, orgId: string, activeWorkspace
                     'flows',
                     subscriptionId,
                     getRunningExpressApp().usageCacheManager,
-                    existingChatflowCount + newChatflowCount
+                    existingChatflowCount + newChatflowCount,
+                    orgId
                 )
                 importData = await replaceDuplicateIdsForChatFlow(queryRunner, importData, importData.AssistantFlow)
             }
@@ -701,7 +705,8 @@ const importData = async (importData: ExportData, orgId: string, activeWorkspace
                     'flows',
                     subscriptionId,
                     getRunningExpressApp().usageCacheManager,
-                    existingAssistantCount + newAssistantCount
+                    existingAssistantCount + newAssistantCount,
+                    orgId
                 )
                 importData = await replaceDuplicateIdsForAssistant(queryRunner, importData, importData.AssistantOpenAI)
             }
@@ -713,7 +718,8 @@ const importData = async (importData: ExportData, orgId: string, activeWorkspace
                     'flows',
                     subscriptionId,
                     getRunningExpressApp().usageCacheManager,
-                    existingAssistantCount + newAssistantCount
+                    existingAssistantCount + newAssistantCount,
+                    orgId
                 )
                 importData = await replaceDuplicateIdsForAssistant(queryRunner, importData, importData.AssistantAzure)
             }
@@ -726,7 +732,8 @@ const importData = async (importData: ExportData, orgId: string, activeWorkspace
                     'flows',
                     subscriptionId,
                     getRunningExpressApp().usageCacheManager,
-                    existingChatflowCount + newChatflowCount
+                    existingChatflowCount + newChatflowCount,
+                    orgId
                 )
                 importData = await replaceDuplicateIdsForChatFlow(queryRunner, importData, importData.ChatFlow)
             }

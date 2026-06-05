@@ -509,7 +509,7 @@ const ShareChatbot = ({ isSessionMemory, isAgentCanvas }) => {
                     'botMessageAvatarSrc',
                     t('pages.chatflows.share.avatarLink'),
                     'string',
-                    `https://raw.githubusercontent.com/zahidkhawaja/langchain-chat-nextjs/main/public/parroticon.png`
+                    `/flowops-icon.svg`
                 )}
                 {booleanField(botMessageShowAvatar, 'botMessageShowAvatar', t('pages.chatflows.share.showAvatar'))}
             </Card>

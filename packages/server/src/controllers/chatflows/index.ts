@@ -152,7 +152,13 @@ const saveChatflow = async (req: Request, res: Response, next: NextFunction) => 
 
         const existingChatflowCount = await chatflowsService.getAllChatflowsCountByOrganization(body.type, orgId)
         const newChatflowCount = 1
-        await checkUsageLimit('flows', subscriptionId, getRunningExpressApp().usageCacheManager, existingChatflowCount + newChatflowCount)
+        await checkUsageLimit(
+            'flows',
+            subscriptionId,
+            getRunningExpressApp().usageCacheManager,
+            existingChatflowCount + newChatflowCount,
+            orgId
+        )
 
         const newChatFlow = new ChatFlow()
         Object.assign(newChatFlow, stripProtectedFields(body))
