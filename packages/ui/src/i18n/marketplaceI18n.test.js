@@ -20,7 +20,9 @@ const usecaseTranslations = {
     Leads: '潜在客户',
     Presentation: '演示文稿',
     'Reflective Agent': '反思型智能体',
+    Research: '研究',
     SQL: 'SQL',
+    'Web Scraping': '网页抓取',
     'Working with tables': '表格处理'
 }
 
