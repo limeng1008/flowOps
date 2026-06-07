@@ -62,9 +62,18 @@ export class WechatProvider implements PaymentProvider {
     async verifyAndParseNotification(headers: Record<string, unknown>, rawBody: Buffer): Promise<PaymentNotification> {
         const timestamp = readHeader(headers, 'wechatpay-timestamp')
         const nonce = readHeader(headers, 'wechatpay-nonce')
+        const serial = readHeader(headers, 'wechatpay-serial')
         const signature = readHeader(headers, 'wechatpay-signature')
         const body = rawBody.toString('utf8')
-        if (!timestamp || !nonce || !signature) throw new InternalFlowiseError(StatusCodes.UNAUTHORIZED, 'INVALID_PAYMENT_SIGNATURE')
+        if (!timestamp || !nonce || !serial || !signature)
+            throw new InternalFlowiseError(StatusCodes.UNAUTHORIZED, 'INVALID_PAYMENT_SIGNATURE')
+        const timestampNumber = Number(timestamp)
+        if (!Number.isFinite(timestampNumber) || Math.abs(Math.floor(Date.now() / 1000) - timestampNumber) > 300) {
+            throw new InternalFlowiseError(StatusCodes.UNAUTHORIZED, 'INVALID_PAYMENT_SIGNATURE')
+        }
+        const expectedSerial = process.env.WECHAT_PLATFORM_SERIAL_NO
+        if (expectedSerial && serial !== expectedSerial)
+            throw new InternalFlowiseError(StatusCodes.UNAUTHORIZED, 'INVALID_PAYMENT_SIGNATURE')
         const message = `${timestamp}\n${nonce}\n${body}\n`
         if (!verifyRsaSha256(message, signature, this.platformCert)) {
             throw new InternalFlowiseError(StatusCodes.UNAUTHORIZED, 'INVALID_PAYMENT_SIGNATURE')
@@ -79,6 +88,37 @@ export class WechatProvider implements PaymentProvider {
             success: decrypted.trade_state === 'SUCCESS',
             raw: decrypted
         }
+    }
+
+    async queryOrder(orderNo: string): Promise<PaymentNotification> {
+        const path = `/v3/pay/transactions/out-trade-no/${encodeURIComponent(orderNo)}?mchid=${this.mchId}`
+        const endpoint = `${this.gateway.replace(/\/$/, '')}${path}`
+        const response = await axios.get(endpoint, {
+            headers: {
+                Authorization: this.buildAuthorization('GET', path, ''),
+                Accept: 'application/json'
+            }
+        })
+        return {
+            orderNo: response.data?.out_trade_no || orderNo,
+            thirdPartyTxnId: response.data?.transaction_id || null,
+            amountCents: Number(response.data?.amount?.total || 0),
+            success: response.data?.trade_state === 'SUCCESS',
+            raw: response.data
+        }
+    }
+
+    async closeOrder(orderNo: string): Promise<void> {
+        const path = `/v3/pay/transactions/out-trade-no/${encodeURIComponent(orderNo)}/close`
+        const endpoint = `${this.gateway.replace(/\/$/, '')}${path}`
+        const body = JSON.stringify({ mchid: this.mchId })
+        await axios.post(endpoint, body, {
+            headers: {
+                Authorization: this.buildAuthorization('POST', path, body),
+                'Content-Type': 'application/json',
+                Accept: 'application/json'
+            }
+        })
     }
 
     private buildAuthorization(method: string, urlPath: string, body: string): string {

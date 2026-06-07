@@ -3,8 +3,10 @@ import { useTranslation } from 'react-i18next'
 import { useSelector } from 'react-redux'
 
 import {
+    Alert,
     Box,
     Button,
+    Chip,
     Dialog,
     DialogActions,
     DialogContent,
@@ -26,11 +28,13 @@ import {
     Typography
 } from '@mui/material'
 import { styled, useTheme } from '@mui/material/styles'
-import { IconPlus, IconRefresh, IconSettings, IconX } from '@tabler/icons-react'
+import { QRCodeSVG } from 'qrcode.react'
+import { IconCopy, IconCreditCard, IconExternalLink, IconPlus, IconRefresh, IconSettings, IconX } from '@tabler/icons-react'
 
 import billingApi from '@/api/billing'
 import useApi from '@/hooks/useApi'
 import ViewHeader from '@/layout/MainLayout/ViewHeader'
+import { useError } from '@/store/context/ErrorContext'
 import { StyledButton } from '@/ui-component/button/StyledButton'
 import MainCard from '@/ui-component/cards/MainCard'
 
@@ -65,14 +69,21 @@ const BillingAdmin = () => {
     const { t, i18n } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
+    const currentUser = useSelector((state) => state.auth.user)
+    const { handleError } = useError()
     const dateLocale = i18n.resolvedLanguage?.startsWith('zh') || i18n.language?.startsWith('zh') ? 'zh-CN' : 'en-US'
 
     const [plans, setPlans] = useState([])
     const [organizations, setOrganizations] = useState([])
     const [openPlanDialog, setOpenPlanDialog] = useState(false)
     const [openSubscriptionDialog, setOpenSubscriptionDialog] = useState(false)
+    const [openPaymentDialog, setOpenPaymentDialog] = useState(false)
     const [planForm, setPlanForm] = useState(defaultPlanForm)
     const [subscriptionForm, setSubscriptionForm] = useState(defaultSubscriptionForm)
+    const [paymentForm, setPaymentForm] = useState({ planCode: '', provider: 'alipay' })
+    const [paymentOrder, setPaymentOrder] = useState(null)
+    const [paymentLoading, setPaymentLoading] = useState(false)
+    const [paymentCopied, setPaymentCopied] = useState(false)
 
     const getPlansApi = useApi(billingApi.getPlans)
     const getOrganizationsApi = useApi(billingApi.getOrganizations)
@@ -83,6 +94,12 @@ const BillingAdmin = () => {
     const isLoading = getPlansApi.loading || getOrganizationsApi.loading
 
     const planOptions = useMemo(() => plans.map((plan) => ({ value: plan.id, label: `${plan.name} (${plan.code})` })), [plans])
+    const paymentPlanOptions = useMemo(
+        () => plans.filter((plan) => plan.isActive !== false).map((plan) => ({ value: plan.code, label: `${plan.name} (${plan.code})` })),
+        [plans]
+    )
+    const paymentUrl = paymentOrder?.qrCodeUrl || paymentOrder?.payUrl || ''
+    const isPaymentTerminal = ['paid', 'failed', 'closed'].includes(paymentOrder?.status)
 
     const reload = () => {
         getPlansApi.request()
@@ -99,6 +116,12 @@ const BillingAdmin = () => {
     }, [getPlansApi.data])
 
     useEffect(() => {
+        if (!paymentForm.planCode && paymentPlanOptions.length) {
+            setPaymentForm((prev) => ({ ...prev, planCode: paymentPlanOptions[0].value }))
+        }
+    }, [paymentForm.planCode, paymentPlanOptions])
+
+    useEffect(() => {
         if (getOrganizationsApi.data) setOrganizations(getOrganizationsApi.data)
     }, [getOrganizationsApi.data])
 
@@ -112,6 +135,21 @@ const BillingAdmin = () => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [upsertPlanApi.data, setSubscriptionApi.data, cancelSubscriptionApi.data])
+
+    useEffect(() => {
+        if (!openPaymentDialog || !paymentOrder?.orderNo || isPaymentTerminal) return undefined
+        const interval = setInterval(async () => {
+            try {
+                const response = await billingApi.getPaymentOrder(paymentOrder.orderNo)
+                setPaymentOrder((previous) => ({ ...previous, ...response.data }))
+                if (response.data?.status === 'paid') reload()
+            } catch (error) {
+                handleError(error)
+            }
+        }, 3000)
+        return () => clearInterval(interval)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [openPaymentDialog, paymentOrder?.orderNo, paymentOrder?.status, isPaymentTerminal])
 
     const formatQuota = (value) => (value === -1 ? t('pages.account.unlimited') : Number(value || 0).toLocaleString())
     const formatDate = (value) => (value ? new Date(value).toLocaleDateString(dateLocale) : t('pages.billing.noExpiry'))
@@ -160,6 +198,32 @@ const BillingAdmin = () => {
         cancelSubscriptionApi.request({ organizationId })
     }
 
+    const openPayment = () => {
+        setPaymentOrder(null)
+        setPaymentCopied(false)
+        setPaymentForm((prev) => ({ ...prev, planCode: prev.planCode || paymentPlanOptions[0]?.value || '' }))
+        setOpenPaymentDialog(true)
+    }
+
+    const startPayment = async () => {
+        setPaymentLoading(true)
+        setPaymentCopied(false)
+        try {
+            const response = await billingApi.createPaymentOrder(paymentForm)
+            setPaymentOrder(response.data)
+        } catch (error) {
+            handleError(error)
+        } finally {
+            setPaymentLoading(false)
+        }
+    }
+
+    const copyPaymentUrl = async () => {
+        if (!paymentUrl) return
+        await navigator.clipboard.writeText(paymentUrl)
+        setPaymentCopied(true)
+    }
+
     return (
         <MainCard>
             <Stack sx={{ gap: 3 }}>
@@ -167,6 +231,14 @@ const BillingAdmin = () => {
                     <Stack direction='row' sx={{ gap: 1 }}>
                         <StyledButton variant='outlined' startIcon={<IconRefresh />} onClick={reload}>
                             {t('common.refresh')}
+                        </StyledButton>
+                        <StyledButton
+                            variant='outlined'
+                            startIcon={<IconCreditCard />}
+                            onClick={openPayment}
+                            disabled={!currentUser?.activeOrganizationId || !paymentPlanOptions.length}
+                        >
+                            {t('pages.billing.purchasePlan')}
                         </StyledButton>
                         <StyledButton variant='contained' startIcon={<IconPlus />} onClick={() => setOpenPlanDialog(true)}>
                             {t('pages.billing.addPlan')}
@@ -356,6 +428,103 @@ const BillingAdmin = () => {
                     >
                         {t('common.save')}
                     </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog open={openPaymentDialog} onClose={() => setOpenPaymentDialog(false)} maxWidth='sm' fullWidth>
+                <DialogTitle>{t('pages.billing.purchasePlan')}</DialogTitle>
+                <DialogContent>
+                    <Stack sx={{ gap: 2, mt: 1 }}>
+                        <FormControl fullWidth>
+                            <InputLabel>{t('pages.billing.plan')}</InputLabel>
+                            <Select
+                                label={t('pages.billing.plan')}
+                                value={paymentForm.planCode}
+                                onChange={(e) => setPaymentForm({ ...paymentForm, planCode: e.target.value })}
+                            >
+                                {paymentPlanOptions.map((plan) => (
+                                    <MenuItem key={plan.value} value={plan.value}>
+                                        {plan.label}
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                        <FormControl fullWidth>
+                            <InputLabel>{t('pages.billing.provider')}</InputLabel>
+                            <Select
+                                label={t('pages.billing.provider')}
+                                value={paymentForm.provider}
+                                onChange={(e) => setPaymentForm({ ...paymentForm, provider: e.target.value })}
+                            >
+                                <MenuItem value='alipay'>{t('pages.billing.alipay')}</MenuItem>
+                                <MenuItem value='wechat'>{t('pages.billing.wechat')}</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <Button variant='contained' onClick={startPayment} disabled={!paymentForm.planCode || paymentLoading}>
+                            {t('pages.billing.startPayment')}
+                        </Button>
+                        {paymentOrder && (
+                            <Paper sx={{ p: 2, border: 1, borderColor: theme.palette.grey[900] + 25, borderRadius: 2 }}>
+                                <Stack sx={{ gap: 2, alignItems: 'center' }}>
+                                    <Stack direction='row' sx={{ width: '100%', justifyContent: 'space-between', alignItems: 'center' }}>
+                                        <Typography variant='subtitle2'>{paymentOrder.orderNo}</Typography>
+                                        <Chip size='small' label={t(`pages.billing.paymentStatus.${paymentOrder.status}`)} />
+                                    </Stack>
+                                    {paymentOrder.status === 'paid' && (
+                                        <Alert severity='success'>{t('pages.billing.paymentSuccess')}</Alert>
+                                    )}
+                                    {paymentOrder.status === 'closed' && (
+                                        <Alert severity='warning'>{t('pages.billing.paymentClosed')}</Alert>
+                                    )}
+                                    {paymentOrder.status === 'failed' && <Alert severity='error'>{t('pages.billing.paymentFailed')}</Alert>}
+                                    {paymentUrl && paymentOrder.status === 'pending' && (
+                                        <>
+                                            <Box
+                                                sx={{
+                                                    width: 208,
+                                                    height: 208,
+                                                    display: 'grid',
+                                                    placeItems: 'center',
+                                                    bgcolor: 'background.paper',
+                                                    borderRadius: 2
+                                                }}
+                                            >
+                                                <QRCodeSVG value={paymentUrl} size={180} includeMargin />
+                                            </Box>
+                                            <TextField
+                                                label={t('pages.billing.payLink')}
+                                                value={paymentUrl}
+                                                fullWidth
+                                                InputProps={{ readOnly: true }}
+                                            />
+                                            <Stack direction={{ xs: 'column', sm: 'row' }} sx={{ gap: 1, width: '100%' }}>
+                                                <Button
+                                                    variant='outlined'
+                                                    startIcon={<IconExternalLink />}
+                                                    onClick={() => window.open(paymentUrl, '_blank', 'noopener,noreferrer')}
+                                                    fullWidth
+                                                >
+                                                    {t('pages.billing.openPayLink')}
+                                                </Button>
+                                                <Button variant='outlined' startIcon={<IconCopy />} onClick={copyPaymentUrl} fullWidth>
+                                                    {paymentCopied ? t('pages.billing.copied') : t('pages.billing.copyPayLink')}
+                                                </Button>
+                                            </Stack>
+                                        </>
+                                    )}
+                                    {paymentOrder.expireAt && (
+                                        <Typography variant='caption' color='text.secondary'>
+                                            {t('pages.billing.paymentExpireAt', {
+                                                date: new Date(paymentOrder.expireAt).toLocaleString(dateLocale)
+                                            })}
+                                        </Typography>
+                                    )}
+                                </Stack>
+                            </Paper>
+                        )}
+                    </Stack>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={() => setOpenPaymentDialog(false)}>{t('common.close')}</Button>
                 </DialogActions>
             </Dialog>
         </MainCard>

@@ -40,6 +40,7 @@
 | `packages/server/src/database/migrations/sqlite/index.ts`                     | Billing-center-v1  |
 | `packages/server/src/enterprise/controllers/organization-user.controller.ts`  | Billing-center-v1  |
 | `packages/server/src/enterprise/services/account.service.ts`                  | Billing-center-v1  |
+| `packages/server/src/index.ts`                                                | Commercial-payment |
 | `packages/server/src/routes/index.ts`                                         | Billing-center-v1  |
 | `packages/server/src/services/assistants/index.ts`                            | Billing-center-v1  |
 | `packages/server/src/services/export-import/index.ts`                         | Billing-center-v1  |

@@ -2176,7 +2176,26 @@
             "configureSubscription": "配置组织套餐",
             "tokensOverride": "Token 覆盖额度",
             "botsOverride": "Bot 覆盖额度",
-            "seatsOverride": "席位覆盖额度"
+            "seatsOverride": "席位覆盖额度",
+            "purchasePlan": "购买套餐",
+            "provider": "支付渠道",
+            "alipay": "支付宝",
+            "wechat": "微信支付",
+            "startPayment": "生成付款码",
+            "payLink": "付款链接",
+            "openPayLink": "打开付款链接",
+            "copyPayLink": "复制付款链接",
+            "copied": "已复制",
+            "paymentSuccess": "支付成功，订阅已开通。",
+            "paymentClosed": "订单已关闭，请重新生成付款码。",
+            "paymentFailed": "支付失败，请重新生成付款码。",
+            "paymentExpireAt": "订单有效期至 {{date}}",
+            "paymentStatus": {
+                "pending": "待支付",
+                "paid": "已支付",
+                "failed": "失败",
+                "closed": "已关闭"
+            }
         },
         "supportTickets": {
             "title": "支持工单",

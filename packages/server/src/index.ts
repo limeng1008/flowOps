@@ -25,10 +25,12 @@ import { NodesPool } from './NodesPool'
 import { QueueManager } from './queue/QueueManager'
 import { ScheduleBeat } from './schedule/ScheduleBeat'
 import { RedisEventSubscriber } from './queue/RedisEventSubscriber'
+import { startPaymentReconciliationJob } from './services/payment/reconciliationJob'
 import { initWebhookListenerRegistry } from './services/webhook-listener'
 import flowiseApiV1Router from './routes'
 import { UsageCacheManager } from './UsageCacheManager'
 import { getEncryptionKey, getNodeModulesPackagePath } from './utils'
+import { capturePaymentNotifyRawBody } from './utils/paymentRawBody'
 import { API_KEY_BLACKLIST_URLS, WHITELIST_URLS } from './utils/constants'
 import logger, { expressRequestLogger } from './utils/logger'
 import { RateLimiterManager } from './utils/rateLimit'
@@ -163,6 +165,8 @@ export class App {
             await ScheduleBeat.getInstance().init()
             logger.info('⏰ [server]: ScheduleBeat initialized successfully')
 
+            startPaymentReconciliationJob()
+
             logger.info('🎉 [server]: All initialization steps completed successfully!')
         } catch (error) {
             logger.error('❌ [server]: Error during Data Source initialization:', error)
@@ -173,12 +177,8 @@ export class App {
         // Limit is needed to allow sending/receiving base64 encoded string
         const flowise_file_size_limit = process.env.FLOWISE_FILE_SIZE_LIMIT || '50mb'
 
-        // Preserve raw bytes before JSON parsing for webhook HMAC signature verification
-        const captureRawBody = (req: Request, _res: Response, buf: Buffer) => {
-            ;(req as any).rawBody = buf
-        }
-        this.app.use(express.json({ limit: flowise_file_size_limit, verify: captureRawBody }))
-        this.app.use(express.urlencoded({ limit: flowise_file_size_limit, extended: true, verify: captureRawBody }))
+        this.app.use(express.json({ limit: flowise_file_size_limit, verify: capturePaymentNotifyRawBody }))
+        this.app.use(express.urlencoded({ limit: flowise_file_size_limit, extended: true, verify: capturePaymentNotifyRawBody }))
 
         // Enhanced trust proxy settings for load balancer
         let trustProxy: string | boolean | number | undefined = process.env.TRUST_PROXY

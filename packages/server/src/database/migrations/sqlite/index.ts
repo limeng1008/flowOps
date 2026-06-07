@@ -47,6 +47,7 @@ import { AddScheduleEntities1772000000000 } from './1772000000000-AddScheduleEnt
 import { AddBillingEntities1777000000000 } from './1777000000000-AddBillingEntities'
 import { AddPaymentOrder1777100000000 } from './1777100000000-AddPaymentOrder'
 import { AddSupportTicketEntity1777200000000 } from './1777200000000-AddSupportTicketEntity'
+import { AddPaymentP0Hardening1777300000000 } from './1777300000000-AddPaymentP0Hardening'
 
 import { AddAuthTables1720230151482 } from '../../../enterprise/database/migrations/sqlite/1720230151482-AddAuthTables'
 import { AddWorkspace1720230151484 } from '../../../enterprise/database/migrations/sqlite/1720230151484-AddWorkspace'
@@ -120,5 +121,6 @@ export const sqliteMigrations = [
     AddScheduleEntities1772000000000,
     AddBillingEntities1777000000000,
     AddPaymentOrder1777100000000,
-    AddSupportTicketEntity1777200000000
+    AddSupportTicketEntity1777200000000,
+    AddPaymentP0Hardening1777300000000
 ]

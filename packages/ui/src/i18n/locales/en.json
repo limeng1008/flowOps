@@ -2176,7 +2176,26 @@
             "configureSubscription": "Configure organization plan",
             "tokensOverride": "Token override",
             "botsOverride": "Bot override",
-            "seatsOverride": "Seat override"
+            "seatsOverride": "Seat override",
+            "purchasePlan": "Purchase Plan",
+            "provider": "Payment provider",
+            "alipay": "Alipay",
+            "wechat": "WeChat Pay",
+            "startPayment": "Generate Payment Code",
+            "payLink": "Payment link",
+            "openPayLink": "Open payment link",
+            "copyPayLink": "Copy payment link",
+            "copied": "Copied",
+            "paymentSuccess": "Payment received. The subscription is active.",
+            "paymentClosed": "The order is closed. Generate a new payment code.",
+            "paymentFailed": "Payment failed. Generate a new payment code.",
+            "paymentExpireAt": "Order expires at {{date}}",
+            "paymentStatus": {
+                "pending": "Pending",
+                "paid": "Paid",
+                "failed": "Failed",
+                "closed": "Closed"
+            }
         },
         "supportTickets": {
             "title": "Support Tickets",

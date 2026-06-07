@@ -24,4 +24,6 @@ export interface PaymentNotification {
 export interface PaymentProvider {
     createOrder(input: CreateOrderInput): Promise<CreateOrderResult>
     verifyAndParseNotification(headers: Record<string, unknown>, rawBody: Buffer): Promise<PaymentNotification>
+    queryOrder(orderNo: string): Promise<PaymentNotification>
+    closeOrder(orderNo: string): Promise<void>
 }

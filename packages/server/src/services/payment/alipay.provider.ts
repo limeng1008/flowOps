@@ -21,24 +21,17 @@ export class AlipayProvider implements PaymentProvider {
     }
 
     async createOrder(input: CreateOrderInput): Promise<CreateOrderResult> {
-        const params: Record<string, string> = {
-            app_id: this.appId,
-            method: 'alipay.trade.precreate',
-            format: 'JSON',
-            charset: 'utf-8',
-            sign_type: 'RSA2',
-            timestamp: currentAlipayTimestamp(),
-            version: '1.0',
-            notify_url: `${this.notifyBaseUrl.replace(/\/$/, '')}/api/v1/payment/notify/alipay`,
-            biz_content: JSON.stringify({
+        const params = this.buildSignedParams(
+            'alipay.trade.precreate',
+            {
                 out_trade_no: input.orderNo,
                 total_amount: centsToYuan(input.amountCents),
                 subject: input.subject
-            })
-        }
-        const signContent = buildAlipaySignContent(params)
+            },
+            true
+        )
         const response = await axios.get(this.gateway, {
-            params: { ...params, sign: signRsaSha256(signContent, this.privateKey) }
+            params
         })
         const payload = response.data?.alipay_trade_precreate_response || response.data
         if (!payload?.qr_code) {
@@ -49,6 +42,49 @@ export class AlipayProvider implements PaymentProvider {
             qrCodeUrl: payload.qr_code,
             rawResponse: response.data
         }
+    }
+
+    async queryOrder(orderNo: string): Promise<PaymentNotification> {
+        const response = await axios.get(this.gateway, {
+            params: this.buildSignedParams('alipay.trade.query', { out_trade_no: orderNo })
+        })
+        const payload = response.data?.alipay_trade_query_response || response.data
+        if (!payload || payload.code !== '10000') {
+            throw new InternalFlowiseError(StatusCodes.BAD_GATEWAY, payload?.sub_msg || payload?.msg || '支付宝查单失败')
+        }
+        return {
+            orderNo: payload.out_trade_no || orderNo,
+            thirdPartyTxnId: payload.trade_no || null,
+            amountCents: payload.total_amount ? yuanToCents(payload.total_amount) : 0,
+            success: payload.trade_status === 'TRADE_SUCCESS' || payload.trade_status === 'TRADE_FINISHED',
+            raw: payload
+        }
+    }
+
+    async closeOrder(orderNo: string): Promise<void> {
+        const response = await axios.get(this.gateway, {
+            params: this.buildSignedParams('alipay.trade.close', { out_trade_no: orderNo })
+        })
+        const payload = response.data?.alipay_trade_close_response || response.data
+        if (payload && payload.code && payload.code !== '10000') {
+            throw new InternalFlowiseError(StatusCodes.BAD_GATEWAY, payload?.sub_msg || payload?.msg || '支付宝关单失败')
+        }
+    }
+
+    private buildSignedParams(method: string, bizContent: Record<string, unknown>, includeNotifyUrl = false): Record<string, string> {
+        const params: Record<string, string> = {
+            app_id: this.appId,
+            method,
+            format: 'JSON',
+            charset: 'utf-8',
+            sign_type: 'RSA2',
+            timestamp: currentAlipayTimestamp(),
+            version: '1.0',
+            biz_content: JSON.stringify(bizContent)
+        }
+        if (includeNotifyUrl) params.notify_url = `${this.notifyBaseUrl.replace(/\/$/, '')}/api/v1/payment/notify/alipay`
+        const signContent = buildAlipaySignContent(params)
+        return { ...params, sign: signRsaSha256(signContent, this.privateKey) }
     }
 
     async verifyAndParseNotification(_headers: Record<string, unknown>, rawBody: Buffer): Promise<PaymentNotification> {

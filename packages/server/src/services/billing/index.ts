@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes'
-import { In } from 'typeorm'
+import { EntityManager, In } from 'typeorm'
 import { Assistant } from '../../database/entities/Assistant'
 import { BillingPlan } from '../../database/entities/BillingPlan'
 import { BillingSubscription, BillingSubscriptionStatus } from '../../database/entities/BillingSubscription'
@@ -259,16 +259,20 @@ export class BillingService {
         return toPlanDTO(await repo.save(entity))
     }
 
-    static async setOrganizationSubscription(input: {
-        organizationId: string
-        planId: string
-        currentPeriodEnd?: string | Date | null
-        quotaOverrides?: Partial<BillingQuotas> | null
-        notes?: string | null
-    }): Promise<BillingSubscription> {
+    static async setOrganizationSubscription(
+        input: {
+            organizationId: string
+            planId: string
+            currentPeriodEnd?: string | Date | null
+            quotaOverrides?: Partial<BillingQuotas> | null
+            notes?: string | null
+        },
+        manager?: EntityManager
+    ): Promise<BillingSubscription> {
         const appServer = getRunningExpressApp()
-        const subscriptionRepo = appServer.AppDataSource.getRepository(BillingSubscription)
-        const planRepo = appServer.AppDataSource.getRepository(BillingPlan)
+        const repositorySource = manager || appServer.AppDataSource
+        const subscriptionRepo = repositorySource.getRepository(BillingSubscription)
+        const planRepo = repositorySource.getRepository(BillingPlan)
         const plan = await planRepo.findOne({ where: [{ id: input.planId }, { code: input.planId }] })
         if (!plan) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, 'BILLING_PLAN_NOT_FOUND')
 
