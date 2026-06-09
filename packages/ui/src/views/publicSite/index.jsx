@@ -2,7 +2,9 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { Link as RouterLink } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
+import { useSelector } from 'react-redux'
 import { Box, Button, Chip, Link, Stack, Typography } from '@mui/material'
+import { ThemeProvider } from '@mui/material/styles'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import {
@@ -22,6 +24,7 @@ import {
 } from '@tabler/icons-react'
 
 import { SUPPORTED_LANGUAGES } from '@/i18n'
+import themes from '@/themes'
 import BrandLogo from '@/ui-component/extended/BrandLogo'
 import DocumentImage from '@/assets/images/doc_store_empty.svg'
 import RobotImage from '@/assets/images/robot.png'
@@ -63,6 +66,8 @@ const PublicSite = ({ page = 'home' }) => {
     const isZh = currentLang === 'zh' || currentLang?.startsWith('zh-')
     const t = useMemo(() => (isZh ? siteCopy.zh : siteCopy.en), [isZh])
     const isHome = page === 'home'
+    const customization = useSelector((state) => state.customization)
+    const lightTheme = useMemo(() => themes({ ...customization, isDarkMode: false }), [customization])
 
     const handleChangeLanguage = (lng) => {
         i18n.changeLanguage(lng)
@@ -146,7 +151,9 @@ const PublicSite = ({ page = 'home' }) => {
             }}
         >
             {isHome ? (
-                <HomePage t={t.home} nav={t.nav} currentLang={currentLang} handleChangeLanguage={handleChangeLanguage} />
+                <ThemeProvider theme={lightTheme}>
+                    <HomePage t={t.home} nav={t.nav} currentLang={currentLang} handleChangeLanguage={handleChangeLanguage} />
+                </ThemeProvider>
             ) : (
                 <>
                     <PublicNav t={t} navItems={navItems} currentLang={currentLang} handleChangeLanguage={handleChangeLanguage} />
