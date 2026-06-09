@@ -2,7 +2,7 @@ import PropTypes from 'prop-types'
 import { Box, Link, Stack, Typography } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 
-import FlowOpsLogoWhite from '@/assets/images/flowops_white.svg'
+import FlowOpsLogoWhite from '@/assets/images/flowops_dark.svg'
 import { getLiquidGlassPanelSx } from '@/ui-component/utils/liquidGlassStyles'
 import { LanguageSwitch, getLinkProps } from './shared'
 

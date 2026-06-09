@@ -5,7 +5,7 @@ import { Box, Button, Drawer, IconButton, Stack, Typography } from '@mui/materia
 import { useTheme } from '@mui/material/styles'
 import { IconArrowRight, IconMenu2, IconX } from '@tabler/icons-react'
 
-import FlowOpsLogo from '@/assets/images/flowops_dark.svg'
+import FlowOpsLogo from '@/assets/images/flowops_white.svg'
 import { getLiquidGlassControlSx, getLiquidGlassPanelSx } from '@/ui-component/utils/liquidGlassStyles'
 import { LanguageSwitch, SITE_COLORS, getLinkProps } from './shared'
 
