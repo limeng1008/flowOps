@@ -113,7 +113,10 @@ router.use('/openai-assistants', openaiAssistantsRouter)
 router.use('/openai-assistants-file', openaiAssistantsFileRouter)
 router.use('/openai-assistants-vector-store', openaiAssistantsVectorStoreRouter)
 router.use('/openai-realtime', openaiRealtimeRouter)
-router.use('/payment', paymentRouter)
+// 在线支付仅 EDITION=cloud 挂载（私有/离线版不暴露支付端点）；直接读 env 避免与 entitlement 形成循环导入
+if (process.env.FLOWOPS_EDITION === 'cloud') {
+    router.use('/payment', paymentRouter)
+}
 router.use('/prediction', predictionRouter)
 router.use('/prompts-list', promptListsRouter)
 router.use('/public-chatbotConfig', publicChatbotRouter)
