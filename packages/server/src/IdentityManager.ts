@@ -36,6 +36,8 @@ import { getRunningExpressApp } from './utils/getRunningExpressApp'
 import { ENTERPRISE_FEATURE_FLAGS } from './utils/quotaUsage'
 
 const allSSOProviders = ['azure', 'google', 'auth0', 'github']
+const LOCAL_COMMERCIAL_PRODUCT_ID = 'flowops-local-commercial'
+
 export class IdentityManager {
     private static instance: IdentityManager
     private stripeManager?: StripeManager
@@ -82,6 +84,10 @@ export class IdentityManager {
         return this.currentInstancePlatform === Platform.OPEN_SOURCE
     }
 
+    public isLocalCommercial = () => {
+        return isTruthyEnv(process.env.FLOWOPS_LOCAL_COMMERCIAL)
+    }
+
     public isLicenseValid = () => {
         return this.licenseValid
     }
@@ -102,6 +108,12 @@ export class IdentityManager {
     private _validateLicenseKey = async () => {
         const LICENSE_URL = process.env.LICENSE_URL
         const FLOWISE_EE_LICENSE_KEY = process.env.FLOWISE_EE_LICENSE_KEY
+
+        if (this.isLocalCommercial()) {
+            this.licenseValid = true
+            this.currentInstancePlatform = Platform.ENTERPRISE
+            return
+        }
 
         // First check if license key is missing
         if (!FLOWISE_EE_LICENSE_KEY) {
@@ -252,6 +264,9 @@ export class IdentityManager {
 
     public async getProductIdFromSubscription(subscriptionId: string) {
         if (!subscriptionId) return ''
+        if (this.isLocalCommercial()) {
+            return process.env.FLOWOPS_LOCAL_PRODUCT_ID || LOCAL_COMMERCIAL_PRODUCT_ID
+        }
         if (!this.stripeManager) {
             throw new Error('Stripe manager is not initialized')
         }
@@ -546,4 +561,8 @@ export class IdentityManager {
         })
         return subscription
     }
+}
+
+function isTruthyEnv(value?: string): boolean {
+    return ['true', '1', 'yes', 'on'].includes((value || '').trim().toLowerCase())
 }

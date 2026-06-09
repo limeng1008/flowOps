@@ -38,6 +38,7 @@
 | `packages/server/.env.example`                                                | Entitlement        |
 | `packages/server/src/schedule/ScheduleExecutor.ts`                            | Entitlement        |
 | `packages/server/src/services/chatflows/index.test.ts`                        | Entitlement        |
+| `packages/server/src/IdentityManager.ts`                                      | Local-commercial   |
 | `deploy/.env.example`                                                         | Commercial-payment |
 | `packages/components/package.json`                                            | Components-deps    |
 | `packages/components/src/modelLoader.ts`                                      | T1-model-loader    |
