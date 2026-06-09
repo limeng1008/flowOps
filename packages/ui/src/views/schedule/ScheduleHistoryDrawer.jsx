@@ -467,7 +467,7 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
             >
                 {/* Left-edge drag handle: click-and-drag to resize */}
                 <button
-                    aria-label='Resize drawer'
+                    aria-label={t('pages.schedule.resizeDrawer')}
                     style={{
                         position: 'absolute',
                         left: 0,
@@ -515,7 +515,7 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
                                 {t('pages.schedule.history')}
                             </Typography>
                         </Stack>
-                        <IconButton onClick={onClose} size='small' aria-label='close'>
+                        <IconButton onClick={onClose} size='small' aria-label={t('common.close')}>
                             <IconX size={18} />
                         </IconButton>
                     </Stack>
@@ -674,7 +674,7 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
                                                 indeterminate={!allOnPageSelected && someOnPageSelected}
                                                 checked={allOnPageSelected}
                                                 onChange={toggleSelectAllOnPage}
-                                                inputProps={{ 'aria-label': 'Select all rows on page' }}
+                                                inputProps={{ 'aria-label': t('pages.schedule.selectAllRowsOnPage') }}
                                             />
                                         </StyledTableCell>
                                         <StyledTableCell>{t('pages.schedule.status')}</StyledTableCell>
@@ -694,7 +694,7 @@ const ScheduleHistoryDrawer = ({ open, chatflowid, onClose }) => {
                                                         size='small'
                                                         checked={isSelected}
                                                         onChange={() => toggleRowSelected(row.id)}
-                                                        inputProps={{ 'aria-label': `Select row ${row.id}` }}
+                                                        inputProps={{ 'aria-label': t('pages.schedule.selectRow', { id: row.id }) }}
                                                     />
                                                 </StyledTableCell>
                                                 <StyledTableCell onClick={clickable ? () => handleRowClick(row) : undefined}>

@@ -566,7 +566,7 @@ const WebhookListenerDrawer = ({ open, chatflowid, onClose, onStatusChange }) =>
         >
             {/* Resize handle */}
             <button
-                aria-label='Resize panel'
+                aria-label={t('pages.webhookListener.resizePanel')}
                 onMouseDown={onMouseDown}
                 style={{
                     position: 'absolute',
@@ -649,7 +649,12 @@ const WebhookListenerDrawer = ({ open, chatflowid, onClose, onStatusChange }) =>
                             {maximized ? <IconArrowsMinimize size={16} /> : <IconArrowsMaximize size={16} />}
                         </IconButton>
                     </Tooltip>
-                    <IconButton size='small' onClick={onClose} aria-label='close' sx={{ color: isDark ? 'common.white' : 'text.primary' }}>
+                    <IconButton
+                        size='small'
+                        onClick={onClose}
+                        aria-label={t('common.close')}
+                        sx={{ color: isDark ? 'common.white' : 'text.primary' }}
+                    >
                         <IconX size={16} />
                     </IconButton>
                 </Stack>

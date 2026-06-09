@@ -1182,7 +1182,17 @@
             "everyDayAt": "Every day at {{time}}{{timezone}}",
             "everyWeekdayAt": "Every weekday at {{time}}{{timezone}}",
             "everyHour": "Every hour{{timezone}}",
-            "everyMinute": "Every minute{{timezone}}"
+            "everyMinute": "Every minute{{timezone}}",
+            "badgeChecking": "Checking schedule status...",
+            "badgeActive": "Schedule active",
+            "badgeActiveNextRun": "Schedule active - next run {{time}}",
+            "badgePaused": "Schedule configured but turned off",
+            "badgeLoading": "Loading...",
+            "badgeScheduled": "Scheduled",
+            "badgePausedShort": "Paused",
+            "resizeDrawer": "Resize drawer",
+            "selectAllRowsOnPage": "Select all rows on page",
+            "selectRow": "Select row {{id}}"
         },
         "webhookListener": {
             "title": "Webhook Listener",
@@ -1214,7 +1224,8 @@
             "statusRunning": "RUNNING",
             "statusCompleted": "COMPLETED",
             "statusStopped": "STOPPED",
-            "statusError": "ERROR"
+            "statusError": "ERROR",
+            "resizePanel": "Resize panel"
         },
         "assistants": {
             "title": "Assistants",

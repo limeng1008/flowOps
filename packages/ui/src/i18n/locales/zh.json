@@ -1182,7 +1182,17 @@
             "everyDayAt": "每天 {{time}}{{timezone}}",
             "everyWeekdayAt": "每个工作日 {{time}}{{timezone}}",
             "everyHour": "每小时{{timezone}}",
-            "everyMinute": "每分钟{{timezone}}"
+            "everyMinute": "每分钟{{timezone}}",
+            "badgeChecking": "正在检查定时状态…",
+            "badgeActive": "定时已启用",
+            "badgeActiveNextRun": "定时已启用，下次运行 {{time}}",
+            "badgePaused": "已配置定时，但当前关闭",
+            "badgeLoading": "加载中…",
+            "badgeScheduled": "定时中",
+            "badgePausedShort": "已暂停",
+            "resizeDrawer": "调整抽屉宽度",
+            "selectAllRowsOnPage": "选择本页全部记录",
+            "selectRow": "选择记录 {{id}}"
         },
         "webhookListener": {
             "title": "Webhook 监听器",
@@ -1214,7 +1224,8 @@
             "statusRunning": "运行中",
             "statusCompleted": "已完成",
             "statusStopped": "已停止",
-            "statusError": "错误"
+            "statusError": "错误",
+            "resizePanel": "调整面板宽度"
         },
         "assistants": {
             "title": "助手",
