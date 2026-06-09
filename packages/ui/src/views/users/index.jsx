@@ -42,6 +42,7 @@ import useConfirm from '@/hooks/useConfirm'
 
 // utils
 import useNotifier from '@/utils/useNotifier'
+import { getFlowOpsRoleLabel } from '@/utils/flowOpsRoles'
 
 // Icons
 import { IconTrash, IconEdit, IconX, IconPlus, IconUser, IconEyeOff, IconEye, IconUserStar } from '@tabler/icons-react'
@@ -149,7 +150,7 @@ function ShowUserRow(props) {
                         <>
                             {' '}
                             <br />
-                            <Chip size='small' label={t('pages.users.organizationOwner')} />{' '}
+                            <Chip size='small' label={getFlowOpsRoleLabel('owner', t)} />{' '}
                         </>
                     )}
                 </StyledTableCell>
@@ -231,7 +232,7 @@ function ShowUserRow(props) {
                             <TableBody>
                                 {userRoles.map((item, index) => (
                                     <TableRow key={index}>
-                                        <StyledTableCell>{item.role.name}</StyledTableCell>
+                                        <StyledTableCell>{getFlowOpsRoleLabel(item.role.name, t)}</StyledTableCell>
                                         <StyledTableCell>
                                             {item.workspace.name}
                                             {/* {assignment.active && <Chip color={'secondary'} label={'Active'} />} */}

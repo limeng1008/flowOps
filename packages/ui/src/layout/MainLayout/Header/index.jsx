@@ -12,7 +12,6 @@ import { useTheme, styled } from '@mui/material/styles'
 import LogoSection from '../LogoSection'
 import ProfileSection from './ProfileSection'
 import WorkspaceSwitcher from '@/layout/MainLayout/Header/WorkspaceSwitcher'
-import OrgWorkspaceBreadcrumbs from '@/layout/MainLayout/Header/OrgWorkspaceBreadcrumbs'
 import PricingDialog from '@/ui-component/subscription/PricingDialog'
 import { getLiquidGlassControlSx } from '@/ui-component/utils/liquidGlassStyles'
 
@@ -287,8 +286,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
             ) : (
                 <Box sx={{ flexGrow: 1 }} />
             )}
-            {isEnterpriseLicensed && isAuthenticated && <WorkspaceSwitcher />}
-            {isCloud && isAuthenticated && <OrgWorkspaceBreadcrumbs />}
+            {(isEnterpriseLicensed || isCloud) && isAuthenticated && <WorkspaceSwitcher />}
             {isCloud && currentUser?.isOrganizationAdmin && (
                 <Button
                     variant='contained'

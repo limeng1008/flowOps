@@ -25,6 +25,26 @@
         "logs": "Logs",
         "account": "Account Settings"
     },
+    "flowOps": {
+        "roles": {
+            "owner": {
+                "name": "Owner",
+                "description": "Full workspace control, including workspace deletion, role assignment, and member management."
+            },
+            "admin": {
+                "name": "Admin",
+                "description": "Manage workspace content and members without deleting the workspace or changing role and SSO settings."
+            },
+            "member": {
+                "name": "Member",
+                "description": "Create and maintain flows, tools, assistants, document stores, variables, templates, and executions."
+            },
+            "viewer": {
+                "name": "Viewer",
+                "description": "Read-only access to workspace content and execution history."
+            }
+        }
+    },
     "profile": {
         "user": "User",
         "export": "Export",
@@ -910,7 +930,7 @@
             "roleToAssign": "Role to Assign",
             "selectRole": "Select Role",
             "invalidEmailsRemoved": "One or more invalid emails were removed.",
-            "alreadyInWorkspaceOrOrganization": "The following users are already in the workspace or organization: {{emails}}",
+            "alreadyInWorkspaceOrOrganization": "The following users are already available to this workspace: {{emails}}",
             "invitedToWorkspace": "Users invited to workspace",
             "noDataReceived": "No data received from the server",
             "failedInvite": "Failed to invite users to workspace: {{message}}",
@@ -1869,6 +1889,7 @@
         },
         "roles": {
             "title": "Roles",
+            "simplifiedDescription": "FlowOps uses four fixed workspace roles. Assign users to the role that matches their responsibilities.",
             "searchPlaceholder": "Search Roles",
             "view": "View",
             "edit": "Edit",
@@ -1904,7 +1925,7 @@
             "deleted": "Workspace deleted",
             "deleteFailed": "Failed to delete workspace: {{message}}",
             "deletingWorkspace": "Deleting workspace...",
-            "organizationOwner": "Organization Owner",
+            "organizationOwner": "Owner",
             "personalWorkspace": "Personal Workspace",
             "addTitle": "Add Workspace",
             "editTitle": "Edit Workspace",
@@ -1926,7 +1947,7 @@
             "removeUsers": "Remove Users",
             "removeUsersConfirm": "Remove the following users from the workspace?\n{{users}}",
             "remove": "Remove",
-            "organizationOwnerCannotRemove": "Organization owner cannot be removed from workspace.",
+            "organizationOwnerCannotRemove": "Workspace owner cannot be removed.",
             "usersRemoved": "{{count}} user(s) removed from workspace.",
             "unlinkFailed": "Failed to unlink users: {{message}}",
             "noAssignedUsers": "No Assigned Users Yet",
@@ -2050,11 +2071,11 @@
             "status": "Status",
             "lastLogin": "Last Login",
             "never": "Never",
-            "organizationOwner": "Organization Owner",
+            "organizationOwner": "Owner",
             "role": "Role",
             "editUser": "Edit User",
             "accountStatus": "Account Status",
-            "cannotChangeOrgOwnerStatus": "Cannot change status of the organization owner!",
+            "cannotChangeOrgOwnerStatus": "Cannot change status of the owner!",
             "updated": "User Details Updated",
             "updateFailed": "Failed to update User: {{message}}",
             "statusActive": "Active",

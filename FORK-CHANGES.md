@@ -28,6 +28,13 @@
 
 | File                                                                          | Category           |
 | ----------------------------------------------------------------------------- | ------------------ |
+| `packages/server/src/enterprise/controllers/workspace.controller.ts`          | Perm-simplify      |
+| `packages/server/src/enterprise/database/entities/role.entity.ts`             | Perm-simplify      |
+| `packages/server/src/enterprise/middleware/passport/index.ts`                 | Perm-simplify      |
+| `packages/server/src/enterprise/services/role.service.ts`                     | Perm-simplify      |
+| `packages/server/src/enterprise/services/workspace-user.service.ts`           | Perm-simplify      |
+| `packages/server/src/enterprise/sso/SSOBase.ts`                               | Perm-simplify      |
+| `packages/ui/src/layout/MainLayout/LogoSection/index.jsx`                     | Branding-shell     |
 | `deploy/.env.example`                                                         | Commercial-payment |
 | `packages/components/package.json`                                            | Components-deps    |
 | `packages/components/src/modelLoader.ts`                                      | T1-model-loader    |

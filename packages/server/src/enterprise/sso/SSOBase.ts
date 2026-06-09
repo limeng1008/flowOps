@@ -14,6 +14,7 @@ import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { StatusCodes } from 'http-status-codes'
 import { Platform } from '../../Interface'
 import { UserStatus } from '../database/entities/user.entity'
+import { OrganizationUserErrorMessage, OrganizationUserService } from '../services/organization-user.service'
 
 abstract class SSOBase {
     protected app: express.Application
@@ -114,6 +115,14 @@ abstract class SSOBase {
 
             const organization = await organizationService.readOrganizationById(workspaceUser.workspace.organizationId, queryRunner)
             if (!organization) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, 'Organization not found')
+            const organizationUserService = new OrganizationUserService()
+            const { organizationUser } = await organizationUserService.readOrganizationUserByOrganizationIdUserId(
+                organization.id,
+                workspaceUser.userId,
+                queryRunner
+            )
+            if (!organizationUser)
+                throw new InternalFlowiseError(StatusCodes.NOT_FOUND, OrganizationUserErrorMessage.ORGANIZATION_USER_NOT_FOUND)
             const subscriptionId = organization.subscriptionId as string
             const customerId = organization.customerId as string
             const features = await getRunningExpressApp().identityManager.getFeaturesByPlan(subscriptionId)
@@ -128,7 +137,7 @@ abstract class SSOBase {
                 activeOrganizationSubscriptionId: subscriptionId,
                 activeOrganizationCustomerId: customerId,
                 activeOrganizationProductId: productId,
-                isOrganizationAdmin: workspaceUser.roleId === ownerRole?.id,
+                isOrganizationAdmin: organizationUser.roleId === ownerRole?.id,
                 activeWorkspaceId: workspaceUser.workspaceId,
                 activeWorkspace: workspaceUser.workspace.name,
                 assignedWorkspaces,

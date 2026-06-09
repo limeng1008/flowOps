@@ -309,15 +309,23 @@ export class AccountService {
         const queryRunner = this.dataSource.createQueryRunner()
         await queryRunner.connect()
         const platform = this.identityManager.getPlatformType()
-        const ownerRole = await this.roleService.readGeneralRoleByName(GeneralRole.OWNER, queryRunner)
 
         try {
+            const ownerRole = await this.roleService.readGeneralRoleByName(GeneralRole.OWNER, queryRunner)
             data = await this.createRegisterAccount(data, queryRunner)
 
             await queryRunner.startTransaction()
             data.user = await this.userService.saveUser(data.user, queryRunner)
             data.organization = await this.organizationservice.saveOrganization(data.organization, queryRunner)
             data.organizationUser = await this.organizationUserService.saveOrganizationUser(data.organizationUser, queryRunner)
+            if (data.organization.id && data.workspaceUser.role?.name === GeneralRole.OWNER) {
+                data.workspaceUser.role = await this.roleService.readPresetWorkspaceRoleByName(
+                    GeneralRole.OWNER,
+                    data.organization.id,
+                    queryRunner
+                )
+                data.workspaceUser.roleId = data.workspaceUser.role.id
+            }
             data.workspace = await this.workspaceService.saveWorkspace(data.workspace, queryRunner)
             data.workspaceUser = await this.workspaceUserService.saveWorkspaceUser(data.workspaceUser, queryRunner)
             if (
@@ -359,7 +367,11 @@ export class AccountService {
             const totalOrgUsers = await this.organizationUserService.readOrgUsersCountByOrgId(data.workspace.organizationId || '')
             const subscriptionId = currentUser?.activeOrganizationSubscriptionId || ''
 
-            const role = await this.roleService.readRoleByRoleIdOrganizationId(data.role.id, data.workspace.organizationId, queryRunner)
+            const role = await this.roleService.readAssignableWorkspaceRoleByIdOrganizationId(
+                data.role.id,
+                data.workspace.organizationId,
+                queryRunner
+            )
             if (!role) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, RoleErrorMessage.ROLE_NOT_FOUND)
             data.role = role
             const user = await this.userService.readUserByEmail(data.user.email, queryRunner)
