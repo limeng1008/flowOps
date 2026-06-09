@@ -239,6 +239,7 @@ const nodeLabelMap = {
     'Execute Flow': '执行流程',
     'LLM Node': 'LLM 节点',
     Loop: '循环',
+    'Parameter Extractor': '参数提取器',
     Start: '开始',
     State: '状态',
     'Tool Node': '工具节点',
@@ -524,6 +525,7 @@ const nodeLabelMap = {
     'Array[Boolean]': 'Array[Boolean]',
     'Array[Object]': 'Array[Object]',
     'String Array': '字符串数组',
+    Array: '数组',
 
     // ---------- Output anchor option labels ----------
     'Memory Retriever': '记忆检索器',
@@ -888,6 +890,7 @@ const nodeDescriptionMap = {
     'Uses an agent to determine which route to take next': '使用智能体决定下一步路由',
     'Execute chatflow/agentflow and return final response': '执行 chatflow / agentflow 并返回最终响应',
     "Execute tool and return tool's output": '执行工具并返回工具输出',
+    'Extract typed parameters from input text with structured model output': '使用模型结构化输出从输入文本中提取指定类型参数',
 
     // ---------- Engine (LlamaIndex) ----------
     'Answer question based on retrieved documents (context) with built-in memory to remember conversation':
