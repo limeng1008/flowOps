@@ -238,6 +238,7 @@ const nodeLabelMap = {
     End: '结束',
     'Execute Flow': '执行流程',
     'LLM Node': 'LLM 节点',
+    'List Operator': '列表操作器',
     Loop: '循环',
     'Parameter Extractor': '参数提取器',
     Start: '开始',
@@ -367,9 +368,13 @@ const nodeLabelMap = {
     'Override Config': '覆盖配置',
     Operation: '操作',
     Size: '大小',
+    Sort: '排序',
     Cache: '缓存',
     'Async Options': '异步选项',
     Action: '动作',
+    Field: '字段',
+    Operator: '运算符',
+    Order: '排序方向',
     Yes: '是',
     No: '否',
     Show: '显示',
@@ -526,6 +531,14 @@ const nodeLabelMap = {
     'Array[Object]': 'Array[Object]',
     'String Array': '字符串数组',
     Array: '数组',
+    'Input Array': '输入数组',
+    Slice: '切片',
+    'Extract Field': '提取字段',
+    Ascending: '升序',
+    Descending: '降序',
+    'Start Index': '开始索引',
+    'End Index': '结束索引',
+    Count: '数量',
 
     // ---------- Output anchor option labels ----------
     'Memory Retriever': '记忆检索器',
@@ -891,6 +904,7 @@ const nodeDescriptionMap = {
     'Execute chatflow/agentflow and return final response': '执行 chatflow / agentflow 并返回最终响应',
     "Execute tool and return tool's output": '执行工具并返回工具输出',
     'Extract typed parameters from input text with structured model output': '使用模型结构化输出从输入文本中提取指定类型参数',
+    'Filter, sort, slice, limit, or extract fields from an array': '对数组进行过滤、排序、切片、截断或字段提取',
 
     // ---------- Engine (LlamaIndex) ----------
     'Answer question based on retrieved documents (context) with built-in memory to remember conversation':
