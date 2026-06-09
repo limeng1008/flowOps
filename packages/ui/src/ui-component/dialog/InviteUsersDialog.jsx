@@ -50,6 +50,7 @@ import {
     SHOW_CANVAS_DIALOG
 } from '@/store/actions'
 import { useTranslation } from 'react-i18next'
+import { filterFlowOpsWorkspaceRoles, toFlowOpsRoleOption } from '@/utils/flowOpsRoles'
 
 const StyledChip = styled(Chip)(({ theme, chiptype }) => {
     let backgroundColor, color
@@ -144,12 +145,7 @@ const InviteUsersDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
 
     useEffect(() => {
         if (getAllRolesApi.data) {
-            const roles = getAllRolesApi.data.map((role) => ({
-                id: role.id,
-                name: role.name,
-                label: role.name,
-                description: role.description
-            }))
+            const roles = filterFlowOpsWorkspaceRoles(getAllRolesApi.data).map((role) => toFlowOpsRoleOption(role, t))
             setAvailableRoles(roles)
             if (
                 dialogProps.type === 'EDIT' &&
@@ -177,13 +173,14 @@ const InviteUsersDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                 name: data.role.name,
                 description: data.role.description
             }
+            const flowOpsRole = toFlowOpsRoleOption(selectedRole, t)
             const selectedWorkspace = {
                 id: data.workspace.id,
                 label: data.workspace.name,
                 name: data.workspace.name,
                 description: data.workspace.description
             }
-            setSelectedRole(selectedRole)
+            setSelectedRole(flowOpsRole)
             setSelectedWorkspace(selectedWorkspace)
         }
 
@@ -703,6 +700,16 @@ const InviteUsersDialog = ({ show, dialogProps, onCancel, onConfirm }) => {
                             getOptionLabel={(option) => option.label || ''}
                             onChange={handleRoleChange}
                             options={availableRoles}
+                            renderOption={(props, option) => (
+                                <li {...props}>
+                                    <Box>
+                                        <Typography variant='h5'>{option.label}</Typography>
+                                        <Typography variant='caption' color='text.secondary'>
+                                            {option.description}
+                                        </Typography>
+                                    </Box>
+                                </li>
+                            )}
                             renderInput={(params) => (
                                 <TextField {...params} variant='outlined' placeholder={t('uiComponents.inviteUsers.selectRole')} />
                             )}

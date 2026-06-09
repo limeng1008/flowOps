@@ -37,6 +37,10 @@ export class WorkspaceUserService {
         this.organizationService = new OrganizationService()
     }
 
+    private isOwnerRole(roleId: string | undefined, role: { name?: string } | undefined, ownerRole: { id?: string } | undefined) {
+        return role?.name === GeneralRole.OWNER || roleId === ownerRole?.id
+    }
+
     public validateWorkspaceUserStatus(status: string | undefined) {
         if (status && !Object.values(WorkspaceUserStatus).includes(status as WorkspaceUserStatus))
             throw new InternalFlowiseError(StatusCodes.BAD_REQUEST, WorkspaceUserErrorMessage.INVALID_WORKSPACE_USER_SATUS)
@@ -70,7 +74,7 @@ export class WorkspaceUserService {
             workspaceUser: workspaceUser
                 ? {
                       ...workspaceUser,
-                      isOrgOwner: workspaceUser.roleId === ownerRole?.id
+                      isOrgOwner: this.isOwnerRole(workspaceUser.roleId, workspaceUser.role, ownerRole)
                   }
                 : null
         }
@@ -94,7 +98,7 @@ export class WorkspaceUserService {
             delete workspaceUser.user.tokenExpiry
             return {
                 ...workspaceUser,
-                isOrgOwner: workspaceUser.roleId === ownerRole?.id
+                isOrgOwner: this.isOwnerRole(workspaceUser.roleId, workspaceUser.role, ownerRole)
             }
         })
     }
@@ -113,7 +117,7 @@ export class WorkspaceUserService {
 
         return workspaceUsers.map((user) => ({
             ...user,
-            isOrgOwner: user.roleId === ownerRole?.id
+            isOrgOwner: this.isOwnerRole(user.roleId, user.role, ownerRole)
         }))
     }
 
@@ -138,7 +142,7 @@ export class WorkspaceUserService {
 
         return workspaceUsers.map((user) => ({
             ...user,
-            isOrgOwner: user.roleId === ownerRole?.id
+            isOrgOwner: this.isOwnerRole(user.roleId, user.role, ownerRole)
         }))
     }
 
@@ -157,7 +161,7 @@ export class WorkspaceUserService {
 
         return workspaceUsers.map((user) => ({
             ...user,
-            isOrgOwner: user.roleId === ownerRole?.id
+            isOrgOwner: this.isOwnerRole(user.roleId, user.role, ownerRole)
         }))
     }
 
@@ -183,7 +187,7 @@ export class WorkspaceUserService {
             delete workspaceUser.user.tokenExpiry
             return {
                 ...workspaceUser,
-                isOrgOwner: workspaceUser.roleId === ownerRole?.id
+                isOrgOwner: this.isOwnerRole(workspaceUser.roleId, workspaceUser.role, ownerRole)
             }
         })
     }
@@ -207,7 +211,7 @@ export class WorkspaceUserService {
 
         return {
             ...workspaceUser,
-            isOrgOwner: workspaceUser.roleId === ownerRole?.id
+            isOrgOwner: this.isOwnerRole(workspaceUser.roleId, workspaceUser.role, ownerRole)
         }
     }
 
@@ -228,7 +232,11 @@ export class WorkspaceUserService {
 
         const { workspace, workspaceUser } = await this.readWorkspaceUserByWorkspaceIdUserId(data.workspaceId, data.userId, queryRunner)
         if (workspaceUser) throw new InternalFlowiseError(StatusCodes.BAD_REQUEST, WorkspaceUserErrorMessage.WORKSPACE_USER_ALREADY_EXISTS)
-        const role = await this.roleService.readRoleById(data.roleId, queryRunner)
+        const role = await this.roleService.readAssignableWorkspaceRoleByIdOrganizationId(
+            data.roleId,
+            workspace.organizationId,
+            queryRunner
+        )
         if (!role) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, RoleErrorMessage.ROLE_NOT_FOUND)
         const createdBy = await this.userService.readUserById(data.createdBy, queryRunner)
         if (!createdBy) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, UserErrorMessage.USER_NOT_FOUND)
@@ -268,16 +276,14 @@ export class WorkspaceUserService {
 
         let newWorkspace = this.workspaceService.createNewWorkspace(data, queryRunner)
 
-        const ownerRole = await this.roleService.readGeneralRoleByName(GeneralRole.OWNER, queryRunner)
+        const ownerRole = await this.roleService.readPresetWorkspaceRoleByName(GeneralRole.OWNER, organization.id, queryRunner)
         if (!ownerRole) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, RoleErrorMessage.ROLE_NOT_FOUND)
 
-        const role = await this.roleService.readRoleById(organizationUser.roleId, queryRunner)
-        if (!role) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, RoleErrorMessage.ROLE_NOT_FOUND)
-
         // Add org admin as workspace owner if the user creating the workspace is NOT the org admin
+        const generalOwnerRole = await this.roleService.readGeneralRoleByName(GeneralRole.OWNER, queryRunner)
         const orgAdmin = await queryRunner.manager.findOneBy(OrganizationUser, {
             organizationId: organization.id,
-            roleId: ownerRole.id
+            roleId: generalOwnerRole.id
         })
         if (!orgAdmin) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, OrganizationUserErrorMessage.ORGANIZATION_USER_NOT_FOUND)
 
@@ -296,19 +302,9 @@ export class WorkspaceUserService {
 
         let newWorkspaceUser: Partial<WorkspaceUser> = {
             workspaceId: newWorkspace.id,
-            roleId: role.id,
+            roleId: ownerRole.id,
             userId: user.id,
             createdBy: user.id
-        }
-        // If user creating the workspace is an invited user, not the organization admin, inherit the role from existingWorkspaceId
-        if ((data as any).existingWorkspaceId) {
-            const existingWorkspaceUser = await queryRunner.manager.findOneBy(WorkspaceUser, {
-                workspaceId: (data as any).existingWorkspaceId,
-                userId: user.id
-            })
-            if (existingWorkspaceUser) {
-                newWorkspaceUser.roleId = existingWorkspaceUser.roleId
-            }
         }
 
         newWorkspaceUser = this.createNewWorkspaceUser(newWorkspaceUser, queryRunner)
@@ -338,7 +334,11 @@ export class WorkspaceUserService {
         )
         if (!workspaceUser) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, WorkspaceUserErrorMessage.WORKSPACE_USER_NOT_FOUND)
         if (newWorkspaserUser.roleId && workspaceUser.role) {
-            const role = await this.roleService.readRoleById(newWorkspaserUser.roleId, queryRunner)
+            const role = await this.roleService.readAssignableWorkspaceRoleByIdOrganizationId(
+                newWorkspaserUser.roleId,
+                workspaceUser.role.organizationId,
+                queryRunner
+            )
             if (!role) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, RoleErrorMessage.ROLE_NOT_FOUND)
             // check if the role is from the same organization
             if (role.organizationId !== workspaceUser.role.organizationId) {

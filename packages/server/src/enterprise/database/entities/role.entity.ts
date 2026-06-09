@@ -4,7 +4,9 @@ import { User } from './user.entity'
 
 export enum GeneralRole {
     OWNER = 'owner',
+    ADMIN = 'admin',
     MEMBER = 'member',
+    VIEWER = 'viewer',
     PERSONAL_WORKSPACE = 'personal workspace'
 }
 

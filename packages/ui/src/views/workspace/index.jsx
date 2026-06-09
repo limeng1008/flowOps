@@ -52,6 +52,7 @@ import { IconEdit, IconEye, IconEyeOff, IconPlus, IconTrash, IconTrashOff, IconU
 // Utils
 import { truncateString } from '@/utils/genericHelper'
 import useNotifier from '@/utils/useNotifier'
+import { getFlowOpsRoleLabel } from '@/utils/flowOpsRoles'
 
 // Store
 import { store } from '@/store'
@@ -197,11 +198,11 @@ function ShowWorkspaceRow(props) {
                                             <StyledTableCell>{item.user.name || item.user.email}</StyledTableCell>
                                             <StyledTableCell>
                                                 {item.isOrgOwner ? (
-                                                    <Chip label={t('pages.workspaces.organizationOwner')} size={'small'} />
+                                                    <Chip label={getFlowOpsRoleLabel('owner', t)} size={'small'} />
                                                 ) : item.role.name === 'personal workspace' ? (
                                                     <Chip label={t('pages.workspaces.personalWorkspace')} size={'small'} />
                                                 ) : (
-                                                    item.role.name
+                                                    getFlowOpsRoleLabel(item.role.name, t)
                                                 )}
                                             </StyledTableCell>
                                         </TableRow>

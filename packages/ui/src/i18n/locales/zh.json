@@ -25,6 +25,26 @@
         "logs": "日志",
         "account": "账户设置"
     },
+    "flowOps": {
+        "roles": {
+            "owner": {
+                "name": "所有者",
+                "description": "拥有完整工作区控制权，包括删除工作区、分配角色和管理成员。"
+            },
+            "admin": {
+                "name": "管理员",
+                "description": "可管理工作区内容和成员，但不能删除工作区或修改角色与 SSO 设置。"
+            },
+            "member": {
+                "name": "成员",
+                "description": "可创建和维护流程、工具、助手、文档库、变量、模板和执行记录。"
+            },
+            "viewer": {
+                "name": "查看者",
+                "description": "仅可查看工作区内容和执行记录。"
+            }
+        }
+    },
     "profile": {
         "user": "用户",
         "export": "导出",
@@ -911,7 +931,7 @@
             "roleToAssign": "分配角色",
             "selectRole": "选择角色",
             "invalidEmailsRemoved": "已移除一个或多个无效邮箱。",
-            "alreadyInWorkspaceOrOrganization": "以下用户已在工作区或组织中：{{emails}}",
+            "alreadyInWorkspaceOrOrganization": "以下用户已可用于该工作区：{{emails}}",
             "invitedToWorkspace": "用户已邀请到工作区",
             "noDataReceived": "服务器未返回数据",
             "failedInvite": "邀请用户到工作区失败：{{message}}",
@@ -1860,6 +1880,7 @@
         },
         "roles": {
             "title": "角色",
+            "simplifiedDescription": "FlowOps 使用四个固定工作区角色。请按成员职责分配合适角色。",
             "searchPlaceholder": "搜索角色",
             "view": "查看",
             "edit": "编辑",
@@ -1895,7 +1916,7 @@
             "deleted": "工作区已删除",
             "deleteFailed": "删除工作区失败：{{message}}",
             "deletingWorkspace": "正在删除工作区…",
-            "organizationOwner": "组织所有者",
+            "organizationOwner": "所有者",
             "personalWorkspace": "个人工作区",
             "addTitle": "新增工作区",
             "editTitle": "编辑工作区",
@@ -1917,7 +1938,7 @@
             "removeUsers": "移除用户",
             "removeUsersConfirm": "确定从工作区移除以下用户吗？\n{{users}}",
             "remove": "移除",
-            "organizationOwnerCannotRemove": "组织所有者不能从工作区移除。",
+            "organizationOwnerCannotRemove": "不能从工作区移除所有者。",
             "usersRemoved": "已从工作区移除 {{count}} 个用户。",
             "unlinkFailed": "移除用户失败：{{message}}",
             "noAssignedUsers": "暂无已分配用户",
@@ -2041,11 +2062,11 @@
             "status": "状态",
             "lastLogin": "最后登录",
             "never": "从未登录",
-            "organizationOwner": "组织所有者",
+            "organizationOwner": "所有者",
             "role": "角色",
             "editUser": "编辑用户",
             "accountStatus": "账号状态",
-            "cannotChangeOrgOwnerStatus": "不能修改组织所有者的状态！",
+            "cannotChangeOrgOwnerStatus": "不能修改所有者的状态！",
             "updated": "用户信息已更新",
             "updateFailed": "更新用户失败：{{message}}",
             "statusActive": "已激活",

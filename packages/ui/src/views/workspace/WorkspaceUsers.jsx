@@ -48,6 +48,7 @@ import { IconEdit, IconX, IconUnlink, IconUserPlus } from '@tabler/icons-react'
 // store
 import { useError } from '@/store/context/ErrorContext'
 import { closeSnackbar as closeSnackbarAction, enqueueSnackbar as enqueueSnackbarAction } from '@/store/actions'
+import { getFlowOpsRoleLabel } from '@/utils/flowOpsRoles'
 
 const WorkspaceDetails = () => {
     const { t, i18n } = useTranslation()
@@ -185,10 +186,10 @@ const WorkspaceDetails = () => {
             cancelButtonName: t('common.cancel')
         }
 
-        const orgOwner = workspaceUsers.find(
-            (user) => usersSelected.some((selected) => selected.userId === user.id) && user.isOrgOwner === true
+        const workspaceOwner = workspaceUsers.find(
+            (user) => usersSelected.some((selected) => selected.userId === user.userId) && user.isOrgOwner === true
         )
-        if (orgOwner) {
+        if (workspaceOwner) {
             enqueueSnackbar({
                 message: t('pages.workspaces.organizationOwnerCannotRemove'),
                 options: {
@@ -492,9 +493,9 @@ const WorkspaceDetails = () => {
                                                             </StyledTableCell>
                                                             <StyledTableCell>
                                                                 {item.isOrgOwner ? (
-                                                                    <Chip size='small' label={t('pages.workspaces.organizationOwner')} />
+                                                                    <Chip size='small' label={getFlowOpsRoleLabel('owner', t)} />
                                                                 ) : (
-                                                                    item.role.name
+                                                                    getFlowOpsRoleLabel(item.role.name, t)
                                                                 )}
                                                             </StyledTableCell>
                                                             <StyledTableCell>

@@ -38,6 +38,7 @@ import { enqueueSnackbar as enqueueSnackbarAction, closeSnackbar as closeSnackba
 import useApi from '@/hooks/useApi'
 import { autocompleteClasses } from '@mui/material/Autocomplete'
 import { useTranslation } from 'react-i18next'
+import { filterFlowOpsWorkspaceRoles, toFlowOpsRoleOption } from '@/utils/flowOpsRoles'
 
 const StyledPopper = styled(Popper)({
     boxShadow: '0px 8px 10px -5px rgb(0 0 0 / 20%), 0px 16px 24px 2px rgb(0 0 0 / 14%), 0px 6px 30px 5px rgb(0 0 0 / 12%)',
@@ -72,12 +73,7 @@ const EditWorkspaceUserRoleDialog = ({ show, dialogProps, onCancel, onConfirm })
 
     useEffect(() => {
         if (getAllRolesApi.data) {
-            const roles = getAllRolesApi.data.map((role) => ({
-                id: role.id,
-                name: role.name,
-                label: role.name,
-                description: role.description
-            }))
+            const roles = filterFlowOpsWorkspaceRoles(getAllRolesApi.data).map((role) => toFlowOpsRoleOption(role, t))
             setAvailableRoles(roles)
             if (dialogProps.type === 'EDIT' && dialogProps.data && dialogProps.data.role && dialogProps.data.role.name) {
                 const userActiveRole = roles.find((role) => role.name === dialogProps.data.role.name)
@@ -189,6 +185,16 @@ const EditWorkspaceUserRoleDialog = ({ show, dialogProps, onCancel, onConfirm })
                         onChange={handleRoleChange}
                         getOptionLabel={(option) => option.label || ''}
                         options={availableRoles}
+                        renderOption={(props, option) => (
+                            <li {...props}>
+                                <Box>
+                                    <Typography variant='h5'>{option.label}</Typography>
+                                    <Typography variant='caption' color='text.secondary'>
+                                        {option.description}
+                                    </Typography>
+                                </Box>
+                            </li>
+                        )}
                         renderInput={(params) => (
                             <TextField {...params} variant='outlined' placeholder={t('pages.workspaces.selectRole')} />
                         )}
