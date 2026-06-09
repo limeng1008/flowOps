@@ -1006,6 +1006,12 @@ export const utilBuildChatflow = async (req: Request, isInternal: boolean = fals
     const baseURL = `${httpProtocol}://${req.get('host')}`
     const incomingInput: IncomingInput = req.body || {} // Ensure incomingInput is never undefined
     const chatId = incomingInput.chatId ?? incomingInput.overrideConfig?.sessionId ?? uuidv4()
+    const predictionRunId = String(
+        req.get('idempotency-key') ??
+            req.get('x-idempotency-key') ??
+            (incomingInput as IncomingInput & { idempotencyKey?: string }).idempotencyKey ??
+            uuidv4()
+    )
     const files = (req.files as Express.Multer.File[]) || []
     const abortControllerId = `${chatflow.id}_${chatId}`
     const isTool = req.get('flowise-tool') === 'true'
@@ -1056,6 +1062,7 @@ export const utilBuildChatflow = async (req: Request, isInternal: boolean = fals
         organizationId = orgId
         const subscriptionId = org.subscriptionId as string
         const productId = await appServer.identityManager.getProductIdFromSubscription(subscriptionId)
+        const predictionUsageKey = `prediction:${orgId}:${workspaceId}:${chatflow.id}:${predictionRunId}`
 
         await BillingService.assertTokenAllowance(orgId)
         await checkPredictions(orgId, subscriptionId, appServer.usageCacheManager)
@@ -1094,8 +1101,7 @@ export const utilBuildChatflow = async (req: Request, isInternal: boolean = fals
             if (!result) {
                 throw new Error('Job execution failed')
             }
-            await updatePredictionsUsage(orgId, subscriptionId, workspaceId, appServer.usageCacheManager)
-            await recordBillingTokenUsage(result, orgId, workspaceId, chatflow.id)
+            await updatePredictionsUsage(orgId, subscriptionId, workspaceId, appServer.usageCacheManager, predictionUsageKey)
             incrementSuccessMetricCounter(appServer.metricsProvider, isInternal, isAgentFlow)
             return result
         } else {
@@ -1107,8 +1113,7 @@ export const utilBuildChatflow = async (req: Request, isInternal: boolean = fals
             const result = await executeFlow(executeData)
 
             appServer.abortControllerPool.remove(abortControllerId)
-            await updatePredictionsUsage(orgId, subscriptionId, workspaceId, appServer.usageCacheManager)
-            await recordBillingTokenUsage(result, orgId, workspaceId, chatflow.id)
+            await updatePredictionsUsage(orgId, subscriptionId, workspaceId, appServer.usageCacheManager, predictionUsageKey)
             incrementSuccessMetricCounter(appServer.metricsProvider, isInternal, isAgentFlow)
             return result
         }

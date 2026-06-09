@@ -24,6 +24,8 @@ import { BillingUsage } from './BillingUsage'
 import { PaymentOrder } from './PaymentOrder'
 import { PaymentNotificationLog } from './PaymentNotificationLog'
 import { SupportTicket } from './SupportTicket'
+import { Entitlement } from './Entitlement'
+import { EntitlementUsage } from './EntitlementUsage'
 import { LoginActivity, WorkspaceShared, WorkspaceUsers } from '../../enterprise/database/entities/EnterpriseEntities'
 import { User } from '../../enterprise/database/entities/user.entity'
 import { Organization } from '../../enterprise/database/entities/organization.entity'
@@ -67,6 +69,8 @@ export const entities = {
     PaymentOrder,
     PaymentNotificationLog,
     SupportTicket,
+    Entitlement,
+    EntitlementUsage,
     Organization,
     Role,
     OrganizationUser,

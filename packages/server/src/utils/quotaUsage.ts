@@ -1,6 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import { InternalFlowiseError } from '../errors/internalFlowiseError'
 import BillingService from '../services/billing'
+import { EntitlementService, getPredictionCreditCost } from '../services/entitlement'
 import { UsageCacheManager } from '../UsageCacheManager'
 import { LICENSE_QUOTAS } from './constants'
 import logger from './logger'
@@ -91,10 +92,25 @@ export const checkUsageLimit = async (
 export const updatePredictionsUsage = async (
     orgId: string,
     subscriptionId: string,
-    _: string = '',
-    usageCacheManager?: UsageCacheManager
+    workspaceId: string = '',
+    usageCacheManager?: UsageCacheManager,
+    idempotencyKey?: string,
+    modelName?: string
 ) => {
-    if (!usageCacheManager) return
+    const credits = getPredictionCreditCost(modelName)
+    if (orgId && idempotencyKey) {
+        await new EntitlementService().consumeCredits({
+            scopeId: orgId,
+            action: 'prediction',
+            credits,
+            idempotencyKey,
+            metadata: workspaceId ? { workspaceId } : undefined
+        })
+    } else if (orgId) {
+        logger.warn('[updatePredictionsUsage] Missing idempotency key, skipping entitlement credit deduction')
+    }
+
+    if (!usageCacheManager || !subscriptionId) return
 
     const quotas = await usageCacheManager.getQuotas(subscriptionId)
     const predictionsLimit = quotas[LICENSE_QUOTAS.PREDICTIONS_LIMIT]
@@ -139,13 +155,24 @@ export const updatePredictionsUsage = async (
 }
 
 export const checkPredictions = async (orgId: string, subscriptionId: string, usageCacheManager: UsageCacheManager) => {
-    if (!usageCacheManager || !subscriptionId) return
+    const credits = getPredictionCreditCost()
+    if (orgId) {
+        await new EntitlementService().assertCreditsAvailable(orgId, credits)
+    }
+
+    const entitlementUsage = {
+        credits: {
+            required: credits
+        }
+    }
+
+    if (!usageCacheManager || !subscriptionId) return entitlementUsage
 
     const currentPredictions: number = (await usageCacheManager.get(`predictions:${orgId}`)) || 0
 
     const quotas = await usageCacheManager.getQuotas(subscriptionId)
     const predictionsLimit = quotas[LICENSE_QUOTAS.PREDICTIONS_LIMIT]
-    if (predictionsLimit === -1) return
+    if (predictionsLimit === -1) return entitlementUsage
 
     if (currentPredictions >= predictionsLimit) {
         throw new InternalFlowiseError(StatusCodes.PAYMENT_REQUIRED, 'Predictions limit exceeded')
@@ -153,7 +180,8 @@ export const checkPredictions = async (orgId: string, subscriptionId: string, us
 
     return {
         usage: currentPredictions,
-        limit: predictionsLimit
+        limit: predictionsLimit,
+        ...entitlementUsage
     }
 }
 

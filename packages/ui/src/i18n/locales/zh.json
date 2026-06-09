@@ -2252,6 +2252,21 @@
             "normal": "普通",
             "high": "高",
             "urgent": "紧急"
+        },
+        "entitlement": {
+            "title": "权益",
+            "credits": "资源点",
+            "creditsBalance": "资源点余额",
+            "tiers": {
+                "free": "免费版",
+                "pro": "专业版",
+                "team": "团队版",
+                "enterprise": "企业版"
+            },
+            "messages": {
+                "insufficientCredits": "资源点不足，请充值/升级",
+                "featureRequired": "该功能需专业版"
+            }
         }
     }
 }

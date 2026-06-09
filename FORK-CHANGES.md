@@ -35,6 +35,9 @@
 | `packages/server/src/enterprise/services/workspace-user.service.ts`           | Perm-simplify      |
 | `packages/server/src/enterprise/sso/SSOBase.ts`                               | Perm-simplify      |
 | `packages/ui/src/layout/MainLayout/LogoSection/index.jsx`                     | Branding-shell     |
+| `packages/server/.env.example`                                                | Entitlement        |
+| `packages/server/src/schedule/ScheduleExecutor.ts`                            | Entitlement        |
+| `packages/server/src/services/chatflows/index.test.ts`                        | Entitlement        |
 | `deploy/.env.example`                                                         | Commercial-payment |
 | `packages/components/package.json`                                            | Components-deps    |
 | `packages/components/src/modelLoader.ts`                                      | T1-model-loader    |

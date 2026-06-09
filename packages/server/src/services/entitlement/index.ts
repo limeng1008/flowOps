@@ -1,0 +1,373 @@
+import { StatusCodes } from 'http-status-codes'
+import { DataSource, EntityManager, MoreThanOrEqual } from 'typeorm'
+import { Entitlement } from '../../database/entities/Entitlement'
+import { EntitlementUsage } from '../../database/entities/EntitlementUsage'
+import { InternalFlowiseError } from '../../errors/internalFlowiseError'
+import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
+
+export type FlowOpsEdition = 'cloud' | 'private'
+export type EntitlementTier = 'free' | 'pro' | 'team' | 'enterprise'
+export type EntitlementSourceKind = 'local' | 'subscription'
+
+export interface EntitlementSnapshot {
+    scopeId: string
+    tier: EntitlementTier
+    seats: number
+    creditsTotal: number
+    creditsBalance: number
+    features: string[]
+    concurrency: number
+    expireAt?: Date | null
+    source: EntitlementSourceKind
+}
+
+export interface EntitlementTemplate {
+    tier: EntitlementTier
+    seats: number
+    creditsTotal: number
+    creditsBalance: number
+    features: string[]
+    concurrency: number
+}
+
+export interface EntitlementSource {
+    resolve(scopeId: string): Promise<EntitlementSnapshot>
+}
+
+export interface CreditConsumptionRequest {
+    scopeId: string
+    idempotencyKey: string
+    action: string
+    credits: number
+    metadata?: Record<string, unknown>
+}
+
+export interface CreditConsumptionResult {
+    deducted: boolean
+    credits: number
+    creditsBalance: number
+    entitlement: EntitlementSnapshot
+}
+
+export const ENTITLEMENT_ERROR_MESSAGES = {
+    insufficientCredits: '资源点不足，请充值/升级',
+    featureRequired: '该功能需专业版'
+}
+
+export const FLOWOPS_ENTITLEMENT_FEATURES = {
+    basicWorkflow: 'basic-workflow',
+    chinaModels: 'china-models',
+    pptExcelExport: 'ppt-excel-export',
+    contentSafety: 'content-safety',
+    humanHandoff: 'human-handoff',
+    traceDebugging: 'trace-debugging',
+    chinaCloudVectorStores: 'china-cloud-vector-stores',
+    multiWorkspace: 'multi-workspace',
+    ssoAuditLogs: 'sso-audit-logs',
+    privateOfflineLicense: 'private-offline-license',
+    customBranding: 'custom-branding',
+    apiAccess: 'api-access'
+} as const
+
+const FREE_FEATURES = [
+    FLOWOPS_ENTITLEMENT_FEATURES.basicWorkflow,
+    FLOWOPS_ENTITLEMENT_FEATURES.chinaModels,
+    FLOWOPS_ENTITLEMENT_FEATURES.apiAccess
+]
+
+const PRO_FEATURES = [
+    ...FREE_FEATURES,
+    FLOWOPS_ENTITLEMENT_FEATURES.pptExcelExport,
+    FLOWOPS_ENTITLEMENT_FEATURES.contentSafety,
+    FLOWOPS_ENTITLEMENT_FEATURES.traceDebugging
+]
+
+const TEAM_FEATURES = [
+    ...PRO_FEATURES,
+    FLOWOPS_ENTITLEMENT_FEATURES.humanHandoff,
+    FLOWOPS_ENTITLEMENT_FEATURES.chinaCloudVectorStores,
+    FLOWOPS_ENTITLEMENT_FEATURES.multiWorkspace,
+    FLOWOPS_ENTITLEMENT_FEATURES.customBranding
+]
+
+export const ENTITLEMENT_TEMPLATES: Record<EntitlementTier, EntitlementTemplate> = {
+    free: {
+        tier: 'free',
+        seats: 1,
+        creditsTotal: 200,
+        creditsBalance: 200,
+        features: FREE_FEATURES,
+        concurrency: 1
+    },
+    pro: {
+        tier: 'pro',
+        seats: 5,
+        creditsTotal: 5000,
+        creditsBalance: 5000,
+        features: PRO_FEATURES,
+        concurrency: 3
+    },
+    team: {
+        tier: 'team',
+        seats: 20,
+        creditsTotal: 30000,
+        creditsBalance: 30000,
+        features: TEAM_FEATURES,
+        concurrency: 10
+    },
+    enterprise: {
+        tier: 'enterprise',
+        seats: -1,
+        creditsTotal: -1,
+        creditsBalance: -1,
+        features: Object.values(FLOWOPS_ENTITLEMENT_FEATURES),
+        concurrency: -1
+    }
+}
+
+export const getFlowOpsEdition = (env: NodeJS.ProcessEnv = process.env): FlowOpsEdition => {
+    return env.FLOWOPS_EDITION === 'cloud' ? 'cloud' : 'private'
+}
+
+export const isLocalCommercialEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => {
+    const value = env.FLOWOPS_LOCAL_COMMERCIAL?.trim().toLowerCase()
+    return value === '1' || value === 'true' || value === 'yes' || value === 'on'
+}
+
+export const getPredictionCreditCost = (modelName?: string): number => {
+    const defaultCredits = Number(process.env.FLOWOPS_DEFAULT_PREDICTION_CREDITS ?? 1)
+    const chinaModelCredits = Number(process.env.FLOWOPS_CHINA_MODEL_CREDITS ?? 2)
+    const premiumModelCredits = Number(process.env.FLOWOPS_PREMIUM_MODEL_CREDITS ?? 5)
+    const normalizedModelName = (modelName ?? '').toLowerCase()
+
+    if (/(gpt|claude|anthropic|gemini)/.test(normalizedModelName)) return premiumModelCredits
+    if (/(qwen|deepseek|ernie|wenxin|glm|moonshot|kimi|yi-)/.test(normalizedModelName)) return chinaModelCredits
+    return defaultCredits
+}
+
+export const parseEntitlementFeatures = (features: string | string[] | null | undefined): string[] => {
+    if (Array.isArray(features)) return features
+    if (!features) return []
+    try {
+        const parsed = JSON.parse(features)
+        return Array.isArray(parsed) ? parsed.filter((feature) => typeof feature === 'string') : []
+    } catch {
+        return features
+            .split(',')
+            .map((feature) => feature.trim())
+            .filter(Boolean)
+    }
+}
+
+export const toEntitlementSnapshot = (entitlement: Entitlement): EntitlementSnapshot => ({
+    scopeId: entitlement.scopeId,
+    tier: entitlement.tier as EntitlementTier,
+    seats: entitlement.seats,
+    creditsTotal: entitlement.creditsTotal,
+    creditsBalance: entitlement.creditsBalance,
+    features: parseEntitlementFeatures(entitlement.features),
+    concurrency: entitlement.concurrency,
+    expireAt: entitlement.expireAt,
+    source: entitlement.source as EntitlementSourceKind
+})
+
+const snapshotToEntity = (snapshot: EntitlementSnapshot): Partial<Entitlement> => ({
+    scopeId: snapshot.scopeId,
+    tier: snapshot.tier,
+    seats: snapshot.seats,
+    creditsTotal: snapshot.creditsTotal,
+    creditsBalance: snapshot.creditsBalance,
+    features: JSON.stringify(snapshot.features),
+    concurrency: snapshot.concurrency,
+    expireAt: snapshot.expireAt ?? null,
+    source: snapshot.source
+})
+
+const templateSnapshot = (scopeId: string, tier: EntitlementTier, source: EntitlementSourceKind): EntitlementSnapshot => {
+    const template = ENTITLEMENT_TEMPLATES[tier]
+    return {
+        scopeId,
+        tier: template.tier,
+        seats: template.seats,
+        creditsTotal: template.creditsTotal,
+        creditsBalance: template.creditsBalance,
+        features: template.features,
+        concurrency: template.concurrency,
+        expireAt: null,
+        source
+    }
+}
+
+export class LocalEntitlementSource implements EntitlementSource {
+    constructor(private readonly env: NodeJS.ProcessEnv = process.env) {}
+
+    async resolve(scopeId: string): Promise<EntitlementSnapshot> {
+        return templateSnapshot(scopeId, isLocalCommercialEnabled(this.env) ? 'enterprise' : 'free', 'local')
+    }
+}
+
+export class SubscriptionEntitlementSource implements EntitlementSource {
+    async resolve(scopeId: string): Promise<EntitlementSnapshot> {
+        return templateSnapshot(scopeId, 'free', 'subscription')
+    }
+}
+
+export const createEntitlementSource = (env: NodeJS.ProcessEnv = process.env): EntitlementSource => {
+    return getFlowOpsEdition(env) === 'cloud' ? new SubscriptionEntitlementSource() : new LocalEntitlementSource(env)
+}
+
+export const consumeCreditsForEntitlement = async (
+    manager: EntityManager,
+    entitlement: Entitlement,
+    request: CreditConsumptionRequest
+): Promise<CreditConsumptionResult> => {
+    if (request.credits <= 0) {
+        return {
+            deducted: false,
+            credits: 0,
+            creditsBalance: entitlement.creditsBalance,
+            entitlement: toEntitlementSnapshot(entitlement)
+        }
+    }
+
+    const existingUsage = await manager.findOne(EntitlementUsage, {
+        where: {
+            scopeId: request.scopeId,
+            idempotencyKey: request.idempotencyKey
+        }
+    })
+
+    if (existingUsage) {
+        const currentEntitlement = (await manager.findOneBy(Entitlement, { id: existingUsage.entitlementId })) ?? entitlement
+        return {
+            deducted: false,
+            credits: existingUsage.credits,
+            creditsBalance: currentEntitlement.creditsBalance,
+            entitlement: toEntitlementSnapshot(currentEntitlement)
+        }
+    }
+
+    await manager.insert(EntitlementUsage, {
+        entitlementId: entitlement.id,
+        scopeId: request.scopeId,
+        idempotencyKey: request.idempotencyKey,
+        action: request.action,
+        credits: request.credits,
+        metadata: request.metadata ? JSON.stringify(request.metadata) : null
+    })
+
+    if (entitlement.creditsBalance === -1) {
+        return {
+            deducted: false,
+            credits: request.credits,
+            creditsBalance: -1,
+            entitlement: toEntitlementSnapshot(entitlement)
+        }
+    }
+
+    const updateResult = await manager.decrement(
+        Entitlement,
+        { id: entitlement.id, creditsBalance: MoreThanOrEqual(request.credits) },
+        'creditsBalance',
+        request.credits
+    )
+
+    if (!updateResult.affected) {
+        throw new InternalFlowiseError(StatusCodes.PAYMENT_REQUIRED, ENTITLEMENT_ERROR_MESSAGES.insufficientCredits)
+    }
+
+    const updatedEntitlement = (await manager.findOneBy(Entitlement, { id: entitlement.id })) ?? entitlement
+    return {
+        deducted: true,
+        credits: request.credits,
+        creditsBalance: updatedEntitlement.creditsBalance,
+        entitlement: toEntitlementSnapshot(updatedEntitlement)
+    }
+}
+
+const isUniqueConstraintError = (error: unknown): boolean => {
+    const err = error as { code?: string | number; errno?: string | number; message?: string }
+    const value = `${err?.code ?? ''} ${err?.errno ?? ''} ${err?.message ?? ''}`.toLowerCase()
+    return value.includes('23505') || value.includes('1062') || value.includes('duplicate') || value.includes('unique')
+}
+
+export class EntitlementService {
+    constructor(private readonly options: { dataSource?: DataSource; source?: EntitlementSource } = {}) {}
+
+    async resolve(scopeId: string): Promise<EntitlementSnapshot> {
+        const entitlement = await this.getOrCreateEntitlement(scopeId)
+        return toEntitlementSnapshot(entitlement)
+    }
+
+    async assertCreditsAvailable(scopeId: string, credits: number): Promise<EntitlementSnapshot> {
+        const entitlement = await this.resolve(scopeId)
+        if (credits <= 0 || entitlement.creditsBalance === -1) return entitlement
+        if (entitlement.creditsBalance < credits) {
+            throw new InternalFlowiseError(StatusCodes.PAYMENT_REQUIRED, ENTITLEMENT_ERROR_MESSAGES.insufficientCredits)
+        }
+        return entitlement
+    }
+
+    async consumeCredits(request: CreditConsumptionRequest): Promise<CreditConsumptionResult> {
+        const dataSource = this.getDataSource()
+
+        try {
+            return await dataSource.transaction(async (manager) => {
+                const entitlement = await this.getOrCreateEntitlement(request.scopeId, manager)
+                return consumeCreditsForEntitlement(manager, entitlement, request)
+            })
+        } catch (error) {
+            if (!isUniqueConstraintError(error)) throw error
+
+            const usage = await dataSource.getRepository(EntitlementUsage).findOne({
+                where: {
+                    scopeId: request.scopeId,
+                    idempotencyKey: request.idempotencyKey
+                }
+            })
+            if (!usage) throw error
+
+            const entitlement =
+                (await dataSource.getRepository(Entitlement).findOneBy({ id: usage.entitlementId })) ??
+                (await this.getOrCreateEntitlement(request.scopeId))
+            return {
+                deducted: false,
+                credits: usage.credits,
+                creditsBalance: entitlement.creditsBalance,
+                entitlement: toEntitlementSnapshot(entitlement)
+            }
+        }
+    }
+
+    async hasFeature(scopeId: string, feature: string): Promise<boolean> {
+        const entitlement = await this.resolve(scopeId)
+        return entitlement.features.includes(feature)
+    }
+
+    private getDataSource(): DataSource {
+        return this.options.dataSource ?? getRunningExpressApp().AppDataSource
+    }
+
+    private getSource(): EntitlementSource {
+        return this.options.source ?? createEntitlementSource()
+    }
+
+    private async getOrCreateEntitlement(scopeId: string, manager?: EntityManager): Promise<Entitlement> {
+        const existing = manager
+            ? await manager.findOneBy(Entitlement, { scopeId })
+            : await this.getDataSource().getRepository(Entitlement).findOneBy({ scopeId })
+        if (existing) return existing
+
+        const snapshot = await this.getSource().resolve(scopeId)
+        if (manager) {
+            const entitlement = manager.create(Entitlement, snapshotToEntity(snapshot))
+            return manager.save(Entitlement, entitlement)
+        }
+
+        const repository = this.getDataSource().getRepository(Entitlement)
+        const entitlement = repository.create(snapshotToEntity(snapshot))
+        return repository.save(entitlement)
+    }
+}
+
+export default new EntitlementService()

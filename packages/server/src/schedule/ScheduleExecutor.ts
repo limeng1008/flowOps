@@ -222,7 +222,13 @@ async function _executeAgentflow(ctx: ScheduleExecutionContext, record: Schedule
             executionId
         })
 
-        await updatePredictionsUsage(orgId, subscriptionId, workspaceId, usageCacheManager)
+        await updatePredictionsUsage(
+            orgId,
+            subscriptionId,
+            workspaceId,
+            usageCacheManager,
+            `prediction:schedule:${orgId}:${workspaceId}:${record.id}:${log.id}`
+        )
         await scheduleService.updateScheduleAfterRun(appDataSource, record.id, record.cronExpression, record.timezone ?? 'UTC')
         logger.debug(`[ScheduleExecutor]: Completed schedule ${record.id} (${elapsedTimeMs}ms)`)
         return result
