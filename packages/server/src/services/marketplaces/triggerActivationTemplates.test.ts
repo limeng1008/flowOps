@@ -122,7 +122,7 @@ describe('Trigger activation AgentflowV2 marketplace templates', () => {
     it('registers Chinese marketplace labels without changing template JSON names', () => {
         const source = fs.readFileSync(marketplaceI18nPath, 'utf8')
         for (const name of ['定时运营日报', '定时数据同步提醒', 'Webhook 接单自动处理']) {
-            expect(source).toContain(`'${name}': '${name}'`)
+            expect(source).toMatch(new RegExp(`['"]?${name}['"]?:\\s*'${name}'`))
         }
         expect(source).toContain("'Automate a daily operations report on a 09:00 Asia/Shanghai cron schedule'")
         expect(source).toContain("'每日上午 9 点（Asia/Shanghai）自动拉取运营数据、总结日报并导出文档'")
