@@ -23,6 +23,7 @@
 | UI-i18n-hardening  | 面向中文用户的全量 i18n 包裹、日期/按钮/弹窗/表格/节点文案本地化。                                      | 上游合并后以 locale 为事实源重放 codemod，随后跑 UI i18n tests 和 `pnpm --filter flowise-ui build`。                                             |
 | UI-dependencies    | UI 换皮、动画和 i18n 运行时依赖引入导致的 package/lockfile 变更。                                       | 合并上游依赖时用 pnpm 重新解锁，保留 FlowOps 所需运行时依赖并跑 UI build。                                                                       |
 | Components-deps    | 国产模型/导出节点/国产云向量库（docx/exceljs/Mochow/VikingDB 等）引入的 components package 依赖变更。   | 合并上游依赖时用 pnpm 重新解锁，保留 FlowOps 运行时依赖（docx/exceljs/国产云 SDK 等），跑 `pnpm --filter flowise-components build` 与节点 jest。 |
+| Trigger-activation | 定时/Webhook 触发激活体验：模板、Cron 配置助手、抽屉/徽标中文化和使用文档。                             | 合并上游 Start/AgentflowV2 UI 后保留 CronBuilder 的字段级入口、触发模板和中文使用说明；跑 triggerActivation/CronBuilder 测试与 UI build。        |
 
 ## Modified File Ledger
 
@@ -128,6 +129,7 @@
 | `packages/ui/src/ui-component/dropdown/Dropdown.jsx`                          | UI-i18n-hardening  |
 | `packages/ui/src/ui-component/dropdown/MultiDropdown.jsx`                     | UI-i18n-hardening  |
 | `packages/ui/src/ui-component/extended/Logo.jsx`                              | Branding-shell     |
+| `packages/ui/src/ui-component/extended/ScheduleStatusBadge.jsx`               | Trigger-activation |
 | `packages/ui/src/ui-component/extended/TextToSpeech.jsx`                      | UI-i18n-hardening  |
 | `packages/ui/src/ui-component/file/File.jsx`                                  | UI-i18n-hardening  |
 | `packages/ui/src/ui-component/grid/DataGrid.jsx`                              | UI-i18n-hardening  |
