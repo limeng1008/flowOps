@@ -371,6 +371,7 @@ const requiredKeys = [
     'auth.validation.passwordsDontMatch',
     'auth.registerOrganizationFailed',
     'auth.registerAccountFailed',
+    'auth.errors.singleOrganizationOnly',
     'pages.loginActivity.from',
     'pages.loginActivity.to',
     'pages.loginActivity.filterBy',
@@ -1328,6 +1329,11 @@ describe('views long-tail i18n coverage', () => {
         expect(organizationSource).not.toContain('Account Administrator')
         expect(organizationSource).not.toContain('Reconfirm your password')
         expect(organizationSource).not.toContain('Sign Up With Microsoft')
+
+        const signInSource = read('views/auth/signIn.jsx')
+        expect(signInSource).toContain('isOpenSource &&')
+        expect(signInSource).toContain("to='/organization-setup'")
+        expect(signInSource).toContain("t('auth.createAccount')")
 
         expect(usersSource).toContain("t('pages.users.inviteUser')")
         expect(usersSource).toContain("cancelButtonName: t('common.cancel')")

@@ -21,16 +21,6 @@ const accountKeys = [
     'pages.account.addSeatsProOnly',
     'pages.account.predictions',
     'pages.account.storage',
-    'pages.account.commercialQuota',
-    'pages.account.localBillingPlan',
-    'pages.account.manualBillingNotice',
-    'pages.account.manualBillingAction',
-    'pages.account.tokenUsage',
-    'pages.account.botUsage',
-    'pages.account.seatUsage',
-    'pages.account.unlimited',
-    'pages.account.notActivated',
-    'pages.account.currentPeriodEnd',
     'pages.account.failedBillingPortal',
     'pages.account.emailChangePending',
     'pages.account.failedUpdateProfile',
@@ -132,22 +122,6 @@ describe('account and subscription i18n coverage', () => {
         expect(source).not.toContain('Applied account balance')
         expect(source).not.toContain('permanently delete')
         expect(source).not.toContain('Delete your account')
-    })
-
-    it('keeps local billing in manual-activation mode without self-service payment copy', () => {
-        const source = fs.readFileSync(path.join(__dirname, '../views/billing/index.jsx'), 'utf8')
-
-        ;['pages.billing.manualActivationNotice', 'pages.billing.manualActivationDetail'].forEach((key) => {
-            expect(get(en, key)).toBeTruthy()
-            expect(get(zh, key)).toBeTruthy()
-            expect(source).toContain(`t('${key}'`)
-        })
-
-        expect(source).not.toContain('createOrder')
-        expect(source).not.toContain('getOrderStatus')
-        expect(source).not.toContain('paymentApi')
-        expect(source).not.toContain('扫码')
-        expect(source).not.toContain('购买')
     })
 
     it('routes pricing dialog billing and plan-change copy through i18n', () => {

@@ -6,7 +6,8 @@ const AUTH_ERROR_KEYS = {
     'Inactive User': 'auth.errors.inactiveUser',
     'No Workspace Assigned': 'auth.errors.invalidWorkspace',
     Forbidden: 'auth.errors.forbidden',
-    'User Invited, but has not registered': 'auth.errors.invitedUser'
+    'User Invited, but has not registered': 'auth.errors.invitedUser',
+    'You can only have one organization': 'auth.errors.singleOrganizationOnly'
 }
 
 export const translateAuthErrorMessage = (message, t) => {

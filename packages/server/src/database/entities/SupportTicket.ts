@@ -49,10 +49,10 @@ export class SupportTicket {
     @Column({ nullable: true, type: 'varchar', length: 20 })
     lastMessageBy?: string | null
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, type: 'datetime' })
     resolvedDate?: Date | null
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, type: 'datetime' })
     closedDate?: Date | null
 
     @CreateDateColumn()

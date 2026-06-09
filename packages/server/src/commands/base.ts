@@ -142,6 +142,8 @@ export abstract class BaseCommand extends Command {
         LICENSE_URL: Flags.string(),
         FLOWISE_EE_LICENSE_KEY: Flags.string(),
         OFFLINE: Flags.string(),
+        FLOWOPS_LOCAL_COMMERCIAL: Flags.string(),
+        FLOWOPS_LOCAL_PRODUCT_ID: Flags.string(),
 
         // Metrics
         POSTHOG_PUBLIC_API_KEY: Flags.string(),

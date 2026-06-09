@@ -1,6 +1,5 @@
 import { StatusCodes } from 'http-status-codes'
 import { InternalFlowiseError } from '../errors/internalFlowiseError'
-import BillingService from '../services/billing'
 import { UsageCacheManager } from '../UsageCacheManager'
 import { LICENSE_QUOTAS } from './constants'
 import logger from './logger'
@@ -52,20 +51,8 @@ export const checkUsageLimit = async (
     type: UsageType,
     subscriptionId: string,
     usageCacheManager: UsageCacheManager,
-    currentUsage: number,
-    organizationId?: string
+    currentUsage: number
 ) => {
-    if (organizationId) {
-        if (type === 'flows') {
-            await BillingService.assertBotAllowance(organizationId, currentUsage)
-            return
-        }
-        if (type === 'users') {
-            await BillingService.assertSeatAllowance(organizationId, currentUsage)
-            return
-        }
-    }
-
     if (!usageCacheManager || !subscriptionId) return
 
     const quotas = await usageCacheManager.getQuotas(subscriptionId)

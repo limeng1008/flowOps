@@ -60,7 +60,7 @@ const copy = {
             badge: 'AI Agent 工作流管理平台',
             title: '把 Agent、知识库与工具编排成可运营的工作流',
             subtitle:
-                'FlowOps 面向团队二开与企业落地，提供可视化画布、模型节点、知识库、工具集成、执行记录和计费治理，让 AI Agent 从 Demo 走向可管理的生产流程。',
+                'FlowOps 面向团队二开与企业落地，提供可视化画布、模型节点、知识库、工具集成、执行记录和 Stripe 订阅治理，让 AI Agent 从 Demo 走向可管理的生产流程。',
             primary: '进入控制台',
             secondary: '阅读文档',
             metrics: [
@@ -80,8 +80,8 @@ const copy = {
             path: [
                 ['官网与说明', '先让用户知道产品定位、核心场景和上手路径。'],
                 ['模板和节点', '沉淀报告、PPT、Excel、营销文案等业务智能体。'],
-                ['计费中台', '用套餐、Token、Bot 和席位额度管理商业权益。'],
-                ['服务闭环', '继续补支付、客服工单、帮助文档和品牌 VI。']
+                ['Stripe 订阅', '用 Free、Starter、Pro 和 Enterprise 套餐管理 Predictions、Storage 与席位。'],
+                ['服务闭环', '继续补客服工单、帮助文档和品牌 VI。']
             ],
             ctaTitle: '先把产品门面搭起来，再持续补齐商业闭环。',
             ctaSubtitle: '官网、文档和帮助中心会成为客户理解 FlowOps、团队培训和后续销售转化的入口。',
@@ -106,7 +106,7 @@ const copy = {
                 ['工作流搭建', '对话流、AgentflowV2、变量、凭证、工具节点和导出节点。'],
                 ['知识库指南', '文档库、向量嵌入、检索参数、RAG 调优和数据更新。'],
                 ['二开指南', '模板开发、节点开发、国际化、主题换皮、分支管理和验证门禁。'],
-                ['运营手册', '套餐配置、额度覆盖、用量查看、超额处理和后台白名单。'],
+                ['运营手册', 'Stripe 套餐、Prediction 用量、Storage 用量、席位增购和超额处理。'],
                 ['API 接入', 'Prediction API、SDK、鉴权、错误码和 402 计费拦截说明。']
             ],
             apiTitle: 'API 调用示例',
@@ -117,20 +117,23 @@ const copy = {
         help: {
             badge: 'Help Center',
             title: '帮助中心',
-            subtitle: '面向管理员、开发者和业务用户，集中回答登录、模型、知识库、工作流运行和计费额度相关问题。',
+            subtitle: '面向管理员、开发者和业务用户，集中回答登录、模型、知识库、工作流运行和 Stripe 套餐额度相关问题。',
             searchHint: '常见问题先按主题整理，后续可接站内搜索和工单系统。',
             topics: [
                 ['账号与权限', '无法登录、403、工作区权限、成员邀请和 SSO 配置。'],
                 ['模型与凭证', '模型不可用、API Key 失效、国产模型节点和嵌入模型选择。'],
                 ['工作流运行', '节点报错、变量解析、工具调用、执行记录和调试方法。'],
                 ['知识库与文件', '文档上传、切片、向量化、检索不准和数据更新。'],
-                ['计费与额度', 'Token、Bot、席位额度、套餐切换、超额提示和运营后台。'],
+                ['计费与额度', 'Stripe 账单门户、Prediction、Storage、席位增购、套餐切换和超额提示。'],
                 ['二开与部署', '本地启动、构建失败、环境变量、分支计划和上线检查。']
             ],
             faqTitle: '常见问题',
             faq: [
-                ['进入计费后台看到 403 怎么办？', '确认登录邮箱已加入 BILLING_ADMIN_EMAILS，并重启后端服务让环境变量生效。'],
-                ['为什么运行工作流后没有 Token 用量？', 'Token 计量依赖模型节点返回 usageMetadata；未返回时平台不会强行估算。'],
+                ['账单入口打不开怎么办？', '确认已配置 Stripe 密钥、Customer Portal 和组织订阅信息，并使用组织管理员账号操作。'],
+                [
+                    '为什么 Prediction 用量没有增加？',
+                    'Prediction 计量依赖运行成功后的订阅额度缓存；请检查组织 subscriptionId 和 Stripe 产品 quota 元数据。'
+                ],
                 ['应用市场模板缺失怎么办？', '先确认当前分支是否包含对应模板提交，再检查 JSON 是否合法以及服务端是否重启。'],
                 ['如何判断适合用对话流还是智能体流？', '固定步骤、可控输出优先对话流；需要多工具规划、条件判断和复杂协作时使用智能体流。']
             ],
@@ -143,7 +146,7 @@ const copy = {
                 '复现步骤和期望结果'
             ],
             ctaTitle: '后续会接入客服 / 工单系统',
-            ctaSubtitle: '当前帮助中心先承担 FAQ 和排障入口，等计费中台稳定后再接入在线客服、工单流转和知识库搜索。'
+            ctaSubtitle: '当前帮助中心先承担 FAQ 和排障入口，后续可继续接入在线客服、工单流转和知识库搜索。'
         },
         footer: 'FlowOps · AI Agent 工作流管理平台'
     },
@@ -174,15 +177,15 @@ const copy = {
                 ['Tools and Integrations', 'Expose APIs, databases and internal systems as callable agent capabilities.'],
                 [
                     'Operations and Governance',
-                    'Manage production through executions, permissions, variables, credentials and billing quotas.'
+                    'Manage production through executions, permissions, variables, credentials and Stripe subscription quotas.'
                 ]
             ],
             pathTitle: 'From rebrand to commercialization',
             path: [
                 ['Website and docs', 'Clarify positioning, scenarios and onboarding.'],
                 ['Templates and nodes', 'Ship report, PPT, Excel and marketing copy agents.'],
-                ['Billing center', 'Manage commercial benefits with plans, tokens, bots and seats.'],
-                ['Service loop', 'Add payments, support tickets, help docs and brand assets.']
+                ['Stripe subscriptions', 'Manage Free, Starter, Pro and Enterprise plans with predictions, storage and seats.'],
+                ['Service loop', 'Add support tickets, help docs and brand assets.']
             ],
             ctaTitle: 'Build the product front door, then complete the commercial loop.',
             ctaSubtitle:
@@ -208,7 +211,7 @@ const copy = {
                 ['Workflow building', 'Chatflows, AgentflowV2, variables, credentials, tools and export nodes.'],
                 ['Knowledge base', 'Doc stores, embeddings, retrieval parameters, RAG tuning and updates.'],
                 ['Customization', 'Templates, nodes, i18n, theming, branch plans and verification gates.'],
-                ['Operations', 'Plans, overrides, usage, overage handling and billing admin allowlist.'],
+                ['Operations', 'Stripe plans, prediction usage, storage usage, seat add-ons and overage handling.'],
                 ['API integration', 'Prediction API, SDK, auth, error codes and 402 billing errors.']
             ],
             apiTitle: 'API example',
@@ -220,25 +223,25 @@ const copy = {
             badge: 'Help Center',
             title: 'Help Center',
             subtitle:
-                'Answers for administrators, developers and business users across login, models, knowledge bases, workflow runs and billing quotas.',
+                'Answers for administrators, developers and business users across login, models, knowledge bases, workflow runs and Stripe plan quotas.',
             searchHint: 'FAQ is grouped by topic first; search and ticketing can come later.',
             topics: [
                 ['Accounts and permissions', 'Login issues, 403, workspace access, invites and SSO.'],
                 ['Models and credentials', 'Unavailable models, expired API keys, model nodes and embeddings.'],
                 ['Workflow runs', 'Node errors, variables, tool calls, executions and debugging.'],
                 ['Knowledge and files', 'Uploads, chunks, vectorization, retrieval quality and updates.'],
-                ['Billing and quotas', 'Tokens, bots, seats, plan changes, overage prompts and admin console.'],
+                ['Billing and quotas', 'Stripe portal, predictions, storage, seat add-ons, plan changes and overage prompts.'],
                 ['Customization and deployment', 'Local startup, builds, env vars, branch plans and release checks.']
             ],
             faqTitle: 'FAQ',
             faq: [
                 [
-                    'Why do I see 403 on billing admin?',
-                    'Add the current email to BILLING_ADMIN_EMAILS and restart the server so env vars apply.'
+                    'Why can’t I open billing?',
+                    'Confirm Stripe keys, Customer Portal settings and organization subscription data, then use an organization admin account.'
                 ],
                 [
-                    'Why is token usage empty after a run?',
-                    'Token metering depends on model usageMetadata. FlowOps does not estimate usage when metadata is missing.'
+                    'Why did prediction usage not increase after a run?',
+                    'Prediction metering depends on successful runs and cached Stripe quota data. Check the organization subscriptionId and Stripe product quota metadata.'
                 ],
                 [
                     'What if a marketplace template is missing?',

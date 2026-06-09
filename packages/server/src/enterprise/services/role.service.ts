@@ -3,7 +3,7 @@ import { DataSource, IsNull, QueryRunner } from 'typeorm'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { GeneralSuccessMessage } from '../../utils/constants'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
-import { Role } from '../database/entities/role.entity'
+import { GeneralRole, Role } from '../database/entities/role.entity'
 import { WorkspaceUser } from '../database/entities/workspace-user.entity'
 import { isInvalidName, isInvalidUUID } from '../utils/validation.util'
 import { OrganizationErrorMessage, OrganizationService } from './organization.service'
@@ -15,6 +15,8 @@ export const enum RoleErrorMessage {
     INVALID_ROLE_PERMISSIONS = 'Invalid Role Permissions',
     ROLE_NOT_FOUND = 'Role Not Found'
 }
+
+const DEFAULT_LOCAL_WORKSPACE_MEMBER_ROLE_DESCRIPTION = 'Can manage assigned workspaces.'
 
 export class RoleService {
     private dataSource: DataSource
@@ -45,7 +47,12 @@ export class RoleService {
         const organization = await this.organizationService.readOrganizationById(organizationId, queryRunner)
         if (!organization) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, OrganizationErrorMessage.ORGANIZATION_NOT_FOUND)
 
-        const roles = await queryRunner.manager.findBy(Role, { organizationId })
+        let roles = await queryRunner.manager.findBy(Role, { organizationId })
+        if (roles.length === 0 && this.shouldCreateLocalDefaultWorkspaceRole()) {
+            const defaultRole = await this.createLocalDefaultWorkspaceRole(organization.id, queryRunner)
+            roles = [defaultRole]
+        }
+
         return await Promise.all(
             roles.map(async (role) => {
                 const workspaceUser = await queryRunner.manager.findBy(WorkspaceUser, { roleId: role.id })
@@ -87,6 +94,23 @@ export class RoleService {
 
     public async saveRole(data: Partial<Role>, queryRunner: QueryRunner) {
         return await queryRunner.manager.save(Role, data)
+    }
+
+    private shouldCreateLocalDefaultWorkspaceRole() {
+        const identityManager = getRunningExpressApp().identityManager
+        return Boolean(identityManager?.isOpenSource?.())
+    }
+
+    private async createLocalDefaultWorkspaceRole(organizationId: string, queryRunner: QueryRunner) {
+        const personalWorkspaceRole = await this.readGeneralRoleByName(GeneralRole.PERSONAL_WORKSPACE, queryRunner)
+        const defaultRole = queryRunner.manager.create(Role, {
+            organizationId,
+            name: GeneralRole.MEMBER,
+            description: DEFAULT_LOCAL_WORKSPACE_MEMBER_ROLE_DESCRIPTION,
+            permissions: personalWorkspaceRole.permissions
+        })
+
+        return await this.saveRole(defaultRole, queryRunner)
     }
 
     public async createRole(data: Partial<Role>) {

@@ -9,6 +9,7 @@ import { Alert, Box, Button, Chip, Divider, Icon, List, ListItemText, Stack, Typ
 import { StyledButton } from '@/ui-component/button/StyledButton'
 import { Input } from '@/ui-component/input/Input'
 import { BackdropLoader } from '@/ui-component/loading/BackdropLoader'
+import { translateAuthErrorMessage } from '@/views/auth/authErrorMessage'
 
 // API
 import accountApi from '@/api/account.api'
@@ -48,6 +49,51 @@ const createOrgSetupSchema = (t) =>
             message: t('auth.validation.passwordsDontMatch'),
             path: ['confirmPassword']
         })
+
+const setupColors = {
+    text: '#102033',
+    textDim: 'rgba(16, 32, 51, 0.72)',
+    textMute: 'rgba(16, 32, 51, 0.54)',
+    panel: 'rgba(248, 251, 255, 0.88)',
+    input: 'rgba(255, 255, 255, 0.86)',
+    border: 'rgba(15, 23, 42, 0.14)',
+    focus: '#14b8a6',
+    required: '#e11d48'
+}
+
+const setupInputStyles = {
+    '& .MuiFormControl-root': {
+        mt: 1
+    },
+    '& .MuiOutlinedInput-root': {
+        borderRadius: '14px',
+        color: setupColors.text,
+        backgroundColor: setupColors.input,
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.72)',
+        '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: setupColors.border
+        },
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: 'rgba(20, 184, 166, 0.46)'
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: setupColors.focus,
+            borderWidth: '1px'
+        }
+    },
+    '& .MuiOutlinedInput-input': {
+        color: setupColors.text,
+        fontWeight: 600,
+        '&:-webkit-autofill': {
+            WebkitTextFillColor: setupColors.text,
+            caretColor: setupColors.text
+        }
+    },
+    '& .MuiOutlinedInput-input::placeholder': {
+        color: setupColors.textMute,
+        opacity: 1
+    }
+}
 
 const OrganizationSetupPage = () => {
     const { t } = useTranslation()
@@ -146,11 +192,12 @@ const OrganizationSetupPage = () => {
                 typeof registerAccountApi.error.response.data === 'object'
                     ? registerAccountApi.error.response.data.message
                     : registerAccountApi.error.response.data
+            const localizedErrMessage = translateAuthErrorMessage(errMessage, t)
             let finalErrMessage = ''
             if (isEnterpriseLicensed) {
-                finalErrMessage = t('auth.registerOrganizationFailed', { message: errMessage })
+                finalErrMessage = t('auth.registerOrganizationFailed', { message: localizedErrMessage })
             } else {
-                finalErrMessage = t('auth.registerAccountFailed', { message: errMessage })
+                finalErrMessage = t('auth.registerAccountFailed', { message: localizedErrMessage })
             }
             setAuthError(finalErrMessage)
             setLoading(false)
@@ -211,15 +258,32 @@ const OrganizationSetupPage = () => {
             <Box
                 sx={{
                     width: '100%',
-                    maxHeight: '100vh',
+                    maxHeight: 'calc(100vh - 48px)',
                     overflowY: 'auto',
                     display: 'flex',
                     flexDirection: 'column',
                     alignItems: 'center',
-                    padding: '24px'
+                    justifyContent: 'center',
+                    padding: { xs: '16px', sm: '24px' },
+                    color: setupColors.text
                 }}
             >
-                <Stack flexDirection='column' sx={{ width: '480px', gap: 3 }}>
+                <Stack
+                    flexDirection='column'
+                    sx={{
+                        width: { xs: '100%', sm: '520px' },
+                        maxWidth: '100%',
+                        gap: 2.5,
+                        p: { xs: 3, sm: 4 },
+                        color: setupColors.text,
+                        backgroundColor: setupColors.panel,
+                        border: `1px solid ${setupColors.border}`,
+                        borderRadius: '8px',
+                        boxShadow: '0 24px 70px rgba(15, 23, 42, 0.14)',
+                        backdropFilter: 'blur(22px) saturate(1.35)',
+                        WebkitBackdropFilter: 'blur(22px) saturate(1.35)'
+                    }}
+                >
                     {authError && (
                         <Alert icon={<IconExclamationCircle />} variant='filled' severity='error'>
                             {authError.split(', ').length > 0 ? (
@@ -239,20 +303,51 @@ const OrganizationSetupPage = () => {
                         </Alert>
                     )}
                     <Stack sx={{ gap: 1 }}>
-                        <Typography variant='h1'>{t('auth.setupAccount')}</Typography>
+                        <Typography variant='h1' sx={{ color: setupColors.text, fontWeight: 800, fontSize: { xs: '2rem', sm: '2.35rem' } }}>
+                            {t('auth.setupAccount')}
+                        </Typography>
                     </Stack>
                     {(isOpenSource || isEnterpriseLicensed) && (
-                        <Typography variant='caption'>{t('auth.accountSetupLocalNotice')}</Typography>
+                        <Typography variant='caption' sx={{ color: setupColors.textDim, fontSize: '0.94rem', lineHeight: 1.7 }}>
+                            {t('auth.accountSetupLocalNotice')}
+                        </Typography>
                     )}
                     <form onSubmit={register}>
-                        <Stack sx={{ width: '100%', flexDirection: 'column', alignItems: 'left', justifyContent: 'center', gap: 2 }}>
+                        <Stack
+                            sx={{
+                                width: '100%',
+                                flexDirection: 'column',
+                                alignItems: 'left',
+                                justifyContent: 'center',
+                                gap: 2,
+                                ...setupInputStyles,
+                                '& .MuiTypography-root': {
+                                    color: setupColors.text
+                                },
+                                '& .MuiTypography-caption': {
+                                    color: setupColors.textDim,
+                                    lineHeight: 1.55
+                                },
+                                '& .MuiDivider-root': {
+                                    color: setupColors.textDim,
+                                    '&::before, &::after': {
+                                        borderColor: setupColors.border
+                                    }
+                                },
+                                '& .MuiChip-root': {
+                                    color: setupColors.text,
+                                    backgroundColor: 'rgba(20, 184, 166, 0.14)',
+                                    border: `1px solid rgba(20, 184, 166, 0.24)`
+                                }
+                            }}
+                        >
                             {isEnterpriseLicensed && (
                                 <>
                                     <Box>
                                         <div style={{ display: 'flex', flexDirection: 'row' }}>
                                             <Typography>
                                                 {t('auth.organizationName')}
-                                                <span style={{ color: 'red' }}>&nbsp;*</span>
+                                                <span style={{ color: setupColors.required }}>&nbsp;*</span>
                                             </Typography>
                                             <div style={{ flexGrow: 1 }}></div>
                                         </div>
@@ -275,7 +370,7 @@ const OrganizationSetupPage = () => {
                                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                                     <Typography>
                                         {t('auth.administratorName')}
-                                        <span style={{ color: 'red' }}>&nbsp;*</span>
+                                        <span style={{ color: setupColors.required }}>&nbsp;*</span>
                                     </Typography>
                                     <div style={{ flexGrow: 1 }}></div>
                                 </div>
@@ -294,7 +389,7 @@ const OrganizationSetupPage = () => {
                                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                                     <Typography>
                                         {t('auth.administratorEmail')}
-                                        <span style={{ color: 'red' }}>&nbsp;*</span>
+                                        <span style={{ color: setupColors.required }}>&nbsp;*</span>
                                     </Typography>
                                     <div style={{ flexGrow: 1 }}></div>
                                 </div>
@@ -313,7 +408,7 @@ const OrganizationSetupPage = () => {
                                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                                     <Typography>
                                         {t('auth.password')}
-                                        <span style={{ color: 'red' }}>&nbsp;*</span>
+                                        <span style={{ color: setupColors.required }}>&nbsp;*</span>
                                     </Typography>
                                     <div style={{ flexGrow: 1 }}></div>
                                 </div>
@@ -326,7 +421,7 @@ const OrganizationSetupPage = () => {
                                 <div style={{ display: 'flex', flexDirection: 'row' }}>
                                     <Typography>
                                         {t('auth.confirmPassword')}
-                                        <span style={{ color: 'red' }}>&nbsp;*</span>
+                                        <span style={{ color: setupColors.required }}>&nbsp;*</span>
                                     </Typography>
                                     <div style={{ flexGrow: 1 }}></div>
                                 </div>
@@ -339,7 +434,21 @@ const OrganizationSetupPage = () => {
                                     <i>{t('auth.confirmPasswordHint')}</i>
                                 </Typography>
                             </Box>
-                            <StyledButton variant='contained' style={{ borderRadius: 12, height: 40, marginRight: 5 }} type='submit'>
+                            <StyledButton
+                                variant='contained'
+                                sx={{
+                                    borderRadius: '999px',
+                                    height: 48,
+                                    mt: 0.5,
+                                    color: '#042f2e',
+                                    fontWeight: 800,
+                                    backgroundColor: 'rgba(20, 184, 166, 0.24)',
+                                    '&:hover': {
+                                        backgroundColor: 'rgba(20, 184, 166, 0.32)'
+                                    }
+                                }}
+                                type='submit'
+                            >
                                 {t('auth.signUp')}
                             </StyledButton>
                             {configuredSsoProviders && configuredSsoProviders.length > 0 && (

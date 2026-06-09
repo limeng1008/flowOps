@@ -35,7 +35,6 @@ describe('support ticket service', () => {
         jest.clearAllMocks()
         repos.clear()
         delete process.env.SUPPORT_ADMIN_EMAILS
-        delete process.env.BILLING_ADMIN_EMAILS
     })
 
     it('creates an open ticket scoped to the requester organization and workspace', async () => {
@@ -177,12 +176,10 @@ describe('support ticket service', () => {
         })
     })
 
-    it('allows SUPPORT_ADMIN_EMAILS and BILLING_ADMIN_EMAILS to manage tickets', () => {
+    it('allows SUPPORT_ADMIN_EMAILS to manage tickets', () => {
         process.env.SUPPORT_ADMIN_EMAILS = 'support@example.com'
-        process.env.BILLING_ADMIN_EMAILS = 'ops@example.com'
 
         expect(() => assertSupportAdmin({ email: 'support@example.com' } as Express.User)).not.toThrow()
-        expect(() => assertSupportAdmin({ email: 'ops@example.com' } as Express.User)).not.toThrow()
         expect(() => assertSupportAdmin({ email: 'user@example.com' } as Express.User)).toThrow()
     })
 })

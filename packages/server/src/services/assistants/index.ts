@@ -428,7 +428,7 @@ const importAssistants = async (
         // step 1 - check whether array is zero
         if (newAssistants.length == 0) return
 
-        await checkUsageLimit('flows', subscriptionId, appServer.usageCacheManager, newAssistants.length, orgId)
+        await checkUsageLimit('flows', subscriptionId, appServer.usageCacheManager, newAssistants.length)
 
         // step 2 - check whether ids are duplicate in database
         let ids = '('

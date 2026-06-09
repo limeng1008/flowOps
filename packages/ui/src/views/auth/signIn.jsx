@@ -481,6 +481,15 @@ const SignInPage = () => {
                             .
                         </Typography>
                     )}
+                    {isOpenSource && (
+                        <Typography sx={{ color: C.textDim, mt: 1.5, fontSize: '0.9rem' }}>
+                            {t('auth.noAccount')}{' '}
+                            <Link style={{ color: C.teal, textDecoration: 'none' }} to='/organization-setup'>
+                                {t('auth.createAccount')}
+                            </Link>
+                            .
+                        </Typography>
+                    )}
                 </Box>
 
                 {/* form */}

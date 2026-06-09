@@ -132,7 +132,7 @@ export class RefactorEnterpriseDatabase1737076223692 implements MigrationInterfa
         // modify workspace table
         await queryRunner.query(`
                 alter table \`workspace\`
-                drop constraint \`fk_workspace_organizationId\`;
+                drop foreign key \`fk_workspace_organizationId\`;
             `)
 
         await queryRunner.query(`

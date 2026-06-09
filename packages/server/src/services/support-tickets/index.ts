@@ -234,7 +234,7 @@ function isSupportAdmin(user?: Express.User): boolean {
 }
 
 function getAdminEmails(): string[] {
-    return `${process.env.SUPPORT_ADMIN_EMAILS || ''},${process.env.BILLING_ADMIN_EMAILS || ''}`
+    return `${process.env.SUPPORT_ADMIN_EMAILS || ''}`
         .split(',')
         .map((email) => email.trim().toLowerCase())
         .filter(Boolean)

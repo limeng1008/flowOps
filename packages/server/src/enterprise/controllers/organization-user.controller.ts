@@ -25,13 +25,7 @@ export class OrganizationUserController {
             const organizationUserservice = new OrganizationUserService()
             const totalOrgUsers = await organizationUserservice.readOrgUsersCountByOrgId(req.body.organizationId)
             const subscriptionId = req.user?.activeOrganizationSubscriptionId || ''
-            await checkUsageLimit(
-                'users',
-                subscriptionId,
-                getRunningExpressApp().usageCacheManager,
-                totalOrgUsers + 1,
-                req.body.organizationId
-            )
+            await checkUsageLimit('users', subscriptionId, getRunningExpressApp().usageCacheManager, totalOrgUsers + 1)
             const newOrganizationUser = await organizationUserservice.createOrganizationUser(req.body)
             return res.status(StatusCodes.CREATED).json(newOrganizationUser)
         } catch (error) {

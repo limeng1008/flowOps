@@ -10,6 +10,12 @@ describe('auth error message translation', () => {
         expect(translateAuthErrorMessage('Incorrect Email or Password', tFrom(zh))).toBe('邮箱或密码错误')
     })
 
+    it('translates open source organization setup failures in Chinese', () => {
+        expect(translateAuthErrorMessage('You can only have one organization', tFrom(zh))).toBe(
+            '系统中已存在组织，请直接登录或联系管理员。'
+        )
+    })
+
     it('keeps backend login failures readable in English', () => {
         expect(translateAuthErrorMessage('Incorrect Email or Password', tFrom(en))).toBe('Incorrect email or password')
     })

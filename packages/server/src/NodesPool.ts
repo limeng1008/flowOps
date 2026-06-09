@@ -39,7 +39,7 @@ export class NodesPool {
         const nodeFiles = await this.getFiles(dir)
         await Promise.all(
             nodeFiles.map(async (file) => {
-                if (file.endsWith('.js')) {
+                if (isRuntimeNodeFile(file)) {
                     try {
                         const nodeModule = await require(file)
 
@@ -126,4 +126,11 @@ export class NodesPool {
         )
         return Array.prototype.concat(...files)
     }
+}
+
+const isRuntimeNodeFile = (file: string): boolean => {
+    if (!file.endsWith('.js')) return false
+
+    const fileName = path.basename(file).toLowerCase()
+    return !fileName.endsWith('.test.js') && !fileName.endsWith('.spec.js') && !fileName.endsWith('testutils.js')
 }
