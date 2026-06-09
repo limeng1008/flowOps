@@ -23,6 +23,9 @@ const templateNameMap = {
     'Supervisor Worker': '主管 + 工作者',
     Translator: '翻译器',
     'Workplace Chat': 'Workplace 对话',
+    定时运营日报: '定时运营日报',
+    定时数据同步提醒: '定时数据同步提醒',
+    'Webhook 接单自动处理': 'Webhook 接单自动处理',
 
     // ---------- Agentflows v1 (additional) ----------
     'Branch Out Merge In': '分支 + 合并',
@@ -105,6 +108,12 @@ const templateDescriptionMap = {
     'Translate text from one language to another': '将文本从一种语言翻译为另一种语言',
     'An agent that can post AI responses to Workplace channels like Slack and Teams':
         '可将 AI 响应推送到 Slack、Teams 等 Workplace 频道的智能体',
+    'Automate a daily operations report on a 09:00 Asia/Shanghai cron schedule':
+        '每日上午 9 点（Asia/Shanghai）自动拉取运营数据、总结日报并导出文档',
+    'Check data sync status hourly and send a reminder callback when the upstream result is abnormal':
+        '每小时检查数据同步状态，异常时发送提醒回调',
+    'Receive external order webhooks, normalize the payload with an LLM, and return a synchronous JSON processing result':
+        '接收外部接单 Webhook，用 LLM 规整 payload，并同步返回 JSON 处理结果',
 
     // ---------- Agentflows v1 ----------
     'A self-improving RAG that check for relevance of a document to a user question': '检查文档与用户问题相关性的自改进 RAG',
