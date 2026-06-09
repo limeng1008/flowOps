@@ -243,6 +243,7 @@ const nodeLabelMap = {
     'Parameter Extractor': '参数提取器',
     Start: '开始',
     State: '状态',
+    'Template Transform': '模板转换',
     'Tool Node': '工具节点',
 
     // ---------- Multi Agents ----------
@@ -271,6 +272,7 @@ const nodeLabelMap = {
     Document: '文档',
     'Model Name': '模型名称',
     Text: '文本',
+    Template: '模板',
     Temperature: '随机性',
     'Text Splitter': '文本分割器',
     'Omit Metadata Keys': '忽略的元数据键',
@@ -512,6 +514,7 @@ const nodeLabelMap = {
     'Value 1': '值 1',
     'Value 2': '值 2',
     'Variable Value': '变量值',
+    Variables: '变量',
     'Conversation Summary': '对话摘要',
     'Conversation Summary Buffer': '对话摘要缓冲',
     'Ephemeral Memory': '临时记忆',
@@ -905,6 +908,7 @@ const nodeDescriptionMap = {
     "Execute tool and return tool's output": '执行工具并返回工具输出',
     'Extract typed parameters from input text with structured model output': '使用模型结构化输出从输入文本中提取指定类型参数',
     'Filter, sort, slice, limit, or extract fields from an array': '对数组进行过滤、排序、切片、截断或字段提取',
+    'Render a text template with runtime variables': '使用运行时变量渲染文本模板',
 
     // ---------- Engine (LlamaIndex) ----------
     'Answer question based on retrieved documents (context) with built-in memory to remember conversation':
