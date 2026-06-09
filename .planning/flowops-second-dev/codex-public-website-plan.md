@@ -1,7 +1,7 @@
 # FlowOps 营销官网（参考扣子水准，全原创）· Codex 执行计划
 
 > 执行者：Codex（无本项目上下文）。本文件自包含。**过门禁再提交；任何门禁失败停下报告，不要猜改核心。**
-> 背景：现有 `packages/ui/src/views/publicSite/index.jsx`（903 行，分支 `codex/billing-v1`）是一个偏「文档门户」的朴素 MVP 官网，已挂路由 `/`、`/welcome`、`/docs`、`/help` 且中英双语。
+> 背景：现有 `packages/ui/src/views/publicSite/index.jsx`（903 行，在 `main`）是一个偏「文档门户」的朴素 MVP 官网，已挂路由 `/`、`/welcome`、`/docs`、`/help` 且中英双语。main 已收敛在线支付主线，并新增了**液态玻璃视觉系统**（见 0.2），官网正好复用它出高级质感。
 > 目标：**把首页（`page='home'`）升级重做成「扣子（coze.cn）那种水准」的营销级落地页** —— 沉浸式 Hero + 能力网格 + 特性深潜 + 滚动动效 + 响应式 + 多列页脚。保留 docs/help 两页与现有路由、i18n 架构不破坏。
 >
 > ⚠️ **「参考扣子」= 学它的信息架构与体验水准，不是抄它**。FlowOps 是 **B 端企业私有化 AI 工作流平台**，调性要「专业、可信、可治理」，不是扣子的 C 端开发者调性。详见 0.3 原创铁律。
@@ -13,7 +13,7 @@
 ### 0.1 环境 / 分支
 
 -   仓库根 `/Volumes/project/Flowise`；前端在 `packages/ui`；**Node 20**（`nvm use 20`）。
--   基分支 **`codex/billing-v1`**（现有 publicSite 在此），切出 **`codex/site-revamp`** 工作。**不要 push、不碰 main**，做完留人工 review。
+-   基分支 **`main`**（已收敛在线支付主线，含**液态玻璃视觉系统** + 国产云向量库；现有 publicSite 也在此），切出 **`codex/site-revamp`** 工作。**不要 push、不碰 main**，做完留人工 review。
 -   纯前端任务，**不碰后端、不加后端依赖**。动效库已具备（见 0.2），原则上**零新依赖**。
 
 ### 0.2 ✅ 参考范式（先读，照抄项目自己的写法）
@@ -22,6 +22,7 @@
 -   **路由**：`packages/ui/src/routes/LandingRoutes.jsx`（`/`、`welcome`、`docs`、`help` 都渲染 `<PublicSite page='...'/>`，外层 `MinimalLayout`）。**保持不变**，只升级 home 分支。
 -   **动效范式（项目已有实战）**：`packages/ui/src/views/landing/`（之前做的青色暗色落地页，用 **GSAP** 做入场/光晕，task 实战验证过）—— 滚动动效**主用 GSAP `ScrollTrigger`**，照 landing 的 gsap 用法写。
 -   **主题/品牌**：主色 AI 紫 `#7C3AED`；主题变量层 `packages/ui/src/themes/_flowops-vars`；logo 资产 `packages/ui/src/assets/images/flowops_dark.svg` / `flowops_white.svg`（已有，直接用）。
+-   **🆕 液态玻璃视觉系统（强烈复用 —— 官网高级感的关键）**：`packages/ui/src/ui-component/utils/liquidGlassStyles.js` 提供 `getLiquidGlassControlSx(theme, sx)`（按钮/控件：渐变 + `backdropFilter` 模糊 + hover 动效）与 `getLiquidGlassPanelSx(theme, sx)`（面板/卡片），配色取 `theme.palette.glass.*`（`accentText`/`highlight`/`border`/`blur`/`shadow` 等）。**官网导航栏、能力卡片、CTA 按钮、各玻璃面板一律套这两个函数**，和产品内部视觉统一，立刻出高级毛玻璃质感。先 `grep -rn "getLiquidGlass" packages/ui/src` 找现有调用处照着用，别自己手搓玻璃样式。
 -   **图标库**：项目已有 `@tabler/icons-react`（去 `package.json` 确认）；能力卡片图标用它，**别引新图标库**。
 
 ### 0.3 ⚠️ 原创铁律（侵权红线，必须守）
