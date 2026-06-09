@@ -646,6 +646,38 @@
             "generatedInstructionSetFailed": "Error setting generated instruction",
             "setupNimLocally": "Setup NIM Locally"
         },
+        "cronBuilder": {
+            "open": "Open cron builder",
+            "title": "Cron Builder",
+            "mode": "Trigger frequency",
+            "daily": "Daily",
+            "weekly": "Weekly",
+            "monthly": "Monthly",
+            "hourly": "Every N hours",
+            "time": "Trigger time",
+            "dayOfWeek": "Day of week",
+            "dayOfMonth": "Day of month",
+            "everyHours": "Every hours",
+            "generated": "Generated expression",
+            "apply": "Apply",
+            "copy": "Copy",
+            "copied": "Copied",
+            "weekdays": {
+                "sunday": "Sunday",
+                "monday": "Monday",
+                "tuesday": "Tuesday",
+                "wednesday": "Wednesday",
+                "thursday": "Thursday",
+                "friday": "Friday",
+                "saturday": "Saturday"
+            },
+            "description": {
+                "daily": "Runs every day at {{time}}.",
+                "weekly": "Runs every {{day}} at {{time}}.",
+                "monthly": "Runs on day {{day}} of every month at {{time}}.",
+                "hourly": "Runs every {{hours}} hour(s)."
+            }
+        },
         "promptGenerator": {
             "placeholder": "Describe your task here",
             "examples": {
