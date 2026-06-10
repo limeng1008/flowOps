@@ -4,6 +4,7 @@ jest.mock('../../utils/getRunningExpressApp', () => ({
 
 import { StatusCodes } from 'http-status-codes'
 import { Entitlement } from '../../database/entities/Entitlement'
+import { EntitlementUsage } from '../../database/entities/EntitlementUsage'
 import {
     ENTITLEMENT_ERROR_MESSAGES,
     ENTITLEMENT_TEMPLATES,
@@ -35,6 +36,7 @@ describe('FlowOps entitlement sources', () => {
 
     it('uses the subscription source in cloud edition and resolves the free template stub', async () => {
         expect(getFlowOpsEdition({ FLOWOPS_EDITION: 'cloud' })).toBe('cloud')
+        expect(getFlowOpsEdition({ EDITION: 'cloud' })).toBe('cloud')
         expect(createEntitlementSource({ FLOWOPS_EDITION: 'cloud' })).toBeInstanceOf(SubscriptionEntitlementSource)
 
         const cloudSource = new SubscriptionEntitlementSource()
@@ -202,6 +204,94 @@ describe('FlowOps entitlement sources', () => {
                 source: 'local'
             })
         )
+    })
+})
+
+describe('FlowOps entitlement billing center overview', () => {
+    it('returns plan templates, persisted balance, monthly usage grouped by action, and deployment edition', async () => {
+        const entitlement = {
+            id: 'ent_overview_1',
+            scopeId: 'org_overview',
+            tier: 'pro',
+            seats: 5,
+            creditsTotal: 5000,
+            creditsBalance: 4200,
+            features: JSON.stringify(ENTITLEMENT_TEMPLATES.pro.features),
+            concurrency: 3,
+            expireAt: new Date('2026-07-01T00:00:00.000Z'),
+            source: 'subscription'
+        } as Entitlement
+        const entitlementRepo = {
+            findOneBy: jest.fn().mockResolvedValue(entitlement),
+            create: jest.fn((value) => value),
+            save: jest.fn((value) => Promise.resolve({ ...entitlement, ...value }))
+        }
+        const usageRepo = {
+            find: jest.fn().mockResolvedValue([
+                { action: 'prediction', credits: 7 },
+                { action: 'retrieval', credits: 2 },
+                { action: 'prediction', credits: 3 },
+                { action: 'export', credits: 10 }
+            ])
+        }
+        const dataSource = {
+            getRepository: jest.fn((entity) => (entity === Entitlement ? entitlementRepo : usageRepo))
+        }
+        const service = new EntitlementService({
+            dataSource: dataSource as any,
+            source: {
+                resolve: jest.fn().mockResolvedValue({
+                    scopeId: 'org_overview',
+                    tier: 'pro',
+                    seats: 5,
+                    creditsTotal: 5000,
+                    creditsBalance: 5000,
+                    features: ENTITLEMENT_TEMPLATES.pro.features,
+                    concurrency: 3,
+                    expireAt: new Date('2026-07-01T00:00:00.000Z'),
+                    source: 'subscription'
+                })
+            } as any
+        })
+
+        const overview = await (service as any).getBillingCenterOverview('org_overview', {
+            env: { EDITION: 'cloud' },
+            now: new Date('2026-06-10T12:00:00.000Z')
+        })
+
+        expect(overview).toMatchObject({
+            edition: 'cloud',
+            period: '2026-06',
+            entitlement: {
+                scopeId: 'org_overview',
+                tier: 'pro',
+                creditsBalance: 4200,
+                expireAt: new Date('2026-07-01T00:00:00.000Z')
+            },
+            resourceUsage: {
+                totalCredits: 22
+            }
+        })
+        expect(overview.plans.map((plan: any) => plan.tier)).toEqual(['free', 'pro', 'team', 'enterprise'])
+        expect(overview.plans.find((plan: any) => plan.tier === 'team')).toMatchObject({
+            seats: 20,
+            spaces: 10,
+            creditsTotal: 30000,
+            concurrency: 10,
+            privateDeployment: 'optional',
+            sourceOptions: ['subscription', 'license']
+        })
+        expect(overview.resourceUsage.byAction).toEqual([
+            { action: 'prediction', credits: 10 },
+            { action: 'export', credits: 10 },
+            { action: 'retrieval', credits: 2 }
+        ])
+        expect(usageRepo.find).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: expect.objectContaining({ scopeId: 'org_overview' })
+            })
+        )
+        expect(dataSource.getRepository).toHaveBeenCalledWith(EntitlementUsage)
     })
 })
 

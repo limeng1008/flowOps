@@ -61,6 +61,7 @@
 | `packages/server/src/services/assistants/index.ts`                            | Billing-center-v1  |
 | `packages/server/src/services/export-import/index.ts`                         | Billing-center-v1  |
 | `packages/server/src/services/predictions/index.ts`                           | Billing-center-v1  |
+| `packages/server/src/services/settings/index.ts`                              | Entitlement        |
 | `packages/server/src/utils/buildChatflow.ts`                                  | Entitlement        |
 | `packages/server/src/utils/constants.ts`                                      | Commercial-payment |
 | `packages/server/src/utils/quotaUsage.test.ts`                                | Entitlement        |
@@ -103,6 +104,7 @@
 | `packages/ui/src/menu-items/dashboard.js`                                     | Local-commercial   |
 | `packages/ui/src/menu-items/settings.js`                                      | UI-i18n-hardening  |
 | `packages/ui/src/routes/MainRoutes.jsx`                                       | Local-commercial   |
+| `packages/ui/src/store/context/ConfigContext.jsx`                             | Entitlement        |
 | `packages/ui/src/routes/index.jsx`                                            | UI-i18n-hardening  |
 | `packages/ui/src/store/context/ErrorContext.jsx`                              | UI-i18n-hardening  |
 | `packages/ui/src/themes/compStyleOverride.js`                                 | Liquid-glass-theme |
@@ -149,7 +151,7 @@
 | `packages/ui/src/ui-component/table/Table.jsx`                                | UI-i18n-hardening  |
 | `packages/ui/src/ui-component/table/TableStyles.jsx`                          | Liquid-glass-theme |
 | `packages/ui/src/ui-component/tooltip/TooltipWithParser.jsx`                  | UI-i18n-hardening  |
-| `packages/ui/src/views/account/index.jsx`                                     | UI-i18n-hardening  |
+| `packages/ui/src/views/account/index.jsx`                                     | Billing-center-v1  |
 | `packages/ui/src/views/agentexecutions/ExecutionDetails.jsx`                  | UI-i18n-hardening  |
 | `packages/ui/src/views/agentexecutions/index.jsx`                             | UI-i18n-hardening  |
 | `packages/ui/src/views/agentexecutions/PublicExecutionDetails.jsx`            | UI-i18n-hardening  |
@@ -181,6 +183,7 @@
 | `packages/ui/src/views/auth/signIn.jsx`                                       | UI-i18n-hardening  |
 | `packages/ui/src/views/auth/ssoConfig.jsx`                                    | UI-i18n-hardening  |
 | `packages/ui/src/views/auth/verify-email.jsx`                                 | UI-i18n-hardening  |
+| `packages/ui/src/views/billing/index.jsx`                                     | Billing-center-v1  |
 | `packages/ui/src/views/canvas/AddNodes.jsx`                                   | UI-i18n-hardening  |
 | `packages/ui/src/views/canvas/CanvasHeader.jsx`                               | UI-i18n-hardening  |
 | `packages/ui/src/views/canvas/CanvasNode.jsx`                                 | UI-i18n-hardening  |

@@ -10,6 +10,7 @@ export const ConfigProvider = ({ children }) => {
     const [isEnterpriseLicensed, setEnterpriseLicensed] = useState(false)
     const [isCloud, setCloudLicensed] = useState(false)
     const [isOpenSource, setOpenSource] = useState(false)
+    const [flowOpsEdition, setFlowOpsEdition] = useState('private')
 
     useEffect(() => {
         const userSettings = platformsettingsApi.getSettings()
@@ -18,7 +19,10 @@ export const ConfigProvider = ({ children }) => {
                 const finalData = {
                     ...currentSettingsData.data
                 }
+                const edition =
+                    finalData.FLOWOPS_EDITION || finalData.EDITION || (finalData.PLATFORM_TYPE === 'cloud' ? 'cloud' : 'private')
                 setConfig(finalData)
+                setFlowOpsEdition(edition === 'cloud' ? 'cloud' : 'private')
                 if (finalData.PLATFORM_TYPE) {
                     if (finalData.PLATFORM_TYPE === 'enterprise') {
                         setEnterpriseLicensed(true)
@@ -44,7 +48,9 @@ export const ConfigProvider = ({ children }) => {
     }, [])
 
     return (
-        <ConfigContext.Provider value={{ config, loading, isEnterpriseLicensed, isCloud, isOpenSource }}>{children}</ConfigContext.Provider>
+        <ConfigContext.Provider value={{ config, loading, isEnterpriseLicensed, isCloud, isOpenSource, flowOpsEdition }}>
+            {children}
+        </ConfigContext.Provider>
     )
 }
 

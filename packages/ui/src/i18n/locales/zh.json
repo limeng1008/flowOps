@@ -2229,6 +2229,48 @@
                 "closed": "已关闭"
             }
         },
+        "billingCenter": {
+            "title": "套餐与资源点",
+            "subtitle": "查看当前权益、资源点余额、本月用量，以及可升级的 FlowOps 套餐。",
+            "currentPlan": "当前套餐",
+            "resourceBalance": "资源点余额",
+            "monthlyUsage": "本月用量",
+            "planComparison": "套餐对比",
+            "currentTier": "当前档",
+            "recharge": "充值",
+            "upgrade": "升级",
+            "contactSales": "联系销售",
+            "importLicense": "导入 License",
+            "privateNoOnlineRecharge": "私有版使用签名 License 或销售协助激活，此部署不会显示在线充值入口。",
+            "cloudRechargeHint": "云版可在线充值资源点或升级套餐。",
+            "lowCreditsWarning": "资源点余额偏低，请在工作流被拦截前充值或升级。",
+            "graceWarning": "License 处于到期宽限期，续期前工作区保持可读。",
+            "expiringSoonWarning": "当前权益即将到期，请在进入宽限期前完成续期。",
+            "noUsage": "本月暂无资源点消耗记录。",
+            "includedCredits": "包含资源点",
+            "source": "权益来源",
+            "privateDeployment": "私有部署",
+            "concurrency": "并发",
+            "workspaces": "空间数",
+            "unlimited": "不限",
+            "optional": "可选",
+            "available": "支持",
+            "notAvailable": "不支持",
+            "custom": "自定义",
+            "sources": {
+                "default": "默认",
+                "subscription": "在线订阅",
+                "license": "License"
+            },
+            "usageActions": {
+                "prediction": "模型调用",
+                "retrieval": "检索",
+                "export": "导出",
+                "workflow": "工作流运行",
+                "embedding": "文档解析与 Embedding",
+                "other": "其他"
+            }
+        },
         "license": {
             "title": "授权管理",
             "currentLicense": "当前授权",

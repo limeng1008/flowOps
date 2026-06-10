@@ -2229,6 +2229,48 @@
                 "closed": "Closed"
             }
         },
+        "billingCenter": {
+            "title": "Plans & Resource Credits",
+            "subtitle": "Review your current entitlement, resource-credit balance, monthly usage, and available FlowOps plans.",
+            "currentPlan": "Current plan",
+            "resourceBalance": "Resource credit balance",
+            "monthlyUsage": "This month's usage",
+            "planComparison": "Plan comparison",
+            "currentTier": "Current",
+            "recharge": "Recharge",
+            "upgrade": "Upgrade",
+            "contactSales": "Contact sales",
+            "importLicense": "Import License",
+            "privateNoOnlineRecharge": "Private edition uses signed licenses or sales-assisted activation. Online recharge is hidden for this deployment.",
+            "cloudRechargeHint": "Cloud edition can recharge credits or upgrade plans online.",
+            "lowCreditsWarning": "Resource credits are running low. Recharge or upgrade before workflows are blocked.",
+            "graceWarning": "The license is in grace period. The workspace remains readable while renewal is handled.",
+            "expiringSoonWarning": "The current entitlement expires soon. Renew before grace period starts.",
+            "noUsage": "No resource-credit usage recorded this month.",
+            "includedCredits": "Included credits",
+            "source": "Source",
+            "privateDeployment": "Private deployment",
+            "concurrency": "Concurrency",
+            "workspaces": "Workspaces",
+            "unlimited": "Unlimited",
+            "optional": "Optional",
+            "available": "Available",
+            "notAvailable": "Not available",
+            "custom": "Custom",
+            "sources": {
+                "default": "Default",
+                "subscription": "Subscription",
+                "license": "License"
+            },
+            "usageActions": {
+                "prediction": "Model calls",
+                "retrieval": "Retrieval",
+                "export": "Export",
+                "workflow": "Workflow runs",
+                "embedding": "Document parsing & embedding",
+                "other": "Other"
+            }
+        },
         "license": {
             "title": "License Management",
             "currentLicense": "Current License",

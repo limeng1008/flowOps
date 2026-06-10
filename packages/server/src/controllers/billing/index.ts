@@ -1,13 +1,22 @@
 import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import BillingService, { assertBillingAdmin } from '../../services/billing'
+import { EntitlementService } from '../../services/entitlement'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 
 const getMyBillingOverview = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const organizationId = req.user?.activeOrganizationId
         if (!organizationId) throw new InternalFlowiseError(StatusCodes.BAD_REQUEST, 'Organization ID is required')
-        return res.status(StatusCodes.OK).json(await BillingService.getOrganizationOverview(organizationId))
+        const [legacyBilling, entitlementOverview] = await Promise.all([
+            BillingService.getOrganizationOverview(organizationId),
+            new EntitlementService().getBillingCenterOverview(organizationId)
+        ])
+        return res.status(StatusCodes.OK).json({
+            ...legacyBilling,
+            ...entitlementOverview,
+            legacyBilling
+        })
     } catch (error) {
         next(error)
     }

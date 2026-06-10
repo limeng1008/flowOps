@@ -101,6 +101,35 @@ const AccountSettings = () => {
     }, [usage])
     const billingUsageItems = useMemo(() => {
         if (!billingOverview) return []
+        if (billingOverview.entitlement) {
+            const entitlement = billingOverview.entitlement
+            const monthlyCredits = billingOverview.resourceUsage?.totalCredits ?? 0
+            const seatUsage = billingOverview.legacyBilling?.usage?.seats ?? billingOverview.usage?.seats ?? 0
+
+            return [
+                {
+                    key: 'creditsBalance',
+                    label: t('pages.billingCenter.resourceBalance'),
+                    usage: entitlement.creditsBalance ?? 0,
+                    limit: entitlement.creditsTotal ?? 0,
+                    exceeded: false
+                },
+                {
+                    key: 'monthlyCredits',
+                    label: t('pages.billingCenter.monthlyUsage'),
+                    usage: monthlyCredits,
+                    limit: entitlement.creditsTotal ?? 0,
+                    exceeded: entitlement.creditsTotal !== -1 && monthlyCredits > (entitlement.creditsTotal ?? 0)
+                },
+                {
+                    key: 'seats',
+                    label: t('pages.account.seatUsage'),
+                    usage: seatUsage,
+                    limit: entitlement.seats ?? 0,
+                    exceeded: entitlement.seats !== -1 && seatUsage > (entitlement.seats ?? 0)
+                }
+            ]
+        }
         return [
             {
                 key: 'tokens',
@@ -536,13 +565,17 @@ const AccountSettings = () => {
                                         <Typography variant='h3'>
                                             {getBillingOverviewApi.loading
                                                 ? t('common.loading')
+                                                : billingOverview?.entitlement?.tier
+                                                ? t(`pages.entitlement.tiers.${billingOverview.entitlement.tier}`)
                                                 : billingOverview?.plan?.name || t('pages.account.notActivated')}
                                         </Typography>
                                     </Box>
-                                    {billingOverview?.subscription?.currentPeriodEnd && (
+                                    {(billingOverview?.entitlement?.expireAt || billingOverview?.subscription?.currentPeriodEnd) && (
                                         <Typography variant='body2' color='text.secondary'>
                                             {t('pages.account.currentPeriodEnd', {
-                                                date: new Date(billingOverview.subscription.currentPeriodEnd).toLocaleDateString(dateLocale)
+                                                date: new Date(
+                                                    billingOverview.entitlement?.expireAt || billingOverview.subscription.currentPeriodEnd
+                                                ).toLocaleDateString(dateLocale)
                                             })}
                                         </Typography>
                                     )}

@@ -1,5 +1,5 @@
 import { StatusCodes } from 'http-status-codes'
-import { DataSource, EntityManager, MoreThanOrEqual } from 'typeorm'
+import { Between, DataSource, EntityManager, MoreThanOrEqual } from 'typeorm'
 import { Entitlement } from '../../database/entities/Entitlement'
 import { EntitlementUsage } from '../../database/entities/EntitlementUsage'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
@@ -46,6 +46,34 @@ export interface CreditConsumptionRequest {
     action: string
     credits: number
     metadata?: Record<string, unknown>
+}
+
+export interface EntitlementPlanCatalogItem extends EntitlementTemplate {
+    spaces: number
+    privateDeployment: 'available' | 'optional' | 'unavailable'
+    sourceOptions: string[]
+}
+
+export interface EntitlementUsageSummaryItem {
+    action: string
+    credits: number
+}
+
+export interface EntitlementBillingCenterOverview {
+    edition: FlowOpsEdition
+    period: string
+    entitlement: EntitlementSnapshot
+    plans: EntitlementPlanCatalogItem[]
+    resourceUsage: {
+        period: string
+        totalCredits: number
+        byAction: EntitlementUsageSummaryItem[]
+    }
+}
+
+export interface EntitlementBillingCenterOverviewOptions {
+    env?: NodeJS.ProcessEnv | Record<string, string | undefined>
+    now?: Date
 }
 
 export interface CreditConsumptionResult {
@@ -133,9 +161,39 @@ export const ENTITLEMENT_TEMPLATES: Record<EntitlementTier, EntitlementTemplate>
     }
 }
 
-export const getFlowOpsEdition = (env: NodeJS.ProcessEnv = process.env): FlowOpsEdition => {
-    return env.FLOWOPS_EDITION === 'cloud' ? 'cloud' : 'private'
+const ENTITLEMENT_PLAN_META: Record<EntitlementTier, Pick<EntitlementPlanCatalogItem, 'spaces' | 'privateDeployment' | 'sourceOptions'>> = {
+    free: {
+        spaces: 1,
+        privateDeployment: 'unavailable',
+        sourceOptions: ['default']
+    },
+    pro: {
+        spaces: 3,
+        privateDeployment: 'unavailable',
+        sourceOptions: ['subscription', 'license']
+    },
+    team: {
+        spaces: 10,
+        privateDeployment: 'optional',
+        sourceOptions: ['subscription', 'license']
+    },
+    enterprise: {
+        spaces: -1,
+        privateDeployment: 'available',
+        sourceOptions: ['license']
+    }
 }
+
+export const getFlowOpsEdition = (env: NodeJS.ProcessEnv = process.env): FlowOpsEdition => {
+    const edition = `${env.FLOWOPS_EDITION ?? env.EDITION ?? ''}`.trim().toLowerCase()
+    return edition === 'cloud' ? 'cloud' : 'private'
+}
+
+export const getEntitlementPlanCatalog = (): EntitlementPlanCatalogItem[] =>
+    (['free', 'pro', 'team', 'enterprise'] as EntitlementTier[]).map((tier) => ({
+        ...ENTITLEMENT_TEMPLATES[tier],
+        ...ENTITLEMENT_PLAN_META[tier]
+    }))
 
 export const isLocalCommercialEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => {
     const value = env.FLOWOPS_LOCAL_COMMERCIAL?.trim().toLowerCase()
@@ -430,6 +488,39 @@ export class EntitlementService {
         return entitlement.features.includes(feature)
     }
 
+    async getBillingCenterOverview(
+        scopeId: string,
+        options: EntitlementBillingCenterOverviewOptions = {}
+    ): Promise<EntitlementBillingCenterOverview> {
+        const sourceSnapshot = await this.resolve(scopeId)
+        const persisted = await this.getDataSource().getRepository(Entitlement).findOneBy({ scopeId })
+        const entitlement = mergeSourceMetadata(persisted ? toEntitlementSnapshot(persisted) : sourceSnapshot, sourceSnapshot)
+        const now = options.now ?? new Date()
+        const period = getEntitlementUsagePeriod(now)
+        const [periodStart, periodEnd] = getEntitlementUsagePeriodRange(now)
+        const usageRows = await this.getDataSource()
+            .getRepository(EntitlementUsage)
+            .find({
+                where: {
+                    scopeId,
+                    createdDate: Between(periodStart, periodEnd)
+                }
+            })
+        const byAction = summarizeEntitlementUsage(usageRows)
+
+        return {
+            edition: getFlowOpsEdition(options.env as NodeJS.ProcessEnv | undefined),
+            period,
+            entitlement,
+            plans: getEntitlementPlanCatalog(),
+            resourceUsage: {
+                period,
+                totalCredits: byAction.reduce((sum, item) => sum + item.credits, 0),
+                byAction
+            }
+        }
+    }
+
     private getDataSource(): DataSource {
         return this.options.dataSource ?? getRunningExpressApp().AppDataSource
     }
@@ -478,6 +569,37 @@ const normalizeRequestedUsage = (requested: number): number => {
 const assertEntitlementLimit = (requested: number, limit: number, message: string): void => {
     if (limit === -1 || requested <= limit) return
     throw new InternalFlowiseError(StatusCodes.PAYMENT_REQUIRED, message)
+}
+
+const mergeSourceMetadata = (persisted: EntitlementSnapshot, source: EntitlementSnapshot): EntitlementSnapshot => ({
+    ...persisted,
+    readOnly: source.readOnly,
+    licenseId: source.licenseId,
+    licenseCustomer: source.licenseCustomer,
+    licenseStatus: source.licenseStatus
+})
+
+const getEntitlementUsagePeriod = (date: Date = new Date()): string => {
+    const year = date.getUTCFullYear()
+    const month = `${date.getUTCMonth() + 1}`.padStart(2, '0')
+    return `${year}-${month}`
+}
+
+const getEntitlementUsagePeriodRange = (date: Date): [Date, Date] => {
+    const start = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), 1, 0, 0, 0, 0))
+    const end = new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1, 0, 0, 0, 0))
+    return [start, end]
+}
+
+const summarizeEntitlementUsage = (rows: EntitlementUsage[]): EntitlementUsageSummaryItem[] => {
+    const totals = new Map<string, number>()
+    for (const row of rows) {
+        const action = row.action || 'other'
+        totals.set(action, (totals.get(action) ?? 0) + Number(row.credits || 0))
+    }
+    return Array.from(totals.entries())
+        .map(([action, credits]) => ({ action, credits }))
+        .sort((left, right) => right.credits - left.credits)
 }
 
 export default new EntitlementService()
