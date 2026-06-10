@@ -1,7 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import { InternalFlowiseError } from '../errors/internalFlowiseError'
 import BillingService from '../services/billing'
-import { EntitlementService, getPredictionCreditCost } from '../services/entitlement'
+import { EntitlementLimitDimension, EntitlementService, getPredictionCreditCost } from '../services/entitlement'
 import { UsageCacheManager } from '../UsageCacheManager'
 import { LICENSE_QUOTAS } from './constants'
 import logger from './logger'
@@ -57,12 +57,14 @@ export const checkUsageLimit = async (
     organizationId?: string
 ) => {
     if (organizationId) {
-        if (type === 'flows') {
-            await BillingService.assertBotAllowance(organizationId, currentUsage)
+        const dimension: EntitlementLimitDimension = type === 'users' ? 'users' : 'flows'
+        try {
+            await new EntitlementService().checkLimit(organizationId, dimension, currentUsage)
             return
-        }
-        if (type === 'users') {
-            await BillingService.assertSeatAllowance(organizationId, currentUsage)
+        } catch (error) {
+            if (isPaymentRequiredError(error)) throw error
+            logger.warn(`[checkUsageLimit] Entitlement limit check failed, falling back to deprecated billing: ${error}`)
+            await checkDeprecatedBillingLimit(type, organizationId, currentUsage)
             return
         }
     }
@@ -108,7 +110,10 @@ export const updatePredictionsUsage = async (
         })
     } else if (orgId) {
         logger.warn('[updatePredictionsUsage] Missing idempotency key, skipping entitlement credit deduction')
+        return
     }
+
+    if (orgId) return
 
     if (!usageCacheManager || !subscriptionId) return
 
@@ -157,7 +162,17 @@ export const updatePredictionsUsage = async (
 export const checkPredictions = async (orgId: string, subscriptionId: string, usageCacheManager: UsageCacheManager) => {
     const credits = getPredictionCreditCost()
     if (orgId) {
-        await new EntitlementService().assertCreditsAvailable(orgId, credits)
+        try {
+            await new EntitlementService().assertCreditsAvailable(orgId, credits)
+            return {
+                credits: {
+                    required: credits
+                }
+            }
+        } catch (error) {
+            if (isPaymentRequiredError(error)) throw error
+            logger.warn(`[checkPredictions] Entitlement credit check failed, falling back to legacy prediction quota: ${error}`)
+        }
     }
 
     const entitlementUsage = {
@@ -183,6 +198,20 @@ export const checkPredictions = async (orgId: string, subscriptionId: string, us
         limit: predictionsLimit,
         ...entitlementUsage
     }
+}
+
+const checkDeprecatedBillingLimit = async (type: UsageType, organizationId: string, currentUsage: number): Promise<void> => {
+    if (type === 'flows') {
+        await BillingService.assertBotAllowance(organizationId, currentUsage)
+        return
+    }
+    if (type === 'users') {
+        await BillingService.assertSeatAllowance(organizationId, currentUsage)
+    }
+}
+
+const isPaymentRequiredError = (error: unknown): boolean => {
+    return (error as { statusCode?: number })?.statusCode === StatusCodes.PAYMENT_REQUIRED
 }
 
 // Storage does not renew per month nor do we store the total size in database, so we just store the total size in cache

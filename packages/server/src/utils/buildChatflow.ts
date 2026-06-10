@@ -72,7 +72,6 @@ import { OMIT_QUEUE_JOB_DATA } from './constants'
 import { executeAgentFlow } from './buildAgentflow'
 import { Workspace } from '../enterprise/database/entities/workspace.entity'
 import { Organization } from '../enterprise/database/entities/organization.entity'
-import BillingService, { BillingUsageSource, extractTokenUsage } from '../services/billing'
 
 const shouldAutoPlayTTS = (textToSpeechConfig: string | undefined | null): boolean => {
     if (!textToSpeechConfig) return false
@@ -1064,7 +1063,6 @@ export const utilBuildChatflow = async (req: Request, isInternal: boolean = fals
         const productId = await appServer.identityManager.getProductIdFromSubscription(subscriptionId)
         const predictionUsageKey = `prediction:${orgId}:${workspaceId}:${chatflow.id}:${predictionRunId}`
 
-        await BillingService.assertTokenAllowance(orgId)
         await checkPredictions(orgId, subscriptionId, appServer.usageCacheManager)
 
         const executeData: IExecuteFlowParams = {
@@ -1127,21 +1125,6 @@ export const utilBuildChatflow = async (req: Request, isInternal: boolean = fals
             throw new InternalFlowiseError(StatusCodes.INTERNAL_SERVER_ERROR, getErrorMessage(e))
         }
     }
-}
-
-const recordBillingTokenUsage = async (result: ICommonObject, orgId: string, workspaceId: string, chatflowId: string) => {
-    const usage = extractTokenUsage(result)
-    const sourceId = (result?.executionId || result?.chatMessageId || result?.chatId) as string | undefined
-    const dedupeKey = sourceId ? `prediction:${sourceId}` : `prediction:${orgId}:${chatflowId}:${Date.now()}`
-    await BillingService.recordTokenUsage({
-        organizationId: orgId,
-        workspaceId,
-        chatflowId,
-        source: BillingUsageSource.PREDICTION,
-        sourceId,
-        dedupeKey,
-        usage
-    })
 }
 
 /**

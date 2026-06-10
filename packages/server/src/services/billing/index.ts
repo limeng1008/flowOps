@@ -134,6 +134,10 @@ export function assertBillingAdmin(user?: Express.User): void {
     }
 }
 
+/**
+ * @deprecated FlowOps runtime metering is unified through EntitlementService.
+ * Keep billing entities/service methods for historical data, admin views, payment activation, and rollback fallback.
+ */
 export class BillingService {
     static async getOrganizationOverview(organizationId: string, period: string = getBillingPeriod()): Promise<BillingOverview> {
         const appServer = getRunningExpressApp()

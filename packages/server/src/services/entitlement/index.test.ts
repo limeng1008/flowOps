@@ -290,3 +290,73 @@ describe('FlowOps entitlement credit consumption', () => {
         })
     })
 })
+
+describe('FlowOps entitlement limit checks', () => {
+    const createService = (overrides: Partial<Entitlement> = {}) => {
+        const entitlement = {
+            id: 'ent_limit_1',
+            scopeId: 'org_limit',
+            tier: 'team',
+            seats: 3,
+            creditsTotal: 10,
+            creditsBalance: 5,
+            features: JSON.stringify(ENTITLEMENT_TEMPLATES.team.features),
+            concurrency: 2,
+            expireAt: null,
+            source: 'local',
+            ...overrides
+        } as Entitlement
+        const repository = {
+            findOneBy: jest.fn().mockResolvedValue(entitlement),
+            create: jest.fn((value) => value),
+            save: jest.fn((value) => Promise.resolve({ ...entitlement, ...value }))
+        }
+
+        return new EntitlementService({
+            dataSource: { getRepository: jest.fn().mockReturnValue(repository) } as any,
+            source: {
+                resolve: jest.fn().mockResolvedValue({
+                    scopeId: 'org_limit',
+                    tier: 'team',
+                    seats: 3,
+                    creditsTotal: 10,
+                    creditsBalance: 10,
+                    features: ENTITLEMENT_TEMPLATES.team.features,
+                    concurrency: 2,
+                    expireAt: null,
+                    source: 'local'
+                })
+            } as any
+        })
+    }
+
+    it('allows usage at the entitlement seat and flow limits', async () => {
+        const service = createService()
+
+        await expect(service.checkLimit('org_limit', 'users', 3)).resolves.toMatchObject({ seats: 3 })
+        await expect(service.checkLimit('org_limit', 'flows', 2)).resolves.toMatchObject({ concurrency: 2 })
+    })
+
+    it('blocks usage above the entitlement limits with Chinese 402 errors', async () => {
+        const service = createService()
+
+        await expect(service.checkLimit('org_limit', 'users', 4)).rejects.toMatchObject({
+            statusCode: StatusCodes.PAYMENT_REQUIRED,
+            message: ENTITLEMENT_ERROR_MESSAGES.seatLimitExceeded
+        })
+        await expect(service.checkLimit('org_limit', 'flows', 3)).rejects.toMatchObject({
+            statusCode: StatusCodes.PAYMENT_REQUIRED,
+            message: ENTITLEMENT_ERROR_MESSAGES.flowLimitExceeded
+        })
+    })
+
+    it('checks credit-style dimensions against creditsBalance', async () => {
+        const service = createService()
+
+        await expect(service.checkLimit('org_limit', 'credits', 5)).resolves.toMatchObject({ creditsBalance: 5 })
+        await expect(service.checkLimit('org_limit', 'credits', 6)).rejects.toMatchObject({
+            statusCode: StatusCodes.PAYMENT_REQUIRED,
+            message: ENTITLEMENT_ERROR_MESSAGES.insufficientCredits
+        })
+    })
+})

@@ -29,7 +29,7 @@
 
 | File                                                                          | Category           |
 | ----------------------------------------------------------------------------- | ------------------ |
-| `FORK-CHANGES.md`                                                             | Local-commercial   |
+| `FORK-CHANGES.md`                                                             | Entitlement        |
 | `packages/server/src/enterprise/controllers/workspace.controller.ts`          | Perm-simplify      |
 | `packages/server/src/enterprise/database/entities/role.entity.ts`             | Perm-simplify      |
 | `packages/server/src/enterprise/middleware/passport/index.ts`                 | Perm-simplify      |
@@ -55,14 +55,16 @@
 | `packages/server/src/enterprise/services/account.service.ts`                  | Billing-center-v1  |
 | `packages/server/src/index.ts`                                                | Commercial-payment |
 | `packages/server/src/routes/index.ts`                                         | Local-commercial   |
-| `packages/server/src/services/entitlement/index.test.ts`                      | Local-commercial   |
-| `packages/server/src/services/entitlement/index.ts`                           | Local-commercial   |
+| `packages/server/src/services/billing/index.ts`                               | Entitlement        |
+| `packages/server/src/services/entitlement/index.test.ts`                      | Entitlement        |
+| `packages/server/src/services/entitlement/index.ts`                           | Entitlement        |
 | `packages/server/src/services/assistants/index.ts`                            | Billing-center-v1  |
 | `packages/server/src/services/export-import/index.ts`                         | Billing-center-v1  |
 | `packages/server/src/services/predictions/index.ts`                           | Billing-center-v1  |
-| `packages/server/src/utils/buildChatflow.ts`                                  | Billing-center-v1  |
+| `packages/server/src/utils/buildChatflow.ts`                                  | Entitlement        |
 | `packages/server/src/utils/constants.ts`                                      | Commercial-payment |
-| `packages/server/src/utils/quotaUsage.ts`                                     | Billing-center-v1  |
+| `packages/server/src/utils/quotaUsage.test.ts`                                | Entitlement        |
+| `packages/server/src/utils/quotaUsage.ts`                                     | Entitlement        |
 | `packages/ui/index.html`                                                      | Branding-shell     |
 | `packages/ui/package.json`                                                    | UI-dependencies    |
 | `packages/ui/public/favicon-16x16.png`                                        | Commercial-brand   |

@@ -9,6 +9,7 @@ import LicenseService, { LicenseService as FlowOpsLicenseService, LicenseVerific
 export type FlowOpsEdition = 'cloud' | 'private'
 export type EntitlementTier = 'free' | 'pro' | 'team' | 'enterprise'
 export type EntitlementSourceKind = 'local' | 'subscription'
+export type EntitlementLimitDimension = 'flows' | 'users' | 'credits' | 'predictions'
 
 export interface EntitlementSnapshot {
     scopeId: string
@@ -56,7 +57,9 @@ export interface CreditConsumptionResult {
 
 export const ENTITLEMENT_ERROR_MESSAGES = {
     insufficientCredits: '资源点不足，请充值/升级',
-    featureRequired: '该功能需专业版'
+    featureRequired: '该功能需专业版',
+    flowLimitExceeded: '工作流数量已超出当前权益，请升级套餐',
+    seatLimitExceeded: '席位数量已超出当前权益，请升级套餐'
 }
 
 export const FLOWOPS_ENTITLEMENT_FEATURES = {
@@ -368,6 +371,29 @@ export class EntitlementService {
         return entitlement
     }
 
+    async checkLimit(scopeId: string, dimension: EntitlementLimitDimension, requested: number): Promise<EntitlementSnapshot> {
+        const entitlement = await this.resolve(scopeId)
+        const requestedUsage = normalizeRequestedUsage(requested)
+
+        if (dimension === 'users') {
+            assertEntitlementLimit(requestedUsage, entitlement.seats, ENTITLEMENT_ERROR_MESSAGES.seatLimitExceeded)
+            return entitlement
+        }
+
+        if (dimension === 'flows') {
+            assertEntitlementLimit(requestedUsage, entitlement.concurrency, ENTITLEMENT_ERROR_MESSAGES.flowLimitExceeded)
+            return entitlement
+        }
+
+        if ((dimension === 'credits' || dimension === 'predictions') && requestedUsage > 0) {
+            if (entitlement.creditsBalance !== -1 && entitlement.creditsBalance < requestedUsage) {
+                throw new InternalFlowiseError(StatusCodes.PAYMENT_REQUIRED, ENTITLEMENT_ERROR_MESSAGES.insufficientCredits)
+            }
+        }
+
+        return entitlement
+    }
+
     async consumeCredits(request: CreditConsumptionRequest): Promise<CreditConsumptionResult> {
         const dataSource = this.getDataSource()
 
@@ -442,6 +468,16 @@ export class EntitlementService {
         const entitlement = repository.create(snapshotToEntity(sourceSnapshot))
         return repository.save(entitlement)
     }
+}
+
+const normalizeRequestedUsage = (requested: number): number => {
+    const value = Number(requested)
+    return Number.isFinite(value) && value > 0 ? value : 0
+}
+
+const assertEntitlementLimit = (requested: number, limit: number, message: string): void => {
+    if (limit === -1 || requested <= limit) return
+    throw new InternalFlowiseError(StatusCodes.PAYMENT_REQUIRED, message)
 }
 
 export default new EntitlementService()
