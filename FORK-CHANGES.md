@@ -20,6 +20,7 @@
 | Billing-center-v1  | 本地计费中台：套餐、订阅、用量、三维度额度拦截、账号页/运营后台入口。                                   | 上游合并后保留 billing service 作为本地权益来源，重跑 `cd packages/server && npx jest billing` 与 UI build。                                     |
 | Commercial-payment | 支付宝/微信支付沙箱骨架：下单、扫码链接、回调验签、订单状态和订阅激活。                                 | 合并上游路由/配置时保留 `/api/v1/payment/notify/*` 公开回调、env 占位和 payment service；跑 `cd packages/server && npx jest services/payment`。  |
 | Commercial-support | 自建轻量工单：工单实体、接口、前端入口、权限隔离和中英 i18n。                                           | 合并上游账号/路由时保留 support-tickets route、白名单管理员判断和工单前端入口；跑 `cd packages/server && npx jest services/support-tickets`。    |
+| Local-commercial   | 私有版本地商业化：离线授权、License 验签、机器指纹、到期只读宽限和本地权益来源。                        | 合并上游企业版/权限/路由后保留产品端公钥验签与本地 License 管理入口；跑 `cd packages/server && npx jest services/license services/entitlement`。 |
 | UI-i18n-hardening  | 面向中文用户的全量 i18n 包裹、日期/按钮/弹窗/表格/节点文案本地化。                                      | 上游合并后以 locale 为事实源重放 codemod，随后跑 UI i18n tests 和 `pnpm --filter flowise-ui build`。                                             |
 | UI-dependencies    | UI 换皮、动画和 i18n 运行时依赖引入导致的 package/lockfile 变更。                                       | 合并上游依赖时用 pnpm 重新解锁，保留 FlowOps 所需运行时依赖并跑 UI build。                                                                       |
 | Components-deps    | 国产模型/导出节点/国产云向量库（docx/exceljs/Mochow/VikingDB 等）引入的 components package 依赖变更。   | 合并上游依赖时用 pnpm 重新解锁，保留 FlowOps 运行时依赖（docx/exceljs/国产云 SDK 等），跑 `pnpm --filter flowise-components build` 与节点 jest。 |
@@ -28,6 +29,7 @@
 
 | File                                                                          | Category           |
 | ----------------------------------------------------------------------------- | ------------------ |
+| `FORK-CHANGES.md`                                                             | Local-commercial   |
 | `packages/server/src/enterprise/controllers/workspace.controller.ts`          | Perm-simplify      |
 | `packages/server/src/enterprise/database/entities/role.entity.ts`             | Perm-simplify      |
 | `packages/server/src/enterprise/middleware/passport/index.ts`                 | Perm-simplify      |
@@ -35,11 +37,11 @@
 | `packages/server/src/enterprise/services/workspace-user.service.ts`           | Perm-simplify      |
 | `packages/server/src/enterprise/sso/SSOBase.ts`                               | Perm-simplify      |
 | `packages/ui/src/layout/MainLayout/LogoSection/index.jsx`                     | Branding-shell     |
-| `packages/server/.env.example`                                                | Entitlement        |
+| `packages/server/.env.example`                                                | Local-commercial   |
 | `packages/server/src/schedule/ScheduleExecutor.ts`                            | Entitlement        |
 | `packages/server/src/services/chatflows/index.test.ts`                        | Entitlement        |
 | `packages/server/src/IdentityManager.ts`                                      | Local-commercial   |
-| `deploy/.env.example`                                                         | Commercial-payment |
+| `deploy/.env.example`                                                         | Local-commercial   |
 | `packages/components/package.json`                                            | Components-deps    |
 | `packages/components/src/modelLoader.ts`                                      | T1-model-loader    |
 | `packages/server/src/controllers/assistants/index.ts`                         | Billing-center-v1  |
@@ -52,7 +54,9 @@
 | `packages/server/src/enterprise/controllers/organization-user.controller.ts`  | Billing-center-v1  |
 | `packages/server/src/enterprise/services/account.service.ts`                  | Billing-center-v1  |
 | `packages/server/src/index.ts`                                                | Commercial-payment |
-| `packages/server/src/routes/index.ts`                                         | Billing-center-v1  |
+| `packages/server/src/routes/index.ts`                                         | Local-commercial   |
+| `packages/server/src/services/entitlement/index.test.ts`                      | Local-commercial   |
+| `packages/server/src/services/entitlement/index.ts`                           | Local-commercial   |
 | `packages/server/src/services/assistants/index.ts`                            | Billing-center-v1  |
 | `packages/server/src/services/export-import/index.ts`                         | Billing-center-v1  |
 | `packages/server/src/services/predictions/index.ts`                           | Billing-center-v1  |
@@ -72,8 +76,8 @@
 | `packages/ui/src/assets/scss/_flowops-vars.module.scss`                       | Liquid-glass-theme |
 | `packages/ui/src/ErrorBoundary.jsx`                                           | UI-i18n-hardening  |
 | `packages/ui/src/index.jsx`                                                   | Branding-shell     |
-| `packages/ui/src/i18n/locales/en.json`                                        | UI-i18n-hardening  |
-| `packages/ui/src/i18n/locales/zh.json`                                        | UI-i18n-hardening  |
+| `packages/ui/src/i18n/locales/en.json`                                        | Local-commercial   |
+| `packages/ui/src/i18n/locales/zh.json`                                        | Local-commercial   |
 | `packages/ui/src/i18n/canvasNodeBadgesI18n.test.js`                           | UI-i18n-hardening  |
 | `packages/ui/src/i18n/finalI18nSweep.test.js`                                 | UI-i18n-hardening  |
 | `packages/ui/src/i18n/nodeI18n.js`                                            | UI-i18n-hardening  |
@@ -94,9 +98,9 @@
 | `packages/ui/src/layout/MainLayout/ViewHeader.jsx`                            | UI-i18n-hardening  |
 | `packages/ui/src/menu-items/agentsettings.js`                                 | UI-i18n-hardening  |
 | `packages/ui/src/menu-items/customassistant.js`                               | UI-i18n-hardening  |
-| `packages/ui/src/menu-items/dashboard.js`                                     | Billing-center-v1  |
+| `packages/ui/src/menu-items/dashboard.js`                                     | Local-commercial   |
 | `packages/ui/src/menu-items/settings.js`                                      | UI-i18n-hardening  |
-| `packages/ui/src/routes/MainRoutes.jsx`                                       | Billing-center-v1  |
+| `packages/ui/src/routes/MainRoutes.jsx`                                       | Local-commercial   |
 | `packages/ui/src/routes/index.jsx`                                            | UI-i18n-hardening  |
 | `packages/ui/src/store/context/ErrorContext.jsx`                              | UI-i18n-hardening  |
 | `packages/ui/src/themes/compStyleOverride.js`                                 | Liquid-glass-theme |

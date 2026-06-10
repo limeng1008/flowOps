@@ -20,6 +20,7 @@
         "workspaces": "Workspaces",
         "login-activity": "Login Activity",
         "billing": "Billing Management",
+        "license": "License Management",
         "support-tickets": "Support Tickets",
         "others": "Others",
         "logs": "Logs",
@@ -2226,6 +2227,44 @@
                 "paid": "Paid",
                 "failed": "Failed",
                 "closed": "Closed"
+            }
+        },
+        "license": {
+            "title": "License Management",
+            "currentLicense": "Current License",
+            "noCustomer": "No imported license",
+            "licenseId": "License ID",
+            "tier": "Tier",
+            "expireAt": "Expires",
+            "seats": "Seats",
+            "concurrency": "Concurrency",
+            "graceDaysRemaining": "Grace Days",
+            "modules": "Modules",
+            "noModules": "No licensed modules",
+            "machineFingerprint": "Machine Fingerprint",
+            "copyFingerprint": "Copy fingerprint",
+            "copied": "Copied",
+            "importLicense": "Import License",
+            "licenseText": "License text",
+            "uploadFile": "Upload file",
+            "activate": "Activate",
+            "activating": "Activating...",
+            "imported": "License imported and activated.",
+            "readOnlyGrace": "This license is in expiry grace. The system remains connected but write operations should stay read-only until renewal.",
+            "status": {
+                "active": "Active",
+                "grace": "Grace",
+                "expired": "Expired",
+                "invalid": "Invalid",
+                "missing": "Missing"
+            },
+            "reason": {
+                "LICENSE_NOT_IMPORTED": "No license has been imported.",
+                "MALFORMED_LICENSE": "The license format is invalid.",
+                "SIGNATURE_INVALID": "The license signature is invalid.",
+                "INVALID_PAYLOAD": "The license payload is invalid.",
+                "FINGERPRINT_MISMATCH": "This license was not issued for this machine fingerprint.",
+                "LICENSE_EXPIRED": "The license has expired beyond the grace period."
             }
         },
         "supportTickets": {

@@ -25,6 +25,7 @@ import getUploadFileRouter from './get-upload-file'
 import internalChatmessagesRouter from './internal-chat-messages'
 import internalPredictionRouter from './internal-predictions'
 import leadsRouter from './leads'
+import licenseRouter from './license'
 import loadPromptRouter from './load-prompts'
 import logsRouter from './log'
 import marketplacesRouter from './marketplaces'
@@ -101,6 +102,7 @@ router.use('/internal-chatmessage', internalChatmessagesRouter)
 router.use('/internal-prediction', internalPredictionRouter)
 router.use('/get-upload-file', getUploadFileRouter)
 router.use('/leads', leadsRouter)
+router.use('/license', licenseRouter)
 router.use('/load-prompt', loadPromptRouter)
 router.use('/marketplaces', marketplacesRouter)
 router.use('/node-config', nodeConfigRouter)

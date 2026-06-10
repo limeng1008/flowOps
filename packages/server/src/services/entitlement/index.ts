@@ -4,6 +4,7 @@ import { Entitlement } from '../../database/entities/Entitlement'
 import { EntitlementUsage } from '../../database/entities/EntitlementUsage'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
+import LicenseService, { LicenseService as FlowOpsLicenseService, LicenseVerificationResult } from '../license'
 
 export type FlowOpsEdition = 'cloud' | 'private'
 export type EntitlementTier = 'free' | 'pro' | 'team' | 'enterprise'
@@ -19,6 +20,10 @@ export interface EntitlementSnapshot {
     concurrency: number
     expireAt?: Date | null
     source: EntitlementSourceKind
+    readOnly?: boolean
+    licenseId?: string
+    licenseCustomer?: string
+    licenseStatus?: string
 }
 
 export interface EntitlementTemplate {
@@ -199,10 +204,32 @@ const templateSnapshot = (scopeId: string, tier: EntitlementTier, source: Entitl
 }
 
 export class LocalEntitlementSource implements EntitlementSource {
-    constructor(private readonly env: NodeJS.ProcessEnv = process.env) {}
+    constructor(
+        private readonly env: NodeJS.ProcessEnv = process.env,
+        private readonly licenseService: Pick<FlowOpsLicenseService, 'getActiveLicense'> = LicenseService
+    ) {}
 
     async resolve(scopeId: string): Promise<EntitlementSnapshot> {
+        const licenseEntitlement = await new LicenseEntitlementSource(this.licenseService).resolve(scopeId)
+        if (isLicenseBackedSnapshot(licenseEntitlement)) {
+            return licenseEntitlement
+        }
+
         return templateSnapshot(scopeId, isLocalCommercialEnabled(this.env) ? 'enterprise' : 'free', 'local')
+    }
+}
+
+export class LicenseEntitlementSource implements EntitlementSource {
+    constructor(private readonly licenseService: Pick<FlowOpsLicenseService, 'getActiveLicense'> = LicenseService) {}
+
+    async resolve(scopeId: string): Promise<EntitlementSnapshot> {
+        const license = await this.licenseService.getActiveLicense()
+        if (!license.valid && license.status !== 'expired') {
+            return templateSnapshot(scopeId, 'free', 'local')
+        }
+        if (license.status === 'expired' && !license.payload) return templateSnapshot(scopeId, 'free', 'local')
+
+        return licenseToEntitlement(scopeId, license)
     }
 }
 
@@ -214,6 +241,33 @@ export class SubscriptionEntitlementSource implements EntitlementSource {
 
 export const createEntitlementSource = (env: NodeJS.ProcessEnv = process.env): EntitlementSource => {
     return getFlowOpsEdition(env) === 'cloud' ? new SubscriptionEntitlementSource() : new LocalEntitlementSource(env)
+}
+
+const licenseToEntitlement = (scopeId: string, license: LicenseVerificationResult): EntitlementSnapshot => {
+    const tier = (license.tier || 'enterprise') as EntitlementTier
+    const template = ENTITLEMENT_TEMPLATES[tier] || ENTITLEMENT_TEMPLATES.enterprise
+    const creditsTotal = license.payload?.creditsTotal ?? template.creditsTotal
+    const features = license.features.length ? license.features : template.features
+
+    return {
+        scopeId,
+        tier,
+        seats: license.seats ?? template.seats,
+        creditsTotal,
+        creditsBalance: creditsTotal === -1 ? -1 : creditsTotal,
+        features,
+        concurrency: license.concurrency ?? template.concurrency,
+        expireAt: license.expireAt ?? null,
+        source: 'local',
+        readOnly: license.readOnly,
+        licenseId: license.licenseId,
+        licenseCustomer: license.customer,
+        licenseStatus: license.status
+    }
+}
+
+const isLicenseBackedSnapshot = (snapshot: EntitlementSnapshot): boolean => {
+    return snapshot.licenseStatus === 'active' || snapshot.licenseStatus === 'grace' || snapshot.licenseStatus === 'expired'
 }
 
 export const consumeCreditsForEntitlement = async (
@@ -295,7 +349,13 @@ export class EntitlementService {
     constructor(private readonly options: { dataSource?: DataSource; source?: EntitlementSource } = {}) {}
 
     async resolve(scopeId: string): Promise<EntitlementSnapshot> {
-        const entitlement = await this.getOrCreateEntitlement(scopeId)
+        const sourceSnapshot = await this.getSource().resolve(scopeId)
+        if (isLicenseBackedSnapshot(sourceSnapshot)) {
+            await this.getOrCreateEntitlement(scopeId, undefined, sourceSnapshot)
+            return sourceSnapshot
+        }
+
+        const entitlement = await this.getOrCreateEntitlement(scopeId, undefined, sourceSnapshot)
         return toEntitlementSnapshot(entitlement)
     }
 
@@ -352,20 +412,34 @@ export class EntitlementService {
         return this.options.source ?? createEntitlementSource()
     }
 
-    private async getOrCreateEntitlement(scopeId: string, manager?: EntityManager): Promise<Entitlement> {
+    private async getOrCreateEntitlement(
+        scopeId: string,
+        manager?: EntityManager,
+        resolvedSource?: EntitlementSnapshot
+    ): Promise<Entitlement> {
+        const sourceSnapshot = resolvedSource ?? (await this.getSource().resolve(scopeId))
         const existing = manager
             ? await manager.findOneBy(Entitlement, { scopeId })
             : await this.getDataSource().getRepository(Entitlement).findOneBy({ scopeId })
-        if (existing) return existing
+        if (existing) {
+            if (!isLicenseBackedSnapshot(sourceSnapshot)) return existing
 
-        const snapshot = await this.getSource().resolve(scopeId)
+            const updatedEntitlement = {
+                ...existing,
+                ...snapshotToEntity(sourceSnapshot)
+            }
+            return manager
+                ? manager.save(Entitlement, updatedEntitlement)
+                : this.getDataSource().getRepository(Entitlement).save(updatedEntitlement)
+        }
+
         if (manager) {
-            const entitlement = manager.create(Entitlement, snapshotToEntity(snapshot))
+            const entitlement = manager.create(Entitlement, snapshotToEntity(sourceSnapshot))
             return manager.save(Entitlement, entitlement)
         }
 
         const repository = this.getDataSource().getRepository(Entitlement)
-        const entitlement = repository.create(snapshotToEntity(snapshot))
+        const entitlement = repository.create(snapshotToEntity(sourceSnapshot))
         return repository.save(entitlement)
     }
 }

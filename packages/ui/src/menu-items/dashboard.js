@@ -24,7 +24,8 @@ import {
     IconFileDatabase,
     IconShieldLock,
     IconListCheck,
-    IconReceipt
+    IconReceipt,
+    IconLicense
 } from '@tabler/icons-react'
 
 // constant
@@ -53,7 +54,8 @@ const icons = {
     IconFileDatabase,
     IconShieldLock,
     IconListCheck,
-    IconReceipt
+    IconReceipt,
+    IconLicense
 }
 
 // ==============================|| DASHBOARD MENU ITEMS ||============================== //
@@ -258,6 +260,14 @@ const dashboard = {
                     type: 'item',
                     url: '/billing',
                     icon: icons.IconReceipt,
+                    breadcrumbs: true
+                },
+                {
+                    id: 'license',
+                    title: 'License Management',
+                    type: 'item',
+                    url: '/license',
+                    icon: icons.IconLicense,
                     breadcrumbs: true
                 },
                 {

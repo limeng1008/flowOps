@@ -20,6 +20,7 @@
         "workspaces": "工作区",
         "login-activity": "登录活动",
         "billing": "计费管理",
+        "license": "授权管理",
         "support-tickets": "支持工单",
         "others": "其他",
         "logs": "日志",
@@ -2226,6 +2227,44 @@
                 "paid": "已支付",
                 "failed": "失败",
                 "closed": "已关闭"
+            }
+        },
+        "license": {
+            "title": "授权管理",
+            "currentLicense": "当前授权",
+            "noCustomer": "未导入授权",
+            "licenseId": "授权 ID",
+            "tier": "版本",
+            "expireAt": "到期时间",
+            "seats": "席位",
+            "concurrency": "并发",
+            "graceDaysRemaining": "宽限天数",
+            "modules": "授权模块",
+            "noModules": "暂无授权模块",
+            "machineFingerprint": "机器指纹",
+            "copyFingerprint": "复制指纹",
+            "copied": "已复制",
+            "importLicense": "导入授权",
+            "licenseText": "授权文本",
+            "uploadFile": "上传文件",
+            "activate": "激活",
+            "activating": "激活中...",
+            "imported": "授权已导入并激活。",
+            "readOnlyGrace": "授权处于到期宽限期，系统不断开连接，但续期前应保持只读降级。",
+            "status": {
+                "active": "有效",
+                "grace": "宽限期",
+                "expired": "已过期",
+                "invalid": "无效",
+                "missing": "未导入"
+            },
+            "reason": {
+                "LICENSE_NOT_IMPORTED": "尚未导入授权。",
+                "MALFORMED_LICENSE": "授权格式无效。",
+                "SIGNATURE_INVALID": "授权签名无效。",
+                "INVALID_PAYLOAD": "授权载荷无效。",
+                "FINGERPRINT_MISMATCH": "该授权未签发给当前机器指纹。",
+                "LICENSE_EXPIRED": "授权已超过宽限期。"
             }
         },
         "supportTickets": {
