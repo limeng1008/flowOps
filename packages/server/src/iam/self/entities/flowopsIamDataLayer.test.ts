@@ -5,6 +5,8 @@ const entityRoot = __dirname
 const srcRoot = path.resolve(__dirname, '../../..')
 const migrationTimestamp = '1778000000000'
 const migrationClass = 'AddFlowOpsIamEntities1778000000000'
+const rolePermissionMigrationTimestamp = '1778000100000'
+const rolePermissionMigrationClass = 'BackfillFlowOpsRolePermissions1778000100000'
 
 const entities = [
     ['FlowOpsUser.ts', 'FlowOpsUser', 'flowops_user'],
@@ -61,6 +63,30 @@ describe('FlowOps IAM self data layer', () => {
             for (const roleName of ['owner', 'admin', 'member']) {
                 expect(migrationSource).toContain(roleName)
             }
+        }
+    })
+
+    it('registers the four role permission backfill migrations', () => {
+        const helperSource = read(path.join(srcRoot, 'database/migrations/flowOpsIamRolePermissions.ts'))
+        expect(helperSource).toContain('FLOWOPS_OWNER_ROLE_PERMISSIONS')
+        expect(helperSource).toContain('chatflows:create')
+        expect(helperSource).toContain('users:manage')
+        expect(helperSource).toContain('workspace:add-user')
+
+        for (const driver of ['postgres', 'mysql', 'mariadb', 'sqlite']) {
+            const migrationPath = path.join(
+                srcRoot,
+                `database/migrations/${driver}/${rolePermissionMigrationTimestamp}-BackfillFlowOpsRolePermissions.ts`
+            )
+            const migrationSource = read(migrationPath)
+            const indexSource = read(path.join(srcRoot, `database/migrations/${driver}/index.ts`))
+
+            expect(indexSource).toContain(
+                `import { ${rolePermissionMigrationClass} } from './${rolePermissionMigrationTimestamp}-BackfillFlowOpsRolePermissions'`
+            )
+            expect(indexSource).toContain(rolePermissionMigrationClass)
+            expect(migrationSource).toContain('FLOWOPS_BUILTIN_ROLE_PERMISSION_ROWS')
+            expect(migrationSource).toContain('flowops_role')
         }
     })
 })

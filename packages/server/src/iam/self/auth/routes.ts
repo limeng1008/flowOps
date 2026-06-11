@@ -3,6 +3,7 @@ import { getDataSource } from '../../../DataSource'
 import { FlowOpsAuthError, FlowOpsAuthService, createSelfAuthTokens, verifySelfAccessToken, verifySelfRefreshToken } from './service'
 import { SELF_ACCESS_TOKEN_COOKIE, SELF_REFRESH_TOKEN_COOKIE } from '../secrets'
 import { configureSelfLocalStrategy } from './passport'
+import { SELF_PERMISSION_GROUPS } from '../rbac/permissions'
 
 const authRouter = Router()
 const accountRouter = Router()
@@ -72,7 +73,7 @@ authRouter.get('/me', async (req, res, next) => {
     }
 })
 
-authRouter.get('/permissions/:type', (_req, res) => res.json([]))
+authRouter.get('/permissions/:type', (_req, res) => res.json(SELF_PERMISSION_GROUPS))
 authRouter.get('/sso-success', (_req, res) => res.status(501).json({ message: 'SSO is not enabled' }))
 
 accountRouter.post('/register', async (req, res, next) => {

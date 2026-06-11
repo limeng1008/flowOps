@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { NextFunction, Request, Response } from 'express'
 import agentflowv2GeneratorRouter from './agentflowv2-generator'
 import apikeyRouter from './apikey'
 import assistantsRouter from './assistants'
@@ -75,8 +75,14 @@ import { userRouter } from '../iam/routes'
 import { workspaceUserRouter } from '../iam/routes'
 import { workspaceRouter } from '../iam/routes'
 import { IdentityManager } from '../iam/identity'
+import { isSelfIamMode } from '../iam/provider'
 
 const router = express.Router()
+
+const requireFeatureUnlessSelfIam = (feature: string) => (req: Request, res: Response, next: NextFunction) => {
+    if (isSelfIamMode()) return next()
+    return IdentityManager.checkFeatureByPlan(feature)(req, res, next)
+}
 
 router.use('/ping', pingRouter)
 router.use('/apikey', apikeyRouter)
@@ -149,7 +155,7 @@ router.use('/auth', authRouter)
 router.use('/audit', IdentityManager.checkFeatureByPlan('feat:login-activity'), auditRouter)
 router.use('/user', userRouter)
 router.use('/organization', organizationRouter)
-router.use('/role', IdentityManager.checkFeatureByPlan('feat:roles'), roleRouter)
+router.use('/role', requireFeatureUnlessSelfIam('feat:roles'), roleRouter)
 router.use('/organizationuser', organizationUserRoute)
 router.use('/workspace', workspaceRouter)
 router.use('/workspaceuser', workspaceUserRouter)

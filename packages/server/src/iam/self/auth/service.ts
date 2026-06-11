@@ -4,6 +4,7 @@ import { randomBytes } from 'crypto'
 import { DataSource, EntityManager } from 'typeorm'
 import { FlowOpsLoginActivity, FlowOpsOrganization, FlowOpsRole, FlowOpsUser, FlowOpsWorkspace, FlowOpsWorkspaceMember } from '../entities'
 import { SELF_ACCESS_TOKEN_COOKIE, SELF_REFRESH_TOKEN_COOKIE, getSelfJwtAuthTokenSecret, getSelfJwtRefreshTokenSecret } from '../secrets'
+import { parsePermissionJson } from '../rbac/permissions'
 
 export const SELF_AUTH_COOKIE_NAMES = {
     access: SELF_ACCESS_TOKEN_COOKIE,
@@ -58,6 +59,13 @@ type InviteBody = {
     roleId?: string
     roleName?: string
     workspaceId?: string
+    workspace?: {
+        id?: string
+    }
+    role?: {
+        id?: string
+        name?: string
+    }
     user?: {
         email?: string
         name?: string
@@ -106,15 +114,7 @@ const normalizeEmail = (email?: string): string => (email ?? '').trim().toLowerC
 
 const getPasswordFromRegisterBody = (body: RegisterBody): string => body.user?.credential ?? body.user?.password ?? ''
 
-const parsePermissions = (role?: FlowOpsRole | null): string[] => {
-    if (!role?.permissions) return []
-    try {
-        const parsed = JSON.parse(role.permissions)
-        return Array.isArray(parsed) ? parsed : []
-    } catch {
-        return []
-    }
-}
+const parsePermissions = (role?: FlowOpsRole | null): string[] => parsePermissionJson(role?.permissions)
 
 const authLink = (path: string, token: string): string => {
     const baseUrl = process.env.APP_URL?.replace(/\/$/, '') || 'http://localhost:3000'
@@ -243,16 +243,17 @@ export class FlowOpsAuthService {
         if (!email) throw new FlowOpsAuthError(400, 'Email is required')
 
         return await this.dataSource.transaction(async (manager) => {
-            const workspaceId = body.user?.workspaceId ?? body.workspaceId ?? actor.activeWorkspaceId
+            const workspaceId = body.user?.workspaceId ?? body.workspaceId ?? body.workspace?.id ?? actor.activeWorkspaceId
             if (!workspaceId) throw new FlowOpsAuthError(400, 'Workspace is required')
 
             const workspace = await manager.getRepository(FlowOpsWorkspace).findOneBy({ id: workspaceId })
             if (!workspace) throw new FlowOpsAuthError(404, 'Workspace not found')
 
+            const roleId = body.user?.roleId ?? body.roleId ?? body.role?.id
             const role =
-                body.user?.roleId || body.roleId
-                    ? await manager.getRepository(FlowOpsRole).findOneBy({ id: body.user?.roleId ?? body.roleId })
-                    : await this.getRole(manager, body.user?.roleName ?? body.roleName ?? 'member')
+                roleId !== undefined
+                    ? await manager.getRepository(FlowOpsRole).findOneBy({ id: roleId })
+                    : await this.getRole(manager, body.user?.roleName ?? body.roleName ?? body.role?.name ?? 'member')
             if (!role) throw new FlowOpsAuthError(404, 'Role not found')
 
             const userRepo = manager.getRepository(FlowOpsUser)
@@ -298,7 +299,7 @@ export class FlowOpsAuthService {
             await this.recordLoginActivity(null, '-1', undefined, 'Unknown user')
             throw new FlowOpsAuthError(401, 'Incorrect Email or Password')
         }
-        if (user.status === 'disabled') {
+        if (user.status === 'disabled' || user.status === 'inactive') {
             await this.recordLoginActivity(user.id, '-3', undefined, 'User disabled')
             throw new FlowOpsAuthError(401, 'User disabled')
         }
@@ -420,7 +421,7 @@ export class FlowOpsAuthService {
             activeWorkspaceId: activeWorkspace?.id,
             activeWorkspace: activeWorkspaceEntity?.name,
             lastLogin: user.lastLogin,
-            isOrganizationAdmin: activeRole?.name === 'owner' || activeRole?.name === 'admin',
+            isOrganizationAdmin: activeRole?.name === 'owner',
             assignedWorkspaces,
             permissions: parsePermissions(activeRole),
             features: {}

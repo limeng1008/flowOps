@@ -50,6 +50,7 @@ import { AddSupportTicketEntity1777200000000 } from './1777200000000-AddSupportT
 import { AddPaymentP0Hardening1777300000000 } from './1777300000000-AddPaymentP0Hardening'
 import { AddEntitlementEntity1777300000001 } from './1777300000001-AddEntitlementEntity'
 import { AddFlowOpsIamEntities1778000000000 } from './1778000000000-AddFlowOpsIamEntities'
+import { BackfillFlowOpsRolePermissions1778000100000 } from './1778000100000-BackfillFlowOpsRolePermissions'
 
 import { AddAuthTables1720230151482 } from '../../../enterprise/database/migrations/sqlite/1720230151482-AddAuthTables'
 import { AddWorkspace1720230151484 } from '../../../enterprise/database/migrations/sqlite/1720230151484-AddWorkspace'
@@ -126,5 +127,6 @@ export const sqliteMigrations = [
     AddSupportTicketEntity1777200000000,
     AddPaymentP0Hardening1777300000000,
     AddEntitlementEntity1777300000001,
-    AddFlowOpsIamEntities1778000000000
+    AddFlowOpsIamEntities1778000000000,
+    BackfillFlowOpsRolePermissions1778000100000
 ]
