@@ -47,24 +47,22 @@ export class ScheduleRecord implements IScheduleRecord {
     @Column({ nullable: true, type: 'text' })
     defaultForm?: string
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, type: Date })
     lastRunAt?: Date
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, type: Date })
     nextRunAt?: Date
 
     /** Optional date/time after which the schedule will no longer fire */
-    @Column({ nullable: true })
+    @Column({ nullable: true, type: Date })
     endDate?: Date
 
     @Column({ type: 'varchar' })
     workspaceId: string
 
-    @Column({ type: 'timestamp' })
     @CreateDateColumn()
     createdDate: Date
 
-    @Column({ type: 'timestamp' })
     @UpdateDateColumn()
     updatedDate: Date
 }

@@ -1,4 +1,8 @@
+const fs = require('fs')
+const path = require('path')
 const { nodeClass: TemplateTransform } = require('./TemplateTransform')
+
+export {}
 
 const baseOptions = { agentflowRuntime: { state: { kept: true } } }
 
@@ -8,6 +12,8 @@ describe('TemplateTransform agentflow node', () => {
         expect(node.label).toBe('Template Transform')
         expect(node.name).toBe('templateTransformAgentflow')
         expect(node.category).toBe('Agent Flows')
+        expect(node.icon).toBe('templatetransform.svg')
+        expect(fs.existsSync(path.join(__dirname, node.icon))).toBe(true)
         expect(node.inputs.map((i: any) => i.name)).toEqual(
             expect.arrayContaining(['templateTransformTemplate', 'templateTransformVariables'])
         )

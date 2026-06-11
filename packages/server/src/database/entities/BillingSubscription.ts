@@ -21,10 +21,10 @@ export class BillingSubscription {
     @Column({ type: 'varchar', length: 20, default: BillingSubscriptionStatus.ACTIVE })
     status: string
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, type: Date })
     currentPeriodStart?: Date
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, type: Date })
     currentPeriodEnd?: Date
 
     @Column({ nullable: true, type: 'text' })

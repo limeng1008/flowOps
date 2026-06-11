@@ -2,7 +2,7 @@ import { useSelector } from 'react-redux'
 import { useConfig } from '@/store/context/ConfigContext'
 
 export const useAuth = () => {
-    const { isOpenSource } = useConfig()
+    const { isOpenSource, isCloud } = useConfig()
     const permissions = useSelector((state) => state.auth.permissions)
     const features = useSelector((state) => state.auth.features)
     const isGlobal = useSelector((state) => state.auth.isGlobal)
@@ -34,6 +34,14 @@ export const useAuth = () => {
     const hasDisplay = (display) => {
         if (!display) {
             return true
+        }
+
+        // FlowOps: edition 门控（不依赖后端 feature flag）—— 在线计费/工单仅 cloud 版显示，private 版隐藏
+        if (display === 'edition:cloud') {
+            return isCloud
+        }
+        if (display === 'edition:private') {
+            return !isCloud
         }
 
         // if it has display flag, but user has no features, then it should not be displayed

@@ -47,7 +47,8 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
     width: 'max-content',
     height: 'auto',
     padding: '10px',
-    boxShadow: 'none'
+    boxShadow: 'none',
+    overflow: 'visible'
 }))
 
 const StyledNodeToolbar = styled(NodeToolbar)(({ theme }) => ({
@@ -213,7 +214,7 @@ const AgentFlowNode = ({ data }) => {
     }, [canvas.componentNodes, currentLang, data.name, data.version, t])
 
     return (
-        <div ref={ref} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+        <div ref={ref} style={{ overflow: 'visible' }} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
             <StyledNodeToolbar>
                 <ButtonGroup sx={{ gap: 1 }} variant='outlined' aria-label='Basic button group'>
                     {data.name !== 'startAgentflow' && (
@@ -273,7 +274,9 @@ const AgentFlowNode = ({ data }) => {
                     borderWidth: '1px',
                     boxShadow: data.selected ? `0 0 0 1px ${getStateColor()} !important` : 'none',
                     minHeight: getMinimumHeight(),
+                    minWidth: data.name === 'startAgentflow' ? undefined : 280,
                     height: 'auto',
+                    overflow: 'visible',
                     backgroundColor: getBackgroundColor(),
                     display: 'flex',
                     alignItems: 'center',
@@ -334,7 +337,7 @@ const AgentFlowNode = ({ data }) => {
                     </Tooltip>
                 )}
 
-                <Box sx={{ width: '100%' }}>
+                <Box sx={{ width: '100%', pr: getOutputAnchors().length ? 2.5 : 0 }}>
                     {!data.hideInput && (
                         <Handle
                             type='target'

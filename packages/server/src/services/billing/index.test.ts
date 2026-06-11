@@ -163,6 +163,37 @@ describe('billing service', () => {
         })
     })
 
+    it('allows bot usage to reach the plan limit', async () => {
+        jest.spyOn(BillingService, 'getOrganizationOverview').mockResolvedValueOnce({
+            organizationId: 'org-1',
+            period: '2026-06',
+            plan: DEFAULT_FREE_PLAN,
+            subscription: null,
+            quotas: { tokens: 100, bots: 3, seats: 3 },
+            usage: { tokens: 0, bots: 2, seats: 1 },
+            exceeded: { tokens: false, bots: false, seats: false }
+        } as any)
+
+        await expect(BillingService.assertBotAllowance('org-1', 3)).resolves.toBeUndefined()
+    })
+
+    it('throws 402 with a stable billing code when bot usage would exceed the plan limit', async () => {
+        jest.spyOn(BillingService, 'getOrganizationOverview').mockResolvedValueOnce({
+            organizationId: 'org-1',
+            period: '2026-06',
+            plan: DEFAULT_FREE_PLAN,
+            subscription: null,
+            quotas: { tokens: 100, bots: 3, seats: 3 },
+            usage: { tokens: 0, bots: 3, seats: 1 },
+            exceeded: { tokens: false, bots: false, seats: false }
+        } as any)
+
+        await expect(BillingService.assertBotAllowance('org-1', 4)).rejects.toMatchObject({
+            statusCode: StatusCodes.PAYMENT_REQUIRED,
+            message: BILLING_ERROR_CODES.BOT_LIMIT_EXCEEDED
+        })
+    })
+
     it('allows only BILLING_ADMIN_EMAILS to use billing admin APIs', () => {
         process.env.BILLING_ADMIN_EMAILS = 'ops@example.com, finance@example.com'
 

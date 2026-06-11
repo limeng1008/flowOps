@@ -38,7 +38,8 @@ import {
     IconBulb,
     IconRefresh,
     IconX,
-    IconCopy
+    IconCopy,
+    IconClock
 } from '@tabler/icons-react'
 import { Tabs } from '@mui/base/Tabs'
 import Autocomplete, { autocompleteClasses } from '@mui/material/Autocomplete'
@@ -80,6 +81,7 @@ import CredentialInputHandler from './CredentialInputHandler'
 import InputHintDialog from '@/ui-component/dialog/InputHintDialog'
 import NvidiaNIMDialog from '@/ui-component/dialog/NvidiaNIMDialog'
 import PromptGeneratorDialog from '@/ui-component/dialog/PromptGeneratorDialog'
+import CronBuilderDialog from '@/ui-component/cron/CronBuilderDialog'
 
 // API
 import assistantsApi from '@/api/assistants'
@@ -162,6 +164,7 @@ const NodeInputHandler = ({
     const tL = (s) => translateNodeLabel(s, currentLang)
     const tT = (s) => translateNodeTooltip(s, currentLang)
     const tP = (s) => translateNodeInputPlaceholder(s, currentLang)
+    const isScheduleCronExpression = inputParam && inputParam.name === 'scheduleCronExpression'
 
     useNotifier()
     const dispatch = useDispatch()
@@ -243,6 +246,7 @@ const NodeInputHandler = ({
 
     const [promptGeneratorDialogOpen, setPromptGeneratorDialogOpen] = useState(false)
     const [promptGeneratorDialogProps, setPromptGeneratorDialogProps] = useState({})
+    const [showCronBuilderDialog, setShowCronBuilderDialog] = useState(false)
 
     const handleDataChange = ({ inputParam, newValue }) => {
         data.inputs[inputParam.name] = newValue
@@ -996,6 +1000,23 @@ const NodeInputHandler = ({
                                     <IconVariable size={20} style={{ color: 'teal' }} />
                                 </Tooltip>
                             )}
+                            {isScheduleCronExpression && (
+                                <Tooltip title={t('canvas.cronBuilder.open')}>
+                                    <IconButton
+                                        size='small'
+                                        sx={{
+                                            height: 25,
+                                            width: 25,
+                                            ml: 0.5
+                                        }}
+                                        color='primary'
+                                        onClick={() => setShowCronBuilderDialog(true)}
+                                        disabled={disabled}
+                                    >
+                                        <IconClock size={17} />
+                                    </IconButton>
+                                </Tooltip>
+                            )}
                             {inputParam.generateDocStoreDescription && (
                                 <IconButton
                                     title={t('canvas.nodeInput.generateKnowledgeDescription')}
@@ -1683,6 +1704,15 @@ const NodeInputHandler = ({
                             }
                         })
                     }
+                }}
+            />
+            <CronBuilderDialog
+                open={showCronBuilderDialog}
+                initialValue={data.inputs[inputParam?.name] ?? inputParam?.default ?? ''}
+                onClose={() => setShowCronBuilderDialog(false)}
+                onApply={(cron) => {
+                    data.inputs[inputParam.name] = cron
+                    onNodeDataChange({ nodeId: data.id, inputParam, newValue: cron })
                 }}
             />
             {loading && <BackdropLoader open={loading} />}

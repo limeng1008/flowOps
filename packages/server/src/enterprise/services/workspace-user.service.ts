@@ -327,21 +327,22 @@ export class WorkspaceUserService {
     }
 
     public async updateWorkspaceUser(newWorkspaserUser: Partial<WorkspaceUser>, queryRunner: QueryRunner) {
-        const { workspaceUser } = await this.readWorkspaceUserByWorkspaceIdUserId(
+        const { workspace, workspaceUser } = await this.readWorkspaceUserByWorkspaceIdUserId(
             newWorkspaserUser.workspaceId,
             newWorkspaserUser.userId,
             queryRunner
         )
         if (!workspaceUser) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, WorkspaceUserErrorMessage.WORKSPACE_USER_NOT_FOUND)
-        if (newWorkspaserUser.roleId && workspaceUser.role) {
+        if (newWorkspaserUser.roleId && newWorkspaserUser.roleId !== workspaceUser.roleId) {
+            const organizationId = workspace.organizationId || workspaceUser.role?.organizationId
             const role = await this.roleService.readAssignableWorkspaceRoleByIdOrganizationId(
                 newWorkspaserUser.roleId,
-                workspaceUser.role.organizationId,
+                organizationId,
                 queryRunner
             )
             if (!role) throw new InternalFlowiseError(StatusCodes.NOT_FOUND, RoleErrorMessage.ROLE_NOT_FOUND)
             // check if the role is from the same organization
-            if (role.organizationId !== workspaceUser.role.organizationId) {
+            if (role.organizationId !== organizationId) {
                 throw new InternalFlowiseError(StatusCodes.NOT_FOUND, RoleErrorMessage.ROLE_NOT_FOUND)
             }
             // delete role, the new role will be created again, with the new roleId (newWorkspaserUser.roleId)

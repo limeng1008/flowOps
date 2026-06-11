@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux'
 import { Box, CircularProgress, Tooltip } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 import { IconClock } from '@tabler/icons-react'
+import { useTranslation } from 'react-i18next'
 
 const ACTIVE = {
     light: { bg: '#dcfce7', text: '#15803d', border: '#86efac', dot: '#22c55e' },
@@ -16,6 +17,7 @@ const PAUSED = {
 }
 
 const ScheduleStatusBadge = ({ scheduleStatus, size = 'md' }) => {
+    const { t, i18n } = useTranslation()
     const theme = useTheme()
     const customization = useSelector((state) => state.customization)
 
@@ -26,13 +28,14 @@ const ScheduleStatusBadge = ({ scheduleStatus, size = 'md' }) => {
     const palette = customization.isDarkMode ? 'dark' : 'light'
     const colors = isActive ? ACTIVE[palette] : PAUSED[palette]
 
+    const dateTimeFormat = i18n.language?.startsWith('zh') ? 'YYYY年M月D日 HH:mm' : 'MMM D, YYYY h:mm A'
     const tooltipText = isLoading
-        ? 'Checking schedule status…'
+        ? t('pages.schedule.badgeChecking')
         : isActive
         ? scheduleStatus.nextRunAt
-            ? `Schedule active — next run ${moment(scheduleStatus.nextRunAt).format('MMM D, YYYY h:mm A')}`
-            : 'Schedule active'
-        : 'Schedule configured but turned off'
+            ? t('pages.schedule.badgeActiveNextRun', { time: moment(scheduleStatus.nextRunAt).format(dateTimeFormat) })
+            : t('pages.schedule.badgeActive')
+        : t('pages.schedule.badgePaused')
 
     const dims =
         size === 'sm'
@@ -85,7 +88,11 @@ const ScheduleStatusBadge = ({ scheduleStatus, size = 'md' }) => {
                 ) : (
                     <IconClock size={dims.icon} stroke={2} />
                 )}
-                {isLoading ? 'Loading…' : isActive ? 'Scheduled' : 'Paused'}
+                {isLoading
+                    ? t('pages.schedule.badgeLoading')
+                    : isActive
+                    ? t('pages.schedule.badgeScheduled')
+                    : t('pages.schedule.badgePausedShort')}
             </Box>
         </Tooltip>
     )

@@ -17,4 +17,8 @@ describe('auth error message translation', () => {
     it('falls back to the original message when no translation mapping exists', () => {
         expect(translateAuthErrorMessage('Something unexpected', tFrom(zh))).toBe('Something unexpected')
     })
+
+    it('translates invalid organization errors in Chinese', () => {
+        expect(translateAuthErrorMessage('Invalid Organization Id', tFrom(zh))).toBe('组织信息异常，请重新登录或联系管理员')
+    })
 })

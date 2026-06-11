@@ -53,11 +53,9 @@ export class ChatFlow implements IChatFlow {
     @Column({ type: 'varchar', length: 20, default: EnumChatflowType.CHATFLOW })
     type?: ChatflowType
 
-    @Column({ type: 'timestamp' })
     @CreateDateColumn()
     createdDate: Date
 
-    @Column({ type: 'timestamp' })
     @UpdateDateColumn()
     updatedDate: Date
 

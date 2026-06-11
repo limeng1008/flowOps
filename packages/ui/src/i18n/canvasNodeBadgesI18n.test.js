@@ -102,6 +102,31 @@ describe('canvas node badge i18n coverage', () => {
         expect(translateNodeTooltip(tooltip, 'en')).toBe(tooltip)
     })
 
+    it('translates Start node schedule and webhook trigger copy', async () => {
+        const { translateNodeLabel, translateNodeTooltip } = await import('./nodeI18n.js')
+
+        expect(translateNodeLabel('Webhook Trigger', 'zh')).toBe('Webhook 触发器')
+        expect(translateNodeLabel('Schedule Input', 'zh')).toBe('定时触发')
+        expect(translateNodeLabel('Full Webhook Payload', 'zh')).toBe('完整 Webhook Payload')
+        expect(translateNodeTooltip('Trigger the workflow via an external webhook', 'zh')).toBe('通过外部 Webhook 请求触发工作流。')
+        expect(translateNodeTooltip('Start the workflow on a recurring schedule (cron)', 'zh')).toBe('按重复计划（cron）自动触发工作流。')
+        expect(
+            translateNodeTooltip(
+                'Standard 5-field cron expression (minute hour day month weekday). Example: "0 9 * * 1-5" runs at 09:00 every weekday.',
+                'zh'
+            )
+        ).toBe('标准 5 位 cron 表达式（分 时 日 月 周）。例如 "0 9 * * *" 表示每天 09:00 触发，"0 9 * * 1-5" 表示工作日 09:00 触发。')
+        expect(translateNodeTooltip('Default question/input passed to the flow when it is triggered by the scheduler.', 'zh')).toBe(
+            '调度器触发时传给流程的默认问题 / 输入。'
+        )
+        expect(translateNodeTooltip('How Flowise replies to the incoming webhook request.', 'zh')).toBe(
+            'FlowOps 如何回复传入的 Webhook 请求。'
+        )
+        expect(translateNodeTooltip('Trigger the workflow via an external webhook', 'en')).toBe(
+            'Trigger the workflow via an external webhook'
+        )
+    })
+
     it('translates CSV agent input label, tooltip, and placeholder copy', async () => {
         const { translateNodeInputPlaceholder, translateNodeLabel, translateNodeTooltip } = await import('./nodeI18n.js')
         const prompt =

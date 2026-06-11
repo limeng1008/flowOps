@@ -1,5 +1,5 @@
 import { describe, expect, it } from '@jest/globals'
-import { isDeniedIP } from './httpSecurity'
+import { createPinnedLookup, isDeniedIP } from './httpSecurity'
 
 // Test deny list covering common SSRF targets
 const TEST_DENY_LIST = [
@@ -392,6 +392,47 @@ describe('isDeniedIP - SSRF Protection', () => {
             // Should allow other IPs (malformed entries skipped)
             expect(() => isDeniedIP('1.1.1.1', multiMalformedList)).not.toThrow()
             expect(() => isDeniedIP('10.0.0.1', multiMalformedList)).not.toThrow()
+        })
+    })
+})
+
+describe('createPinnedLookup', () => {
+    const target = {
+        hostname: 'example.com',
+        ip: '93.184.216.34',
+        family: 4 as const,
+        protocol: 'https' as const
+    }
+
+    it('supports Node lookup(host, options, callback) calls', (done) => {
+        const lookup = createPinnedLookup(target)
+
+        lookup('example.com', {}, (error: NodeJS.ErrnoException | null, address: string | unknown[], family?: number) => {
+            expect(error).toBeNull()
+            expect(address).toBe(target.ip)
+            expect(family).toBe(target.family)
+            done()
+        })
+    })
+
+    it('supports Node lookup(host, { all: true }, callback) calls', (done) => {
+        const lookup = createPinnedLookup(target)
+
+        lookup('example.com', { all: true }, (error: NodeJS.ErrnoException | null, addresses: string | unknown[]) => {
+            expect(error).toBeNull()
+            expect(addresses).toEqual([{ address: target.ip, family: target.family }])
+            done()
+        })
+    })
+
+    it('supports Node lookup(host, callback) calls', (done) => {
+        const lookup = createPinnedLookup(target)
+
+        ;(lookup as any)('example.com', (error: NodeJS.ErrnoException | null, address: string | unknown[], family?: number) => {
+            expect(error).toBeNull()
+            expect(address).toBe(target.ip)
+            expect(family).toBe(target.family)
+            done()
         })
     })
 })

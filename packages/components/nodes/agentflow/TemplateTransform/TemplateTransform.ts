@@ -24,6 +24,7 @@ class TemplateTransform_Agentflow implements INode {
         this.description = 'Render a text template with runtime variables'
         this.baseClasses = [this.type]
         this.color = '#F97316'
+        this.icon = 'templatetransform.svg'
         this.inputs = [
             {
                 label: 'Template',

@@ -171,6 +171,7 @@
             "incorrectEmailOrPassword": "邮箱或密码错误",
             "userEmailUnverified": "用户邮箱尚未验证",
             "inactiveUser": "该用户已停用",
+            "invalidOrganization": "组织信息异常，请重新登录或联系管理员",
             "invalidWorkspace": "尚未分配工作区",
             "forbidden": "你没有登录权限",
             "invitedUser": "该受邀用户尚未完成注册"
@@ -646,6 +647,38 @@
             "removeSecret": "移除 secret",
             "generatedInstructionSetFailed": "写入生成指令失败",
             "setupNimLocally": "本地设置 NIM"
+        },
+        "cronBuilder": {
+            "open": "打开 Cron 配置助手",
+            "title": "Cron 配置助手",
+            "mode": "触发频率",
+            "daily": "每天",
+            "weekly": "每周",
+            "monthly": "每月",
+            "hourly": "每隔 N 小时",
+            "time": "触发时间",
+            "dayOfWeek": "星期",
+            "dayOfMonth": "每月第几天",
+            "everyHours": "间隔小时数",
+            "generated": "生成表达式",
+            "apply": "应用",
+            "copy": "复制",
+            "copied": "已复制",
+            "weekdays": {
+                "sunday": "周日",
+                "monday": "周一",
+                "tuesday": "周二",
+                "wednesday": "周三",
+                "thursday": "周四",
+                "friday": "周五",
+                "saturday": "周六"
+            },
+            "description": {
+                "daily": "每天 {{time}} 触发一次。",
+                "weekly": "每周{{day}} {{time}} 触发一次。",
+                "monthly": "每月第 {{day}} 天 {{time}} 触发一次。",
+                "hourly": "每隔 {{hours}} 小时触发一次。"
+            }
         },
         "promptGenerator": {
             "placeholder": "描述你的任务",
@@ -1183,7 +1216,17 @@
             "everyDayAt": "每天 {{time}}{{timezone}}",
             "everyWeekdayAt": "每个工作日 {{time}}{{timezone}}",
             "everyHour": "每小时{{timezone}}",
-            "everyMinute": "每分钟{{timezone}}"
+            "everyMinute": "每分钟{{timezone}}",
+            "badgeChecking": "正在检查定时状态…",
+            "badgeActive": "定时已启用",
+            "badgeActiveNextRun": "定时已启用，下次运行 {{time}}",
+            "badgePaused": "已配置定时，但当前关闭",
+            "badgeLoading": "加载中…",
+            "badgeScheduled": "定时中",
+            "badgePausedShort": "已暂停",
+            "resizeDrawer": "调整抽屉宽度",
+            "selectAllRowsOnPage": "选择本页全部记录",
+            "selectRow": "选择记录 {{id}}"
         },
         "webhookListener": {
             "title": "Webhook 监听器",
@@ -1215,7 +1258,8 @@
             "statusRunning": "运行中",
             "statusCompleted": "已完成",
             "statusStopped": "已停止",
-            "statusError": "错误"
+            "statusError": "错误",
+            "resizePanel": "调整面板宽度"
         },
         "assistants": {
             "title": "助手",

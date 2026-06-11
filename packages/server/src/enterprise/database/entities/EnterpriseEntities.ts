@@ -30,11 +30,9 @@ export class WorkspaceShared implements IWorkspaceShared {
     @Column({ type: 'text', name: 'itemType' })
     itemType: string
 
-    @Column({ type: 'timestamp' })
     @UpdateDateColumn()
     createdDate: Date
 
-    @Column({ type: 'timestamp' })
     @UpdateDateColumn()
     updatedDate: Date
 }
@@ -56,7 +54,6 @@ export class LoginActivity implements ILoginActivity {
     @Column({ type: 'text' })
     message: string
 
-    @Column({ type: 'timestamp' })
     @UpdateDateColumn()
     attemptedDateTime: Date
 }

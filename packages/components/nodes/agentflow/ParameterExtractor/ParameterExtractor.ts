@@ -36,6 +36,7 @@ class ParameterExtractor_Agentflow implements INode {
         this.description = 'Extract typed parameters from input text with structured model output'
         this.baseClasses = [this.type]
         this.color = '#7C3AED'
+        this.icon = 'parameterextractor.svg'
         this.inputs = [
             {
                 label: 'Model',

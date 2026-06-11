@@ -171,6 +171,7 @@
             "incorrectEmailOrPassword": "Incorrect email or password",
             "userEmailUnverified": "User email is not verified",
             "inactiveUser": "This user is inactive",
+            "invalidOrganization": "Organization information is invalid. Please sign in again or contact an administrator.",
             "invalidWorkspace": "No workspace is assigned",
             "forbidden": "You do not have permission to sign in",
             "invitedUser": "This invited user has not registered yet"
@@ -646,6 +647,38 @@
             "removeSecret": "Remove secret",
             "generatedInstructionSetFailed": "Error setting generated instruction",
             "setupNimLocally": "Setup NIM Locally"
+        },
+        "cronBuilder": {
+            "open": "Open cron builder",
+            "title": "Cron Builder",
+            "mode": "Trigger frequency",
+            "daily": "Daily",
+            "weekly": "Weekly",
+            "monthly": "Monthly",
+            "hourly": "Every N hours",
+            "time": "Trigger time",
+            "dayOfWeek": "Day of week",
+            "dayOfMonth": "Day of month",
+            "everyHours": "Every hours",
+            "generated": "Generated expression",
+            "apply": "Apply",
+            "copy": "Copy",
+            "copied": "Copied",
+            "weekdays": {
+                "sunday": "Sunday",
+                "monday": "Monday",
+                "tuesday": "Tuesday",
+                "wednesday": "Wednesday",
+                "thursday": "Thursday",
+                "friday": "Friday",
+                "saturday": "Saturday"
+            },
+            "description": {
+                "daily": "Runs every day at {{time}}.",
+                "weekly": "Runs every {{day}} at {{time}}.",
+                "monthly": "Runs on day {{day}} of every month at {{time}}.",
+                "hourly": "Runs every {{hours}} hour(s)."
+            }
         },
         "promptGenerator": {
             "placeholder": "Describe your task here",
@@ -1183,7 +1216,17 @@
             "everyDayAt": "Every day at {{time}}{{timezone}}",
             "everyWeekdayAt": "Every weekday at {{time}}{{timezone}}",
             "everyHour": "Every hour{{timezone}}",
-            "everyMinute": "Every minute{{timezone}}"
+            "everyMinute": "Every minute{{timezone}}",
+            "badgeChecking": "Checking schedule status...",
+            "badgeActive": "Schedule active",
+            "badgeActiveNextRun": "Schedule active - next run {{time}}",
+            "badgePaused": "Schedule configured but turned off",
+            "badgeLoading": "Loading...",
+            "badgeScheduled": "Scheduled",
+            "badgePausedShort": "Paused",
+            "resizeDrawer": "Resize drawer",
+            "selectAllRowsOnPage": "Select all rows on page",
+            "selectRow": "Select row {{id}}"
         },
         "webhookListener": {
             "title": "Webhook Listener",
@@ -1215,7 +1258,8 @@
             "statusRunning": "RUNNING",
             "statusCompleted": "COMPLETED",
             "statusStopped": "STOPPED",
-            "statusError": "ERROR"
+            "statusError": "ERROR",
+            "resizePanel": "Resize panel"
         },
         "assistants": {
             "title": "Assistants",

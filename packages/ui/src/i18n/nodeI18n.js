@@ -441,8 +441,9 @@ const nodeLabelMap = {
     'Loop Back To': '回环到',
     'Max Loop Count': '最大循环次数',
     'Max Token Limit': '最大 Token 上限',
+    'Input Type': '输入类型',
     'Schedule Type': '调度类型',
-    'Schedule Input': '调度输入',
+    'Schedule Input': '定时触发',
     'Schedule Input Mode': '调度输入模式',
     'Cron Expression': 'Cron 表达式',
     'Start Date': '开始日期',
@@ -519,13 +520,19 @@ const nodeLabelMap = {
     'Conversation Summary Buffer': '对话摘要缓冲',
     'Ephemeral Memory': '临时记忆',
     'Chat Input': '对话输入',
+    'Form Input': '表单输入',
     'No Input': '无输入',
     'Custom Text': '自定义文本',
+    'Full Webhook Payload': '完整 Webhook Payload',
+    'Input Mode': '输入模式',
+    'HTTP Method': 'HTTP 方法',
     'Response Mode': '响应模式',
     'Response Type': '响应类型',
     'Streaming (SSE)': '流式（SSE）',
     Synchronous: '同步',
     'Asynchronous (callback)': '异步（callback）',
+    'Plain Token': '明文 Token',
+    Hourly: '每小时',
     Raw: '原始',
     'Raw (Base64)': '原始（Base64）',
     'Array[String]': 'Array[String]',
@@ -549,6 +556,55 @@ const nodeLabelMap = {
 }
 
 const nodeDescriptionMap = {
+    // ---------- Agentflow Start triggers ----------
+    'Start the conversation with chat input': '使用聊天输入启动对话。',
+    'Start the workflow with form inputs': '使用表单输入启动工作流。',
+    'Trigger the workflow via an external webhook': '通过外部 Webhook 请求触发工作流。',
+    'Start the workflow on a recurring schedule (cron)': '按重复计划（cron）自动触发工作流。',
+    'Expected Content-Type of incoming requests. For application/x-www-form-urlencoded, if the entire payload is a JSON string in a "payload" field (e.g. GitHub webhooks), it is automatically parsed — use $webhook.body.* as normal.':
+        '传入请求期望的 Content-Type。对于 application/x-www-form-urlencoded，如果整个 payload 作为 "payload" 字段中的 JSON 字符串传入（例如 GitHub Webhook），系统会自动解析；下游仍可正常使用 $webhook.body.*。',
+    'Send a request to this URL to trigger the workflow': '向此 URL 发送请求即可触发工作流。',
+    'What this Start node passes as input to the rest of the flow when a webhook fires.':
+        'Webhook 触发时，这个 Start 节点传给后续流程的输入内容。',
+    'Pass a fixed string. Reference webhook fields with $webhook.body.* / $webhook.headers.* / $webhook.query.*':
+        '传入固定文本。可通过 $webhook.body.* / $webhook.headers.* / $webhook.query.* 引用 Webhook 字段。',
+    'Pass nothing. Use $webhook.* references inside downstream node configs to access the payload.':
+        '不传入输入。可在下游节点配置中使用 $webhook.* 引用访问 payload。',
+    'Pass the full JSON-serialized webhook payload (body, headers, query). Useful for debugging; bloats LLM context.':
+        '传入完整 JSON 序列化的 Webhook payload（body、headers、query）。适合调试，但会增大 LLM 上下文。',
+    'Text passed to downstream nodes as the user input. Use {{ $webhook.body.* }}, {{ $webhook.headers.* }}, or {{ $webhook.query.* }} to interpolate fields from the incoming request.':
+        '作为用户输入传给下游节点的文本。可使用 {{ $webhook.body.* }}、{{ $webhook.headers.* }} 或 {{ $webhook.query.* }} 插入传入请求字段。',
+    'How Flowise replies to the incoming webhook request.': 'FlowOps 如何回复传入的 Webhook 请求。',
+    'Wait for the flow to finish and return the full result as JSON. Simple but blocks the caller; can time out for senders with short HTTP windows.':
+        '等待流程完成并以 JSON 返回完整结果。简单直接，但会阻塞调用方；对 HTTP 超时时间较短的发送方可能超时。',
+    'Return 202 Accepted immediately and run the flow in the background. Set a Callback URL below to have the result POSTed there when the flow finishes; leave it blank for fire-and-forget. Best for senders with short HTTP timeouts.':
+        '立即返回 202 Accepted，并在后台运行流程。填写下方 Callback URL 后，流程完成时会 POST 结果；留空则只触发不回调。适合 HTTP 超时时间较短的发送方。',
+    'Return a Server-Sent Events stream so the caller sees tokens and agent steps as they happen. Best for custom callers (browsers using fetch+ReadableStream, internal services). NOT compatible with senders that expect a single quick response.':
+        '返回 Server-Sent Events 流，让调用方实时看到 token 和 Agent 步骤。适合自定义调用方（使用 fetch+ReadableStream 的浏览器、内部服务）。不适合只接受单次快速响应的发送方。',
+    'Reject requests that are missing required headers, body fields, or query parameters declared below. Turn this on to enforce a request contract and catch bad requests early. Leave off to accept any payload and let the flow handle validation itself.':
+        '拒绝缺少下方必填 headers、body 字段或 query 参数的请求。开启后可强制请求契约并提前发现异常请求；关闭则接受任意 payload，由流程自行校验。',
+    'Standard 5-field cron expression (minute hour day month weekday). Example: "0 9 * * 1-5" runs at 09:00 every weekday.':
+        '标准 5 位 cron 表达式（分 时 日 月 周）。例如 "0 9 * * *" 表示每天 09:00 触发，"0 9 * * 1-5" 表示工作日 09:00 触发。',
+    'Use a visual picker to select schedule options': '使用可视化选择器配置定时选项。',
+    'Use a cron expression to define the schedule': '使用 cron 表达式定义定时计划。',
+    'Run every hour at the specified time': '按指定分钟每小时运行一次。',
+    'Run every day at the specified time': '每天在指定时间运行。',
+    'Run every week on the specified day and time': '每周在指定星期和时间运行。',
+    'Run every month on the specified date and time': '每月在指定日期和时间运行。',
+    'Minute of the hour when the schedule should run (0-59). For example, "30" means the schedule will run at the 30th minute of the hour.':
+        '定时任务在每小时的第几分钟运行（0-59）。例如 "30" 表示每小时第 30 分钟运行。',
+    'Optional date after which the schedule will stop firing.': '可选。超过该日期后定时任务停止触发。',
+    'IANA timezone. Defaults to UTC.': 'IANA 时区，默认 UTC。中国常用 Asia/Shanghai。',
+    'How the schedule should invoke this flow on each fire.': '每次定时触发时，调度器如何调用此流程。',
+    'Pass a fixed text string as the question on every fire': '每次触发都传入固定文本作为问题。',
+    'Pass default values for the form fields below on every fire': '每次触发都为下方表单字段传入默认值。',
+    'Fire with no input.': '触发时不传入输入。',
+    'Default question/input passed to the flow when it is triggered by the scheduler.': '调度器触发时传给流程的默认问题 / 输入。',
+    'Define the typed fields this scheduled flow receives on each fire.': '定义该定时流程每次触发时接收的字段。',
+    'Default values for the form fields above, as a JSON object keyed by variable name. Example: { "team": "engineering", "metric": "p95" }':
+        '上方表单字段的默认值，使用变量名作为 key 的 JSON 对象。例如：{ "team": "engineering", "metric": "p95" }。',
+    'Start fresh for every execution without past chat history': '每次执行都从空上下文开始，不带历史对话。',
+
     // ---------- Agents ----------
     'Agent that uses Function Calling to pick the tools and args to call': '调用 Function Calling 自动选择工具和参数的智能体',
     'Agent that uses OpenAI Function Calling to pick the tools and args to call using LlamaIndex':
