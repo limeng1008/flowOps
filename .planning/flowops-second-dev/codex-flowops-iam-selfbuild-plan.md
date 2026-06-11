@@ -28,7 +28,7 @@
 3. 新文件一律**不带任何 FlowiseAI 版权头**;自有实现内**禁止 import 任何 enterprise 路径**(门禁 grep 兜底)。
 4. 拿不准某段逻辑"是不是只能看 enterprise 源码才知道" → **停下报告**,人来决策。
 5. **类型接缝隔离规则(2026-06-11 事件 #2 后裁定)**:`iam/` 接缝对外暴露的类型必须**由我方显式声明**(明确的参数/返回值标注,或我方自有 interface),**禁止**用 `typeof <enterprise 符号>`、`Parameters<typeof …>`、联合/条件类型等写法把 enterprise 实现文件拖进类型推导——tsc/jest 的诊断会引用并打印 enterprise 源码行(已发生一次)。enterprise 符号只允许出现在赋值/调用点,不参与类型构造。**批准模式(事件 #3 后裁定)——类型擦除桥**:接缝内对 enterprise 函数的**调用点**一律先本地桥接再调用:`const bridged = enterpriseFn as unknown as <我方显式签名>`,调用 `bridged(...)`;桥接语句只许出现在 `iam/` 接缝文件内、每符号一处、注释标明「接缝类型擦除」,这是唯一允许 `as unknown as` 的场景。**T4 起新增门禁:目标测试/tsc 诊断输出中 enterprise 路径出现次数 = 0**(`npx jest <目标> 2>&1 | grep -c "src/enterprise/"` 为 0)。
-6. **搜索白名单规则(2026-06-11 事件后裁定)**:代码搜索一律用**目录白名单**(显式指定要搜的目录,如 `rg <pattern> packages/ui/src packages/server/src/iam packages/server/src/routes ...`),**禁止用"全仓搜索 + 排除黑名单"**(exclude glob 写不准就会泄出 enterprise 内容,已发生一次)。若输出意外包含 enterprise 内容:立即停止、不读不用、报告记录。
+6. **搜索白名单规则(2026-06-11 事件后裁定)**:代码搜索**必须走 `scripts/iam-clean-search.sh`**(固定白名单包装,物理不含 enterprise 与 IdentityManager.ts;事件 #4 后裁定——手写白名单也会写宽,如把 `packages/server/src` 整目录当搜索根)。禁止裸 rg/grep 全仓搜索、禁止"排除黑名单"写法(#1)、禁止把 `packages/server/src` 作为搜索根(#4)。若输出意外包含 enterprise 内容:立即停止、不读不用、报告记录。
 
 ### 清洁室事件记录(证据链)
 
@@ -37,6 +37,7 @@
 | 2026-06-11    | T3 勘察阶段,rg exclude glob 不精确,输出泄出 `enterprise/database/migrations/sqlite/` 若干行(schema DDL)。执行者未基于其做任何改动,零提交,主动停止报告。                                  | 人工裁定:内容类别=schema 事实(黑盒可得,活库 psql 即可观察);我方 flowops\_ 表设计于 T1 早已提交,无因果路径;**允许继续,无需重置上下文**。根因修正=上方第 5 条搜索白名单规则。T3 完成报告中须注明本事件及"未参考"声明。 |
 | 2026-06-11 #2 | T4 实现中,`iam/boot.ts` 类型接缝改为含 FlowOpsIdentity 的联合类型,致 tsc/jest 诊断打印 `enterprise/middleware/passport/index.ts` 两处源码行片段。执行者零使用、零提交、立即停报。        | 人工裁定:暴露为编译器诊断的机械引用(2 行片段),签名级信息本属 T0 已许可范围,无设计决策派生,**允许继续**。根因修正=上方第 6 条类型接缝隔离规则;按「只做类型隔离、不参考泄出内容」修正后继续 T4,完成报告注明本事件。    |
 | 2026-06-11 #3 | 事件 #2 同类复发:第一轮类型隔离后,iam/boot.ts 对 enterprise initializeJwtCookieMiddleware 的**调用点**仍触发实参结构比对,jest 诊断再打印同两处 enterprise 行片段。零使用、零提交、停报。 | 人工裁定:与 #2 完全相同的两行,**零新增暴露**,允许继续。根因升级:声明隔离不够,须切断调用点类型关联;**批准 unknown 类型擦除桥**(规则 6 补充),并新增「诊断输出 enterprise 路径=0」门禁,将该泄露面永久封死。             |
+| 2026-06-11 #4 | 查 Express req.user 类型时,rg 白名单含 `packages/server/src` 整目录,输出泄出 enterprise 测试文件路径与少量匹配行。零使用、零提交、停报。                                                 | 人工裁定:同 #1 类(搜索范围事故,第二起),零使用允许继续,记为事件 #4。根因升级:白名单从"纪律"升级为"工具"——新增 `scripts/iam-clean-search.sh` 固定白名单包装脚本,自建期间所有仓库搜索强制走脚本(规则 6 同步修订)。      |
 
 ### 0.3 ⚠️ 工程铁律(项目踩坑沉淀)
 
