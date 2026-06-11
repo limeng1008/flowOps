@@ -30,6 +30,7 @@ import accountApi from '@/api/account.api'
 // hooks
 import useApi from '@/hooks/useApi'
 import { useConfig } from '@/store/context/ConfigContext'
+import { getWorkspaceSwitchReloadPath } from '@/utils/workspaceNavigation'
 
 // store
 import { store } from '@/store'
@@ -190,8 +191,7 @@ const WorkspaceSwitcher = () => {
             setIsSwitching(false)
             store.dispatch(workspaceSwitchSuccess(switchWorkspaceApi.data))
 
-            // get the current path and navigate to the same after refresh
-            navigate('/', { replace: true })
+            navigate(getWorkspaceSwitchReloadPath(), { replace: true })
             navigate(0)
         }
     }, [switchWorkspaceApi.data, navigate])

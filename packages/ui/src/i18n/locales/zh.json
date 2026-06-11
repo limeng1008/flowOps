@@ -170,6 +170,7 @@
             "incorrectEmailOrPassword": "邮箱或密码错误",
             "userEmailUnverified": "用户邮箱尚未验证",
             "inactiveUser": "该用户已停用",
+            "invalidOrganization": "组织信息异常，请重新登录或联系管理员",
             "invalidWorkspace": "尚未分配工作区",
             "forbidden": "你没有登录权限",
             "invitedUser": "该受邀用户尚未完成注册"

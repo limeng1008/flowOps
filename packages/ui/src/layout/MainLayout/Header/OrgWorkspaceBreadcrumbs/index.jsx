@@ -29,6 +29,7 @@ import workspaceApi from '@/api/workspace'
 
 // hooks
 import useApi from '@/hooks/useApi'
+import { getWorkspaceSwitchReloadPath } from '@/utils/workspaceNavigation'
 
 // store
 import { store } from '@/store'
@@ -257,8 +258,7 @@ const OrgWorkspaceBreadcrumbs = () => {
             setIsOrganizationSwitching(false)
             store.dispatch(workspaceSwitchSuccess(switchWorkspaceApi.data))
 
-            // get the current path and navigate to the same after refresh
-            navigate('/', { replace: true })
+            navigate(getWorkspaceSwitchReloadPath(), { replace: true })
             navigate(0)
         }
     }, [switchWorkspaceApi.data, navigate])

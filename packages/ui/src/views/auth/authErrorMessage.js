@@ -4,6 +4,7 @@ const AUTH_ERROR_KEYS = {
     'Incorrect Password': 'auth.errors.incorrectEmailOrPassword',
     'User Email Unverified': 'auth.errors.userEmailUnverified',
     'Inactive User': 'auth.errors.inactiveUser',
+    'Invalid Organization Id': 'auth.errors.invalidOrganization',
     'No Workspace Assigned': 'auth.errors.invalidWorkspace',
     Forbidden: 'auth.errors.forbidden',
     'User Invited, but has not registered': 'auth.errors.invitedUser'

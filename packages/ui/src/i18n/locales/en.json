@@ -170,6 +170,7 @@
             "incorrectEmailOrPassword": "Incorrect email or password",
             "userEmailUnverified": "User email is not verified",
             "inactiveUser": "This user is inactive",
+            "invalidOrganization": "Organization information is invalid. Please sign in again or contact an administrator.",
             "invalidWorkspace": "No workspace is assigned",
             "forbidden": "You do not have permission to sign in",
             "invitedUser": "This invited user has not registered yet"

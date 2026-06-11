@@ -43,6 +43,7 @@ import workspaceApi from '@/api/workspace'
 
 // Hooks
 import useApi from '@/hooks/useApi'
+import { getWorkspaceSwitchReloadPath } from '@/utils/workspaceNavigation'
 import useConfirm from '@/hooks/useConfirm'
 
 // icons
@@ -380,7 +381,7 @@ const Workspaces = () => {
             // Dispatch and wait for state update before navigating
             store.dispatch(workspaceSwitchSuccess(switchWorkspaceApi.data))
             waitForStateUpdate.then(() => {
-                navigate('/', { replace: true })
+                navigate(getWorkspaceSwitchReloadPath(), { replace: true })
                 navigate(0)
             })
         }
