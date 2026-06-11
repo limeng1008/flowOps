@@ -94,6 +94,7 @@
 2. **`pnpm build` 是独立门禁,不能用 `tsc --noEmit` 代替**——build 产 .d.ts 时 `Parameters<typeof xxx>` 风格的导出会触发 TS2742(类型不可携带);`iam/boot.ts` 的 `verifyToken`/`verifyTokenForBullMQDashboard` 需改为显式 `(req: Request, res: Response, next: NextFunction)` 参数标注。
 3. **curl 受保护端点(me/登出后验证等)必须带 `-H 'x-request-from: internal'`**——App 级守卫(index.ts)只对 internal 标记的请求走 cookie JWT 验证,否则进 API-Key 分支返回 401 'Unauthorized Access'(上游固有行为,enterprise 轨相同)。注册/登录在白名单内不受影响。
 4. 门禁可重复执行:跑链路前允许清空 `flowops_user/organization/workspace/workspace_member/login_activity`(**保留 `flowops_role` 种子**),恢复"空库首人"态。
+   5.5. **门禁产生的业务对象必须随链路清理**(chatflow 等用可识别名前缀建、链路尾删除)——FK 解耦后数据库不再拦孤儿行,清理纪律代替约束(T3.1 验收时发现一条门禁遗留孤儿 chatflow,已清)。
 5. env 用内联形式起服:`FLOWOPS_IAM=self pnpm start`(同一行,确保进程可见)。
 
 **DoD**:`pnpm build` exit 0;tsc/jest 过;真机 `FLOWOPS_IAM=self` 起服:curl 完成 注册 → 登录(拿 cookie)→me(带 internal 头)→ 登出 → 登出后 me=401 全链路(命令和输出写进报告);`FLOWOPS_IAM=enterprise` 回切,行为仍与 T0 一致。
