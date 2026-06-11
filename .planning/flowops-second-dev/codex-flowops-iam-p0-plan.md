@@ -17,12 +17,12 @@
 ### 0.1 环境 / 分支
 
 -   仓库根 `/Volumes/project/Flowise`;**Node 20**(`nvm use 20`,系统默认 22)。
--   从 **`main`** 切分支 **`codex/iam-p0-decouple`**。**不要 push、不碰 main**,做完留人工 review。
+-   从 **`main`** 切分支 **`codex/iam-p0-decouple`**。**不要 push、不碰 main**,做完留人工 review。(若由主计划 `codex-flowops-iam-selfbuild-plan.md` 驱动执行,分支以主计划为准:`codex/iam-selfbuild`。)
 -   数据库现为 **PostgreSQL 16**(本机 brew,库/用户/密码均 `flowise`);`.env` 已配好,启动验证用它。
 
 ### 0.2 ⚠️ 铁律
 
--   **不改 `src/enterprise/` 内任何文件**,不改 `IdentityManager.ts` 内容(只动谁 import 它)。
+-   **不改 `src/enterprise/` 内任何文件**,不改 `IdentityManager.ts` 内容(只动谁 import 它)。**口径裁定:`IdentityManager.ts` 与 `enterprise/` 同属商业授权边界文件——它内部的 `from './enterprise/...'` import 属预期存在,P0 保持原样不动,收口 grep 将其排除(见 §3),P3 出货时随 enterprise 一并剥离。**
 -   **`src/iam/` 内 P0 只做 re-export / 薄转发**,禁止把 enterprise 的实现代码复制进来(import 转发 ≠ 复制;P1 才写自有实现)。
 -   **不动 UI**(`packages/ui` 零改动)。
 -   **行为零变化**:P0 完成后系统功能、API、权限行为必须与改前完全一致。
@@ -75,7 +75,16 @@ src/iam/
 
 ## 3. 验收(DoD)
 
--   **收口检查**:`grep -rn "from '.*enterprise\|IdentityManager'" packages/server/src --include="*.ts" | grep -v "^packages/server/src/enterprise/" | grep -v "^packages/server/src/iam/" | grep -v "database/migrations/" | grep -v ".test.ts"` → **0 行**。
+-   **收口检查**(在仓库根执行;`IdentityManager.ts` 自身被排除——商业边界文件,内部 enterprise import 属预期):
+    ```
+    grep -rnE "from '[^']*enterprise|from '[^']*IdentityManager'" packages/server/src --include="*.ts" \
+      | grep -v "^packages/server/src/enterprise/" \
+      | grep -v "^packages/server/src/iam/" \
+      | grep -v "^packages/server/src/IdentityManager.ts" \
+      | grep -v "database/migrations/" \
+      | grep -v ".test.ts"
+    ```
+    → **0 行**。
 -   `cd packages/server && npx tsc --noEmit` = 0 错。
 -   `npx jest` 现有测试**全过**(billing / schedule / httpSecurity / 日期守护等)。
 -   后端真机:`pnpm build && pnpm start` 在 PG 上正常启动,`curl http://localhost:3000/api/v1/settings` 返回 `{"PLATFORM_TYPE":"enterprise"}`(行为与改前一致)。
