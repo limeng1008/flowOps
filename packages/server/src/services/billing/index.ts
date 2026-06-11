@@ -374,7 +374,9 @@ function isLimitExceeded(usage: number, limit: number): boolean {
 }
 
 function assertLimit(type: BillingQuotaKey, usage: number, limit: number): void {
-    if (limit === -1 || usage < limit) return
+    if (limit === -1) return
+    const exceeded = type === 'tokens' ? usage >= limit : usage > limit
+    if (!exceeded) return
     const code =
         type === 'tokens'
             ? BILLING_ERROR_CODES.TOKEN_LIMIT_EXCEEDED
