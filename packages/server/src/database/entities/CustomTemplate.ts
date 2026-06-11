@@ -30,11 +30,9 @@ export class CustomTemplate implements ICustomTemplate {
     @Column({ nullable: false, type: 'text' })
     workspaceId: string
 
-    @Column({ type: 'timestamp' })
     @CreateDateColumn()
     createdDate: Date
 
-    @Column({ type: 'timestamp' })
     @UpdateDateColumn()
     updatedDate: Date
 }

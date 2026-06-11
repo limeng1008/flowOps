@@ -18,11 +18,9 @@ export class DocumentStore implements IDocumentStore {
     @Column({ nullable: true, type: 'text' })
     whereUsed: string
 
-    @Column({ type: 'timestamp' })
     @CreateDateColumn()
     createdDate: Date
 
-    @Column({ type: 'timestamp' })
     @UpdateDateColumn()
     updatedDate: Date
 

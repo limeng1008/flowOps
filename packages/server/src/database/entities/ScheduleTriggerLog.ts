@@ -46,7 +46,6 @@ export class ScheduleTriggerLog implements IScheduleTriggerLog {
     @Column({ type: 'varchar' })
     workspaceId: string
 
-    @Column({ type: 'timestamp' })
     @CreateDateColumn()
     createdDate: Date
 }

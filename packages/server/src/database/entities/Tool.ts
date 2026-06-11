@@ -25,11 +25,9 @@ export class Tool implements ITool {
     @Column({ nullable: true, type: 'text' })
     func?: string
 
-    @Column({ type: 'timestamp' })
     @CreateDateColumn()
     createdDate: Date
 
-    @Column({ type: 'timestamp' })
     @UpdateDateColumn()
     updatedDate: Date
 

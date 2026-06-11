@@ -27,11 +27,9 @@ export class Execution implements IExecution {
     @Column({ nullable: true })
     isPublic?: boolean
 
-    @Column({ type: 'timestamp' })
     @CreateDateColumn()
     createdDate: Date
 
-    @Column({ type: 'timestamp' })
     @UpdateDateColumn()
     updatedDate: Date
 

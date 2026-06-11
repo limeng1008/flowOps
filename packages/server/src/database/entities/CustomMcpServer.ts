@@ -34,11 +34,9 @@ export class CustomMcpServer implements ICustomMcpServer {
     @Column({ default: 'PENDING' })
     status: string
 
-    @Column({ type: 'timestamp' })
     @CreateDateColumn()
     createdDate: Date
 
-    @Column({ type: 'timestamp' })
     @UpdateDateColumn()
     updatedDate: Date
 

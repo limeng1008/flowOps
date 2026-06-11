@@ -17,7 +17,6 @@ export class ApiKey {
     @Column({ nullable: false, type: 'simple-json', default: '[]' })
     permissions: string[]
 
-    @Column({ type: 'timestamp' })
     @UpdateDateColumn()
     updatedDate: Date
 
