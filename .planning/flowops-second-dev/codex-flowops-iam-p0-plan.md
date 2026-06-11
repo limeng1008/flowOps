@@ -65,7 +65,13 @@ src/iam/
   services.ts       # WorkspaceService、audit 等零星 service 转发
 ```
 
-**循环依赖规则(裁定,违反必炸 jest)**:`iam/index.ts` 大桶 `export *` 会把 routes/服务全部拉进模块图;而 routes 传递依赖回 `utils/constants.ts` 等低层文件 → CommonJS 环 → 顶层取值时符号 undefined(如 `AzureSSO.LOGIN_URI`)。因此:**低层模块(`utils/**`、`database/entities/index.ts`及其同级)禁止从`../iam` 大桶导入,必须直连对应叶子文件**(`iam/sso`、`iam/entities` 等;叶子文件之间互不 import);大桶仅供高层使用(`index.ts` 主入口、routes/controllers/services、queue、commands、schedule)。若 jest 报「Cannot read properties of undefined」同类错,即为某低层文件走了大桶 → 把它的导入降级为叶子直连。
+**循环依赖规则(终极裁定 v2,违反必炸 jest)**:`iam/index.ts` 大桶 `export *` 的传递闭包经 `boot → enterprise passport → getRunningExpressApp → App 主入口 → routes/*` 回到大桶自身——**App 与全部 routes 都在大桶自己的环里,不存在"安全的高层"**。因此一步到位:
+
+-   **server 源码内任何文件一律禁止 `import ... from '<相对路径>/iam'`(大桶)**;必须按符号直连对应叶子文件:`iam/middleware`(checkPermission/checkAnyPermission)、`iam/entities`(实体与 LoggedInUser 类型)、`iam/query`、`iam/boot`(启动三件套)、`iam/identity`(IdentityManager/Platform)、`iam/routes`(10 个企业 router,仅 `routes/index.ts` 用)、`iam/services`、`iam/sso`。
+-   叶子文件之间**互不 import**;每个叶子只 re-export 它对应的 enterprise 源——这使模块图与改造前的直连拓扑完全同构(原拓扑经生产验证无环)。
+-   `iam/index.ts` 大桶保留但**本期无任何消费者**(它是 P1 provider 接缝的预留入口)。
+-   症状识别:jest 报「Cannot read properties of undefined」或「(0, iam_1.X) is not a function」= 还有文件在 import 大桶 → 改为叶子直连,不要改别的。
+-   **新增门禁**(随 §3 收口检查一起跑):`grep -rnE "from '[^']*/iam'" packages/server/src --include="*.ts" | grep -v ".test.ts"` → **0 行**(只允许 `from '.../iam/<叶子>'` 形态)。
 
 替换规则(机械执行):
 
