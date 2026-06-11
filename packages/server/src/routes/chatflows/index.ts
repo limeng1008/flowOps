@@ -1,6 +1,6 @@
 import express from 'express'
 import chatflowsController from '../../controllers/chatflows'
-import { checkAnyPermission } from '../../enterprise/rbac/PermissionCheck'
+import { checkAnyPermission } from '../../iam/middleware'
 const router = express.Router()
 
 // CREATE

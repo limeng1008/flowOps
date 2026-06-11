@@ -1,7 +1,7 @@
-import Auth0SSO from '../enterprise/sso/Auth0SSO'
-import AzureSSO from '../enterprise/sso/AzureSSO'
-import GithubSSO from '../enterprise/sso/GithubSSO'
-import GoogleSSO from '../enterprise/sso/GoogleSSO'
+import { Auth0SSO } from '../iam/sso'
+import { AzureSSO } from '../iam/sso'
+import { GithubSSO } from '../iam/sso'
+import { GoogleSSO } from '../iam/sso'
 
 export const WHITELIST_URLS = [
     '/api/v1/verify/apikey/',

@@ -28,8 +28,8 @@ import { BillingSubscription } from '../../database/entities/BillingSubscription
 import { BillingUsage } from '../../database/entities/BillingUsage'
 import { ChatFlow } from '../../database/entities/ChatFlow'
 import { Assistant } from '../../database/entities/Assistant'
-import { Workspace } from '../../enterprise/database/entities/workspace.entity'
-import { OrganizationUser } from '../../enterprise/database/entities/organization-user.entity'
+import { Workspace } from '../../iam/entities'
+import { OrganizationUser } from '../../iam/entities'
 
 const makeRepo = (overrides: Record<string, unknown> = {}) => ({
     find: jest.fn(),

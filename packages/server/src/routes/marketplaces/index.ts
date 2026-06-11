@@ -1,6 +1,6 @@
 import express from 'express'
 import marketplacesController from '../../controllers/marketplaces'
-import { checkPermission, checkAnyPermission } from '../../enterprise/rbac/PermissionCheck'
+import { checkPermission, checkAnyPermission } from '../../iam/middleware'
 const router = express.Router()
 
 // READ

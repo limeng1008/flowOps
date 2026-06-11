@@ -1,6 +1,6 @@
 import express from 'express'
 import assistantsController from '../../controllers/assistants'
-import { checkPermission, checkAnyPermission } from '../../enterprise/rbac/PermissionCheck'
+import { checkPermission, checkAnyPermission } from '../../iam/middleware'
 
 const router = express.Router()
 

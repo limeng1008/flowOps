@@ -16,9 +16,9 @@ import { FLOWISE_COUNTER_STATUS, FLOWISE_METRIC_COUNTERS } from '../Interface.Me
 import { ChatFlow } from '../database/entities/ChatFlow'
 import { UpsertHistory } from '../database/entities/UpsertHistory'
 import { Variable } from '../database/entities/Variable'
-import { Organization } from '../enterprise/database/entities/organization.entity'
-import { Workspace } from '../enterprise/database/entities/workspace.entity'
-import { getWorkspaceSearchOptions } from '../enterprise/utils/ControllerServiceUtils'
+import { Organization } from '../iam/entities'
+import { Workspace } from '../iam/entities'
+import { getWorkspaceSearchOptions } from '../iam/query'
 import { InternalFlowiseError } from '../errors/internalFlowiseError'
 import { getErrorMessage } from '../errors/utils'
 import {
