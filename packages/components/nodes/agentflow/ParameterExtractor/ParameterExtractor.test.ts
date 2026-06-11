@@ -47,6 +47,8 @@ describe('ParameterExtractor agentflow node', () => {
         expect(node.label).toBe('Parameter Extractor')
         expect(node.name).toBe('parameterExtractorAgentflow')
         expect(node.category).toBe('Agent Flows')
+        expect(node.icon).toBe('parameterextractor.svg')
+        expect(fs.existsSync(path.join(__dirname, node.icon))).toBe(true)
         expect(node.inputs.map((i: any) => i.name)).toEqual(
             expect.arrayContaining([
                 'parameterExtractorModel',

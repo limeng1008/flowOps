@@ -26,6 +26,7 @@ class ListOperator_Agentflow implements INode {
         this.description = 'Filter, sort, slice, limit, or extract fields from an array'
         this.baseClasses = [this.type]
         this.color = '#0EA5E9'
+        this.icon = 'listoperator.svg'
         this.inputs = [
             {
                 label: 'Input Array',

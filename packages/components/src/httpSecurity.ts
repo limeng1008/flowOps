@@ -1,4 +1,5 @@
 import axios, { AxiosRequestConfig, AxiosResponse } from 'axios'
+import type { LookupOptions } from 'dns'
 import dns from 'dns/promises'
 import http from 'http'
 import https from 'https'
@@ -292,6 +293,8 @@ type ResolvedTarget = {
     protocol: 'http' | 'https'
 }
 
+type PinnedLookupCallback = (error: NodeJS.ErrnoException | null, address: string, family: 4 | 6) => void
+
 async function resolveAndValidate(url: string): Promise<ResolvedTarget> {
     const denyList = getHttpDenyList()
 
@@ -332,13 +335,24 @@ async function resolveAndValidate(url: string): Promise<ResolvedTarget> {
     }
 }
 
+export function createPinnedLookup(target: ResolvedTarget): NonNullable<http.AgentOptions['lookup']> {
+    const lookup = (_host: string, optionsOrCallback: LookupOptions | PinnedLookupCallback, maybeCallback?: PinnedLookupCallback) => {
+        const callback = typeof optionsOrCallback === 'function' ? optionsOrCallback : maybeCallback
+        if (!callback) throw new Error('Pinned agent lookup callback missing')
+        if (typeof optionsOrCallback !== 'function' && optionsOrCallback?.all) {
+            ;(callback as any)(null, [{ address: target.ip, family: target.family }])
+            return
+        }
+        callback(null, target.ip, target.family)
+    }
+    return lookup as NonNullable<http.AgentOptions['lookup']>
+}
+
 function createPinnedAgent(target: ResolvedTarget, options?: { ca?: string | string[] | Buffer }): http.Agent | https.Agent {
     const Agent = target.protocol === 'https' ? https.Agent : http.Agent
 
     return new Agent({
-        lookup: (_host, _opts, cb) => {
-            cb(null, target.ip, target.family)
-        },
+        lookup: createPinnedLookup(target),
         ...options
     })
 }
