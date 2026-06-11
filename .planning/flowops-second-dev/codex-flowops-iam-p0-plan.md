@@ -65,6 +65,8 @@ src/iam/
   services.ts       # WorkspaceService、audit 等零星 service 转发
 ```
 
+**循环依赖规则(裁定,违反必炸 jest)**:`iam/index.ts` 大桶 `export *` 会把 routes/服务全部拉进模块图;而 routes 传递依赖回 `utils/constants.ts` 等低层文件 → CommonJS 环 → 顶层取值时符号 undefined(如 `AzureSSO.LOGIN_URI`)。因此:**低层模块(`utils/**`、`database/entities/index.ts`及其同级)禁止从`../iam` 大桶导入,必须直连对应叶子文件**(`iam/sso`、`iam/entities` 等;叶子文件之间互不 import);大桶仅供高层使用(`index.ts` 主入口、routes/controllers/services、queue、commands、schedule)。若 jest 报「Cannot read properties of undefined」同类错,即为某低层文件走了大桶 → 把它的导入降级为叶子直连。
+
 替换规则(机械执行):
 
 1. 上表每个符号在 `iam/` 对应文件里 `export { X } from '../enterprise/...'`(类型用 `export type`)。
