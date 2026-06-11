@@ -81,7 +81,15 @@
 -   **中间件**:`verifyToken`(JWT 校验 → 挂 req.user)self 版;未带 token 且不在 `WHITELIST_URLS`(`utils/constants.ts:6`,Apache)→ 401。
 -   **测试**:注册(首用户成 owner / 二号无邀请 403 / 邀请流全通)、登录(对错密码)、JWT 过期、重置流,mock 数据源照 `services/billing/index.test.ts` 范式。
 
-**DoD**:tsc/jest 过;真机 `FLOWOPS_IAM=self` 起服:curl 完成 注册 → 登录(拿 cookie)→me→ 登出 全链路(命令和输出写进报告);`FLOWOPS_IAM=enterprise` 回切,行为仍与 T0 一致。
+**T2 门禁操作规程(2026-06-11 验收实测裁定,违反必假失败)**:
+
+1. **真机门禁前必须 `cd packages/server && pnpm build`**——后端跑 dist 编译产物,src 草稿不 build 等于没改(本次踩坑:旧 dist 把请求全路由进 enterprise 轨,报"You can only have one organization")。
+2. **`pnpm build` 是独立门禁,不能用 `tsc --noEmit` 代替**——build 产 .d.ts 时 `Parameters<typeof xxx>` 风格的导出会触发 TS2742(类型不可携带);`iam/boot.ts` 的 `verifyToken`/`verifyTokenForBullMQDashboard` 需改为显式 `(req: Request, res: Response, next: NextFunction)` 参数标注。
+3. **curl 受保护端点(me/登出后验证等)必须带 `-H 'x-request-from: internal'`**——App 级守卫(index.ts)只对 internal 标记的请求走 cookie JWT 验证,否则进 API-Key 分支返回 401 'Unauthorized Access'(上游固有行为,enterprise 轨相同)。注册/登录在白名单内不受影响。
+4. 门禁可重复执行:跑链路前允许清空 `flowops_user/organization/workspace/workspace_member/login_activity`(**保留 `flowops_role` 种子**),恢复"空库首人"态。
+5. env 用内联形式起服:`FLOWOPS_IAM=self pnpm start`(同一行,确保进程可见)。
+
+**DoD**:`pnpm build` exit 0;tsc/jest 过;真机 `FLOWOPS_IAM=self` 起服:curl 完成 注册 → 登录(拿 cookie)→me(带 internal 头)→ 登出 → 登出后 me=401 全链路(命令和输出写进报告);`FLOWOPS_IAM=enterprise` 回切,行为仍与 T0 一致。
 
 ## T3 · RBAC + 工作区(self 轨)
 
