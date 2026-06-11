@@ -109,6 +109,26 @@
 
 **DoD**:tsc/jest 过;真机 self 轨:owner 邀请一个 member → member 登录只见其工作区与受限菜单(curl 验证 me.permissions 差异写报告)。
 
+### T3.1 · 补丁:业务表工作区 FK 解耦(验收阻塞裁定,2026-06-11)
+
+**背景**:T3 验收真机链发现——self 轨工作区里创建 chatflow 报 500:`violates foreign key constraint "fk_chat_flow_workspaceId"`。根因:enterprise 的 `LinkWorkspaceId(1729130948686)` migration 在 **PG/MySQL/MariaDB** 上给 12 张 Apache 业务表的 `workspaceId` 加了指向 enterprise `workspace` 表的硬外键;self 轨工作区在 `flowops_workspace`,插入即违约。**SQLite 因引擎不支持后补 FK 从来没有这些约束——松耦合语义已被 SQLite 生产验证,删除约束行为安全**(且全部为 ON DELETE NO ACTION,无级联语义损失)。
+
+**清洁室声明**:以下约束清单来自**活库 `pg_constraint` 黑盒查询**,非阅读 enterprise migration 源码。
+
+**指令**:新增 4 库 migration `1778000200000-DecoupleWorkspaceFkFromBusinessTables`:
+
+-   **PG**:对下列 12 个约束执行 `ALTER TABLE "<表>" DROP CONSTRAINT IF EXISTS "<约束>"`:
+    fk_apikey_workspaceId(apikey)/ fk_assistant_workspaceId(assistant)/ fk_chat_flow_workspaceId(chat_flow)/ fk_credential_workspaceId(credential)/ fk_custom_template_workspaceId(custom_template)/ fk_dataset_workspaceId(dataset)/ fk_document_store_workspaceId(document_store)/ fk_evaluation_workspaceId(evaluation)/ fk_evaluator_workspaceId(evaluator)/ fk_execution_workspaceId(execution)/ fk_tool_workspaceId(tool)/ fk_variable_workspaceId(variable)
+-   **MySQL/MariaDB**:同 12 表;先查 `information_schema.TABLE_CONSTRAINTS` 存在才 `DROP FOREIGN KEY`(MySQL 无 IF EXISTS;约束名以 information_schema 实查为准,不读 enterprise 源码)。
+-   **SQLite**:空 up/down + 注释说明(引擎从未有这些 FK)。
+-   **down()**:带存在性守卫地重建约束(仅当 `workspace` 表存在)。
+-   **B 组红线**:enterprise 表互相之间的 FK(user/organization/role/workspace_user/login_method/workspace_shared 等)**一个不许动**。
+-   P3 出货化的自建版 migration 集不含 enterprise migrations → 全新部署根本不会创建这些 FK,本补丁的 IF EXISTS 在彼处自然空转,前向兼容。
+
+**T3.1 DoD**:build/tsc/jest 过;**T3 真机链重跑且必须包含**:owner 在新建 self 工作区创建 chatflow 成功(200)→ 切回默认区列表不可见(隔离证明)→ member(默认区)亦不可见 → enterprise 轨回切后既有 9 条 chatflow 完好、新建 chatflow 功能正常。
+
+**附带语义记录**:邀请落区 = 邀请者当前活跃工作区(T3 验收实测),属合理设计,写入 `docs/iam-contract.md`。
+
 ## T4 · 平台门面 + 企业路由替换(self 轨补完)
 
 -   **FlowOpsIdentity**(`iam/self/identity.ts`):与 IdentityManager 同形的方法面(P0 收口层已定义需要哪些):`getPlatformType()` 恒返 `'enterprise'`(UI 走企业 UX)、license 校验恒有效、`getFeaturesByPlan()` 返回自有 feature map(键沿用 `utils/quotaUsage.ts` 的 `ENTERPRISE_FEATURE_FLAGS`,Apache 侧,全 true)、`initializeSSO()` 空实现(本期无 SSO)。
