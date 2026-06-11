@@ -52,6 +52,7 @@ import { AddPaymentOrder1777100000000 } from './1777100000000-AddPaymentOrder'
 import { AddSupportTicketEntity1777200000000 } from './1777200000000-AddSupportTicketEntity'
 import { AddPaymentP0Hardening1777300000000 } from './1777300000000-AddPaymentP0Hardening'
 import { AddEntitlementEntity1777300000001 } from './1777300000001-AddEntitlementEntity'
+import { AddFlowOpsIamEntities1778000000000 } from './1778000000000-AddFlowOpsIamEntities'
 
 import { AddAuthTables1720230151482 } from '../../../enterprise/database/migrations/mariadb/1720230151482-AddAuthTables'
 import { AddWorkspace1725437498242 } from '../../../enterprise/database/migrations/mariadb/1725437498242-AddWorkspace'
@@ -130,5 +131,6 @@ export const mariadbMigrations = [
     AddPaymentOrder1777100000000,
     AddSupportTicketEntity1777200000000,
     AddPaymentP0Hardening1777300000000,
-    AddEntitlementEntity1777300000001
+    AddEntitlementEntity1777300000001,
+    AddFlowOpsIamEntities1778000000000
 ]

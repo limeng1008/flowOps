@@ -26,6 +26,14 @@ import { PaymentNotificationLog } from './PaymentNotificationLog'
 import { SupportTicket } from './SupportTicket'
 import { Entitlement } from './Entitlement'
 import { EntitlementUsage } from './EntitlementUsage'
+import {
+    FlowOpsLoginActivity,
+    FlowOpsOrganization,
+    FlowOpsRole,
+    FlowOpsUser,
+    FlowOpsWorkspace,
+    FlowOpsWorkspaceMember
+} from '../../iam/self/entities'
 import { LoginActivity, WorkspaceShared, WorkspaceUsers } from '../../iam/entities'
 import { User } from '../../iam/entities'
 import { Organization } from '../../iam/entities'
@@ -71,6 +79,12 @@ export const entities = {
     SupportTicket,
     Entitlement,
     EntitlementUsage,
+    FlowOpsUser,
+    FlowOpsOrganization,
+    FlowOpsWorkspace,
+    FlowOpsWorkspaceMember,
+    FlowOpsRole,
+    FlowOpsLoginActivity,
     Organization,
     Role,
     OrganizationUser,
