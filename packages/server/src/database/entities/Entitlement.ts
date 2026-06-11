@@ -29,7 +29,7 @@ export class Entitlement {
     @Column({ nullable: false, type: 'int', default: 1 })
     concurrency: number
 
-    @Column({ nullable: true, type: 'datetime' })
+    @Column({ nullable: true, type: Date })
     expireAt?: Date | null
 
     @Index()

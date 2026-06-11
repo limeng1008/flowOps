@@ -42,10 +42,10 @@ export class PaymentOrder {
     @Column({ nullable: true, type: 'varchar', length: 100 })
     thirdPartyTxnId?: string | null
 
-    @Column({ nullable: true, type: 'timestamp' })
+    @Column({ nullable: true, type: Date })
     paidAt?: Date | null
 
-    @Column({ nullable: true, type: 'timestamp' })
+    @Column({ nullable: true, type: Date })
     expireAt?: Date | null
 
     @CreateDateColumn()

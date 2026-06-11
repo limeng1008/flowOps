@@ -4,7 +4,7 @@ export class AddBillingEntities1777000000000 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
         await queryRunner.query(`
             CREATE TABLE IF NOT EXISTS billing_plan (
-                id uuid NOT NULL DEFAULT uuid_generate_v4(),
+                id varchar(36) NOT NULL DEFAULT (uuid_generate_v4()::varchar),
                 code varchar(50) NOT NULL,
                 name varchar(100) NOT NULL,
                 description text,
