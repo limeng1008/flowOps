@@ -7,6 +7,23 @@ const migrationTimestamp = '1778000000000'
 const migrationClass = 'AddFlowOpsIamEntities1778000000000'
 const rolePermissionMigrationTimestamp = '1778000100000'
 const rolePermissionMigrationClass = 'BackfillFlowOpsRolePermissions1778000100000'
+const workspaceFkDecoupleMigrationTimestamp = '1778000200000'
+const workspaceFkDecoupleMigrationClass = 'DecoupleWorkspaceFkFromBusinessTables1778000200000'
+const businessWorkspaceConstraints = [
+    ['apikey', 'fk_apikey_workspaceId'],
+    ['assistant', 'fk_assistant_workspaceId'],
+    ['chat_flow', 'fk_chat_flow_workspaceId'],
+    ['credential', 'fk_credential_workspaceId'],
+    ['custom_template', 'fk_custom_template_workspaceId'],
+    ['dataset', 'fk_dataset_workspaceId'],
+    ['document_store', 'fk_document_store_workspaceId'],
+    ['evaluation', 'fk_evaluation_workspaceId'],
+    ['evaluator', 'fk_evaluator_workspaceId'],
+    ['execution', 'fk_execution_workspaceId'],
+    ['tool', 'fk_tool_workspaceId'],
+    ['variable', 'fk_variable_workspaceId']
+] as const
+const blockedEnterprisePeerTables = ['organization', 'role', 'user', 'workspace_shared', 'workspace_user', 'login_method'] as const
 
 const entities = [
     ['FlowOpsUser.ts', 'FlowOpsUser', 'flowops_user'],
@@ -87,6 +104,36 @@ describe('FlowOps IAM self data layer', () => {
             expect(indexSource).toContain(rolePermissionMigrationClass)
             expect(migrationSource).toContain('FLOWOPS_BUILTIN_ROLE_PERMISSION_ROWS')
             expect(migrationSource).toContain('flowops_role')
+        }
+    })
+
+    it('registers the four business workspace FK decoupling migrations without touching enterprise peer tables', () => {
+        for (const driver of ['postgres', 'mysql', 'mariadb', 'sqlite']) {
+            const migrationPath = path.join(
+                srcRoot,
+                `database/migrations/${driver}/${workspaceFkDecoupleMigrationTimestamp}-DecoupleWorkspaceFkFromBusinessTables.ts`
+            )
+            const migrationSource = read(migrationPath)
+            const indexSource = read(path.join(srcRoot, `database/migrations/${driver}/index.ts`))
+
+            expect(indexSource).toContain(
+                `import { ${workspaceFkDecoupleMigrationClass} } from './${workspaceFkDecoupleMigrationTimestamp}-DecoupleWorkspaceFkFromBusinessTables'`
+            )
+            expect(indexSource).toContain(workspaceFkDecoupleMigrationClass)
+
+            if (driver === 'sqlite') {
+                expect(migrationSource).toContain('SQLite never had these late-added workspace foreign keys')
+                continue
+            }
+
+            for (const [tableName, constraintName] of businessWorkspaceConstraints) {
+                expect(migrationSource).toContain(tableName)
+                expect(migrationSource).toContain(constraintName)
+            }
+            for (const tableName of blockedEnterprisePeerTables) {
+                expect(migrationSource).not.toContain(`'${tableName}'`)
+                expect(migrationSource).not.toContain(`"${tableName}"`)
+            }
         }
     })
 })

@@ -250,6 +250,11 @@ Expected T2 self behavior from the plan: owner/admin creates an invite token,
 persists it on the invited user, sends email if SMTP is configured, and otherwise
 returns an invite link in the JSON response.
 
+T3.1 semantic record: when the request body does not explicitly choose a
+workspace, the self track assigns the invite to the inviter's current active
+workspace. This matches the T3 verification flow and keeps workspace membership
+selection deterministic after switching workspaces.
+
 ## Other Account Endpoints Present In API Layer
 
 ### `POST /account/confirm-email-change`
