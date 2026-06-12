@@ -1,7 +1,7 @@
 import { DataSource, EntityManager } from 'typeorm'
 import { ChatFlow } from '../../../database/entities/ChatFlow'
-import { FlowOpsOrganization, FlowOpsRole, FlowOpsUser, FlowOpsWorkspace, FlowOpsWorkspaceMember } from '../entities'
-import { FlowOpsAuthError, FlowOpsAuthService, FlowOpsLoggedInUser } from '../auth/service'
+import { FlowOpsLoginActivity, FlowOpsOrganization, FlowOpsRole, FlowOpsUser, FlowOpsWorkspace, FlowOpsWorkspaceMember } from '../entities'
+import { FlowOpsAuthError, FlowOpsLoggedInUser } from '../auth/types'
 import { normalizePermissionJson } from '../rbac/permissions'
 
 type RepositorySource = DataSource | EntityManager
@@ -32,7 +32,33 @@ type OrganizationUserBody = {
     status?: string
 }
 
+type LoginActivityBody = {
+    pageNo?: number | string
+    pageSize?: number | string
+    startDate?: Date | string
+    endDate?: Date | string
+    activityCodes?: Array<number | string>
+}
+
 const lowerStatus = (status?: string): string | undefined => status?.trim().toLowerCase()
+
+const toPositiveInteger = (value: number | string | undefined, fallback: number): number => {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback
+}
+
+const toDate = (value?: Date | string): Date | undefined => {
+    if (!value) return undefined
+    const date = value instanceof Date ? value : new Date(value)
+    return Number.isFinite(date.getTime()) ? date : undefined
+}
+
+const getFlowOpsAuthService = () =>
+    require('../auth/service') as {
+        FlowOpsAuthService: new (dataSource: DataSource) => {
+            getLoggedInUser: (userId: string, preferredWorkspaceId?: string) => Promise<FlowOpsLoggedInUser>
+        }
+    }
 
 export class FlowOpsAdminService {
     constructor(private readonly dataSource: DataSource) {}
@@ -178,6 +204,7 @@ export class FlowOpsAdminService {
     async switchWorkspace(workspaceId: string, actor: FlowOpsLoggedInUser): Promise<FlowOpsLoggedInUser> {
         const membership = await this.dataSource.getRepository(FlowOpsWorkspaceMember).findOneBy({ workspaceId, userId: actor.id })
         if (!membership) throw new FlowOpsAuthError(403, 'Workspace is not assigned to user')
+        const { FlowOpsAuthService } = getFlowOpsAuthService()
         return await new FlowOpsAuthService(this.dataSource).getLoggedInUser(actor.id, workspaceId)
     }
 
@@ -293,6 +320,97 @@ export class FlowOpsAdminService {
             workspaceIds.has(member.workspaceId)
         )
         return await this.hydrateMemberships(members)
+    }
+
+    async listLoginActivity(body: LoginActivityBody = {}) {
+        const currentPage = toPositiveInteger(body.pageNo, 1)
+        const pageSize = toPositiveInteger(body.pageSize, 50)
+        const startDate = toDate(body.startDate)
+        const endDate = toDate(body.endDate)
+        const activityCodes = new Set((body.activityCodes ?? []).map((activityCode) => String(activityCode)))
+        const activities = await this.dataSource.getRepository(FlowOpsLoginActivity).find()
+        const users = await this.dataSource.getRepository(FlowOpsUser).find()
+        const usersById = new Map(users.map((user) => [user.id, user]))
+
+        const filtered = activities
+            .filter((activity) => {
+                const activityDate = activity.createdDate ?? activity.updatedDate ?? new Date(0)
+                const timestamp = activityDate.getTime()
+                if (startDate && timestamp < startDate.getTime()) return false
+                if (endDate && timestamp > endDate.getTime()) return false
+                if (activityCodes.size > 0 && !activityCodes.has(String(activity.activityCode))) return false
+                return true
+            })
+            .sort((left, right) => {
+                const leftDate = left.createdDate ?? left.updatedDate ?? new Date(0)
+                const rightDate = right.createdDate ?? right.updatedDate ?? new Date(0)
+                return rightDate.getTime() - leftDate.getTime()
+            })
+
+        const offset = (currentPage - 1) * pageSize
+        const data = filtered.slice(offset, offset + pageSize).map((activity) => {
+            const user = activity.userId ? usersById.get(activity.userId) : undefined
+            const attemptedDateTime = activity.createdDate ?? activity.updatedDate ?? new Date()
+            return {
+                id: activity.id,
+                userId: activity.userId,
+                username: user?.email ?? user?.name ?? 'Unknown User',
+                activityCode: Number(activity.activityCode),
+                attemptedDateTime,
+                loginMode: null,
+                message: activity.message,
+                ip: activity.ip
+            }
+        })
+
+        return {
+            data,
+            count: filtered.length,
+            currentPage,
+            pageSize
+        }
+    }
+
+    async listOrganizations(actor?: FlowOpsLoggedInUser) {
+        const organizations = await this.dataSource.getRepository(FlowOpsOrganization).find()
+        const organization = actor?.activeOrganizationId
+            ? organizations.find((item) => item.id === actor.activeOrganizationId) ?? organizations[0]
+            : organizations[0]
+        if (!organization) return []
+
+        const userCount = await this.dataSource.getRepository(FlowOpsUser).count()
+        const workspaceCount = await this.dataSource.getRepository(FlowOpsWorkspace).countBy({ organizationId: organization.id })
+        return [
+            {
+                ...organization,
+                subscriptionId: null,
+                customerId: null,
+                productId: null,
+                plan: null,
+                userCount,
+                workspaceCount
+            }
+        ]
+    }
+
+    async getAdditionalSeatsQuantity() {
+        const totalOrgUsers = await this.dataSource.getRepository(FlowOpsUser).count()
+        return {
+            includedSeats: Math.max(totalOrgUsers, 1),
+            quantity: 0,
+            totalOrgUsers
+        }
+    }
+
+    async getCurrentUsage() {
+        const userCount = await this.dataSource.getRepository(FlowOpsUser).count()
+        const workspaceCount = await this.dataSource.getRepository(FlowOpsWorkspace).count()
+        return {
+            users: { usage: userCount, limit: -1 },
+            workspaces: { usage: workspaceCount, limit: -1 },
+            predictions: { usage: 0, limit: -1 },
+            storage: { usage: 0, limit: -1 }
+        }
     }
 
     private async hydrateMemberships(members: FlowOpsWorkspaceMember[], ownerUserId?: string | null) {

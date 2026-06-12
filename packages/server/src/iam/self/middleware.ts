@@ -1,7 +1,5 @@
 import { NextFunction, Request, Response } from 'express'
 import jwt from 'jsonwebtoken'
-import { getDataSource } from '../../DataSource'
-import { FlowOpsAuthService, verifySelfAccessToken } from './auth/service'
 import { SELF_ACCESS_TOKEN_COOKIE } from './secrets'
 
 const getBearerToken = (req: Request): string | undefined => {
@@ -10,13 +8,25 @@ const getBearerToken = (req: Request): string | undefined => {
     return authorization.slice('Bearer '.length).trim()
 }
 
+const getSelfDataSource = () => {
+    const dataSourceModule = require('../../DataSource') as { getDataSource: () => any }
+    return dataSourceModule.getDataSource()
+}
+
+const getSelfAuthServiceModule = () =>
+    require('./auth/service') as {
+        FlowOpsAuthService: new (dataSource: any) => { getLoggedInUser: (userId: string, workspaceId?: string) => Promise<any> }
+        verifySelfAccessToken: (token: string) => { sub: string; activeWorkspaceId?: string }
+    }
+
 export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
     const token = req.cookies?.[SELF_ACCESS_TOKEN_COOKIE] ?? getBearerToken(req)
     if (!token) return res.status(401).json({ message: 'Invalid or Missing token' })
 
     try {
+        const { FlowOpsAuthService, verifySelfAccessToken } = getSelfAuthServiceModule()
         const payload = verifySelfAccessToken(token)
-        req.user = (await new FlowOpsAuthService(getDataSource()).getLoggedInUser(payload.sub, payload.activeWorkspaceId)) as any
+        req.user = (await new FlowOpsAuthService(getSelfDataSource()).getLoggedInUser(payload.sub, payload.activeWorkspaceId)) as any
         return next()
     } catch (error) {
         if (error instanceof jwt.TokenExpiredError) {

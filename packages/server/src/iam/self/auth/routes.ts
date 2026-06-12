@@ -4,6 +4,7 @@ import { FlowOpsAuthError, FlowOpsAuthService, createSelfAuthTokens, verifySelfA
 import { SELF_ACCESS_TOKEN_COOKIE, SELF_REFRESH_TOKEN_COOKIE } from '../secrets'
 import { configureSelfLocalStrategy } from './passport'
 import { SELF_PERMISSION_GROUPS } from '../rbac/permissions'
+import { checkPermission } from '../middleware'
 
 const authRouter = Router()
 const accountRouter = Router()
@@ -23,6 +24,12 @@ const sendError = (error: unknown, res: Response, next: NextFunction) => {
     if (error instanceof FlowOpsAuthError) return res.status(error.statusCode).json({ message: error.message })
     next(error)
 }
+
+const passwordOnlyLoginMethods = () => ({
+    providers: [],
+    callbacks: [],
+    passwordLoginEnabled: true
+})
 
 const issueCookies = (res: Response, user: { id: string; activeWorkspaceId?: string }) => {
     const tokens = createSelfAuthTokens(user)
@@ -157,9 +164,9 @@ accountRouter.post('/confirm-email-change', async (req, res, next) => {
 accountRouter.post('/billing', (_req, res) => res.json({}))
 accountRouter.delete('/delete', (_req, res) => res.status(501).json({ message: 'Account deletion is not enabled' }))
 
-loginMethodRouter.get('/default', (_req, res) => res.json({ providers: [] }))
-loginMethodRouter.get('/', (_req, res) => res.json({ providers: [], callbacks: [] }))
-loginMethodRouter.put('/', (_req, res) => res.json({ providers: [], callbacks: [] }))
-loginMethodRouter.post('/test', (_req, res) => res.status(501).json({ message: 'SSO is not enabled' }))
+loginMethodRouter.get('/default', (_req, res) => res.json(passwordOnlyLoginMethods()))
+loginMethodRouter.get('/', checkPermission('sso:manage'), (_req, res) => res.json(passwordOnlyLoginMethods()))
+loginMethodRouter.put('/', checkPermission('sso:manage'), (_req, res) => res.json(passwordOnlyLoginMethods()))
+loginMethodRouter.post('/test', checkPermission('sso:manage'), (_req, res) => res.status(501).json({ message: 'SSO is not enabled' }))
 
 export { accountRouter, authRouter, loginMethodRouter }

@@ -74,14 +74,12 @@ import { roleRouter } from '../iam/routes'
 import { userRouter } from '../iam/routes'
 import { workspaceUserRouter } from '../iam/routes'
 import { workspaceRouter } from '../iam/routes'
-import { IdentityManager } from '../iam/identity'
-import { isSelfIamMode } from '../iam/provider'
+import { checkFeatureByPlan } from '../iam/identity'
 
 const router = express.Router()
 
 const requireFeatureUnlessSelfIam = (feature: string) => (req: Request, res: Response, next: NextFunction) => {
-    if (isSelfIamMode()) return next()
-    return IdentityManager.checkFeatureByPlan(feature)(req, res, next)
+    return checkFeatureByPlan(feature)(req, res, next)
 }
 
 router.use('/ping', pingRouter)
@@ -96,10 +94,10 @@ router.use('/chatflows-uploads', chatflowsUploadsRouter)
 router.use('/components-credentials', componentsCredentialsRouter)
 router.use('/components-credentials-icon', componentsCredentialsIconRouter)
 router.use('/credentials', credentialsRouter)
-router.use('/datasets', IdentityManager.checkFeatureByPlan('feat:datasets'), datasetRouter)
+router.use('/datasets', checkFeatureByPlan('feat:datasets'), datasetRouter)
 router.use('/document-store', documentStoreRouter)
-router.use('/evaluations', IdentityManager.checkFeatureByPlan('feat:evaluations'), evaluationsRouter)
-router.use('/evaluators', IdentityManager.checkFeatureByPlan('feat:evaluators'), evaluatorsRouter)
+router.use('/evaluations', checkFeatureByPlan('feat:evaluations'), evaluationsRouter)
+router.use('/evaluators', checkFeatureByPlan('feat:evaluators'), evaluatorsRouter)
 router.use('/export-import', exportImportRouter)
 router.use('/feedback', feedbackRouter)
 router.use('/fetch-links', fetchLinksRouter)
@@ -152,7 +150,7 @@ router.use('/mcp-server', mcpServerRouter)
 router.use('/mcp', mcpEndpointRouter)
 
 router.use('/auth', authRouter)
-router.use('/audit', IdentityManager.checkFeatureByPlan('feat:login-activity'), auditRouter)
+router.use('/audit', checkFeatureByPlan('feat:login-activity'), auditRouter)
 router.use('/user', userRouter)
 router.use('/organization', organizationRouter)
 router.use('/role', requireFeatureUnlessSelfIam('feat:roles'), roleRouter)
@@ -161,7 +159,7 @@ router.use('/workspace', workspaceRouter)
 router.use('/workspaceuser', workspaceUserRouter)
 router.use('/account', accountRouter)
 router.use('/loginmethod', loginMethodRouter)
-router.use('/logs', IdentityManager.checkFeatureByPlan('feat:logs'), logsRouter)
-// router.use('/files', IdentityManager.checkFeatureByPlan('feat:files'), filesRouter)
+router.use('/logs', checkFeatureByPlan('feat:logs'), logsRouter)
+// router.use('/files', checkFeatureByPlan('feat:files'), filesRouter)
 
 export default router

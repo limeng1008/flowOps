@@ -1,6 +1,6 @@
 import * as Server from '../index'
 
-export const getRunningExpressApp = function () {
+export const getRunningExpressApp = function (): Server.App {
     const runningExpressInstance = Server.getInstance()
     if (
         typeof runningExpressInstance === 'undefined' ||

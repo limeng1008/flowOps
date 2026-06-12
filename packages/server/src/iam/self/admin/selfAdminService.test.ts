@@ -100,7 +100,7 @@ const makeInMemoryDataSource = (): DataSource => {
         transaction: jest.fn(async (callback: (manager: { getRepository: typeof getRepository }) => Promise<unknown>) =>
             callback({ getRepository })
         )
-    } as unknown as DataSource
+    } as any as DataSource
 }
 
 const seedRoles = async (dataSource: DataSource) => {

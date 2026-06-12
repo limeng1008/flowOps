@@ -13,7 +13,7 @@ import { BullMQAdapter } from '@bull-board/api/bullMQAdapter'
 import { Express } from 'express'
 import { UsageCacheManager } from '../UsageCacheManager'
 import { ExpressAdapter } from '@bull-board/express'
-import { IdentityManager } from '../iam/identity'
+import type { IFlowOpsIdentity } from '../iam/identity'
 
 const QUEUE_NAME = process.env.QUEUE_NAME || 'flowise-queue'
 
@@ -130,7 +130,7 @@ export class QueueManager {
         appDataSource: DataSource
         abortControllerPool: AbortControllerPool
         usageCacheManager: UsageCacheManager
-        identityManager: IdentityManager
+        identityManager: IFlowOpsIdentity
         serverAdapter?: ExpressAdapter
     }) {
         const predictionQueueName = `${QUEUE_NAME}-prediction`

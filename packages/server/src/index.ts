@@ -15,7 +15,8 @@ import { Workspace } from './iam/entities'
 import { LoggedInUser } from './iam/entities'
 import { initializeJwtCookieMiddleware, verifyToken, verifyTokenForBullMQDashboard } from './iam/boot'
 import { initAuthSecrets } from './iam/boot'
-import { IdentityManager } from './iam/identity'
+import { getIdentityManagerForApp, toFlowOpsIdentityView } from './iam/identity'
+import type { IdentityManager } from './iam/identity'
 import { MODE, Platform } from './Interface'
 import { IMetricsProvider } from './Interface.Metrics'
 import { OpenTelemetry } from './metrics/OpenTelemetry'
@@ -93,7 +94,7 @@ export class App {
             logger.info('🔄 [server]: Database migrations completed successfully')
 
             // Initialize Identity Manager
-            this.identityManager = await IdentityManager.getInstance()
+            this.identityManager = await getIdentityManagerForApp()
             logger.info('🔐 [server]: Identity Manager initialized successfully')
 
             // Initialize nodes pool
@@ -147,7 +148,7 @@ export class App {
                     appDataSource: this.AppDataSource,
                     abortControllerPool: this.abortControllerPool,
                     usageCacheManager: this.usageCacheManager,
-                    identityManager: this.identityManager,
+                    identityManager: toFlowOpsIdentityView(this.identityManager),
                     serverAdapter
                 })
                 logger.info('✅ [Queue]: All queues setup successfully')
@@ -225,7 +226,7 @@ export class App {
         const URL_CASE_INSENSITIVE_REGEX: RegExp = /\/api\/v1\//i
         const URL_CASE_SENSITIVE_REGEX: RegExp = /\/api\/v1\//
 
-        await initializeJwtCookieMiddleware(this.app, this.identityManager)
+        await initializeJwtCookieMiddleware(this.app, toFlowOpsIdentityView(this.identityManager))
 
         this.app.use(async (req, res, next) => {
             // Step 1: Check if the req path contains /api/v1 regardless of case

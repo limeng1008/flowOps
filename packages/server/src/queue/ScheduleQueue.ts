@@ -10,7 +10,7 @@ import { CachePool } from '../CachePool'
 import { UsageCacheManager } from '../UsageCacheManager'
 import { RedisEventPublisher } from './RedisEventPublisher'
 import { executeScheduleJob } from '../schedule/ScheduleExecutor'
-import { IdentityManager } from '../iam/identity'
+import type { IFlowOpsIdentity } from '../iam/identity'
 
 interface ScheduleQueueOptions {
     appDataSource: DataSource
@@ -18,7 +18,7 @@ interface ScheduleQueueOptions {
     cachePool: CachePool
     componentNodes: IComponentNodes
     usageCacheManager: UsageCacheManager
-    identityManager: IdentityManager
+    identityManager: IFlowOpsIdentity
 }
 
 interface ScheduleAgentflowJobData {
@@ -37,7 +37,7 @@ export class ScheduleQueue extends BaseQueue {
     private cachePool: CachePool
     private appDataSource: DataSource
     private usageCacheManager: UsageCacheManager
-    private identityManager: IdentityManager
+    private identityManager: IFlowOpsIdentity
     private redisPublisher: RedisEventPublisher
     private queueName: string
 

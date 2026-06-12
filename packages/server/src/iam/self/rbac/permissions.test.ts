@@ -98,7 +98,7 @@ const makeResponse = () => {
         status: jest.fn().mockReturnThis(),
         json: jest.fn().mockReturnThis()
     }
-    return response as unknown as Response & { status: jest.Mock; json: jest.Mock }
+    return response as any as Response & { status: jest.Mock; json: jest.Mock }
 }
 
 describe('FlowOps self permissions', () => {
@@ -147,22 +147,22 @@ describe('FlowOps self permissions', () => {
     })
 
     it('checks exact and any permissions from req.user.permissions', () => {
-        const next = jest.fn() as unknown as NextFunction
+        const next = jest.fn() as any as NextFunction
 
-        checkPermission('users:manage')({ user: { permissions: ADMIN_SELF_PERMISSIONS } } as unknown as Request, makeResponse(), next)
+        checkPermission('users:manage')({ user: { permissions: ADMIN_SELF_PERMISSIONS } } as any as Request, makeResponse(), next)
         expect(next).toHaveBeenCalledTimes(1)
 
         const forbiddenResponse = makeResponse()
         checkPermission('roles:manage')(
-            { user: { permissions: MEMBER_SELF_PERMISSIONS } } as unknown as Request,
+            { user: { permissions: MEMBER_SELF_PERMISSIONS } } as any as Request,
             forbiddenResponse,
-            jest.fn() as unknown as NextFunction
+            jest.fn() as any as NextFunction
         )
         expect(forbiddenResponse.status).toHaveBeenCalledWith(403)
 
-        const anyNext = jest.fn() as unknown as NextFunction
+        const anyNext = jest.fn() as any as NextFunction
         checkAnyPermission('chatflows:delete,chatflows:update')(
-            { user: { permissions: MEMBER_SELF_PERMISSIONS } } as unknown as Request,
+            { user: { permissions: MEMBER_SELF_PERMISSIONS } } as any as Request,
             makeResponse(),
             anyNext
         )

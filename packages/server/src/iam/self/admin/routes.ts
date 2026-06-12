@@ -1,7 +1,8 @@
 import { NextFunction, Response, Router } from 'express'
 import { getDataSource } from '../../../DataSource'
 import { checkAnyPermission, checkPermission } from '../middleware'
-import { FlowOpsAuthError, FlowOpsLoggedInUser, createSelfAuthTokens } from '../auth/service'
+import { createSelfAuthTokens } from '../auth/service'
+import { FlowOpsAuthError, FlowOpsLoggedInUser } from '../auth/types'
 import { SELF_ACCESS_TOKEN_COOKIE, SELF_REFRESH_TOKEN_COOKIE } from '../secrets'
 import { FlowOpsAdminService } from './service'
 
@@ -10,6 +11,8 @@ const workspaceRouter = Router()
 const workspaceUserRouter = Router()
 const userRouter = Router()
 const organizationUserRoute = Router()
+const auditRouter = Router()
+const organizationRouter = Router()
 
 const cookieOptions = (maxAge: number) => ({
     httpOnly: true,
@@ -73,7 +76,7 @@ workspaceRouter.get('/', checkPermission('workspace:view'), async (req, res, nex
 })
 workspaceRouter.post('/', checkPermission('workspace:create'), async (req, res, next) => {
     try {
-        res.json(await service().createWorkspace(req.body, req.user as unknown as FlowOpsLoggedInUser))
+        res.json(await service().createWorkspace(req.body, req.user as any as FlowOpsLoggedInUser))
     } catch (error) {
         sendError(error, res, next)
     }
@@ -94,7 +97,7 @@ workspaceRouter.delete('/:id', checkPermission('workspace:delete'), async (req, 
 })
 workspaceRouter.post('/switch', checkPermission('workspace:view'), async (req, res, next) => {
     try {
-        const loggedInUser = await service().switchWorkspace(req.query.id as string, req.user as unknown as FlowOpsLoggedInUser)
+        const loggedInUser = await service().switchWorkspace(req.query.id as string, req.user as any as FlowOpsLoggedInUser)
         const tokens = issueCookies(res, loggedInUser)
         res.json({ ...loggedInUser, token: tokens.accessToken })
     } catch (error) {
@@ -172,6 +175,51 @@ organizationUserRoute.delete('/', checkPermission('users:manage'), async (req, r
     }
 })
 
+auditRouter.post('/login-activity', checkPermission('loginActivity:view'), async (req, res, next) => {
+    try {
+        res.json(await service().listLoginActivity(req.body))
+    } catch (error) {
+        sendError(error, res, next)
+    }
+})
+
+organizationRouter.get('/', checkPermission('users:manage'), async (req, res, next) => {
+    try {
+        res.json(await service().listOrganizations(req.user as any as FlowOpsLoggedInUser))
+    } catch (error) {
+        sendError(error, res, next)
+    }
+})
+organizationRouter.get('/additional-seats-quantity', checkPermission('users:manage'), async (_req, res, next) => {
+    try {
+        res.json(await service().getAdditionalSeatsQuantity())
+    } catch (error) {
+        sendError(error, res, next)
+    }
+})
+organizationRouter.get('/customer-default-source', checkPermission('users:manage'), (_req, res) => {
+    res.json({ invoice_settings: { default_payment_method: null } })
+})
+organizationRouter.get('/additional-seats-proration', checkPermission('users:manage'), (_req, res) => {
+    res.json({ currency: 'usd', additionalSeatsProratedAmount: 0, prorationDate: null })
+})
+organizationRouter.post('/update-additional-seats', checkPermission('users:manage'), (_req, res) => {
+    res.json({ success: true })
+})
+organizationRouter.get('/plan-proration', checkPermission('users:manage'), (_req, res) => {
+    res.json({ currency: 'usd', additionalSeatsProratedAmount: 0, prorationDate: null })
+})
+organizationRouter.post('/update-subscription-plan', checkPermission('users:manage'), (_req, res) => {
+    res.json({ success: true })
+})
+organizationRouter.get('/get-current-usage', checkPermission('users:manage'), async (_req, res, next) => {
+    try {
+        res.json(await service().getCurrentUsage())
+    } catch (error) {
+        sendError(error, res, next)
+    }
+})
+
 userRouter.get('/', checkPermission('users:manage'), async (req, res, next) => {
     try {
         res.json(await service().getUserById(req.query.id as string))
@@ -187,4 +235,4 @@ userRouter.put('/', checkPermission('users:manage'), async (req, res, next) => {
     }
 })
 
-export { organizationUserRoute, roleRouter, userRouter, workspaceRouter, workspaceUserRouter }
+export { auditRouter, organizationRouter, organizationUserRoute, roleRouter, userRouter, workspaceRouter, workspaceUserRouter }

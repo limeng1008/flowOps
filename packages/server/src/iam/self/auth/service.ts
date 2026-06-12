@@ -5,37 +5,15 @@ import { DataSource, EntityManager } from 'typeorm'
 import { FlowOpsLoginActivity, FlowOpsOrganization, FlowOpsRole, FlowOpsUser, FlowOpsWorkspace, FlowOpsWorkspaceMember } from '../entities'
 import { SELF_ACCESS_TOKEN_COOKIE, SELF_REFRESH_TOKEN_COOKIE, getSelfJwtAuthTokenSecret, getSelfJwtRefreshTokenSecret } from '../secrets'
 import { parsePermissionJson } from '../rbac/permissions'
+import { getSelfEnterpriseFeatures } from '../features'
+import { FlowOpsAuthError, FlowOpsLoggedInUser } from './types'
+
+export { FlowOpsAuthError }
+export type { FlowOpsLoggedInUser }
 
 export const SELF_AUTH_COOKIE_NAMES = {
     access: SELF_ACCESS_TOKEN_COOKIE,
     refresh: SELF_REFRESH_TOKEN_COOKIE
-}
-
-export type FlowOpsLoggedInUser = {
-    id: string
-    email: string
-    name?: string | null
-    status?: string
-    role?: string
-    isSSO: boolean
-    activeOrganizationId?: string
-    activeOrganizationSubscriptionId?: string | null
-    activeOrganizationCustomerId?: string | null
-    activeOrganizationProductId?: string | null
-    activeWorkspaceId?: string
-    activeWorkspace?: string
-    lastLogin?: Date | null
-    isOrganizationAdmin: boolean
-    assignedWorkspaces: Array<{
-        id: string
-        name: string
-        roleId: string
-        role: string
-        organizationId: string
-    }>
-    permissions: string[]
-    features: Record<string, boolean>
-    token?: string
 }
 
 type RegisterBody = {
@@ -99,15 +77,6 @@ export type SelfAuthTokenPayload = JwtPayload & {
     sub: string
     activeWorkspaceId?: string
     tokenType: 'access' | 'refresh'
-}
-
-export class FlowOpsAuthError extends Error {
-    statusCode: number
-
-    constructor(statusCode: number, message: string) {
-        super(message)
-        this.statusCode = statusCode
-    }
 }
 
 const normalizeEmail = (email?: string): string => (email ?? '').trim().toLowerCase()
@@ -424,7 +393,7 @@ export class FlowOpsAuthService {
             isOrganizationAdmin: activeRole?.name === 'owner',
             assignedWorkspaces,
             permissions: parsePermissions(activeRole),
-            features: {}
+            features: getSelfEnterpriseFeatures()
         }
     }
 

@@ -22,7 +22,7 @@ import { CachePool } from '../CachePool'
 import { UsageCacheManager } from '../UsageCacheManager'
 import { v4 as uuidv4 } from 'uuid'
 import logger from '../utils/logger'
-import { IdentityManager } from '../iam/identity'
+import type { IFlowOpsIdentity } from '../iam/identity'
 
 // ─── Types ─────────────────────────────────────────────────────────────────────
 
@@ -37,7 +37,7 @@ export interface ScheduleExecutionContext {
     cachePool: CachePool
     usageCacheManager: UsageCacheManager
     sseStreamer: IServerSideEventStreamer
-    identityManager: IdentityManager
+    identityManager: IFlowOpsIdentity
 }
 
 /**

@@ -15,6 +15,8 @@ import {
     loginMethodRouter as selfLoginMethodRouter
 } from './self/auth/routes'
 import {
+    auditRouter as selfAuditRouter,
+    organizationRouter as selfOrganizationRouter,
     organizationUserRoute as selfOrganizationUserRoute,
     roleRouter as selfRoleRouter,
     userRouter as selfUserRouter,
@@ -26,9 +28,9 @@ export const accountRouter = isSelfIamMode() ? selfAccountRouter : enterpriseAcc
 export const authRouter = isSelfIamMode() ? selfAuthRouter : enterpriseAuthRouter
 export const loginMethodRouter = isSelfIamMode() ? selfLoginMethodRouter : enterpriseLoginMethodRouter
 
-export const auditRouter = enterpriseAuditRouter
+export const auditRouter = isSelfIamMode() ? selfAuditRouter : enterpriseAuditRouter
 export const organizationUserRoute = isSelfIamMode() ? selfOrganizationUserRoute : enterpriseOrganizationUserRoute
-export const organizationRouter = enterpriseOrganizationRouter
+export const organizationRouter = isSelfIamMode() ? selfOrganizationRouter : enterpriseOrganizationRouter
 export const roleRouter = isSelfIamMode() ? selfRoleRouter : enterpriseRoleRouter
 export const userRouter = isSelfIamMode() ? selfUserRouter : enterpriseUserRouter
 export const workspaceUserRouter = isSelfIamMode() ? selfWorkspaceUserRouter : enterpriseWorkspaceUserRouter
