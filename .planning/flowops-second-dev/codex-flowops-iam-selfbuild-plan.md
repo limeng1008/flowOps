@@ -167,6 +167,7 @@
 3. **`utils/getRunningExpressApp.ts`**:**整体还原为上游形态**——返回 `Server.App`,删除 Omit 重写与 IFlowOpsIdentity import(属性类型随 App 即类类型,enterprise 两个消费者恢复改造前的编译环境)。
 4. **职责边界**:遗留槽位(`this.identityManager`/`getRunningExpressApp().identityManager`)= 遗留世界专用视图;self 轨与新代码**一律**走 `getIdentityManager(): Promise<IFlowOpsIdentity>`,禁止读遗留槽位。
 5. **P3 待办**:enterprise 消费者消失后,槽位类型翻转为 `IFlowOpsIdentity`,type-only 转发与 App 槽位擦除桥一并删除。
+6. **双向视图转换器(T4.2 补充裁定)**:遗留槽位值需要进入我方 `IFlowOpsIdentity` 槽时(boot 中间件参数、队列/调度上下文等),一律经接缝转换器 `export const toFlowOpsIdentityView = (im: IdentityManager): IFlowOpsIdentity => im as unknown as IFlowOpsIdentity`(iam/identity.ts 内,注释「接缝类型擦除·视图转换」)。至此双向桥配齐:类 → 接口用 toFlowOpsIdentityView,接口 → 类用 getIdentityManagerForApp;`as unknown as` 文本仍仅存在于接缝文件,调用方只调函数。禁止用放宽 IFlowOpsIdentity 成员形状的方式"迁就"类(那需要对照类内部,违反类型主权)。
 
 **预期**:tsc 全仓 0 错(两个 enterprise 消费者回到与改造前完全相同的类型环境)。门禁不变。
 
