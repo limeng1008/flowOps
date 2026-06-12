@@ -158,6 +158,18 @@
 
 **仲裁勘察记录(证据链,事件 #4 附录)**:为定位本回归,仲裁者(Claude)执行:enterprise/controllers/auth 的 import 行提取、(34) 行单行查看、`identityManager.*` 成员名 grep 采集——均为依赖/诊断元数据级,未读取实现逻辑;另以 git stash 二分定位触发文件。范围与理由记录在案。
 
+### T4.2 · 终局裁定:App 身份槽位双视图(修正 T4.1 §2 的过度设计)
+
+**事实(诊断驱动)**:enterprise 内部对 `App.identityManager` 存在互斥静态需求——auth 控制器需要具体形状(any 经 `Object.entries→unknown` 爆炸,已实证),account.service 需要 `IdentityManager` 类全成员(TS2740 列缺 21 个)。唯一兼容类型 = 他们自己的类(改造前零报错的原因)。T4.1 把该槽位改挂 `IFlowOpsIdentity` 系仲裁过度设计,据此修正:
+
+1. **`iam/identity.ts`** 增加两件:`export type { IdentityManager } from '../IdentityManager'`(**type-only 转发**,沿用 T0 已许可的 re-export 模式,非类型构造,不违反规则 5);`export const getIdentityManagerForApp = async (): Promise<IdentityManager> => (await getIdentityManager()) as unknown as IdentityManager`(接缝内擦除桥,注释「接缝类型擦除·App 槽位」)。
+2. **`index.ts`**:属性回 typed `identityManager: IdentityManager`(类型从 `./iam/identity` type-only 导入);赋值改 `await getIdentityManagerForApp()`;`IFlowOpsIdentity` 导入若无他用则移除。
+3. **`utils/getRunningExpressApp.ts`**:**整体还原为上游形态**——返回 `Server.App`,删除 Omit 重写与 IFlowOpsIdentity import(属性类型随 App 即类类型,enterprise 两个消费者恢复改造前的编译环境)。
+4. **职责边界**:遗留槽位(`this.identityManager`/`getRunningExpressApp().identityManager`)= 遗留世界专用视图;self 轨与新代码**一律**走 `getIdentityManager(): Promise<IFlowOpsIdentity>`,禁止读遗留槽位。
+5. **P3 待办**:enterprise 消费者消失后,槽位类型翻转为 `IFlowOpsIdentity`,type-only 转发与 App 槽位擦除桥一并删除。
+
+**预期**:tsc 全仓 0 错(两个 enterprise 消费者回到与改造前完全相同的类型环境)。门禁不变。
+
 ## T5 · 数据迁移工具 + 双轨回归
 
 -   `packages/server/scripts/migrate-enterprise-to-flowops-iam.js`:把既有 enterprise 表(`user`/`organization`/`workspace`/`workspace_user`/`role`/`login_activity` …)数据搬到 `flowops_` 表(**id 原样保留**——业务表的 workspaceId 外键值因此免改;角色映射:GeneralRole owner/member → 内置角色;密码 hash 原样搬,bcrypt 同算法可直接登录)。范式照 `scripts/migrate-sqlite-to-pg.js`(行数核对、失败退出非零)。
