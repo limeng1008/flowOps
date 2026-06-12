@@ -26,7 +26,7 @@
 产出 **`docs/iam-seam-ledger.md`**(桥点造册,出货审计的证据文件):
 
 1. **桥点清单**:全仓 `as unknown as`(预期:iam/boot.ts 4、iam/identity.ts 3、iam/middleware.ts 2,共 9 处 + utils 3 处上游原有)逐条登记:文件/行/方向/用途/P4 移除条件。
-2. **enterprise 触点全景**:`grep -rnE "from '[^']*enterprise|require\(.*enterprise" packages/server/src --include="*.ts" | grep -v "^packages/server/src/enterprise/" | grep -v test` 全量列表(预期仅:iam/ 接缝文件 + IdentityManager.ts 自身 + database/migrations 四库 index)→ 这就是 T1 要惰化、T2 要分叉的完整靶面。
+2. **enterprise 触点全景**:`grep -rnE "from '[^']*enterprise|require\(.*enterprise" packages/server/src --include="*.ts" | grep -v "^packages/server/src/enterprise/" | grep -v test` 全量列表(预期:iam/ 接缝文件 + IdentityManager.ts 自身 + database/migrations 四库 index + **四库 `1765360298674-AddApiKeyPermission.ts`**——后者自 P0 §2-4 例外条款起即为已知触点,P3 初版预期清单漏抄,T0.5 裁定已补)→ 这就是 T1 要惰化、T2 要分叉的完整靶面。
 3. **全规则复检**:主计划四道 grep 门禁 + tsc + jest 全量 + 双轨真机启动,结果记入 ledger。
 4. 列出 `dist/` 现状里的 enterprise 产物路径清单(`find packages/server/dist -path "*enterprise*"` + `dist/IdentityManager.js*`)——T3 的删除靶面。
 
@@ -42,12 +42,13 @@
 4. `iam/self/features.ts`:`feat:sso-config` 在 self 轨置 **false**(self 无 SSO,避免 UI 配置页打到不存在的端点)。
 5. **验证手段(本任务核心门禁,统一用「目录改名冒烟」)**:build 后临时 `mv packages/server/dist/enterprise packages/server/dist/enterprise.off`(连同 `mv dist/IdentityManager.js dist/IdentityManager.js.off`),`FLOWOPS_IAM=self pnpm start` 必须正常启动,并通过认证链探针(无邀请注册被 403 拒 / 已有账号登录 200 / me 200);验完改回原名,enterprise 轨照常启动。若 self 轨在改名状态下报「Cannot find module ...enterprise...」即 T1 未完成,定位该 require 继续惰化。
 6. 测试:新增 jest 用例断言 self 模式下 `require.cache` 无 enterprise 路径(起进程级测试若复杂,降级为「目录改名冒烟」写进报告即可,停报勿猜)。
+7. **四库 `AddApiKeyPermission` 处置(T0.5 裁定,两处小改 ×4 文件)**:① 第 2 行 `import { Role }` 改 **`import type { Role }`**(该文件 Role 仅作类型标注于原生 SQL 结果,无运行时使用;type-only 编译期擦除,dist 零痕迹——T4.2 已批准的模式);② 后半段 role 表更新逻辑包进 **`if (await queryRunner.hasTable('role')) { ... }`** 守卫(全新 ship 库无 role 表,原代码无条件 SELECT 必崩;已有库行为零变化)。处理后该 migration **保留在两套集合中**(apikey 列段 ship 库也需要)。这是 Apache 文件,可自由阅读编辑;已应用过的库按名跳过不会重跑,守卫只影响全新库。
 
 **DoD**:tsc 0 + jest 全量过 + 四道接缝 grep 门禁不变;**「目录改名」冒烟:self 轨在无 enterprise dist 下完整启动并通过登录链**;enterprise 轨(目录还原后)行为零变化。
 
 ## T2 · 自建版 migration 集分叉
 
-1. `database/migrations/{postgres,mysql,mariadb,sqlite}/index.ts`:各自导出**两套数组**——`xxxMigrations`(现状全集,enterprise 轨用)与 `xxxShipMigrations`(全集**减去** enterprise 来源的 migration 类;哪些属 enterprise 来源以 import 路径含 `enterprise/` 为准,机械筛选)。
+1. **设计升级(T0.5 裁定):两套数组不够,必须两个文件**——四库 index.ts 顶层静态 import 了 11 个 enterprise migration 类,无论导出哪个数组,require index 即加载 enterprise,T1 惰化目标即破。改为:`index.ts`(现状全集,enterprise 轨用,不动)+ 新增 **`index.ship.ts`**(只 import Apache+flowops 来源的 migration 类,**零 enterprise import**;`AddApiKeyPermission` 经 T1-7 处理后属 Apache 安全,纳入);DataSource 装配处按 `isSelfIamMode()` **惰性 require 对应模块**(self 模式 require `./migrations/<库>/index.ship`),self 进程全程不加载全集 index。
 2. DataSource 装配处:按 `isSelfIamMode()` 选用数组(self → ship 集)。dev 库已记录的 enterprise migration 行会被 TypeORM 忽略,无碍;**全新空库 + self 轨启动 = 只建 Apache 表 + flowops\_ 表,零 enterprise 表**。
 3. **冒烟(写进报告)**:建临时空库 `flowise_ship_smoke` → `FLOWOPS_IAM=self` 指向它启动 → 表清单断言(无 user/organization/workspace 等 enterprise 表,有 flowops\_ 六表)→ 首人注册 → 登录 → 建 chatflow 全链 → 删临时库。
 4. T3.1 的 FK 解耦 migration 属我方,留在两套集合中(ship 集里它对全新库自然空转,IF EXISTS 兜底)。
