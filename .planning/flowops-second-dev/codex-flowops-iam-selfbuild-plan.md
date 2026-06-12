@@ -143,6 +143,21 @@
 
 **DoD**:tsc/jest 过;真机 self 轨 **UI 全流程人工清单**(报告里逐条勾):登录页登录 ✓ 全部管理菜单可见 ✓ 用户页邀请 ✓ 角色页建自定义角色 ✓ 工作区建/切 ✓ 登录活动有记录 ✓ chatflow 新建保存跑通(业务回归)✓ —— **全程 UI 零改动**。
 
+### T4.1 · 接缝重写指令(2026-06-11 类型回归裁定,替代当前 identity.ts 草稿方案)
+
+**事实(stash 二分定位)**:摘除 index.ts 草稿改动(`FlowOpsIdentityManager as IdentityManager` 别名导入)后 enterprise 唯一 tsc 错误消失——触发点即该别名构造。叠加现行草稿三处违规(`: any` 导出违反规则 5、`isSelfIamMode()` 模块加载期定轨重蹈 T2 覆辙、裸 re-export 残留),裁定**整体重写接缝**而非继续修补:
+
+1. **`iam/identity.ts` 最终形态**(全部类型我方主权,零 any 导出):
+    - `IFlowOpsIdentity` 接口 = 已采集的消费面:`getPlatformType/isLicenseValid/isCloud/isOpenSource/isEnterprise/getFeaturesByPlan/getProductIdFromSubscription/getPermissions(): { toJSON(): Record<string, FlowOpsIdentityPermission[]> }/getPermissionsByType/initializeSSO` + **保留 `[key: string]: any` 兼容垫**(11 个 Stripe/cloud 专属成员只在 enterprise 的 cloud 分支调用,self 轨平台恒 enterprise 走不进去;垫子 P3 随 enterprise 一起移除,加注释标明)。
+    - `export const getIdentityManager = async (): Promise<IFlowOpsIdentity>`:**调用时**判 `isSelfIamMode()`;self → `FlowOpsIdentity.getInstance()`;enterprise → `(EnterpriseIdentityManager as unknown as { getInstance(): Promise<IFlowOpsIdentity> }).getInstance()`(规则 5 擦除桥,注释「接缝类型擦除」)。
+    - `export const checkFeatureByPlan = (feature: string): FlowOpsFeatureGateMiddleware`:返回**按请求**分流的中间件(self → 直接 next;enterprise → 擦除桥后转发原静态)。
+    - **删除**:`export const FlowOpsIdentityManager: any`、`export type FlowOpsIdentityManager = any`、`const enterpriseIdentityManager: any`、裸 `export { IdentityManager }`。
+2. **消费者迁移**(收口 grep 仍须 0):`index.ts` 属性改 `identityManager: IFlowOpsIdentity`,赋值 `await getIdentityManager()`,导入只拿 `getIdentityManager` + `import type { IFlowOpsIdentity }`;`routes/index.ts` 的 6 处 `IdentityManager.checkFeatureByPlan(...)` 与 `requireFeatureUnlessSelfIam` 全部改用接缝 `checkFeatureByPlan`;`worker.ts`/queue/schedule 的 `IdentityManager.getInstance()` 改 `getIdentityManager()`。
+3. index.ts 草稿 hunk2(`features: features as any`)随属性强类型化后**还原检验**:若 `FlowOpsIdentityFeatureMap` 与消费点兼容则删掉 as any;确需保留则注明原因。
+4. **门禁**:tsc 全仓 0 错(enterprise 文件 0 诊断)+「诊断 enterprise 路径=0」+ jest 全量 + 双轨真机(T2/T3 规程)。
+
+**仲裁勘察记录(证据链,事件 #4 附录)**:为定位本回归,仲裁者(Claude)执行:enterprise/controllers/auth 的 import 行提取、(34) 行单行查看、`identityManager.*` 成员名 grep 采集——均为依赖/诊断元数据级,未读取实现逻辑;另以 git stash 二分定位触发文件。范围与理由记录在案。
+
 ## T5 · 数据迁移工具 + 双轨回归
 
 -   `packages/server/scripts/migrate-enterprise-to-flowops-iam.js`:把既有 enterprise 表(`user`/`organization`/`workspace`/`workspace_user`/`role`/`login_activity` …)数据搬到 `flowops_` 表(**id 原样保留**——业务表的 workspaceId 外键值因此免改;角色映射:GeneralRole owner/member → 内置角色;密码 hash 原样搬,bcrypt 同算法可直接登录)。范式照 `scripts/migrate-sqlite-to-pg.js`(行数核对、失败退出非零)。
