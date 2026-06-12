@@ -44,7 +44,7 @@ const CardWrapper = styled(MainCard)(({ theme }) => ({
     background: theme.palette.card.main,
     color: theme.darkTextPrimary,
     border: 'solid 1px',
-    width: 'max-content',
+    width: 'fit-content',
     height: 'auto',
     padding: '10px',
     boxShadow: 'none',
@@ -274,7 +274,8 @@ const AgentFlowNode = ({ data }) => {
                     borderWidth: '1px',
                     boxShadow: data.selected ? `0 0 0 1px ${getStateColor()} !important` : 'none',
                     minHeight: getMinimumHeight(),
-                    minWidth: data.name === 'startAgentflow' ? undefined : 280,
+                    minWidth: data.name === 'startAgentflow' ? undefined : 220,
+                    maxWidth: data.name === 'startAgentflow' ? undefined : 300,
                     height: 'auto',
                     overflow: 'visible',
                     backgroundColor: getBackgroundColor(),
@@ -337,7 +338,7 @@ const AgentFlowNode = ({ data }) => {
                     </Tooltip>
                 )}
 
-                <Box sx={{ width: '100%', pr: getOutputAnchors().length ? 2.5 : 0 }}>
+                <Box sx={{ width: 'auto', maxWidth: '100%', pr: getOutputAnchors().length ? 2.5 : 0 }}>
                     {!data.hideInput && (
                         <Handle
                             type='target'
@@ -367,7 +368,7 @@ const AgentFlowNode = ({ data }) => {
                     )}
 
                     <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <Box item style={{ width: 50 }}>
+                        <Box item style={{ width: 50, flexShrink: 0 }}>
                             {data.color && !data.icon ? (
                                 <div
                                     style={{
@@ -402,11 +403,15 @@ const AgentFlowNode = ({ data }) => {
                                 </div>
                             )}
                         </Box>
-                        <Box>
+                        <Box sx={{ minWidth: 0, maxWidth: data.name === 'startAgentflow' ? undefined : 205 }}>
                             <Typography
                                 sx={{
                                     fontSize: '0.85rem',
-                                    fontWeight: 500
+                                    fontWeight: 500,
+                                    maxWidth: '100%',
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    whiteSpace: 'nowrap'
                                 }}
                             >
                                 {translateNodeLabel(data.label, currentLang)}
@@ -459,28 +464,39 @@ const AgentFlowNode = ({ data }) => {
                                 return modelConfigs
                                     .filter((item) => item.model && item.config)
                                     .map((item, index) => (
-                                        <Box key={`model-${index}`} sx={{ display: 'flex', gap: 1, mt: 1 }}>
+                                        <Box key={`model-${index}`} sx={{ display: 'flex', gap: 1, mt: 1, minWidth: 0 }}>
                                             <Box
                                                 sx={{
                                                     backgroundColor: customization.isDarkMode
                                                         ? 'rgba(255, 255, 255, 0.2)'
                                                         : 'rgba(255, 255, 255, 0.9)',
                                                     borderRadius: '16px',
-                                                    width: 'max-content',
+                                                    width: 'fit-content',
+                                                    maxWidth: '100%',
                                                     height: 24,
                                                     pl: 1,
                                                     pr: 1,
                                                     display: 'flex',
                                                     justifyContent: 'center',
-                                                    alignItems: 'center'
+                                                    alignItems: 'center',
+                                                    overflow: 'hidden'
                                                 }}
                                             >
                                                 <img
-                                                    style={{ width: 20, height: 20, objectFit: 'contain' }}
+                                                    style={{ width: 20, height: 20, objectFit: 'contain', flexShrink: 0 }}
                                                     src={`${baseURL}/api/v1/node-icon/${item.model}`}
                                                     alt={item.model}
                                                 />
-                                                <Typography sx={{ fontSize: '0.7rem', ml: 0.5 }}>
+                                                <Typography
+                                                    sx={{
+                                                        fontSize: '0.7rem',
+                                                        ml: 0.5,
+                                                        minWidth: 0,
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        whiteSpace: 'nowrap'
+                                                    }}
+                                                >
                                                     {item.config.customModel
                                                         ? item.config.customModel.replace(/^arn:aws:bedrock:[^:]+:[^:]+:/, '')
                                                         : item.config.modelName || item.config.model}
