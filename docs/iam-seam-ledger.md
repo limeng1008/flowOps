@@ -223,3 +223,43 @@ Environment note: this worktree has no `.env`, so inline process env was used in
 | enterprise | `DATABASE_TYPE=postgres ... FLOWOPS_IAM=enterprise PORT=3000 pnpm start` | `curl http://localhost:3000/api/v1/settings` | HTTP 200, `{"PLATFORM_TYPE":"open source","FLOWOPS_EDITION":"private","EDITION":"private"}` |
 
 Operational note: foreground startup was used for the probes and shut down cleanly after each track. Attempts to leave a detached self soak process from the Codex exec environment exited after logging `Flowise Server is listening at :3000`, so no long-running process is left by this T0 audit.
+
+## T3 Ship Dist Result
+
+Audit date: 2026-06-14
+
+T3 added:
+
+-   `scripts/build-ship.sh`: build, prune, verify, and print ship artifact policy.
+-   `scripts/verify-ship-dist.sh`: CI-ready zero-residue gate for server dist.
+-   `packages/server/src/iam/provider.ts`: one-time `dist/enterprise` existence probe; missing enterprise dist forces `FLOWOPS_IAM=self` with a startup log.
+
+Ship pruning performed by `scripts/build-ship.sh`:
+
+-   `packages/server/dist/enterprise`
+-   `packages/server/dist/IdentityManager.*`
+-   compiled server test artifacts `*.test.js*`
+-   legacy full migration entrypoints `packages/server/dist/database/migrations/{postgres,mysql,mariadb,sqlite}/index.*`
+
+The source tree is not pruned by this task. Enterprise source removal, App slot flip, and compatibility bridge removal remain P4 work.
+
+## T3 Gate Results
+
+| Gate                                    | Command summary                                                                                         | Result                                                                                                                                                         |
+| --------------------------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| ship build                              | `scripts/build-ship.sh`                                                                                 | exit 0; `pnpm build` completed, dist pruned, `verify-ship-dist.sh` passed                                                                                      |
+| ship verify                             | `scripts/verify-ship-dist.sh`                                                                           | exit 0                                                                                                                                                         |
+| enterprise dist path residue            | verify assertion `find packages/server/dist -path "*enterprise*"`                                       | 0 paths                                                                                                                                                        |
+| `IdentityManager` dist residue          | verify assertion `find packages/server/dist -maxdepth 1 -name "IdentityManager.*"`                      | 0 paths                                                                                                                                                        |
+| JS enterprise string residue            | verify assertion over `packages/server/dist/**/*.js`                                                    | only whitelisted `packages/server/dist/iam/*.js` seam files may contain lazy enterprise require strings                                                        |
+| ship migration residue                  | verify assertion over four `index.ship.js` files                                                        | no enterprise migration class names or enterprise paths                                                                                                        |
+| provider ship default                   | `FLOWOPS_IAM=enterprise node -e "require('./packages/server/dist/iam/provider').getIamProviderName()"`  | prints the one-time ship log and returns `self`                                                                                                                |
+| pruned dist empty-db self smoke         | `FLOWOPS_IAM=self`, PostgreSQL temp DB `flowise_ship_smoke`, `pnpm start` from `packages/server`        | HTTP 200 settings; table count 37; six `flowops_` tables present; enterprise IAM tables absent; register 200, login 200, me 200, create chatflow 200, list 200 |
+| UI static resource smoke on pruned dist | `curl http://localhost:3000/` during ship smoke                                                         | HTTP 200                                                                                                                                                       |
+| dev tree regular build                  | `pnpm build` after ship smoke                                                                           | exit 0; regular dev dist restored                                                                                                                              |
+| dev tree self startup                   | `FLOWOPS_IAM=self`, PostgreSQL temp DB `flowise_ship_dev_smoke`, `pnpm start`, `/api/v1/settings`       | HTTP 200                                                                                                                                                       |
+| dev tree enterprise startup             | `FLOWOPS_IAM=enterprise`, PostgreSQL temp DB `flowise_ship_dev_smoke`, `pnpm start`, `/api/v1/settings` | HTTP 200                                                                                                                                                       |
+| server tsc                              | `cd packages/server && npx tsc --noEmit --pretty false`                                                 | exit 0; enterprise diagnostic paths 0                                                                                                                          |
+| server jest                             | `cd packages/server && npx jest`                                                                        | 67 suites passed, 1059 tests passed                                                                                                                            |
+| temp DB cleanup                         | `SELECT datname FROM pg_database WHERE datname IN ('flowise_ship_smoke','flowise_ship_dev_smoke')`      | 0 rows                                                                                                                                                         |
+| port cleanup                            | `lsof -nP -iTCP:3000 -sTCP:LISTEN`                                                                      | 0 rows                                                                                                                                                         |

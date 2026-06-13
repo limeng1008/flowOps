@@ -85,7 +85,42 @@ node scripts/migrate-enterprise-to-flowops-iam.js
 -   SSO 本期不实现;self 轨 `login-method` 只返回密码登录。
 -   产品形态为单组织私有化部署;多组织/SaaS 多租户不在本计划内。
 -   flowops membership 目标表有独立 id,legacy `workspace_user` 没有对应源 id,因此使用稳定生成 id。
--   迁移工具面向 PostgreSQL 真机库;跨数据库出货化迁移集属于 P3/P5 之后的交付工作。
+-   迁移工具面向 PostgreSQL 真机库;全新安装使用 ship migration 集,不加载 enterprise migration。
+
+## 出货构建
+
+脚本:
+
+```bash
+scripts/build-ship.sh
+```
+
+流程:
+
+1. 运行仓库级 `pnpm build`。
+2. 剪除 `packages/server/dist/enterprise`。
+3. 剪除 `packages/server/dist/IdentityManager.*`。
+4. 剪除 server dist 中的编译测试产物 `*.test.js*`。
+5. 剪除四库 migration 全集入口 `packages/server/dist/database/migrations/{postgres,mysql,mariadb,sqlite}/index.*`,ship 运行只保留 `index.ship.*`。
+6. 调用 `scripts/verify-ship-dist.sh` 做零残留门禁。
+
+校验项:
+
+-   `packages/server/dist` 下不允许存在路径名包含 `enterprise` 的文件或目录。
+-   `packages/server/dist/IdentityManager.*` 必须不存在。
+-   server dist 的 `.js` 文件中,`src/enterprise` 或 `/enterprise/` 字符串只允许出现在 `packages/server/dist/iam/*.js` 接缝白名单中。
+-   四库 `index.ship.js` 不允许包含 enterprise migration 类或 enterprise 路径。
+
+ship dist 缺省:
+
+-   `packages/server/dist/enterprise` 不存在时,`iam/provider.ts` 会强制返回 `self`。
+-   即使客户环境误设 `FLOWOPS_IAM=enterprise`,ship dist 也会打印一行启动日志并进入 self 轨,避免裸 require 已剪除的 enterprise 产物。
+
+出货物口径:
+
+-   源码包排除 `src/enterprise`, `src/IdentityManager.ts` 和 `.planning`。
+-   dist 由 `scripts/build-ship.sh` 生成并剪除。
+-   打包格式由发布流水线决定;本脚本只负责构建、剪除和校验。
 
 ## P3 待办
 
