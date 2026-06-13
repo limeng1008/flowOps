@@ -92,6 +92,10 @@
 
 **清洁室声明**:映射表的字段需求来自 **Apache service 的 getRepository 用法**(已勘察)+ FlowOps 实体声明,**未参考 enterprise 实体实现**。
 
+**T2.2 类型擦除补充裁定(2026-06-13,TS2352 停报后)**:self 实体值赋给 legacy 类型 export 触发 TS2352(`FlowOpsWorkspaceMember` 与 `EntityConstructor<WorkspaceUser>` 不重叠)——**此处正是接缝「类型擦除桥」的合法场景**,与 `iam/identity.ts` 的 `toFlowOpsIdentityView`(IFlowOpsIdentity→IdentityManager)同性质,规则 5 的擦除桥适用。**裁定:补回 `as unknown as`**,形式 `export const Workspace = (isSelfIamMode() ? FlowOpsWorkspace : <惰化 enterprise>) as unknown as EntityConstructor<WorkspaceEntity>`,每处注释「接缝类型擦除·entities self 映射,字段兼容已核对」。这不是"放宽类型迁就"(那指改 IFlowOpsIdentity 接口形状),而是接缝处明确的类型主权转换,合法前提=运行时字段兼容(T2.2 表已核对)+ 冒烟验证。同步:`lazyEnterprise.test.ts` 修复;`docs/iam-seam-ledger.md` 桥点清单增列这几个 entities 擦除桥(方向/用途/P4 移除条件——P4 槽位翻转后 self 成唯一实现即删)。
+
+**规则边界澄清(写给规则 5)**:接缝擦除桥适用于 `iam/**` 内**一切 self↔legacy 类型分离**——函数签名(boot)、身份视图(identity)、实体映射(entities),只要运行时行为兼容目标类型的消费用法且字段已核对。仍禁止:`& any`、`typeof enterprise 符号` 参与类型构造、在非接缝文件用 `as unknown as`。
+
 **T2.2 DoD**:`flowise_ship_smoke` 全新库 self 轨:建 chatflow **200** + 列表可见 + 后续冒烟无 `No metadata`;dev 库 self/enterprise 轨零变化(enterprise 轨仍走 enterprise 实体);tsc 0 / jest 全量过;四道 grep 门禁不变。
 
 ## T3 · 出货构建管道 + 零残留门禁
