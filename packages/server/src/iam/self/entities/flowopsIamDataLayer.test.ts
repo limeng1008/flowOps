@@ -9,6 +9,8 @@ const rolePermissionMigrationTimestamp = '1778000100000'
 const rolePermissionMigrationClass = 'BackfillFlowOpsRolePermissions1778000100000'
 const workspaceFkDecoupleMigrationTimestamp = '1778000200000'
 const workspaceFkDecoupleMigrationClass = 'DecoupleWorkspaceFkFromBusinessTables1778000200000'
+const workspaceColumnMigrationTimestamp = '1778000300000'
+const workspaceColumnMigrationClass = 'AddWorkspaceIdColumnsToBusinessTables1778000300000'
 const businessWorkspaceConstraints = [
     ['apikey', 'fk_apikey_workspaceId'],
     ['assistant', 'fk_assistant_workspaceId'],
@@ -24,6 +26,21 @@ const businessWorkspaceConstraints = [
     ['variable', 'fk_variable_workspaceId']
 ] as const
 const blockedEnterprisePeerTables = ['organization', 'role', 'user', 'workspace_shared', 'workspace_user', 'login_method'] as const
+const businessWorkspaceTables = [
+    'apikey',
+    'assistant',
+    'chat_flow',
+    'credential',
+    'custom_template',
+    'custom_mcp_server',
+    'dataset',
+    'document_store',
+    'evaluation',
+    'evaluator',
+    'execution',
+    'tool',
+    'variable'
+] as const
 
 const entities = [
     ['FlowOpsUser.ts', 'FlowOpsUser', 'flowops_user'],
@@ -133,6 +150,32 @@ describe('FlowOps IAM self data layer', () => {
             for (const tableName of blockedEnterprisePeerTables) {
                 expect(migrationSource).not.toContain(`'${tableName}'`)
                 expect(migrationSource).not.toContain(`"${tableName}"`)
+            }
+        }
+    })
+
+    it('registers the four business workspaceId column migrations in full and ship migration sets', () => {
+        for (const driver of ['postgres', 'mysql', 'mariadb', 'sqlite']) {
+            const migrationPath = path.join(
+                srcRoot,
+                `database/migrations/${driver}/${workspaceColumnMigrationTimestamp}-AddWorkspaceIdColumnsToBusinessTables.ts`
+            )
+            const migrationSource = read(migrationPath)
+            const indexSource = read(path.join(srcRoot, `database/migrations/${driver}/index.ts`))
+            const shipIndexSource = read(path.join(srcRoot, `database/migrations/${driver}/index.ship.ts`))
+
+            expect(indexSource).toContain(
+                `import { ${workspaceColumnMigrationClass} } from './${workspaceColumnMigrationTimestamp}-AddWorkspaceIdColumnsToBusinessTables'`
+            )
+            expect(indexSource).toContain(workspaceColumnMigrationClass)
+            expect(shipIndexSource).toContain(
+                `import { ${workspaceColumnMigrationClass} } from './${workspaceColumnMigrationTimestamp}-AddWorkspaceIdColumnsToBusinessTables'`
+            )
+            expect(shipIndexSource).toContain(workspaceColumnMigrationClass)
+            expect(migrationSource).toContain('workspaceId')
+            expect(migrationSource).toContain('hasColumn')
+            for (const tableName of businessWorkspaceTables) {
+                expect(migrationSource).toContain(tableName)
             }
         }
     })

@@ -56,6 +56,7 @@ import { AddEntitlementEntity1777300000001 } from './1777300000001-AddEntitlemen
 import { AddFlowOpsIamEntities1778000000000 } from './1778000000000-AddFlowOpsIamEntities'
 import { BackfillFlowOpsRolePermissions1778000100000 } from './1778000100000-BackfillFlowOpsRolePermissions'
 import { DecoupleWorkspaceFkFromBusinessTables1778000200000 } from './1778000200000-DecoupleWorkspaceFkFromBusinessTables'
+import { AddWorkspaceIdColumnsToBusinessTables1778000300000 } from './1778000300000-AddWorkspaceIdColumnsToBusinessTables'
 
 import { AddAuthTables1720230151482 } from '../../../enterprise/database/migrations/mysql/1720230151482-AddAuthTables'
 import { AddWorkspace1720230151484 } from '../../../enterprise/database/migrations/mysql/1720230151484-AddWorkspace'
@@ -138,5 +139,6 @@ export const mysqlMigrations = [
     AddEntitlementEntity1777300000001,
     AddFlowOpsIamEntities1778000000000,
     BackfillFlowOpsRolePermissions1778000100000,
-    DecoupleWorkspaceFkFromBusinessTables1778000200000
+    DecoupleWorkspaceFkFromBusinessTables1778000200000,
+    AddWorkspaceIdColumnsToBusinessTables1778000300000
 ]
