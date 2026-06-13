@@ -15,6 +15,6 @@ export const SELF_ENTERPRISE_FEATURE_FLAGS = [
 
 export const getSelfEnterpriseFeatures = (): FlowOpsFeatureMap =>
     SELF_ENTERPRISE_FEATURE_FLAGS.reduce((features, feature) => {
-        features[feature] = true
+        features[feature] = feature !== 'feat:sso-config'
         return features
     }, {} as FlowOpsFeatureMap)

@@ -38,6 +38,7 @@ interface IFlowOpsIdentityConstructor {
 type EnterpriseIdentityModule = { IdentityManager: IFlowOpsIdentityConstructor }
 
 const getBridgedEnterpriseIdentityManager = (): IFlowOpsIdentityConstructor => {
+    // P3 惰化:self 轨不加载 enterprise。
     const enterpriseIdentityModule = require('../IdentityManager') as unknown as EnterpriseIdentityModule
     // 接缝类型擦除: enterprise 符号只在运行时调用,不参与 iam/ 对外类型推导。
     return enterpriseIdentityModule.IdentityManager

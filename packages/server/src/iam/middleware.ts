@@ -1,25 +1,27 @@
 import { NextFunction, Request, Response } from 'express'
-import {
-    checkAnyPermission as enterpriseCheckAnyPermission,
-    checkPermission as enterpriseCheckPermission
-} from '../enterprise/rbac/PermissionCheck'
 import { checkAnyPermission as selfCheckAnyPermission, checkPermission as selfCheckPermission } from './self/middleware'
 import { isSelfIamMode } from './provider'
 
 type PermissionMiddleware = (req: Request, res: Response, next: NextFunction) => void
 type PermissionFactory = (permission: string) => PermissionMiddleware
 
-// 接缝类型擦除: enterprise 符号只在运行时调用,不参与 iam/ 对外类型推导。
-const bridgedEnterpriseCheckPermission = enterpriseCheckPermission as unknown as PermissionFactory
-// 接缝类型擦除: enterprise 符号只在运行时调用,不参与 iam/ 对外类型推导。
-const bridgedEnterpriseCheckAnyPermission = enterpriseCheckAnyPermission as unknown as PermissionFactory
+const getEnterprisePermissionCheck = () => {
+    // P3 惰化:self 轨不加载 enterprise。
+    const enterprisePermissionCheck = require('../enterprise/rbac/PermissionCheck') as Record<string, unknown>
+    return {
+        // 接缝类型擦除: enterprise 符号只在运行时调用,不参与 iam/ 对外类型推导。
+        checkPermission: enterprisePermissionCheck.checkPermission as unknown as PermissionFactory,
+        // 接缝类型擦除: enterprise 符号只在运行时调用,不参与 iam/ 对外类型推导。
+        checkAnyPermission: enterprisePermissionCheck.checkAnyPermission as unknown as PermissionFactory
+    }
+}
 
 export const checkPermission = (permission: string): PermissionMiddleware => {
     if (isSelfIamMode()) return selfCheckPermission(permission)
-    return bridgedEnterpriseCheckPermission(permission)
+    return getEnterprisePermissionCheck().checkPermission(permission)
 }
 
 export const checkAnyPermission = (permissions: string): PermissionMiddleware => {
     if (isSelfIamMode()) return selfCheckAnyPermission(permissions)
-    return bridgedEnterpriseCheckAnyPermission(permissions)
+    return getEnterprisePermissionCheck().checkAnyPermission(permissions)
 }

@@ -1,7 +1,4 @@
-import { Auth0SSO } from '../iam/sso'
-import { AzureSSO } from '../iam/sso'
-import { GithubSSO } from '../iam/sso'
-import { GoogleSSO } from '../iam/sso'
+import { getSsoWhitelistUrls } from '../iam/sso'
 
 export const WHITELIST_URLS = [
     '/api/v1/verify/apikey/',
@@ -44,18 +41,7 @@ export const WHITELIST_URLS = [
     '/api/v1/mcp/',
     '/api/v1/text-to-speech/generate',
     '/api/v1/text-to-speech/abort',
-    AzureSSO.LOGIN_URI,
-    AzureSSO.LOGOUT_URI,
-    AzureSSO.CALLBACK_URI,
-    GoogleSSO.LOGIN_URI,
-    GoogleSSO.LOGOUT_URI,
-    GoogleSSO.CALLBACK_URI,
-    Auth0SSO.LOGIN_URI,
-    Auth0SSO.LOGOUT_URI,
-    Auth0SSO.CALLBACK_URI,
-    GithubSSO.LOGIN_URI,
-    GithubSSO.LOGOUT_URI,
-    GithubSSO.CALLBACK_URI
+    ...getSsoWhitelistUrls()
 ]
 
 export const API_KEY_BLACKLIST_URLS = ['/api/v1/nvidia-nim', '/api/v1/account/delete', '/api/v1/files']

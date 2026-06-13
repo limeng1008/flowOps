@@ -1,13 +1,4 @@
-import enterpriseAccountRouter from '../enterprise/routes/account.route'
-import enterpriseAuditRouter from '../enterprise/routes/audit'
-import enterpriseAuthRouter from '../enterprise/routes/auth'
-import enterpriseLoginMethodRouter from '../enterprise/routes/login-method.route'
-import enterpriseOrganizationUserRoute from '../enterprise/routes/organization-user.route'
-import enterpriseOrganizationRouter from '../enterprise/routes/organization.route'
-import enterpriseRoleRouter from '../enterprise/routes/role.route'
-import enterpriseUserRouter from '../enterprise/routes/user.route'
-import enterpriseWorkspaceUserRouter from '../enterprise/routes/workspace-user.route'
-import enterpriseWorkspaceRouter from '../enterprise/routes/workspace.route'
+import type { Router } from 'express'
 import { isSelfIamMode } from './provider'
 import {
     accountRouter as selfAccountRouter,
@@ -24,14 +15,23 @@ import {
     workspaceUserRouter as selfWorkspaceUserRouter
 } from './self/admin/routes'
 
-export const accountRouter = isSelfIamMode() ? selfAccountRouter : enterpriseAccountRouter
-export const authRouter = isSelfIamMode() ? selfAuthRouter : enterpriseAuthRouter
-export const loginMethodRouter = isSelfIamMode() ? selfLoginMethodRouter : enterpriseLoginMethodRouter
+const loadEnterpriseRouter = (path: string): Router => {
+    // P3 惰化:self 轨不加载 enterprise。
+    return (require(path) as { default: Router }).default
+}
 
-export const auditRouter = isSelfIamMode() ? selfAuditRouter : enterpriseAuditRouter
-export const organizationUserRoute = isSelfIamMode() ? selfOrganizationUserRoute : enterpriseOrganizationUserRoute
-export const organizationRouter = isSelfIamMode() ? selfOrganizationRouter : enterpriseOrganizationRouter
-export const roleRouter = isSelfIamMode() ? selfRoleRouter : enterpriseRoleRouter
-export const userRouter = isSelfIamMode() ? selfUserRouter : enterpriseUserRouter
-export const workspaceUserRouter = isSelfIamMode() ? selfWorkspaceUserRouter : enterpriseWorkspaceUserRouter
-export const workspaceRouter = isSelfIamMode() ? selfWorkspaceRouter : enterpriseWorkspaceRouter
+export const accountRouter = isSelfIamMode() ? selfAccountRouter : loadEnterpriseRouter('../enterprise/routes/account.route')
+export const authRouter = isSelfIamMode() ? selfAuthRouter : loadEnterpriseRouter('../enterprise/routes/auth')
+export const loginMethodRouter = isSelfIamMode() ? selfLoginMethodRouter : loadEnterpriseRouter('../enterprise/routes/login-method.route')
+
+export const auditRouter = isSelfIamMode() ? selfAuditRouter : loadEnterpriseRouter('../enterprise/routes/audit')
+export const organizationUserRoute = isSelfIamMode()
+    ? selfOrganizationUserRoute
+    : loadEnterpriseRouter('../enterprise/routes/organization-user.route')
+export const organizationRouter = isSelfIamMode() ? selfOrganizationRouter : loadEnterpriseRouter('../enterprise/routes/organization.route')
+export const roleRouter = isSelfIamMode() ? selfRoleRouter : loadEnterpriseRouter('../enterprise/routes/role.route')
+export const userRouter = isSelfIamMode() ? selfUserRouter : loadEnterpriseRouter('../enterprise/routes/user.route')
+export const workspaceUserRouter = isSelfIamMode()
+    ? selfWorkspaceUserRouter
+    : loadEnterpriseRouter('../enterprise/routes/workspace-user.route')
+export const workspaceRouter = isSelfIamMode() ? selfWorkspaceRouter : loadEnterpriseRouter('../enterprise/routes/workspace.route')

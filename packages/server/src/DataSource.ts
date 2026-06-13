@@ -4,13 +4,32 @@ import * as fs from 'fs'
 import { DataSource } from 'typeorm'
 import { getUserHome } from './utils'
 import { entities } from './database/entities'
-import { sqliteMigrations } from './database/migrations/sqlite'
-import { mysqlMigrations } from './database/migrations/mysql'
-import { mariadbMigrations } from './database/migrations/mariadb'
-import { postgresMigrations } from './database/migrations/postgres'
 import logger from './utils/logger'
+import { isSelfIamMode } from './iam/provider'
 
 let appDataSource: DataSource
+
+type MigrationList = Function[]
+
+const getMigrations = (databaseType?: string): MigrationList => {
+    if (isSelfIamMode()) return []
+
+    switch (databaseType) {
+        case 'mysql':
+            // P3 惰化:self 轨不加载 enterprise。
+            return require('./database/migrations/mysql').mysqlMigrations
+        case 'mariadb':
+            // P3 惰化:self 轨不加载 enterprise。
+            return require('./database/migrations/mariadb').mariadbMigrations
+        case 'postgres':
+            // P3 惰化:self 轨不加载 enterprise。
+            return require('./database/migrations/postgres').postgresMigrations
+        case 'sqlite':
+        default:
+            // P3 惰化:self 轨不加载 enterprise。
+            return require('./database/migrations/sqlite').sqliteMigrations
+    }
+}
 
 export const init = async (): Promise<void> => {
     let homePath
@@ -27,7 +46,7 @@ export const init = async (): Promise<void> => {
                 synchronize: false,
                 migrationsRun: false,
                 entities: Object.values(entities),
-                migrations: sqliteMigrations
+                migrations: getMigrations('sqlite')
             })
             break
         case 'mysql':
@@ -42,7 +61,7 @@ export const init = async (): Promise<void> => {
                 synchronize: false,
                 migrationsRun: false,
                 entities: Object.values(entities),
-                migrations: mysqlMigrations,
+                migrations: getMigrations('mysql'),
                 ssl: getDatabaseSSLFromEnv()
             })
             break
@@ -58,7 +77,7 @@ export const init = async (): Promise<void> => {
                 synchronize: false,
                 migrationsRun: false,
                 entities: Object.values(entities),
-                migrations: mariadbMigrations,
+                migrations: getMigrations('mariadb'),
                 ssl: getDatabaseSSLFromEnv()
             })
             break
@@ -74,7 +93,7 @@ export const init = async (): Promise<void> => {
                 synchronize: false,
                 migrationsRun: false,
                 entities: Object.values(entities),
-                migrations: postgresMigrations,
+                migrations: getMigrations('postgres'),
                 extra: {
                     idleTimeoutMillis: 120000
                 },
@@ -95,7 +114,7 @@ export const init = async (): Promise<void> => {
                 synchronize: false,
                 migrationsRun: false,
                 entities: Object.values(entities),
-                migrations: sqliteMigrations
+                migrations: getMigrations('sqlite')
             })
             break
     }

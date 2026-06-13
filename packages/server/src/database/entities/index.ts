@@ -34,17 +34,41 @@ import {
     FlowOpsWorkspace,
     FlowOpsWorkspaceMember
 } from '../../iam/self/entities'
-import { LoginActivity, WorkspaceShared, WorkspaceUsers } from '../../iam/entities'
-import { User } from '../../iam/entities'
-import { Organization } from '../../iam/entities'
-import { Role } from '../../iam/entities'
-import { OrganizationUser } from '../../iam/entities'
-import { Workspace } from '../../iam/entities'
-import { WorkspaceUser } from '../../iam/entities'
-import { LoginMethod } from '../../iam/entities'
-import { LoginSession } from '../../iam/entities'
+import { isSelfIamMode } from '../../iam/provider'
 import { ScheduleRecord } from './ScheduleRecord'
 import { ScheduleTriggerLog } from './ScheduleTriggerLog'
+
+const legacyIamEntities = isSelfIamMode()
+    ? {}
+    : (() => {
+          // P3 惰化:self 轨不加载 enterprise。
+          const {
+              LoginActivity,
+              LoginMethod,
+              LoginSession,
+              Organization,
+              OrganizationUser,
+              Role,
+              User,
+              Workspace,
+              WorkspaceShared,
+              WorkspaceUser,
+              WorkspaceUsers
+          } = require('../../iam/entities')
+          return {
+              LoginActivity,
+              LoginMethod,
+              LoginSession,
+              Organization,
+              OrganizationUser,
+              Role,
+              User,
+              Workspace,
+              WorkspaceShared,
+              WorkspaceUser,
+              WorkspaceUsers
+          }
+      })()
 
 export const entities = {
     ChatFlow,
@@ -64,10 +88,6 @@ export const entities = {
     EvaluationRun,
     Evaluator,
     ApiKey,
-    User,
-    WorkspaceUsers,
-    LoginActivity,
-    WorkspaceShared,
     CustomTemplate,
     Execution,
     CustomMcpServer,
@@ -85,13 +105,7 @@ export const entities = {
     FlowOpsWorkspaceMember,
     FlowOpsRole,
     FlowOpsLoginActivity,
-    Organization,
-    Role,
-    OrganizationUser,
-    Workspace,
-    WorkspaceUser,
-    LoginMethod,
-    LoginSession,
+    ...legacyIamEntities,
     ScheduleRecord,
     ScheduleTriggerLog
 }

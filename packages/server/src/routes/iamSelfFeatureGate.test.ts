@@ -13,9 +13,15 @@ describe('self IAM feature gates', () => {
     it('switches platform IAM routers to self implementations when FLOWOPS_IAM=self', () => {
         const source = fs.readFileSync(path.join(__dirname, '../iam/routes.ts'), 'utf8')
 
-        expect(source).toContain('auditRouter = isSelfIamMode() ? selfAuditRouter : enterpriseAuditRouter')
-        expect(source).toContain('organizationRouter = isSelfIamMode() ? selfOrganizationRouter : enterpriseOrganizationRouter')
-        expect(source).toContain('loginMethodRouter = isSelfIamMode() ? selfLoginMethodRouter : enterpriseLoginMethodRouter')
+        expect(source).toContain('auditRouter = isSelfIamMode() ? selfAuditRouter : loadEnterpriseRouter')
+        expect(source).toContain('organizationRouter = isSelfIamMode()')
+        expect(source).toContain('loginMethodRouter = isSelfIamMode()')
+        expect(source).toContain("loadEnterpriseRouter('../enterprise/routes/audit')")
+        expect(source).toContain("loadEnterpriseRouter('../enterprise/routes/organization.route')")
+        expect(source).toContain("loadEnterpriseRouter('../enterprise/routes/login-method.route')")
+        expect(source).not.toContain('import enterpriseAuditRouter')
+        expect(source).not.toContain('import enterpriseOrganizationRouter')
+        expect(source).not.toContain('import enterpriseLoginMethodRouter')
     })
 
     it('keeps identity provider selection behind the T4.1 factory seam', () => {
