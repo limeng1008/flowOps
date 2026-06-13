@@ -458,7 +458,7 @@ const SignInPage = () => {
                     className='auth-anim-item'
                     sx={{ textAlign: 'center', mb: 4, mt: successMessage || authError || authRateLimitError ? 2 : 0 }}
                 >
-                    <BrandLogo tone='onDark' width={156} sx={{ mb: 2, display: { xs: 'inline-block', md: 'none' } }} />
+                    <BrandLogo tone='onLight' width={156} sx={{ mb: 2, display: { xs: 'inline-block', md: 'none' } }} />
                     <Typography component='h1' sx={{ fontSize: '2rem', fontWeight: 800, color: C.text }}>
                         {t('auth.welcomeBack')}
                     </Typography>

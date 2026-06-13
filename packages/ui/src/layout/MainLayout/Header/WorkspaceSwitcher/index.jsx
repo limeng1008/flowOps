@@ -30,6 +30,7 @@ import accountApi from '@/api/account.api'
 // hooks
 import useApi from '@/hooks/useApi'
 import { useConfig } from '@/store/context/ConfigContext'
+import { getLogoutRedirectPath } from '@/utils/logoutRedirect'
 import { getWorkspaceSwitchReloadPath } from '@/utils/workspaceNavigation'
 
 // store
@@ -209,9 +210,10 @@ const WorkspaceSwitcher = () => {
 
     useEffect(() => {
         try {
-            if (logoutApi.data && logoutApi.data.message === 'logged_out') {
+            const redirectTo = getLogoutRedirectPath(logoutApi.data)
+            if (redirectTo) {
                 store.dispatch(logoutSuccess())
-                window.location.href = logoutApi.data.redirectTo
+                window.location.href = redirectTo
             }
         } catch (e) {
             console.error(e)

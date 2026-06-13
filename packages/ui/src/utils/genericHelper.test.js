@@ -1,4 +1,4 @@
-import { applyVisibleInputDefaults, showHideInputs } from './genericHelper'
+import { applyVisibleInputDefaults, shouldRenderNodeInputParam, showHideInputs } from './genericHelper'
 
 describe('showHideInputs – declared defaults of sibling fields', () => {
     const buildParams = () => [
@@ -170,5 +170,16 @@ describe('applyVisibleInputDefaults', () => {
     it('handles undefined or null inputs gracefully', () => {
         expect(() => applyVisibleInputDefaults(buildParams(), undefined)).not.toThrow()
         expect(() => applyVisibleInputDefaults(buildParams(), null)).not.toThrow()
+    })
+})
+
+describe('shouldRenderNodeInputParam', () => {
+    it('hides legacy Zhipu base path fields while leaving other providers untouched', () => {
+        expect(shouldRenderNodeInputParam({ name: 'chatZhipuAI' }, { name: 'basePath', label: 'Base Path' })).toBe(false)
+        expect(shouldRenderNodeInputParam({ name: 'chatZhipuAI' }, { name: 'basepath', label: 'Base Path' })).toBe(false)
+
+        expect(shouldRenderNodeInputParam({ name: 'chatMoonshot' }, { name: 'basePath', label: 'Base Path' })).toBe(true)
+        expect(shouldRenderNodeInputParam({ name: 'chatZhipuAI' }, { name: 'baseOptions', label: 'Base Options' })).toBe(true)
+        expect(shouldRenderNodeInputParam({ name: 'chatOpenAI' }, { name: 'basepath', label: 'Base Path' })).toBe(true)
     })
 })

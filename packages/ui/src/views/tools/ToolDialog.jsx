@@ -143,18 +143,75 @@ const ToolDialog = ({ show, dialogProps, onUseTemplate, onCancel, onConfirm, set
         })
     }
 
+    const renderEditableSchemaCell = useCallback((params, placeholder, cursor = 'text') => {
+        const rawValue = params.value
+        const hasValue = rawValue !== undefined && rawValue !== null && `${rawValue}`.trim() !== ''
+        const displayValue = hasValue ? `${rawValue}` : placeholder
+
+        return (
+            <Box
+                component='div'
+                className={hasValue ? 'schema-editable-cell' : 'schema-empty-editable-cell'}
+                title={displayValue}
+                sx={(theme) => ({
+                    display: 'flex',
+                    alignItems: 'center',
+                    flex: 1,
+                    width: '100%',
+                    maxWidth: '100%',
+                    height: 34,
+                    minWidth: 0,
+                    px: 1.25,
+                    py: 0.5,
+                    borderRadius: 1,
+                    border: hasValue ? '1px solid transparent' : `1px dashed ${theme.palette.primary.main}`,
+                    backgroundColor: hasValue ? 'transparent' : theme.palette.background.paper,
+                    boxShadow: hasValue ? 'none' : `inset 0 0 0 1px ${theme.palette.action.hover}`,
+                    color: hasValue ? 'inherit' : theme.palette.primary.main,
+                    cursor,
+                    fontWeight: hasValue ? 400 : 600,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    transition: theme.transitions.create(['background-color', 'border-color', 'box-shadow'], {
+                        duration: theme.transitions.duration.shortest
+                    }),
+                    '.MuiDataGrid-row:hover &': {
+                        borderColor: hasValue ? 'transparent' : theme.palette.primary.dark,
+                        boxShadow: hasValue ? 'none' : `inset 0 0 0 1px ${theme.palette.primary.light}`
+                    }
+                })}
+            >
+                {displayValue}
+            </Box>
+        )
+    }, [])
+
     const columns = useMemo(
         () => [
-            { field: 'property', headerName: t('pages.tools.schemaProperty'), editable: true, flex: 1 },
+            {
+                field: 'property',
+                headerName: t('pages.tools.schemaProperty'),
+                editable: true,
+                flex: 1,
+                renderCell: (params) => renderEditableSchemaCell(params, t('pages.tools.schemaPropertyPlaceholder'))
+            },
             {
                 field: 'type',
                 headerName: t('pages.tools.schemaType'),
                 type: 'singleSelect',
                 valueOptions: ['string', 'number', 'boolean', 'date'],
                 editable: true,
-                width: 120
+                width: 120,
+                renderCell: (params) => renderEditableSchemaCell(params, t('pages.tools.schemaTypePlaceholder'), 'pointer')
             },
-            { field: 'description', headerName: t('pages.tools.schemaDescription'), editable: true, flex: 1 },
+            {
+                field: 'description',
+                headerName: t('pages.tools.schemaDescription'),
+                editable: true,
+                flex: 1,
+                renderCell: (params) => renderEditableSchemaCell(params, t('pages.tools.schemaDescriptionPlaceholder'))
+            },
             { field: 'required', headerName: t('pages.tools.schemaRequired'), type: 'boolean', editable: true, width: 80 },
             {
                 field: 'actions',
@@ -165,7 +222,7 @@ const ToolDialog = ({ show, dialogProps, onUseTemplate, onCancel, onConfirm, set
                 ]
             }
         ],
-        [deleteItem, t]
+        [deleteItem, renderEditableSchemaCell, t]
     )
 
     useEffect(() => {
