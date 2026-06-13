@@ -17,6 +17,7 @@
 -   仓库根 `/Volumes/project/Flowise`;Node 20;PG 16;分支:从 `codex/iam-selfbuild` 切 **`codex/iam-p3-ship`**,每任务独立 commit,不 push 不碰 main。
 -   **清洁室铁律全套沿用**(主计划 §0.2 六条 + 事件记录;搜索必须走 `scripts/iam-clean-search.sh`;诊断泄出即停报)。
 -   **UI 零改动**;零新依赖;`.env` 不进 git。
+-   **⚠️ 新 worktree/新克隆首次跑门禁前必先 `pnpm build`(2026-06-13 实测裁定)**:monorepo 内部包 `flowise-components` 需编出 dist,否则所有 import 它的文件(`controllers/files` 与恰好也 import 它的 enterprise 文件)全报 `TS2307: Cannot find module 'flowise-components'`,**会连带把 enterprise 路径刷进 tsc 诊断、误触「enterprise 诊断=0」门禁**。这是环境缺失、非接缝泄露——判该门禁前先确认 build 成功、TS2307 清零。
 -   主计划的类型接缝规则(擦除桥仅限 iam/、禁 `& any`、禁 typeof enterprise)继续有效——T1 惰化只是把**值导入**变懒,**不新增任何类型构造**。
 -   **浸泡期门禁操作规程(事件 #5 连带裁定)**:① `.env` 现含 `PORT=3000` 与 `FLOWOPS_IAM=self`,且 dotenv 为 override:true——**命令行内联 env 会被 .env 碾压**(本项目头号陷阱),不要试图用 `PORT=3100` 绕端口。② 真机门禁前:`lsof -ti:3000 | xargs kill -9` 停掉浸泡后端 → 跑门禁(self 轨即默认 `pnpm start`)→ 验 enterprise 轨时**临时注释 .env 的 `FLOWOPS_IAM=self` 行**,验完恢复 → 门禁结束后重启浸泡后端(默认 `pnpm start` 即 self 轨)。`.env` 不在 git,放心改但必须复原。
 
