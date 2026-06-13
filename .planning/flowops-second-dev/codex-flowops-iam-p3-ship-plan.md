@@ -73,6 +73,27 @@
 
 **T2.1 DoD**:重跑 T2 空库冒烟——`flowise_ship_smoke` 全新库 self 轨:ship 建表后目标业务表均含 workspaceId 列 → 首人注册 → 登录 →**建 chatflow 200**→ 列表可见;dev 库(enterprise/self 轨)启动零变化(守卫空转);tsc/jest 过。
 
+### T2.2 · entities 接缝 self 映射(修正 T1 的 undefined 惰化,T2 冒烟暴露)
+
+**根因**:T1 把 `iam/entities` 惰化成「self 轨 = undefined」,但 ~10 处 Apache service/util(chatflows count、billing、buildChatflow、upsertVector、assistants、openai-realtime 等,**均已走 iam/entities 接缝**)在 self 轨执行路径也 `getRepository(Workspace/Organization/...)`,拿到 undefined → `No metadata for "undefined"`。entities **不能**惰化成 undefined:self 轨必须提供等价实体。
+
+**裁定**:`iam/entities` 的**运行时值**在 self 轨映射到 flowops 实体(enterprise 轨仍惰化 require)。已核对字段兼容的映射(Apache service 只用下列字段,FlowOps 实体均具备):
+
+| 接缝导出        | self 轨值                | Apache service 实际用到的字段(已核对)                  |
+| --------------- | ------------------------ | ------------------------------------------------------ |
+| `Workspace`     | `FlowOpsWorkspace`       | `id` / `organizationId`(findBy organizationId、map id) |
+| `Organization`  | `FlowOpsOrganization`    | `id` / `createdDate`(findOneBy id、order)              |
+| `User`          | `FlowOpsUser`            | id / email / name                                      |
+| `Role`          | `FlowOpsRole`            | id / name / permissions                                |
+| `WorkspaceUser` | `FlowOpsWorkspaceMember` | workspaceId / userId / roleId                          |
+
+-   **类型 export 保持现状**(enterprise 类型);self 值是 FlowOps 实例,靠字段兼容编译通过(service 用到的字段两侧都有)。若某字段 tsc 不兼容 → 停下报告(可能需该实体类型也 self 化或 FlowOps 补字段)。
+-   **self 无 1:1 对应的**(`OrganizationUser` / `WorkspaceShared` / `LoginMethod` / `LoginSession`):**迭代式处理**——重跑冒烟,凡 self 轨执行路径报 `No metadata` 的,逐个判断:① 能映射到最近 flowops 实体(字段对齐 service 用法)就映射;② 该 service 路径在 self/private 轨本不该执行(如 billing 的 cloud 专属统计)就让它在 self 轨短路/返回空;③ 字段缺口(如 `Organization.subscriptionId`)→ FlowOps 实体补 nullable 字段(self 恒空=无订阅语义)或路径短路。**拿不准停下报告,禁止猜改 service 语义**。
+
+**清洁室声明**:映射表的字段需求来自 **Apache service 的 getRepository 用法**(已勘察)+ FlowOps 实体声明,**未参考 enterprise 实体实现**。
+
+**T2.2 DoD**:`flowise_ship_smoke` 全新库 self 轨:建 chatflow **200** + 列表可见 + 后续冒烟无 `No metadata`;dev 库 self/enterprise 轨零变化(enterprise 轨仍走 enterprise 实体);tsc 0 / jest 全量过;四道 grep 门禁不变。
+
 ## T3 · 出货构建管道 + 零残留门禁
 
 1. **`scripts/build-ship.sh`**:`pnpm build`(server+components+ui)→ **物理剪除**:`rm -rf packages/server/dist/enterprise packages/server/dist/IdentityManager.js*`(含 .d.ts/.map)→ 调用第 2 步校验 → 产出说明(出货物 = 仓库减 `src/enterprise`、减 `src/IdentityManager.ts`、减 `.planning`,dist 已剪除;打包方式留人工,脚本只负责构建+剪除+校验)。
