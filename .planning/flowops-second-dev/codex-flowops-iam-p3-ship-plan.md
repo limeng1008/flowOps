@@ -57,6 +57,22 @@
 
 **DoD**:tsc/jest 过;空库冒烟全链绿;dev 库(enterprise 轨/self 轨)启动均零变化。
 
+### T2.1 · 自建业务表 workspaceId 补列 migration(T2 冒烟裁定,2026-06-13)
+
+**根因**:上游把业务表 `workspaceId` 列的 migration 放在 enterprise 包(`LinkWorkspaceId` 等),但 Apache 实体(`ChatFlow.ts` 等)**公开声明**了该列(`@Column({ nullable: false, type: 'text' }) workspaceId`)、Apache service 也依赖它(`getWorkspaceSearchOptions` 按 workspaceId 过滤)。ship 集排除 enterprise migration → 全新库缺列 → service 报 `column ChatFlow.workspaceId does not exist`。
+
+**清洁室声明**:列名 `workspaceId`、类型 `text`、目标表清单均来自 **Apache 实体 `@Column` 声明**(已勘察确认)+ Apache service 用法,**未参考 enterprise migration 实现**。
+
+**指令**:新增自有 migration `1778000300000-AddWorkspaceIdColumnsToBusinessTables`(4 库,纳入 `index.ship.ts` **与**全集 index):
+
+-   目标表 = Apache 实体声明 `workspaceId: string`(nullable:false)、但其非-enterprise 建表 migration 未含该列的上游业务表:`apikey / assistant / chat_flow / credential / custom_template / custom_mcp_server / dataset / document_store / evaluation / evaluator / execution / tool / variable`(**以全新 ship 空库实测缺列为准,多列入无害**)。
+-   每表用 Apache 工具 `hasColumn(queryRunner, table, 'workspaceId')` 守卫(`AddApiKeyPermission` 已用此法,`import { hasColumn } from '../../../utils/database.util'`),**不存在才 `ADD COLUMN "workspaceId" text`**;全新库补齐、dev 库(已有列)空转。
+-   列加为 **nullable text**(全新空库安全;workspaceId 实际由 service 写入,not-null 由应用层保证);`down()` 按库守卫式处理(SQLite DROP COLUMN 视版本,留注释即可)。
+-   **不加 FK**(T3.1 已确立业务表与工作区松耦合,SQLite 先例证明安全)。
+-   类命名/注册照 flowops 既有自有 migration 范式。
+
+**T2.1 DoD**:重跑 T2 空库冒烟——`flowise_ship_smoke` 全新库 self 轨:ship 建表后目标业务表均含 workspaceId 列 → 首人注册 → 登录 →**建 chatflow 200**→ 列表可见;dev 库(enterprise/self 轨)启动零变化(守卫空转);tsc/jest 过。
+
 ## T3 · 出货构建管道 + 零残留门禁
 
 1. **`scripts/build-ship.sh`**:`pnpm build`(server+components+ui)→ **物理剪除**:`rm -rf packages/server/dist/enterprise packages/server/dist/IdentityManager.js*`(含 .d.ts/.map)→ 调用第 2 步校验 → 产出说明(出货物 = 仓库减 `src/enterprise`、减 `src/IdentityManager.ts`、减 `.planning`,dist 已剪除;打包方式留人工,脚本只负责构建+剪除+校验)。
