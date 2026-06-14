@@ -1133,7 +1133,6 @@ const ChatMessage = ({ open, chatflowid, isAgentCanvas, isDialog, previews, setP
             },
             async onopen(response) {
                 if (response.ok && response.headers.get('content-type') === EventStreamContentType) {
-                    //console.log('EventSource Open')
                 }
             },
             async onmessage(ev) {
