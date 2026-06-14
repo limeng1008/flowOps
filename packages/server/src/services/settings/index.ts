@@ -1,5 +1,3 @@
-// TODO: add settings
-
 import { Platform } from '../../Interface'
 import { getFlowOpsEdition } from '../entitlement'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'

@@ -228,7 +228,6 @@ const ExpandedChunkDialog = ({ show, dialogProps, onCancel, onChunkEdit, onDelet
                                         setMetadata(edit.updated_src)
                                     }}
                                     onAdd={() => {
-                                        //console.log(add)
                                     }}
                                     onDelete={(deleteobj) => {
                                         setMetadata(deleteobj.updated_src)
