@@ -3,8 +3,11 @@ jest.mock('../../utils/getRunningExpressApp', () => ({
 }))
 
 import { StatusCodes } from 'http-status-codes'
+import { BillingPlan } from '../../database/entities/BillingPlan'
+import { BillingSubscription, BillingSubscriptionStatus } from '../../database/entities/BillingSubscription'
 import { Entitlement } from '../../database/entities/Entitlement'
 import { EntitlementUsage } from '../../database/entities/EntitlementUsage'
+import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
 import {
     ENTITLEMENT_ERROR_MESSAGES,
     ENTITLEMENT_TEMPLATES,
@@ -18,7 +21,19 @@ import {
     getFlowOpsEdition
 } from '.'
 
+const mockRunningAppDataSource = (repos: Map<unknown, any>) => {
+    ;(getRunningExpressApp as jest.Mock).mockReturnValue({
+        AppDataSource: {
+            getRepository: jest.fn((entity) => repos.get(entity))
+        }
+    })
+}
+
 describe('FlowOps entitlement sources', () => {
+    beforeEach(() => {
+        jest.clearAllMocks()
+    })
+
     it('defaults to private edition and maps local commercial deployments to enterprise entitlements', async () => {
         expect(getFlowOpsEdition({})).toBe('private')
 
@@ -34,10 +49,19 @@ describe('FlowOps entitlement sources', () => {
         expect(entitlement.features).toContain(FLOWOPS_ENTITLEMENT_FEATURES.privateOfflineLicense)
     })
 
-    it('uses the subscription source in cloud edition and resolves the free template stub', async () => {
+    it('uses the subscription source in cloud edition and resolves free when no active subscription exists', async () => {
         expect(getFlowOpsEdition({ FLOWOPS_EDITION: 'cloud' })).toBe('cloud')
         expect(getFlowOpsEdition({ EDITION: 'cloud' })).toBe('cloud')
         expect(createEntitlementSource({ FLOWOPS_EDITION: 'cloud' })).toBeInstanceOf(SubscriptionEntitlementSource)
+
+        const billingSubscriptionRepo = { findOne: jest.fn(async () => null) }
+        const billingPlanRepo = { findOne: jest.fn() }
+        mockRunningAppDataSource(
+            new Map<unknown, any>([
+                [BillingSubscription, billingSubscriptionRepo],
+                [BillingPlan, billingPlanRepo]
+            ])
+        )
 
         const cloudSource = new SubscriptionEntitlementSource()
         const entitlement = await cloudSource.resolve('org_cloud')
@@ -49,6 +73,86 @@ describe('FlowOps entitlement sources', () => {
             creditsTotal: 200,
             creditsBalance: 200
         })
+        expect(billingPlanRepo.findOne).not.toHaveBeenCalled()
+    })
+
+    it('derives a subscription entitlement from the active billing subscription plan tier and quotas', async () => {
+        const billingSubscriptionRepo = {
+            findOne: jest.fn(async () => ({
+                id: 'sub-pro',
+                organizationId: 'org_cloud_paid',
+                planId: 'plan-pro',
+                status: BillingSubscriptionStatus.ACTIVE
+            }))
+        }
+        const billingPlanRepo = {
+            findOne: jest.fn(async () => ({
+                id: 'plan-pro',
+                code: 'pro',
+                name: 'Pro',
+                entitlementTier: 'pro',
+                quotas: JSON.stringify({
+                    creditsTotal: 9000,
+                    seats: 7,
+                    concurrency: 4,
+                    features: [FLOWOPS_ENTITLEMENT_FEATURES.basicWorkflow, FLOWOPS_ENTITLEMENT_FEATURES.apiAccess]
+                }),
+                monthlyPriceCents: 9900,
+                currency: 'CNY',
+                isActive: true
+            }))
+        }
+        mockRunningAppDataSource(
+            new Map<unknown, any>([
+                [BillingSubscription, billingSubscriptionRepo],
+                [BillingPlan, billingPlanRepo]
+            ])
+        )
+
+        const entitlement = await new SubscriptionEntitlementSource().resolve('org_cloud_paid')
+
+        expect(entitlement).toMatchObject({
+            scopeId: 'org_cloud_paid',
+            tier: 'pro',
+            source: 'subscription',
+            seats: 7,
+            creditsTotal: 9000,
+            creditsBalance: 9000,
+            concurrency: 4,
+            features: [FLOWOPS_ENTITLEMENT_FEATURES.basicWorkflow, FLOWOPS_ENTITLEMENT_FEATURES.apiAccess]
+        })
+        expect(billingSubscriptionRepo.findOne).toHaveBeenCalledWith(
+            expect.objectContaining({
+                where: { organizationId: 'org_cloud_paid', status: BillingSubscriptionStatus.ACTIVE },
+                order: { updatedDate: 'DESC' }
+            })
+        )
+        expect(billingPlanRepo.findOne).toHaveBeenCalledWith({ where: [{ id: 'plan-pro' }, { code: 'plan-pro' }] })
+    })
+
+    it('treats non-active subscription rows and missing plans as free subscription entitlements', async () => {
+        const billingSubscriptionRepo = {
+            findOne: jest.fn(async () => ({
+                id: 'sub-canceled',
+                organizationId: 'org_cloud_canceled',
+                planId: 'plan-pro',
+                status: BillingSubscriptionStatus.CANCELED
+            }))
+        }
+        const billingPlanRepo = { findOne: jest.fn() }
+        mockRunningAppDataSource(
+            new Map<unknown, any>([
+                [BillingSubscription, billingSubscriptionRepo],
+                [BillingPlan, billingPlanRepo]
+            ])
+        )
+
+        await expect(new SubscriptionEntitlementSource().resolve('org_cloud_canceled')).resolves.toMatchObject({
+            scopeId: 'org_cloud_canceled',
+            tier: 'free',
+            source: 'subscription'
+        })
+        expect(billingPlanRepo.findOne).not.toHaveBeenCalled()
     })
 
     it('defines the free, pro, team, and enterprise entitlement templates', () => {
@@ -202,6 +306,102 @@ describe('FlowOps entitlement sources', () => {
                 tier: 'enterprise',
                 creditsBalance: -1,
                 source: 'local'
+            })
+        )
+    })
+
+    it('refreshes an existing free entitlement when the active cloud subscription upgrades the source tier', async () => {
+        const existing = {
+            id: 'ent_cloud_free',
+            scopeId: 'org_cloud_upgrade',
+            tier: 'free',
+            seats: 1,
+            creditsTotal: 200,
+            creditsBalance: 200,
+            features: JSON.stringify(ENTITLEMENT_TEMPLATES.free.features),
+            concurrency: 1,
+            expireAt: null,
+            source: 'subscription'
+        } as Entitlement
+        const repository = {
+            findOneBy: jest.fn().mockResolvedValue(existing),
+            create: jest.fn((value) => value),
+            save: jest.fn((value) => Promise.resolve({ ...existing, ...value }))
+        }
+        const service = new EntitlementService({
+            dataSource: { getRepository: jest.fn().mockReturnValue(repository) } as any,
+            source: {
+                resolve: jest.fn().mockResolvedValue({
+                    scopeId: 'org_cloud_upgrade',
+                    tier: 'pro',
+                    seats: 5,
+                    creditsTotal: 5000,
+                    creditsBalance: 5000,
+                    features: ENTITLEMENT_TEMPLATES.pro.features,
+                    concurrency: 3,
+                    expireAt: null,
+                    source: 'subscription'
+                })
+            } as any
+        })
+
+        const entitlement = await service.resolve('org_cloud_upgrade')
+
+        expect(entitlement).toMatchObject({ tier: 'pro', creditsTotal: 5000, creditsBalance: 5000, concurrency: 3 })
+        expect(repository.save).toHaveBeenCalledWith(
+            expect.objectContaining({
+                tier: 'pro',
+                creditsTotal: 5000,
+                creditsBalance: 5000,
+                source: 'subscription'
+            })
+        )
+    })
+
+    it('refreshes an existing paid cloud entitlement back to free when the subscription source has no active plan', async () => {
+        const existing = {
+            id: 'ent_cloud_pro',
+            scopeId: 'org_cloud_cancel',
+            tier: 'pro',
+            seats: 5,
+            creditsTotal: 5000,
+            creditsBalance: 4200,
+            features: JSON.stringify(ENTITLEMENT_TEMPLATES.pro.features),
+            concurrency: 3,
+            expireAt: null,
+            source: 'subscription'
+        } as Entitlement
+        const repository = {
+            findOneBy: jest.fn().mockResolvedValue(existing),
+            create: jest.fn((value) => value),
+            save: jest.fn((value) => Promise.resolve({ ...existing, ...value }))
+        }
+        const service = new EntitlementService({
+            dataSource: { getRepository: jest.fn().mockReturnValue(repository) } as any,
+            source: {
+                resolve: jest.fn().mockResolvedValue({
+                    scopeId: 'org_cloud_cancel',
+                    tier: 'free',
+                    seats: 1,
+                    creditsTotal: 200,
+                    creditsBalance: 200,
+                    features: ENTITLEMENT_TEMPLATES.free.features,
+                    concurrency: 1,
+                    expireAt: null,
+                    source: 'subscription'
+                })
+            } as any
+        })
+
+        const entitlement = await service.resolve('org_cloud_cancel')
+
+        expect(entitlement).toMatchObject({ tier: 'free', creditsTotal: 200, creditsBalance: 200, concurrency: 1 })
+        expect(repository.save).toHaveBeenCalledWith(
+            expect.objectContaining({
+                tier: 'free',
+                creditsTotal: 200,
+                creditsBalance: 200,
+                source: 'subscription'
             })
         )
     })

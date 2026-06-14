@@ -56,6 +56,7 @@ import { AddFlowOpsIamEntities1778000000000 } from './1778000000000-AddFlowOpsIa
 import { BackfillFlowOpsRolePermissions1778000100000 } from './1778000100000-BackfillFlowOpsRolePermissions'
 import { DecoupleWorkspaceFkFromBusinessTables1778000200000 } from './1778000200000-DecoupleWorkspaceFkFromBusinessTables'
 import { AddWorkspaceIdColumnsToBusinessTables1778000300000 } from './1778000300000-AddWorkspaceIdColumnsToBusinessTables'
+import { AddBillingPlanEntitlementTier1779000000000 } from './1779000000000-AddBillingPlanEntitlementTier'
 
 export const mariadbMigrations = [
     Init1693840429259,
@@ -115,5 +116,6 @@ export const mariadbMigrations = [
     AddFlowOpsIamEntities1778000000000,
     BackfillFlowOpsRolePermissions1778000100000,
     DecoupleWorkspaceFkFromBusinessTables1778000200000,
-    AddWorkspaceIdColumnsToBusinessTables1778000300000
+    AddWorkspaceIdColumnsToBusinessTables1778000300000,
+    AddBillingPlanEntitlementTier1779000000000
 ]

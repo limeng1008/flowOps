@@ -146,6 +146,35 @@ describe('billing service', () => {
         expect(billingUsageRepo.save).toHaveBeenCalledTimes(1)
     })
 
+    it('persists the entitlement tier when upserting an operator-managed billing plan', async () => {
+        const billingPlanRepo = makeRepo({
+            findOneBy: jest.fn(async () => null),
+            create: jest.fn((value: Record<string, unknown>) => ({ id: 'plan-team', ...value })),
+            save: jest.fn(async (value: unknown) => value)
+        })
+        repos.set(BillingPlan, billingPlanRepo)
+
+        const plan = await BillingService.upsertPlan({
+            code: 'team',
+            name: '团队版',
+            entitlementTier: 'team',
+            quotas: { tokens: 30000, bots: 10, seats: 20 },
+            monthlyPriceCents: 29900
+        } as any)
+
+        expect(plan).toMatchObject({
+            code: 'team',
+            entitlementTier: 'team',
+            monthlyPriceCents: 29900
+        })
+        expect(billingPlanRepo.save).toHaveBeenCalledWith(
+            expect.objectContaining({
+                entitlementTier: 'team',
+                monthlyPriceCents: 29900
+            })
+        )
+    })
+
     it('throws 402 with a stable billing code when token limits are exceeded', async () => {
         jest.spyOn(BillingService, 'getOrganizationOverview').mockResolvedValueOnce({
             organizationId: 'org-1',

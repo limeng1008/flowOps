@@ -8,8 +8,11 @@ import { ChatFlow } from '../../database/entities/ChatFlow'
 import { Organization } from '../../iam/entities'
 import { OrganizationUser } from '../../iam/entities'
 import { Workspace } from '../../iam/entities'
+import { WorkspaceUser } from '../../iam/entities'
+import { isSelfIamMode } from '../../iam/provider'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
+import { EntitlementTier, inferEntitlementTierFromPlanCode, isEntitlementTier, normalizeEntitlementTier } from '../entitlement'
 
 export type BillingQuotaKey = 'tokens' | 'bots' | 'seats'
 export type BillingQuotas = Record<BillingQuotaKey, number>
@@ -36,6 +39,7 @@ export const DEFAULT_FREE_PLAN: BillingPlanDTO = {
         bots: 3,
         seats: 3
     } as BillingQuotas,
+    entitlementTier: 'free',
     monthlyPriceCents: 0,
     currency: 'CNY',
     isActive: true
@@ -47,6 +51,7 @@ export interface BillingPlanDTO {
     name: string
     description?: string | null
     quotas: BillingQuotas
+    entitlementTier: EntitlementTier
     monthlyPriceCents: number
     currency: string
     isActive?: boolean
@@ -182,7 +187,6 @@ export class BillingService {
         const workspaceRepo = appServer.AppDataSource.getRepository(Workspace)
         const chatFlowRepo = appServer.AppDataSource.getRepository(ChatFlow)
         const assistantRepo = appServer.AppDataSource.getRepository(Assistant)
-        const orgUserRepo = appServer.AppDataSource.getRepository(OrganizationUser)
 
         const usageRows = await usageRepo.find({ where: { organizationId, period } })
         const tokens = usageRows.reduce((sum: number, row: BillingUsage) => sum + safeNumber(row.totalTokens), 0)
@@ -190,10 +194,13 @@ export class BillingService {
         const workspaces = await workspaceRepo.findBy({ organizationId })
         const workspaceIds = workspaces.map((workspace: Workspace) => workspace.id)
         const botWhere = workspaceIds.length ? { workspaceId: In(workspaceIds) } : { workspaceId: In(['__none__']) }
+        const seatsPromise = isSelfIamMode()
+            ? appServer.AppDataSource.getRepository(WorkspaceUser).countBy(botWhere)
+            : appServer.AppDataSource.getRepository(OrganizationUser).countBy({ organizationId })
         const [chatflows, assistants, seats] = await Promise.all([
             chatFlowRepo.countBy(botWhere),
             assistantRepo.countBy(botWhere),
-            orgUserRepo.countBy({ organizationId })
+            seatsPromise
         ])
 
         return {
@@ -256,6 +263,7 @@ export class BillingService {
             name: input.name,
             description: input.description ?? existing?.description ?? null,
             quotas: JSON.stringify(mergeBillingQuotas(input.quotas)),
+            entitlementTier: resolveUpsertEntitlementTier(input.entitlementTier, existing?.entitlementTier, input.code),
             monthlyPriceCents: safeNumber(input.monthlyPriceCents ?? existing?.monthlyPriceCents ?? 0),
             currency: input.currency || existing?.currency || 'CNY',
             isActive: input.isActive ?? existing?.isActive ?? true
@@ -331,6 +339,7 @@ function toPlanDTO(plan: BillingPlan | typeof DEFAULT_FREE_PLAN): BillingPlanDTO
         name: plan.name,
         description: plan.description,
         quotas: typeof plan.quotas === 'string' ? mergeBillingQuotas(parseJson<Partial<BillingQuotas>>(plan.quotas, {})) : plan.quotas,
+        entitlementTier: normalizeEntitlementTier(plan.entitlementTier, plan.code),
         monthlyPriceCents: plan.monthlyPriceCents,
         currency: plan.currency,
         isActive: plan.isActive
@@ -370,6 +379,22 @@ function parseJson<T>(value: string | null | undefined, fallback: T): T {
 function safeNumber(value: unknown): number {
     const number = Number(value)
     return Number.isFinite(number) ? number : 0
+}
+
+function resolveUpsertEntitlementTier(inputTier: unknown, existingTier: unknown, planCode: string): EntitlementTier {
+    if (inputTier !== undefined && inputTier !== null && `${inputTier}`.trim() !== '') {
+        const normalizedInput = `${inputTier}`.trim().toLowerCase()
+        if (!isEntitlementTier(normalizedInput)) {
+            throw new InternalFlowiseError(StatusCodes.BAD_REQUEST, 'INVALID_ENTITLEMENT_TIER')
+        }
+        return normalizedInput
+    }
+
+    if (existingTier !== undefined && existingTier !== null && `${existingTier}`.trim() !== '') {
+        return normalizeEntitlementTier(existingTier, planCode)
+    }
+
+    return inferEntitlementTierFromPlanCode(planCode)
 }
 
 function isLimitExceeded(usage: number, limit: number): boolean {

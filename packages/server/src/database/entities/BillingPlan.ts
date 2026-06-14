@@ -17,6 +17,9 @@ export class BillingPlan {
     @Column({ nullable: false, type: 'text' })
     quotas: string
 
+    @Column({ type: 'varchar', length: 32, default: 'free' })
+    entitlementTier: string
+
     @Column({ type: 'int', default: 0 })
     monthlyPriceCents: number
 

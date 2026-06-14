@@ -1,5 +1,7 @@
 import { StatusCodes } from 'http-status-codes'
 import { Between, DataSource, EntityManager, MoreThanOrEqual } from 'typeorm'
+import { BillingPlan } from '../../database/entities/BillingPlan'
+import { BillingSubscription, BillingSubscriptionStatus } from '../../database/entities/BillingSubscription'
 import { Entitlement } from '../../database/entities/Entitlement'
 import { EntitlementUsage } from '../../database/entities/EntitlementUsage'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
@@ -10,6 +12,27 @@ export type FlowOpsEdition = 'cloud' | 'private'
 export type EntitlementTier = 'free' | 'pro' | 'team' | 'enterprise'
 export type EntitlementSourceKind = 'local' | 'subscription'
 export type EntitlementLimitDimension = 'flows' | 'users' | 'credits' | 'predictions'
+
+export const ENTITLEMENT_TIERS: EntitlementTier[] = ['free', 'pro', 'team', 'enterprise']
+
+export const isEntitlementTier = (value: unknown): value is EntitlementTier => {
+    return ENTITLEMENT_TIERS.includes(`${value ?? ''}`.trim().toLowerCase() as EntitlementTier)
+}
+
+export const inferEntitlementTierFromPlanCode = (planCode?: string | null): EntitlementTier => {
+    const code = `${planCode ?? ''}`.trim().toLowerCase()
+    if (!code) return 'free'
+    if (code.startsWith('local_dev') || code.includes('enterprise')) return 'enterprise'
+    if (code.includes('team')) return 'team'
+    if (code === 'pro' || code.includes('_pro') || code.includes('-pro')) return 'pro'
+    if (code.includes('free')) return 'free'
+    return 'free'
+}
+
+export const normalizeEntitlementTier = (value: unknown, fallbackPlanCode?: string | null): EntitlementTier => {
+    const normalized = `${value ?? ''}`.trim().toLowerCase()
+    return isEntitlementTier(normalized) ? normalized : inferEntitlementTierFromPlanCode(fallbackPlanCode)
+}
 
 export interface EntitlementSnapshot {
     scopeId: string
@@ -295,8 +318,25 @@ export class LicenseEntitlementSource implements EntitlementSource {
 }
 
 export class SubscriptionEntitlementSource implements EntitlementSource {
+    constructor(private readonly dataSource?: DataSource) {}
+
     async resolve(scopeId: string): Promise<EntitlementSnapshot> {
-        return templateSnapshot(scopeId, 'free', 'subscription')
+        const dataSource = this.dataSource ?? getRunningExpressApp().AppDataSource
+        const subscription = await dataSource.getRepository(BillingSubscription).findOne({
+            where: { organizationId: scopeId, status: BillingSubscriptionStatus.ACTIVE },
+            order: { updatedDate: 'DESC' }
+        })
+
+        if (!subscription || subscription.status !== BillingSubscriptionStatus.ACTIVE) {
+            return templateSnapshot(scopeId, 'free', 'subscription')
+        }
+
+        const plan = await dataSource
+            .getRepository(BillingPlan)
+            .findOne({ where: [{ id: subscription.planId }, { code: subscription.planId }] })
+        if (!plan) return templateSnapshot(scopeId, 'free', 'subscription')
+
+        return billingPlanToSubscriptionEntitlement(scopeId, plan)
     }
 }
 
@@ -327,8 +367,57 @@ const licenseToEntitlement = (scopeId: string, license: LicenseVerificationResul
     }
 }
 
+const billingPlanToSubscriptionEntitlement = (scopeId: string, plan: BillingPlan): EntitlementSnapshot => {
+    const tier = normalizeEntitlementTier(plan.entitlementTier, plan.code)
+    const template = ENTITLEMENT_TEMPLATES[tier]
+    const quotas = parseJson<Record<string, unknown>>(plan.quotas, {})
+    const creditsTotal = readQuotaNumber(quotas.creditsTotal ?? quotas.credits ?? quotas.tokens) ?? template.creditsTotal
+    const features = parseEntitlementFeatures(quotas.features as string | string[] | null | undefined)
+
+    return {
+        scopeId,
+        tier,
+        seats: readQuotaNumber(quotas.seats) ?? template.seats,
+        creditsTotal,
+        creditsBalance: creditsTotal === -1 ? -1 : creditsTotal,
+        features: features.length ? features : template.features,
+        concurrency: readQuotaNumber(quotas.concurrency ?? quotas.flows ?? quotas.bots) ?? template.concurrency,
+        expireAt: null,
+        source: 'subscription'
+    }
+}
+
+const parseJson = <T>(value: string | null | undefined, fallback: T): T => {
+    if (!value) return fallback
+    try {
+        return JSON.parse(value) as T
+    } catch {
+        return fallback
+    }
+}
+
+const readQuotaNumber = (value: unknown): number | undefined => {
+    if (value === undefined || value === null || value === '') return undefined
+    const number = Number(value)
+    return Number.isFinite(number) ? number : undefined
+}
+
 const isLicenseBackedSnapshot = (snapshot: EntitlementSnapshot): boolean => {
     return snapshot.licenseStatus === 'active' || snapshot.licenseStatus === 'grace' || snapshot.licenseStatus === 'expired'
+}
+
+const shouldRefreshSubscriptionEntitlement = (existing: Entitlement, sourceSnapshot: EntitlementSnapshot): boolean => {
+    if (sourceSnapshot.source !== 'subscription') return false
+    const existingSnapshot = toEntitlementSnapshot(existing)
+    return (
+        existingSnapshot.source !== sourceSnapshot.source ||
+        existingSnapshot.tier !== sourceSnapshot.tier ||
+        existingSnapshot.seats !== sourceSnapshot.seats ||
+        existingSnapshot.creditsTotal !== sourceSnapshot.creditsTotal ||
+        existingSnapshot.concurrency !== sourceSnapshot.concurrency ||
+        (existingSnapshot.expireAt?.getTime() ?? null) !== (sourceSnapshot.expireAt?.getTime() ?? null) ||
+        JSON.stringify(existingSnapshot.features) !== JSON.stringify(sourceSnapshot.features)
+    )
 }
 
 export const consumeCreditsForEntitlement = async (
@@ -539,7 +628,7 @@ export class EntitlementService {
             ? await manager.findOneBy(Entitlement, { scopeId })
             : await this.getDataSource().getRepository(Entitlement).findOneBy({ scopeId })
         if (existing) {
-            if (!isLicenseBackedSnapshot(sourceSnapshot)) return existing
+            if (!isLicenseBackedSnapshot(sourceSnapshot) && !shouldRefreshSubscriptionEntitlement(existing, sourceSnapshot)) return existing
 
             const updatedEntitlement = {
                 ...existing,
