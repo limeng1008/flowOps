@@ -46,6 +46,40 @@
             }
         }
     },
+    "snackbar": {
+        "chatflowSaved": "对话流已保存",
+        "agentflowSaved": "智能体流已保存",
+        "scheduleEnabled": "定时任务已启用",
+        "scheduleDisabled": "定时任务已停用",
+        "scheduleToggleFailed": "切换定时任务失败",
+        "mandatoryFields": "请填写以下必填字段：{{fields}}",
+        "failedActionTarget": "{{action}}{{target}}失败：{{message}}",
+        "failedActionOnly": "{{action}}失败：{{message}}",
+        "failedWithMessage": "失败：{{message}}",
+        "ttsFailed": "TTS 失败：{{message}}",
+        "ttsRequestFailed": "TTS 请求失败：{{status}}",
+        "httpStatusError": "HTTP 错误！状态码：{{status}}",
+        "actions": {
+            "addNew": "新增",
+            "save": "保存",
+            "delete": "删除",
+            "update": "更新",
+            "refresh": "刷新",
+            "export": "导出",
+            "retrieve": "获取",
+            "previewChunks": "预览分块",
+            "processChunking": "处理分块"
+        },
+        "targets": {
+            "apiKey": "API 密钥",
+            "documentStore": "文档库",
+            "documentLoader": "文档加载器",
+            "tool": "工具",
+            "variable": "变量",
+            "vectorStoreConfig": "向量库配置",
+            "chunk": "分块"
+        }
+    },
     "profile": {
         "user": "用户",
         "export": "导出",
@@ -443,6 +477,8 @@
         },
         "validation": {
             "validateNodes": "校验节点",
+            "validateFlow": "校验流程",
+            "validating": "校验中...",
             "noIssuesFound": "当前流程未发现问题！",
             "failed": "流程校验失败",
             "checklist": "检查项（{{count}}）"
@@ -553,6 +589,12 @@
         "syncNodes": "同步节点",
         "toggleSnapping": "切换网格吸附",
         "toggleBackground": "切换背景",
+        "controls": {
+            "zoomIn": "放大",
+            "zoomOut": "缩小",
+            "fitView": "适应视图",
+            "toggleInteractivity": "切换交互"
+        },
         "byAuthor": "作者：{{author}}",
         "elseBranch": "否则",
         "tabUtilities": "实用工具",
@@ -1014,6 +1056,7 @@
             "title": "对话流",
             "description": "构建单 Agent 系统、聊天机器人和简单的 LLM 流程",
             "searchPlaceholder": "搜索名称或分类",
+            "embedApiTitle": "嵌入网站或作为 API 使用",
             "share": {
                 "copyLink": "复制链接",
                 "openNewTab": "新标签页打开",
@@ -1430,6 +1473,9 @@
             "schemaType": "类型",
             "schemaDescription": "描述",
             "schemaRequired": "必填",
+            "schemaPropertyPlaceholder": "输入参数名",
+            "schemaTypePlaceholder": "选择类型",
+            "schemaDescriptionPlaceholder": "输入描述",
             "noSchemaRows": "暂无字段",
             "pasteJson": "粘贴 JSON",
             "addItem": "添加字段",

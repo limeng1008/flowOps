@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import ReactFlow, { Controls, Background, useNodesState, useEdgesState } from 'reactflow'
+import ReactFlow, { Background, ControlButton, useNodesState, useEdgesState } from 'reactflow'
 import 'reactflow/dist/style.css'
 import '@/views/canvas/index.css'
 
@@ -14,6 +14,7 @@ import { useTheme } from '@mui/material/styles'
 // project imports
 import MarketplaceCanvasNode from './MarketplaceCanvasNode'
 import MarketplaceCanvasHeader from './MarketplaceCanvasHeader'
+import LocalizedControls from '@/ui-component/canvas/LocalizedControls'
 import StickyNote from '../canvas/StickyNote'
 
 // icons
@@ -98,7 +99,7 @@ const MarketplaceCanvas = () => {
                                 snapGrid={[25, 25]}
                                 snapToGrid={isSnappingEnabled}
                             >
-                                <Controls
+                                <LocalizedControls
                                     className={customization.isDarkMode ? 'dark-mode-controls' : ''}
                                     style={{
                                         display: 'flex',
@@ -107,27 +108,27 @@ const MarketplaceCanvas = () => {
                                         transform: 'translate(-50%, -50%)'
                                     }}
                                 >
-                                    <button
-                                        className='react-flow__controls-button react-flow__controls-interactive'
+                                    <ControlButton
+                                        className='react-flow__controls-interactive'
                                         onClick={() => {
-                                            setIsSnappingEnabled(!isSnappingEnabled)
+                                            setIsSnappingEnabled((isEnabled) => !isEnabled)
                                         }}
                                         title={t('canvas.toggleSnapping')}
                                         aria-label={t('canvas.toggleSnapping')}
                                     >
                                         {isSnappingEnabled ? <IconMagnetFilled /> : <IconMagnetOff />}
-                                    </button>
-                                    <button
-                                        className='react-flow__controls-button react-flow__controls-interactive'
+                                    </ControlButton>
+                                    <ControlButton
+                                        className='react-flow__controls-interactive'
                                         onClick={() => {
-                                            setIsBackgroundEnabled(!isBackgroundEnabled)
+                                            setIsBackgroundEnabled((isEnabled) => !isEnabled)
                                         }}
                                         title={t('canvas.toggleBackground')}
                                         aria-label={t('canvas.toggleBackground')}
                                     >
                                         {isBackgroundEnabled ? <IconArtboard /> : <IconArtboardOff />}
-                                    </button>
-                                </Controls>
+                                    </ControlButton>
+                                </LocalizedControls>
                                 {isBackgroundEnabled && <Background color='#aaa' gap={16} />}
                             </ReactFlow>
                         </div>

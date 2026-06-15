@@ -94,7 +94,8 @@ import {
     getInputVariables,
     getCustomConditionOutputs,
     isValidConnection,
-    getAvailableNodesForVariable
+    getAvailableNodesForVariable,
+    shouldRenderNodeInputParam
 } from '@/utils/genericHelper'
 import useNotifier from '@/utils/useNotifier'
 
@@ -898,7 +899,7 @@ const NodeInputHandler = ({
                 </>
             )}
 
-            {((inputParam && !inputParam.additionalParams) || isAdditionalParams) && (
+            {shouldRenderNodeInputParam(data, inputParam) && ((inputParam && !inputParam.additionalParams) || isAdditionalParams) && (
                 <>
                     {inputParam.acceptVariable && !isAdditionalParams && (
                         <CustomWidthTooltip placement='left' title={inputParam.type}>

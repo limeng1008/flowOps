@@ -282,7 +282,7 @@ const ValidationPopUp = ({ chatflowid, hidden }) => {
                                             startIcon={loading ? null : <IconCheckbox size={18} />}
                                             sx={{ color: 'white', minWidth: '120px' }}
                                         >
-                                            {loading ? 'Validating...' : 'Validate Flow'}
+                                            {loading ? t('components.validation.validating') : t('components.validation.validateFlow')}
                                         </Button>
                                     </Box>
                                 </MainCard>

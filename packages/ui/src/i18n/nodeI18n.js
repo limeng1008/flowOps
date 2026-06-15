@@ -110,6 +110,7 @@ const nodeLabelMap = {
     'Requests Post': 'HTTP POST 请求',
     'Requests Put': 'HTTP PUT 请求',
     'Retriever Tool': '检索工具',
+    'Sequential Thinking MCP': '顺序思考 MCP',
     StripeAgentTool: 'Stripe 智能体工具',
     'Web Browser': '网页浏览器',
     'Web Scraper Tool': 'Web 抓取工具',
@@ -281,7 +282,7 @@ const nodeLabelMap = {
     'Max Tokens': '最大生成 Token 数',
     Embeddings: '向量模型',
     'Input Moderation': '输入审核',
-    'Top Probability': 'Top Probability',
+    'Top Probability': '最高概率',
     Timeout: '超时',
     Query: '查询',
     'How to use': '使用说明',
@@ -315,6 +316,7 @@ const nodeLabelMap = {
     Tool: '工具',
     Tools: '工具',
     'Session Id': '会话 ID',
+    'Session ID': '会话 ID',
     'Stop Sequence': '停止序列',
     'Sequential Node': '顺序节点',
     'Return Source Documents': '返回来源文档',
@@ -347,6 +349,12 @@ const nodeLabelMap = {
     'Use Global Inference Endpoint': '使用全局推理端点',
     'Cohere Input Type': 'Cohere 输入类型',
     'Max AWS API retries': 'AWS API 最大重试次数',
+    Thinking: '深度思考',
+    'Extended Thinking': '扩展思考',
+    'Adaptive Thinking': '自适应思考',
+    'Thinking Effort': '思考强度',
+    'Thinking Budget': '思考预算',
+    'Thinking Level': '思考级别',
     'Base Path to load': '加载路径',
     'Base Path to store': '存储路径',
     'Chunk Size': '块大小',
@@ -605,6 +613,33 @@ const nodeDescriptionMap = {
         '上方表单字段的默认值，使用变量名作为 key 的 JSON 对象。例如：{ "team": "engineering", "metric": "p95" }。',
     'Start fresh for every execution without past chat history': '每次执行都从空上下文开始，不带历史对话。',
 
+    // ---------- Agentflow nodes ----------
+    'Starting point of the agentflow': 'Agentflow 的起始节点',
+    'Large language models to analyze user-provided inputs and generate responses': '用于分析用户输入并生成回复的大语言模型',
+    'Dynamically choose and utilize tools during runtime, enabling multi-step reasoning': '运行时动态选择并调用工具，支持多步推理',
+    'Tools allow LLM to interact with external systems': '允许 LLM 与外部系统交互的工具',
+    'Retrieve information from vector database': '从向量数据库检索信息',
+    'Directly reply to the user with a message': '直接向用户回复消息',
+    'Request human input, approval or rejection during execution': '执行过程中请求人工输入、审批或拒绝',
+    'Add notes to the agent flow': '给 agent flow 添加备注',
+    'Execute the nodes within the iteration block through N iterations': '在迭代块内执行节点，共执行 N 次',
+    'Loop back to a previous node': '回到前一个节点继续执行',
+    'Split flows based on If Else conditions': '根据 If Else 条件拆分流程',
+    'Utilize an agent to split flows based on dynamic conditions': '使用智能体根据动态条件拆分流程',
+
+    // ---------- Engine / Graph / Synthesizer / Retriever ----------
+    'Breaks complex query into sub questions for each relevant data source, then gather all the intermediate responses and synthesizes a final response':
+        '将复杂查询拆分为面向各相关数据源的子问题，收集中间回答并合成最终回复',
+    'Connect with Neo4j graph database': '连接 Neo4j 图数据库',
+    'Create and refine an answer by sequentially going through each retrieved text chunk. This makes a separate LLM call per Node. Good for more detailed answers.':
+        '依次遍历每个检索到的文本块来创建并优化答案。每个节点会单独调用一次 LLM，适合更细致的回答。',
+    'CompactRefine is a slight variation of Refine that first compacts the text chunks into the smallest possible number of chunks.':
+        'CompactRefine 是 Refine 的轻微变体，会先将文本块压缩为尽可能少的块。',
+    'Given a set of text chunks and the query, recursively construct a tree and return the root node as the response. Good for summarization purposes.':
+        '基于一组文本块和查询递归构建树，并返回根节点作为响应。适合摘要场景。',
+    'Iterate over the initially returned documents and extract, from each, only the content that is relevant to the query':
+        '遍历初始返回的文档，并从每个文档中仅提取与查询相关的内容',
+
     // ---------- Agents ----------
     'Agent that uses Function Calling to pick the tools and args to call': '调用 Function Calling 自动选择工具和参数的智能体',
     'Agent that uses OpenAI Function Calling to pick the tools and args to call using LlamaIndex':
@@ -698,13 +733,15 @@ const nodeDescriptionMap = {
         'Google Custom Search API 封装 — 访问 Google 搜索结果的实时 API',
     'Wrapper around SearXNG - a free internet metasearch engine': 'SearXNG 封装 — 免费的互联网元搜索引擎',
     'Wrapper around SerpAPI - a real-time API to access Google search results': 'SerpAPI 封装 — 访问 Google 搜索结果的实时 API',
-    'Wrapper around Serper.dev - Google Search API': 'Serper.dev 封装 — Google Search API',
+    'Wrapper around Serper.dev - Google Search API': '通过 Serper.dev 调用 Google 搜索接口的工具封装。',
     'Wrapper around TavilyAPI - A specialized search engine designed for LLMs and AI agents':
         'Tavily API 封装 — 专为 LLMs 与 AI agent 设计的搜索引擎',
     'Wrapper around WolframAlpha - a powerful computational knowledge engine': 'WolframAlpha 封装 — 强大的计算知识引擎',
     'Perform Gmail operations for drafts, messages, labels, and threads': '执行 Gmail 操作：草稿、邮件、标签、会话线程',
     'Perform Google Calendar operations such as managing events, calendars, and checking availability':
         '执行 Google 日历操作：管理事件、日历、检查可用时段',
+    'Perform Google Docs operations such as creating, reading, updating, and deleting documents, as well as text manipulation':
+        '执行 Google 文档操作：创建、读取、更新、删除文档，以及文本处理。',
     'Perform Google Drive operations such as managing files, folders, sharing, and searching':
         '执行 Google 云端硬盘操作：管理文件、文件夹、共享与搜索',
     'Perform Google Sheets operations such as managing spreadsheets, reading and writing values':
@@ -722,15 +759,17 @@ const nodeDescriptionMap = {
     'MCP server that integrates the Brave Search API - a real-time API to access web search capabilities':
         '集成 Brave Search API 的 MCP 服务 — 访问网络搜索的实时 API',
     'MCP server that provides read-only access to PostgreSQL databases': '提供 PostgreSQL 数据库只读访问的 MCP 服务',
+    'MCP server that provides a tool for dynamic and reflective problem-solving through a structured thinking process':
+        '提供结构化思考流程的 MCP 服务，用于动态、反思式地解决问题。',
 
     // ---------- Chat Models ----------
     'Access models through the Nemo Guardrails API': '通过 Nemo Guardrails API 访问模型',
     'Chat completion using open-source LLM on Ollama': '使用 Ollama 上的开源 LLM 进行对话补全',
     'Connect to a Litellm server using OpenAI-compatible API': '通过 OpenAI 兼容 API 接入 Litellm 服务',
     'Custom/FineTuned model using OpenAI Chat compatible API': '通过 OpenAI Chat 兼容 API 接入自定义 / 微调模型',
-    'Use local LLMs like llama.cpp, gpt4all using LocalAI': '通过 LocalAI 使用本地 LLM（如 llama.cpp、gpt4all）',
+    'Use local LLMs like llama.cpp, gpt4all using LocalAI': '通过 LocalAI 调用本地大语言模型，例如 llama.cpp、gpt4all。',
     'Wrapper around Alibaba Tongyi Chat Endpoints': 'Alibaba Tongyi 对话接口封装',
-    'Wrapper around Azure OpenAI Chat LLM specific for LlamaIndex': '专为 LlamaIndex 的 Azure OpenAI 对话 LLM 封装',
+    'Wrapper around Azure OpenAI Chat LLM specific for LlamaIndex': '专为 LlamaIndex 使用场景封装的 Azure OpenAI 对话模型。',
     'Wrapper around Azure OpenAI large language models that use the Chat endpoint': '使用 Chat 端点的 Azure OpenAI 大语言模型封装',
     'Wrapper around BaiduWenxin Chat Endpoints': 'BaiduWenxin 对话接口封装',
     'Wrapper around Cerebras Inference API': 'Cerebras Inference API 封装',
@@ -751,9 +790,9 @@ const nodeDescriptionMap = {
     'Wrapper around HuggingFace large language models': 'HuggingFace 大语言模型封装',
     'Wrapper around IBM watsonx.ai foundation models': 'IBM watsonx.ai 基础模型封装',
     'Wrapper around Mistral large language models that use the Chat endpoint': '使用 Chat 端点的 Mistral 大语言模型封装',
-    'Wrapper around NVIDIA NIM Inference API': 'NVIDIA NIM Inference API 封装',
+    'Wrapper around NVIDIA NIM Inference API': '用于调用 NVIDIA NIM 推理接口的模型封装。',
     'Wrapper around Open Router Inference API': 'OpenRouter Inference API 封装',
-    'Wrapper around OpenAI Chat LLM specific for LlamaIndex': '专为 LlamaIndex 的 OpenAI Chat LLM 封装',
+    'Wrapper around OpenAI Chat LLM specific for LlamaIndex': '专为 LlamaIndex 使用场景封装的 OpenAI 对话模型。',
     'Wrapper around OpenAI large language models that use the Chat endpoint': '使用 Chat 端点的 OpenAI 大语言模型封装',
     'Wrapper around Perplexity large language models that use the Chat endpoint': '使用 Chat 端点的 Perplexity 大语言模型封装',
     'Wrapper around Sambanova Chat Endpoints': 'Sambanova 对话接口封装',
@@ -766,6 +805,8 @@ const nodeDescriptionMap = {
     'Wrapper around MiniMax large language models that use the Chat endpoint': '通过 MiniMax OpenAI 兼容接口调用 MiniMax 对话模型',
     'Wrapper around Kimi/Moonshot large language models that use the Chat endpoint': '使用 Chat 端点的 Kimi / 月之暗面大语言模型封装',
     'Wrapper around Zhipu GLM large language models that use the Chat endpoint': '使用 Chat 端点的智谱 GLM 大语言模型封装',
+    'Wrapper around AWS Bedrock large language models. Supports built-in, imported, fine-tuned, and provisioned-throughput models.':
+        'AWS Bedrock 大语言模型封装。支持内置、导入、微调和预置吞吐量模型。',
 
     // ---------- Embeddings ----------
     'AWSBedrock embedding models to generate embeddings for a given text': '使用 AWS Bedrock 向量模型为文本生成向量',
@@ -821,14 +862,30 @@ const nodeDescriptionMap = {
         '使用 Postgres 的 pgvector 存入嵌入并进行相似度检索',
     'Upsert embedded data to local path and perform similarity search': '将嵌入存到本地路径并进行相似度检索',
     'Search and retrieve documents from Document Store': '从文档库检索与读取文档',
+    'Upsert data as embedding or string and perform similarity search with Upstash, the leading serverless data platform':
+        '使用 Upstash 存入向量或字符串并进行相似度检索。Upstash 是领先的无服务器数据平台',
     'Upsert embedded data and load existing index using Couchbase, a award-winning distributed NoSQL database':
         '使用获奖分布式 NoSQL 数据库 Couchbase 存入嵌入并加载现有索引',
+    'Upsert embedded data and perform similarity search upon query using SingleStore, a fast and distributed cloud relational database':
+        '使用快速分布式云关系型数据库 SingleStore 存入嵌入并进行相似度检索',
     'Upsert embedded data and perform similarity or mmr search upon query using DataStax Astra DB, a serverless vector database that’s perfect for managing mission-critical AI workloads':
         '使用无服务器向量库 DataStax Astra DB 存入嵌入并进行相似度 / MMR 检索，适合关键 AI 工作负载',
+    "Upsert embedded data and perform similarity search upon query using Milvus, world's most advanced open-source vector database":
+        '使用全球最先进的开源向量库 Milvus 存入嵌入并进行相似度检索',
     'Upsert embedded data and perform similarity or mmr search upon query using MongoDB Atlas, a managed cloud mongodb database':
         '使用云托管 MongoDB Atlas 存入嵌入并进行相似度 / MMR 检索',
+    'Upsert embedded data and perform similarity search upon query using Elasticsearch, a distributed search and analytics engine':
+        '使用分布式搜索与分析引擎 Elasticsearch 存入嵌入并进行相似度检索',
+    'Upsert embedded data and perform similarity search upon query using Qdrant, a scalable open source vector database written in Rust':
+        '使用基于 Rust 编写的可扩展开源向量库 Qdrant 存入嵌入并进行相似度检索',
     'Upsert embedded data and perform similarity or mmr search using Pinecone, a leading fully managed hosted vector database':
         '使用领先的全托管向量库 Pinecone 存入嵌入并进行相似度 / MMR 检索',
+    'Upsert embedded data and perform similarity or mmr search using Weaviate, a scalable open-source vector database':
+        '使用可扩展的开源向量库 Weaviate 存入嵌入并进行相似度 / MMR 检索',
+    'Upsert embedded data and perform similarity or mmr search upon query using Zep, a fast and scalable building block for LLM apps':
+        '使用快速、可扩展的 LLM 应用构建模块 Zep 存入嵌入并进行相似度 / MMR 检索',
+    'Upsert embedded data and perform similarity search upon query using Redis, an open source, in-memory data structure store':
+        '使用开源内存数据结构存储 Redis 存入嵌入并进行相似度检索',
     'Upsert embedded data and perform similarity search upon query using Meilisearch hybrid search functionality':
         '使用 Meilisearch 的混合搜索能力存入嵌入并进行相似度检索',
     'Upsert embedded data and perform similarity search upon query using Milvus, world’s most advanced open-source vector database':
@@ -845,7 +902,7 @@ const nodeDescriptionMap = {
     'Load Data from S3 Buckets': '从 S3 存储桶加载数据',
     'Load and process data from BraveSearch results': '加载并处理 BraveSearch 结果数据',
     'Load and process data from web search results': '加载并处理网页搜索结果数据',
-    'Load data from Apify Website Content Crawler': '从 Apify Website Content Crawler 加载数据',
+    'Load data from Apify Website Content Crawler': '从 Apify 网站内容爬虫加载网页数据。',
     'Load data from EPUB files': '从 EPUB 文件加载数据',
     'Load data from Notion Database (each row is a separate document with all properties as metadata)':
         '从 Notion 数据库加载数据（每行作为独立文档，所有属性作为元数据）',
@@ -1040,6 +1097,16 @@ const nodeTooltipMap = {
     'Override existing prompt with Chat Prompt Template. Human Message must includes {input} variable':
         '使用 Chat Prompt Template 覆盖默认提示词；其中 Human Message 必须包含 {input} 变量。',
     'If Chat Prompt Template is provided, this will be ignored': '如果已提供 Chat Prompt Template，将忽略这里的系统消息。',
+    'If not specified, a random id will be used. Learn <a target="_blank" href="https://docs.flowiseai.com/memory/long-term-memory#ui-and-embedded-chat">more</a>':
+        '不填写时将使用随机会话 ID。<a target="_blank" href="https://docs.flowiseai.com/memory/long-term-memory#ui-and-embedded-chat">了解更多</a>',
+    'If not specified, a random id will be used. Learn <a target="_blank" href="https://docs.flowiseai.com/memory#ui-and-embedded-chat">more</a>':
+        '不填写时将使用随机会话 ID。<a target="_blank" href="https://docs.flowiseai.com/memory#ui-and-embedded-chat">了解更多</a>',
+    'The aws region in which table is located': '表所在的 AWS 区域。',
+    'List of stop words to use when generating. Use comma to separate multiple stop words.':
+        '生成时使用的停止词列表。多个停止词请用英文逗号分隔。',
+    'Seconds till a session expires. If not specified, the session will never expire.': '会话过期时间，单位为秒。不填写时会话永不过期。',
+    'Configure password authentication on your upstash redis instance': '配置 Upstash Redis 实例的密码认证。',
+    'Zep Memory Type, can be perpetual or message_window': 'Zep 记忆类型，可选择永久记忆 perpetual 或消息窗口 message_window。',
     'Detect text that could generate harmful output and prevent it from being sent to the language model':
         '检测可能产生有害输出的内容，并阻止其发送给语言模型。',
     'If left empty, a default BufferMemory will be used': '留空时将使用默认 Buffer Memory。',
@@ -1062,6 +1129,8 @@ const nodeTooltipMap = {
     'Base URL for the API. Leave empty to use the default.': 'API 的 Base URL。留空时使用默认地址。',
     'Temperature parameter may not apply to certain model. Please check available model parameters':
         '随机性参数不一定适用于所有模型，请以模型支持的参数为准。',
+    'Enable deep thinking mode for complex reasoning tasks. When enabled, the model will use extended thinking before responding.':
+        '启用深度思考模式，用于复杂推理任务。开启后，模型会在回复前进行扩展思考。',
     'Max Tokens parameter may not apply to certain model. Please check available model parameters':
         '最大生成 Token 数不一定适用于所有模型，请以模型支持的参数为准。',
     'Enable latency optimized configuration for supported models. Refer to the supported <a href="https://docs.aws.amazon.com/bedrock/latest/userguide/latency-optimized-inference.html" target="_blank">latecny optimized models</a> for more details.':
@@ -1116,6 +1185,172 @@ const nodeInputPlaceholderMap = {
 
 const isZh = (lang) => !!lang && (lang === 'zh' || lang.startsWith('zh-'))
 
+const isEnglishHeavyCopy = (text) => {
+    if (!text || typeof text !== 'string') return false
+    const latinWords = text.match(/[A-Za-z][A-Za-z'-]{2,}/g) || []
+    const cjkChars = text.match(/[\u3400-\u9fff]/g) || []
+    return latinWords.length >= 4 && cjkChars.length < 8
+}
+
+const normalizeTooltipText = (text) => text.replace(/\s+/g, ' ').trim()
+
+const exactNodeTooltipFallbackMap = {
+    'Search the web for the latest information': '搜索网页获取最新信息。',
+    'Generate images based on a text prompt': '根据文本提示生成图片。',
+    'Extract content from given URLs': '从给定 URL 中提取内容。',
+    'Search real-time web content': '搜索实时网页内容。',
+    'Retrieve full content from specified web pages': '读取指定网页的完整内容。',
+    'Enable memory for the conversation thread': '为当前会话线程启用记忆。',
+    'Instruct the Agent to give output in a JSON structured schema': '要求 Agent 按 JSON 结构化 Schema 输出。',
+    'Instruct the LLM to give output in a JSON structured schema': '要求 LLM 按 JSON 结构化 Schema 输出。',
+    'Enum values. Separated by comma': '枚举值，多个值请用英文逗号分隔。',
+    'JSON schema for the structured output': '结构化输出使用的 JSON Schema。',
+    'First value to be compared with': '用于比较的第一个值。',
+    'A general instructions of what the condition agent should do': '描述条件 Agent 应该执行的总体指令。',
+    'Input to be used for the condition agent': '条件 Agent 使用的输入内容。',
+    'Define the scenarios that will be used as the conditions to split the flow': '定义用于拆分流程的条件场景。',
+    'Override initial system prompt for Condition Agent': '覆盖 Condition Agent 的初始系统提示词。',
+    'Expert use only. Modifying this can significantly alter agent behavior. Leave default if unsure':
+        '仅供高级用户使用。修改此项可能显著改变 Agent 行为；不确定时请保持默认值。',
+    'Input variables can be used in the function with prefix $. For example: $foo': '函数中可使用带 $ 前缀的输入变量，例如 $foo。',
+    'The function to execute. Must return a string or an object that can be converted to a string.':
+        '要执行的函数。必须返回字符串，或返回可转换为字符串的对象。',
+    'Override the config passed to the flow': '覆盖传递给流程的配置。',
+    'Override the config passed to the flow.': '覆盖传递给流程的配置。',
+    'The input array to iterate over': '需要遍历的输入数组。',
+    'Message to display if the loop count is exceeded': '循环次数超限时显示的消息。',
+    'Specify the type of form input': '指定表单输入类型。',
+    'Variable name must be camel case. For example: firstName, lastName, etc.': '变量名必须使用驼峰命名，例如 firstName、lastName 等。',
+    'Declare expected query parameters. Leave empty to accept any.': '声明期望的查询参数；留空则接受任意参数。',
+    'Declare expected request headers. Leave empty to accept any.': '声明期望的请求头；留空则接受任意请求头。',
+    'Define expected parameters in the webhook request body. Leave empty to accept any JSON body.':
+        '定义 Webhook 请求体中的期望参数；留空则接受任意 JSON 请求体。',
+    'Runtime state during the execution of the workflow': '工作流执行期间的运行时状态。',
+    'Persist the state in the same session': '在同一会话中持久化状态。',
+    'Maximum number of messages to return': '要返回的最大消息数量。',
+    'Maximum number of events to return': '要返回的最大事件数量。',
+    'Maximum number of results to return': '要返回的最大结果数量。',
+    'Maximum number of results to return (1-1000)': '要返回的最大结果数量（1-1000）。',
+    'BCC email address(es), comma-separated': '密送邮箱地址，多个请用英文逗号分隔。',
+    'CC email address(es), comma-separated': '抄送邮箱地址，多个请用英文逗号分隔。',
+    'Description of what the tool does. This is for LLM to determine when to use this tool.':
+        '描述该工具的用途，供 LLM 判断何时调用此工具。',
+    'Return the output of the tool directly to the user': '将工具输出直接返回给用户。',
+    'Enter AWS Access Key ID and Secret Access Key': '输入 AWS 访问密钥 ID 和 Secret Access Key，用于授权访问 AWS 服务。',
+    'Enter Composio API key in the credential field': '在凭证字段中输入 Composio API key。',
+    'No available actions, please check your API key and refresh': '没有可用动作，请检查 API key 后刷新。',
+    'No DynamoDB tables found in this region': '当前区域没有找到 DynamoDB 表。',
+    'Only when loading JSONL files': '仅在加载 JSONL 文件时使用。',
+    'Only when loading PDF files': '仅在加载 PDF 文件时使用。',
+    'How values should be represented in the output': '设置输出中的值展示方式。',
+    'If all results should be returned or only up to a given limit': '设置是否返回全部结果，或仅返回指定数量以内的结果。',
+    'Crawl relative links from HTML URL': '从 HTML URL 抓取相对链接。',
+    'Select a go to wait until option': '选择页面跳转后的等待条件。',
+    'Only content inside this selector will be extracted. Leave empty to use the entire page body.':
+        '仅提取该选择器内的内容；留空则使用整个页面正文。',
+    'Only needed when using Qdrant cloud hosted': '仅在使用 Qdrant 云托管服务时需要。',
+    'Only needed when using Weaviate cloud hosted': '仅在使用 Weaviate 云托管服务时需要。',
+    'Only needed if you have chroma on cloud services with X-Api-key': '仅在云服务中的 Chroma 需要 X-Api-key 时填写。',
+    'Use SSL to connect to Postgres': '使用 SSL 连接 Postgres。',
+    'Different option to connect to Postgres': '选择连接 Postgres 的方式。',
+    'Distance metric for similarity search': '相似度检索使用的距离度量。',
+    'Similarity measure used in Elasticsearch.': 'Elasticsearch 使用的相似度度量。',
+    'Similarity measure used in Qdrant.': 'Qdrant 使用的相似度度量。',
+    'Dimension used for storing vector embedding': '用于存储向量嵌入的维度。',
+    'Path to load faiss.index file': '加载 faiss.index 文件的路径。',
+    'Path to the client PEM file': '客户端 PEM 文件路径。',
+    'Path to the client key file': '客户端 key 文件路径。',
+    'Path to the root PEM file': '根 PEM 文件路径。',
+    'Server name for the secure connection': '安全连接使用的服务器名称。',
+    'Enable secure connection to Milvus server': '启用到 Milvus 服务的安全连接。',
+    'Name of the field (column) that contains the actual content': '包含实际内容的字段（列）名称。',
+    'Name of the field (column) that contains the Embedding': '包含 Embedding 的字段（列）名称。',
+    'Name of the field (column) that contains the metadata of the document': '包含文档元数据的字段（列）名称。',
+    'Name of the field (column) that contains the vector': '包含向量的字段（列）名称。',
+    'Show the output result in the Prediction API response': '在 Prediction API 响应中显示输出结果。',
+    'Function must return a value': '函数必须返回一个值。',
+    'Use LLM to generate a description': '使用 LLM 生成描述。'
+}
+
+const translateNodeTooltipByPattern = (text) => {
+    const normalized = normalizeTooltipText(text)
+    const lower = normalized.toLowerCase()
+
+    if (exactNodeTooltipFallbackMap[normalized]) return exactNodeTooltipFallbackMap[normalized]
+    if (lower.includes('comma-separated') || lower.includes('comma separated')) return '请填写以英文逗号分隔的列表。'
+    if (lower.includes('json schema')) return '请填写用于结构化数据的 JSON Schema。'
+    if (lower.includes('json body')) return '请填写 JSON 格式的请求体。'
+    if (lower.includes('json object')) return '请填写 JSON 对象格式的配置。'
+    if (lower.includes('base url')) return '填写服务的 Base URL；留空时使用默认地址。'
+    if (lower.includes('api key')) return '填写对应服务的 API key 或在凭证中配置。'
+    if (lower.includes('credential')) return '选择或配置访问该服务所需的凭证。'
+    if (lower.includes('oauth')) return '选择对应服务的 OAuth 凭证。'
+    if (lower.includes('webhook')) return '配置 Webhook 请求、签名或回调相关参数。'
+    if (lower.includes('signature')) return '配置请求签名校验相关参数。'
+    if (lower.includes('callback')) return '配置流程完成后的回调地址或回调签名。'
+    if (lower.includes('email')) return '填写邮箱相关参数；多个值通常可用英文逗号分隔。'
+    if (lower.includes('calendar')) return '配置日历、事件或可用时间查询相关参数。'
+    if (lower.includes('google drive')) return '配置 Google 云端硬盘文件、文件夹或共享盘相关参数。'
+    if (lower.includes('google docs')) return '配置 Google 文档的创建、读取、更新或文本操作参数。'
+    if (lower.includes('google spreadsheet') || lower.includes('google sheets')) return '配置 Google 表格范围、值或批量操作参数。'
+    if (lower.includes('jira')) return '配置 Jira 工单、评论或用户相关操作参数。'
+    if (lower.includes('microsoft teams')) return '配置 Microsoft Teams 团队、频道、聊天或消息相关参数。'
+    if (lower.includes('microsoft outlook')) return '配置 Microsoft Outlook 邮件、日历或事件相关参数。'
+    if (lower.includes('dynamodb')) return '配置 AWS DynamoDB 表、区域或键值存储参数。'
+    if (lower.includes('aws')) return '配置 AWS 服务访问、区域或资源相关参数。'
+    if (lower.includes('vectara')) return '配置 Vectara 检索、过滤、上传或摘要相关参数。'
+    if (lower.includes('qdrant')) return '配置 Qdrant 集合、过滤、相似度或云托管连接参数。'
+    if (lower.includes('milvus')) return '配置 Milvus 连接、安全证书或过滤查询参数。'
+    if (lower.includes('weaviate')) return '配置 Weaviate 连接、集合或混合检索参数。'
+    if (lower.includes('pinecone')) return '配置 Pinecone 索引、命名空间或元数据字段参数。'
+    if (lower.includes('postgres')) return '配置 Postgres 连接、表、列或向量检索参数。'
+    if (lower.includes('redis')) return '配置 Redis 连接、索引、字段或缓存参数。'
+    if (lower.includes('mongodb')) return '配置 MongoDB Atlas 连接、集合或向量字段参数。'
+    if (lower.includes('elasticsearch')) return '配置 Elasticsearch 索引、连接或相似度参数。'
+    if (lower.includes('opensearch')) return '配置 OpenSearch 引擎、索引或相似度参数。'
+    if (lower.includes('meilisearch')) return '配置 Meilisearch 实例、索引或混合搜索参数。'
+    if (lower.includes('ollama')) return '配置 Ollama 模型推理参数。'
+    if (lower.includes('reasoning')) return '配置模型推理能力、推理强度或推理摘要相关参数。'
+    if (lower.includes('temperature')) return '配置模型输出随机性；数值越高，回答通常越发散。'
+    if (lower.includes('top-k') || lower.includes('top k')) return '配置 Top-K 采样或返回结果数量。'
+    if (lower.includes('top-p') || lower.includes('nucleus')) return '配置 nucleus / Top-P 采样参数。'
+    if (lower.includes('token')) return '配置模型生成、上下文或推理过程使用的 Token 参数。'
+    if (lower.includes('model')) return '配置模型名称、模型能力或模型调用参数。'
+    if (lower.includes('prompt')) return '配置提示词、提示词变量或消息模板。'
+    if (lower.includes('message')) return '配置消息内容、消息来源或消息返回方式。'
+    if (lower.includes('conversation history')) return '配置提示词中包含哪些历史对话消息。'
+    if (lower.includes('memory')) return '配置会话记忆、窗口大小或记忆存储方式。'
+    if (lower.includes('document loader') || lower.includes('metadata keys')) return '配置文档加载器的元数据键；可按需忽略默认元数据字段。'
+    if (lower.includes('metadata')) return '配置文档或检索结果的元数据字段、过滤条件或附加信息。'
+    if (lower.includes('chunk')) return '配置文档切分、块大小、重叠或切分策略。'
+    if (lower.includes('ocr') || lower.includes('partition')) return '配置文档解析、OCR 或分区策略。'
+    if (lower.includes('selector')) return '配置页面选择器；留空时通常使用完整页面内容。'
+    if (lower.includes('crawl') || lower.includes('scrape')) return '配置网页抓取、爬取范围、深度或等待策略。'
+    if (lower.includes('search')) return '配置搜索查询、搜索范围、结果数量或过滤条件。'
+    if (lower.includes('query')) return '配置查询内容、查询参数或检索过滤条件。'
+    if (lower.includes('filter')) return '配置过滤条件，用于限制返回或检索的结果。'
+    if (lower.includes('file')) return '配置文件上传、文件读取、文件路径或文件处理选项。'
+    if (lower.includes('folder')) return '配置文件夹、目录或批量文件处理选项。'
+    if (lower.includes('url') || lower.includes('link')) return '填写相关 URL / 链接地址或链接处理方式。'
+    if (lower.includes('path')) return '填写文件路径、加载路径或接口路径。'
+    if (lower.includes('header')) return '配置请求头或响应头相关参数。'
+    if (lower.includes('body')) return '配置请求体、Body 参数或 Body 格式。'
+    if (lower.includes('request')) return '配置请求参数、请求格式或请求处理方式。'
+    if (lower.includes('response')) return '配置响应内容、响应格式或返回方式。'
+    if (lower.includes('return')) return '配置该节点返回给下游或用户的内容。'
+    if (lower.includes('select')) return '选择当前节点需要使用的选项或资源。'
+    if (lower.includes('maximum number') || lower.includes('max number') || lower.includes('number of')) return '设置要处理或返回的数量。'
+    if (lower.includes('whether')) return '设置是否启用当前选项。'
+    if (lower.includes('enable')) return '启用或配置当前功能选项。'
+    if (lower.includes('custom')) return '配置当前节点的自定义行为或自定义输入。'
+    if (lower.includes('tool')) return '配置工具名称、工具说明、工具输入或工具返回方式。'
+    if (lower.includes('agent')) return '配置 Agent 的输入、工具调用、审批或执行行为。'
+    if (lower.includes('flow')) return '配置流程调用、流程输入或流程执行方式。'
+
+    if (isEnglishHeavyCopy(normalized)) return '该参数用于配置当前节点的相关行为，请结合字段名称和节点上下文填写。'
+    return text
+}
+
 export const translateNodeCategory = (text, lang) => {
     if (!text) return text
     if (isZh(lang) && nodeCategoryMap[text]) return nodeCategoryMap[text]
@@ -1136,7 +1371,7 @@ export const translateNodeDescription = (text, lang) => {
 
 export const translateNodeTooltip = (text, lang) => {
     if (!text || typeof text !== 'string') return text
-    if (isZh(lang)) return nodeTooltipMap[text] || nodeDescriptionMap[text] || text
+    if (isZh(lang)) return nodeTooltipMap[text] || nodeDescriptionMap[text] || translateNodeTooltipByPattern(text)
     return text
 }
 

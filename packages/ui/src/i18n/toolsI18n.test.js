@@ -21,6 +21,9 @@ const requiredKeys = [
     'pages.tools.schemaType',
     'pages.tools.schemaDescription',
     'pages.tools.schemaRequired',
+    'pages.tools.schemaPropertyPlaceholder',
+    'pages.tools.schemaTypePlaceholder',
+    'pages.tools.schemaDescriptionPlaceholder',
     'pages.tools.noSchemaRows',
     'pages.tools.pasteJson',
     'pages.tools.addItem',
@@ -76,6 +79,10 @@ describe('tools i18n coverage', () => {
         expect(source).toContain("headerName: t('pages.tools.schemaType')")
         expect(source).toContain("headerName: t('pages.tools.schemaDescription')")
         expect(source).toContain("headerName: t('pages.tools.schemaRequired')")
+        expect(source).toContain("t('pages.tools.schemaPropertyPlaceholder')")
+        expect(source).toContain("t('pages.tools.schemaTypePlaceholder')")
+        expect(source).toContain("t('pages.tools.schemaDescriptionPlaceholder')")
+        expect(source).toContain('schema-empty-editable-cell')
         expect(source).toContain("localeText={{ noRowsLabel: t('pages.tools.noSchemaRows') }}")
         expect(source).toContain("t('pages.tools.javascriptFunction')")
         expect(source).toContain("t('pages.tools.howToUseFunction')")

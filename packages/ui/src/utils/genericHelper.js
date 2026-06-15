@@ -115,6 +115,14 @@ export const initializeDefaultNodeData = (nodeParams) => {
     return initialValues
 }
 
+export const shouldRenderNodeInputParam = (nodeData, inputParam) => {
+    if (!inputParam) return true
+    const nodeName = nodeData?.name
+    const inputName = inputParam?.name
+
+    return !(nodeName === 'chatZhipuAI' && (inputName === 'basePath' || inputName === 'basepath'))
+}
+
 export const initNode = (nodeData, newNodeId, isAgentflow) => {
     const inputAnchors = []
     const inputParams = []

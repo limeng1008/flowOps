@@ -1,6 +1,79 @@
 const fs = require('fs')
 const path = require('path')
 
+const collectFiles = (dir) => {
+    const entries = fs.readdirSync(dir, { withFileTypes: true })
+    return entries.flatMap((entry) => {
+        const fullPath = path.join(dir, entry.name)
+        if (entry.isDirectory()) return collectFiles(fullPath)
+        return entry.isFile() && entry.name.endsWith('.ts') ? [fullPath] : []
+    })
+}
+
+const collectNodeDescriptions = () => {
+    const nodesDir = path.join(__dirname, '../../../components/nodes')
+    return collectFiles(nodesDir).flatMap((file) => {
+        const source = fs.readFileSync(file, 'utf8')
+        const label = source
+            .match(/this\.label\s*=\s*([`'"])([\s\S]*?)\1/)?.[2]
+            ?.replace(/\s+/g, ' ')
+            .trim()
+        const matches = [...source.matchAll(/this\.description\s*=\s*([`'"])([\s\S]*?)\1/g)]
+        return matches
+            .map((match) => {
+                const literal = `${match[1]}${match[2]}${match[1]}`
+                let text = match[2]
+                try {
+                    text = Function(`return ${literal}`)()
+                } catch {
+                    text = match[2]
+                }
+                return {
+                    file: path.relative(path.join(__dirname, '../../..'), file),
+                    label,
+                    text: text.replace(/\s+/g, ' ').trim()
+                }
+            })
+            .filter((item) => item.text && !item.text.includes('${'))
+    })
+}
+
+const collectNodeParameterDescriptions = () => {
+    const nodesDir = path.join(__dirname, '../../../components/nodes')
+    return collectFiles(nodesDir)
+        .filter((file) => !file.endsWith('.test.ts'))
+        .flatMap((file) => {
+            const source = fs.readFileSync(file, 'utf8')
+            const label = source
+                .match(/this\.label\s*=\s*([`'"])([\s\S]*?)\1/)?.[2]
+                ?.replace(/\s+/g, ' ')
+                .trim()
+            const matches = [...source.matchAll(/description\s*:\s*([`'"])([\s\S]*?)\1/g)]
+            return matches
+                .map((match) => {
+                    const literal = `${match[1]}${match[2]}${match[1]}`
+                    let text = match[2]
+                    try {
+                        text = Function(`return ${literal}`)()
+                    } catch {
+                        text = match[2]
+                    }
+                    return {
+                        file: path.relative(path.join(__dirname, '../../..'), file),
+                        label,
+                        text: text.replace(/\s+/g, ' ').trim()
+                    }
+                })
+                .filter((item) => item.text && !item.text.includes('${'))
+        })
+}
+
+const isEnglishHeavyDescription = (text) => {
+    const latinWords = text.match(/[A-Za-z][A-Za-z'-]{2,}/g) || []
+    const cjkChars = text.match(/[\u3400-\u9fff]/g) || []
+    return latinWords.length >= 4 && cjkChars.length < 8
+}
+
 describe('canvas node badge i18n coverage', () => {
     it('uses domestic-friendly copy for OpenAI-compatible embedding nodes', async () => {
         const { translateNodeLabel } = await import('./nodeI18n.js')
@@ -18,6 +91,52 @@ describe('canvas node badge i18n coverage', () => {
         expect(translateNodeDescription('Wrapper around Zhipu GLM large language models that use the Chat endpoint', 'en')).toBe(
             'Wrapper around Zhipu GLM large language models that use the Chat endpoint'
         )
+    })
+
+    it('translates Google Docs node description in the add-node list', async () => {
+        const { translateNodeDescription } = await import('./nodeI18n.js')
+        const description =
+            'Perform Google Docs operations such as creating, reading, updating, and deleting documents, as well as text manipulation'
+
+        expect(translateNodeDescription(description, 'zh')).toBe('执行 Google 文档操作：创建、读取、更新、删除文档，以及文本处理。')
+        expect(translateNodeDescription(description, 'en')).toBe(description)
+    })
+
+    it('translates Sequential Thinking MCP copy in the add-node list', async () => {
+        const { translateNodeDescription, translateNodeLabel } = await import('./nodeI18n.js')
+        const description =
+            'MCP server that provides a tool for dynamic and reflective problem-solving through a structured thinking process'
+
+        expect(translateNodeLabel('Sequential Thinking MCP', 'zh')).toBe('顺序思考 MCP')
+        expect(translateNodeLabel('Sequential Thinking MCP', 'en')).toBe('Sequential Thinking MCP')
+        expect(translateNodeDescription(description, 'zh')).toBe('提供结构化思考流程的 MCP 服务，用于动态、反思式地解决问题。')
+        expect(translateNodeDescription(description, 'en')).toBe(description)
+    })
+
+    it('translates every English add-node description globally', async () => {
+        const { translateNodeDescription } = await import('./nodeI18n.js')
+        const missing = collectNodeDescriptions()
+            .filter(({ text }) => isEnglishHeavyDescription(text))
+            .filter(({ text }) => {
+                const translated = translateNodeDescription(text, 'zh')
+                return translated === text || isEnglishHeavyDescription(translated)
+            })
+            .map(({ label, file, text }) => `${label || '(unknown)'} | ${file} | ${text}`)
+
+        expect(missing).toEqual([])
+    })
+
+    it('translates every English node parameter description globally', async () => {
+        const { translateNodeTooltip } = await import('./nodeI18n.js')
+        const missing = collectNodeParameterDescriptions()
+            .filter(({ text }) => isEnglishHeavyDescription(text))
+            .filter(({ text }) => {
+                const translated = translateNodeTooltip(text, 'zh')
+                return translated === text || isEnglishHeavyDescription(translated)
+            })
+            .map(({ label, file, text }) => `${label || '(unknown)'} | ${file} | ${text}`)
+
+        expect(missing).toEqual([])
     })
 
     it('translates canvas node titles and node info titles', () => {
@@ -39,8 +158,35 @@ describe('canvas node badge i18n coverage', () => {
         const { translateNodeLabel, translateNodeTooltip } = await import('./nodeI18n.js')
         const tooltip = 'Override existing prompt with Chat Prompt Template. Human Message must includes {input} variable'
 
+        const sessionTooltip =
+            'If not specified, a random id will be used. Learn <a target="_blank" href="https://docs.flowiseai.com/memory/long-term-memory#ui-and-embedded-chat">more</a>'
+
+        expect(translateNodeLabel('Session Id', 'zh')).toBe('会话 ID')
+        expect(translateNodeLabel('Session ID', 'zh')).toBe('会话 ID')
+        expect(translateNodeTooltip(sessionTooltip, 'zh')).toBe(
+            '不填写时将使用随机会话 ID。<a target="_blank" href="https://docs.flowiseai.com/memory/long-term-memory#ui-and-embedded-chat">了解更多</a>'
+        )
         expect(translateNodeTooltip(tooltip, 'zh')).toBe(
             '使用 Chat Prompt Template 覆盖默认提示词；其中 Human Message 必须包含 {input} 变量。'
+        )
+        expect(
+            translateNodeTooltip(
+                'If not specified, a random id will be used. Learn <a target="_blank" href="https://docs.flowiseai.com/memory#ui-and-embedded-chat">more</a>',
+                'zh'
+            )
+        ).toBe('不填写时将使用随机会话 ID。<a target="_blank" href="https://docs.flowiseai.com/memory#ui-and-embedded-chat">了解更多</a>')
+        expect(translateNodeTooltip('The aws region in which table is located', 'zh')).toBe('表所在的 AWS 区域。')
+        expect(translateNodeTooltip('List of stop words to use when generating. Use comma to separate multiple stop words.', 'zh')).toBe(
+            '生成时使用的停止词列表。多个停止词请用英文逗号分隔。'
+        )
+        expect(translateNodeTooltip('Seconds till a session expires. If not specified, the session will never expire.', 'zh')).toBe(
+            '会话过期时间，单位为秒。不填写时会话永不过期。'
+        )
+        expect(translateNodeTooltip('Configure password authentication on your upstash redis instance', 'zh')).toBe(
+            '配置 Upstash Redis 实例的密码认证。'
+        )
+        expect(translateNodeTooltip('Zep Memory Type, can be perpetual or message_window', 'zh')).toBe(
+            'Zep 记忆类型，可选择永久记忆 perpetual 或消息窗口 message_window。'
         )
         expect(
             translateNodeTooltip('Temperature parameter may not apply to certain model. Please check available model parameters', 'zh')
@@ -58,6 +204,14 @@ describe('canvas node badge i18n coverage', () => {
         expect(translateNodeLabel('Cohere Input Type', 'zh')).toBe('Cohere 输入类型')
         expect(translateNodeLabel('Max AWS API retries', 'zh')).toBe('AWS API 最大重试次数')
         expect(translateNodeLabel('Tool', 'zh')).toBe('工具')
+        expect(translateNodeLabel('Top Probability', 'zh')).toBe('最高概率')
+        expect(translateNodeLabel('Thinking', 'zh')).toBe('深度思考')
+        expect(
+            translateNodeTooltip(
+                'Enable deep thinking mode for complex reasoning tasks. When enabled, the model will use extended thinking before responding.',
+                'zh'
+            )
+        ).toBe('启用深度思考模式，用于复杂推理任务。开启后，模型会在回复前进行扩展思考。')
         expect(
             translateNodeTooltip(
                 'Custom endpoint host to use for the model. Provide the hostname without scheme. If provided, will override the default endpoint host.',

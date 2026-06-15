@@ -46,6 +46,40 @@
             }
         }
     },
+    "snackbar": {
+        "chatflowSaved": "Chatflow saved",
+        "agentflowSaved": "Agentflow saved",
+        "scheduleEnabled": "Schedule enabled successfully",
+        "scheduleDisabled": "Schedule disabled successfully",
+        "scheduleToggleFailed": "Failed to toggle schedule",
+        "mandatoryFields": "Please fill in the following mandatory fields: {{fields}}",
+        "failedActionTarget": "Failed to {{action}} {{target}}: {{message}}",
+        "failedActionOnly": "Failed to {{action}}: {{message}}",
+        "failedWithMessage": "Failed: {{message}}",
+        "ttsFailed": "TTS failed: {{message}}",
+        "ttsRequestFailed": "TTS request failed: {{status}}",
+        "httpStatusError": "HTTP error! status: {{status}}",
+        "actions": {
+            "addNew": "add new",
+            "save": "save",
+            "delete": "delete",
+            "update": "update",
+            "refresh": "refresh",
+            "export": "export",
+            "retrieve": "retrieve",
+            "previewChunks": "preview chunks",
+            "processChunking": "process chunking"
+        },
+        "targets": {
+            "apiKey": "API key",
+            "documentStore": "Document Store",
+            "documentLoader": "Document Loader",
+            "tool": "Tool",
+            "variable": "Variable",
+            "vectorStoreConfig": "vector store config",
+            "chunk": "chunk"
+        }
+    },
     "profile": {
         "user": "User",
         "export": "Export",
@@ -443,6 +477,8 @@
         },
         "validation": {
             "validateNodes": "Validate Nodes",
+            "validateFlow": "Validate Flow",
+            "validating": "Validating...",
             "noIssuesFound": "No issues found in your flow!",
             "failed": "Failed to validate flow",
             "checklist": "Checklist ({{count}})"
@@ -553,6 +589,12 @@
         "syncNodes": "Sync Nodes",
         "toggleSnapping": "Toggle snapping",
         "toggleBackground": "Toggle background",
+        "controls": {
+            "zoomIn": "Zoom in",
+            "zoomOut": "Zoom out",
+            "fitView": "Fit view",
+            "toggleInteractivity": "Toggle interactivity"
+        },
         "byAuthor": "By {{author}}",
         "elseBranch": "Else",
         "tabUtilities": "Utilities",
@@ -1014,6 +1056,7 @@
             "title": "Chatflows",
             "description": "Build single-agent systems, chatbots and simple LLM flows",
             "searchPlaceholder": "Search Name or Category",
+            "embedApiTitle": "Embed in website or use as API",
             "share": {
                 "copyLink": "Copy Link",
                 "openNewTab": "Open New Tab",
@@ -1430,6 +1473,9 @@
             "schemaType": "Type",
             "schemaDescription": "Description",
             "schemaRequired": "Required",
+            "schemaPropertyPlaceholder": "Enter parameter name",
+            "schemaTypePlaceholder": "Select type",
+            "schemaDescriptionPlaceholder": "Enter description",
             "noSchemaRows": "No fields yet",
             "pasteJson": "Paste JSON",
             "addItem": "Add Field",

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useCallback, useContext } from 'react'
-import ReactFlow, { addEdge, Controls, MiniMap, Background, useNodesState, useEdgesState } from 'reactflow'
+import ReactFlow, { addEdge, MiniMap, Background, ControlButton, useNodesState, useEdgesState } from 'reactflow'
 import 'reactflow/dist/style.css'
 import './index.css'
 import { useReward } from 'react-rewards'
@@ -29,6 +29,7 @@ import StickyNote from './StickyNote'
 import CanvasHeader from '@/views/canvas/CanvasHeader'
 import AddNodes from '@/views/canvas/AddNodes'
 import ConfirmDialog from '@/ui-component/dialog/ConfirmDialog'
+import LocalizedControls from '@/ui-component/canvas/LocalizedControls'
 import EditNodeDialog from '@/views/agentflowsv2/EditNodeDialog'
 import ChatPopUp from '@/views/chatmessage/ChatPopUp'
 import ScheduleHistoryFAB from '@/views/schedule/ScheduleHistoryFAB'
@@ -745,7 +746,7 @@ const AgentflowCanvas = () => {
                                 snapToGrid={isSnappingEnabled}
                                 connectionLineComponent={ConnectionLine}
                             >
-                                <Controls
+                                <LocalizedControls
                                     className={customization.isDarkMode ? 'dark-mode-controls' : ''}
                                     style={{
                                         display: 'flex',
@@ -754,27 +755,27 @@ const AgentflowCanvas = () => {
                                         transform: 'translate(-50%, -50%)'
                                     }}
                                 >
-                                    <button
-                                        className='react-flow__controls-button react-flow__controls-interactive'
+                                    <ControlButton
+                                        className='react-flow__controls-interactive'
                                         onClick={() => {
-                                            setIsSnappingEnabled(!isSnappingEnabled)
+                                            setIsSnappingEnabled((isEnabled) => !isEnabled)
                                         }}
                                         title={t('canvas.toggleSnapping')}
                                         aria-label={t('canvas.toggleSnapping')}
                                     >
                                         {isSnappingEnabled ? <IconMagnetFilled /> : <IconMagnetOff />}
-                                    </button>
-                                    <button
-                                        className='react-flow__controls-button react-flow__controls-interactive'
+                                    </ControlButton>
+                                    <ControlButton
+                                        className='react-flow__controls-interactive'
                                         onClick={() => {
-                                            setIsBackgroundEnabled(!isBackgroundEnabled)
+                                            setIsBackgroundEnabled((isEnabled) => !isEnabled)
                                         }}
                                         title={t('canvas.toggleBackground')}
                                         aria-label={t('canvas.toggleBackground')}
                                     >
                                         {isBackgroundEnabled ? <IconArtboard /> : <IconArtboardOff />}
-                                    </button>
-                                </Controls>
+                                    </ControlButton>
+                                </LocalizedControls>
                                 <MiniMap
                                     nodeStrokeWidth={3}
                                     nodeColor={customization.isDarkMode ? '#2d2d2d' : '#e2e2e2'}
