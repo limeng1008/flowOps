@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 // material-ui
-import { Box, Skeleton, Stack, ToggleButton, ToggleButtonGroup } from '@mui/material'
+import { Box, ListItemIcon, ListItemText, Menu, MenuItem, Skeleton, Stack, ToggleButton, ToggleButtonGroup } from '@mui/material'
 import { useTheme } from '@mui/material/styles'
 
 // project imports
@@ -19,6 +19,7 @@ import TablePagination, { DEFAULT_ITEMS_PER_PAGE } from '@/ui-component/paginati
 import { FlowListTable } from '@/ui-component/table/FlowListTable'
 import { translateNodeLabel } from '@/i18n/nodeI18n'
 import { getLiquidGlassControlSx } from '@/ui-component/utils/liquidGlassStyles'
+import { createFeishuHandoffTemplateFlowData } from './feishuHandoffTemplate'
 
 // API
 import chatflowsApi from '@/api/chatflows'
@@ -31,7 +32,7 @@ import { baseURL } from '@/store/constant'
 import { useError } from '@/store/context/ErrorContext'
 
 // icons
-import { IconLayoutGrid, IconList, IconPlus } from '@tabler/icons-react'
+import { IconChevronDown, IconLayoutGrid, IconList, IconPlus, IconRobot } from '@tabler/icons-react'
 
 // ==============================|| CHATFLOWS ||============================== //
 
@@ -44,6 +45,7 @@ const Chatflows = () => {
     const [isLoading, setLoading] = useState(true)
     const [images, setImages] = useState({})
     const [search, setSearch] = useState('')
+    const [createMenuAnchor, setCreateMenuAnchor] = useState(null)
     const { error, setError } = useError()
 
     const getAllChatflowsApi = useApi(chatflowsApi.getAllChatflows)
@@ -87,8 +89,24 @@ const Chatflows = () => {
         )
     }
 
+    const isCreateMenuOpen = Boolean(createMenuAnchor)
+
+    const openCreateMenu = (event) => {
+        setCreateMenuAnchor(event.currentTarget)
+    }
+
+    const closeCreateMenu = () => {
+        setCreateMenuAnchor(null)
+    }
+
     const addNew = () => {
+        closeCreateMenu()
         navigate('/canvas')
+    }
+
+    const addFeishuHandoff = () => {
+        closeCreateMenu()
+        navigate('/canvas', { state: { templateFlowData: createFeishuHandoffTemplateFlowData() } })
     }
 
     const goToCanvas = (selectedChatflow) => {
@@ -202,10 +220,15 @@ const Chatflows = () => {
                             </ToggleButton>
                         </ToggleButtonGroup>
                         <StyledPermissionButton
+                            id='chatflow-create-button'
                             permissionId={'chatflows:create'}
                             variant='contained'
-                            onClick={addNew}
+                            onClick={openCreateMenu}
                             startIcon={<IconPlus />}
+                            endIcon={<IconChevronDown size={18} />}
+                            aria-controls={isCreateMenuOpen ? 'chatflow-create-menu' : undefined}
+                            aria-haspopup='menu'
+                            aria-expanded={isCreateMenuOpen ? 'true' : undefined}
                             sx={{
                                 ...getLiquidGlassControlSx(theme),
                                 borderRadius: '18px',
@@ -216,6 +239,44 @@ const Chatflows = () => {
                         >
                             {t('common.addNew')}
                         </StyledPermissionButton>
+                        <Menu
+                            id='chatflow-create-menu'
+                            anchorEl={createMenuAnchor}
+                            open={isCreateMenuOpen}
+                            onClose={closeCreateMenu}
+                            MenuListProps={{ 'aria-labelledby': 'chatflow-create-button' }}
+                            PaperProps={{
+                                sx: {
+                                    mt: 1,
+                                    minWidth: 288,
+                                    borderRadius: 2,
+                                    border: `1px solid ${theme.palette.glass.border}`,
+                                    background: theme.palette.glass.surfaceStrong,
+                                    backdropFilter: `blur(${theme.palette.glass.blur}) saturate(1.45)`,
+                                    WebkitBackdropFilter: `blur(${theme.palette.glass.blur}) saturate(1.45)`,
+                                    boxShadow: theme.palette.glass.shadow
+                                }
+                            }}
+                        >
+                            <MenuItem onClick={addNew}>
+                                <ListItemIcon>
+                                    <IconPlus size={20} />
+                                </ListItemIcon>
+                                <ListItemText
+                                    primary={t('pages.chatflows.create.blankChatflow')}
+                                    secondary={t('pages.chatflows.create.blankChatflowDescription')}
+                                />
+                            </MenuItem>
+                            <MenuItem onClick={addFeishuHandoff}>
+                                <ListItemIcon>
+                                    <IconRobot size={20} />
+                                </ListItemIcon>
+                                <ListItemText
+                                    primary={t('pages.chatflows.create.feishuHandoff')}
+                                    secondary={t('pages.chatflows.create.feishuHandoffDescription')}
+                                />
+                            </MenuItem>
+                        </Menu>
                     </ViewHeader>
 
                     {isLoading && (

@@ -49,7 +49,12 @@ const requiredKeys = [
     'pages.chatflows.api.selectNoAuthorization',
     'pages.chatflows.api.showOverrideConfig',
     'pages.chatflows.api.overrideConfigHelp',
-    'pages.chatflows.api.streamingHelp'
+    'pages.chatflows.api.streamingHelp',
+    'pages.chatflows.api.tabs.embed',
+    'pages.chatflows.api.tabs.python',
+    'pages.chatflows.api.tabs.javascript',
+    'pages.chatflows.api.tabs.curl',
+    'pages.chatflows.api.tabs.shareChatbot'
 ]
 
 const get = (obj, key) => key.split('.').reduce((acc, part) => acc?.[part], obj)
@@ -90,6 +95,10 @@ describe('chatflow share and API dialog i18n coverage', () => {
         expect(source).toContain("t('pages.chatflows.api.scheduledTriggerNotice')")
         expect(source).toContain("t('pages.chatflows.api.webhookTriggerNotice'")
         expect(source).toContain("t('pages.chatflows.api.showOverrideConfig')")
+        expect(source).toContain("t('pages.chatflows.embedApiTitle')")
+        expect(source).toContain("t('pages.chatflows.api.tabs.embed')")
+        expect(source).toContain("t('pages.chatflows.api.tabs.shareChatbot')")
+        expect(source).not.toContain('label={codeLang}')
         expect(source).not.toContain('This flow is configured as a <b>Scheduled Trigger</b>')
         expect(source).not.toContain('This flow is configured as a <b>Webhook Trigger</b>')
         expect(source).not.toContain('You cannot use API key while embedding/sharing chatbot.')
