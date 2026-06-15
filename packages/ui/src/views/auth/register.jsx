@@ -129,6 +129,8 @@ const RegisterPage = () => {
     const getDefaultProvidersApi = useApi(loginMethodApi.getDefaultLoginMethods)
     const navigate = useNavigate()
     const location = useLocation()
+    const allowOpenRegistration = getDefaultProvidersApi.data?.allowOpenRegistration === true
+    const isInviteRegistrationRequired = isEnterpriseLicensed && !allowOpenRegistration
 
     const validationMessage = (message) =>
         ({
@@ -149,7 +151,7 @@ const RegisterPage = () => {
     const register = async (event) => {
         event.preventDefault()
         setAuthRateLimitError(null)
-        if (isEnterpriseLicensed) {
+        if (isInviteRegistrationRequired) {
             const result = RegisterEnterpriseUserSchema.safeParse({
                 username,
                 email,
@@ -172,7 +174,7 @@ const RegisterPage = () => {
                 const errorMessages = result.error.errors.map((err) => validationMessage(err.message))
                 setAuthError(errorMessages.join(', '))
             }
-        } else if (isCloud) {
+        } else if (isCloud || allowOpenRegistration) {
             const formData = new FormData(event.target)
             const referral = formData.get('referral')
             const result = RegisterCloudUserSchema.safeParse({
@@ -361,7 +363,7 @@ const RegisterPage = () => {
                                     <i>{t('auth.emailHint')}</i>
                                 </Typography>
                             </Box>
-                            {isEnterpriseLicensed && (
+                            {isInviteRegistrationRequired && (
                                 <Box>
                                     <div style={{ display: 'flex', flexDirection: 'row' }}>
                                         <Typography>

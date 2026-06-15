@@ -113,6 +113,20 @@ describe('FlowOpsAuthService', () => {
         delete process.env.APP_URL
     })
 
+    it('reports whether the self track is ready for first admin bootstrap', async () => {
+        await expect(service.isFirstAdminSetup()).resolves.toBe(true)
+
+        await service.registerAccount({
+            user: {
+                name: 'Ada Lovelace',
+                email: 'ada@example.com',
+                credential: 'Password1!'
+            }
+        })
+
+        await expect(service.isFirstAdminSetup()).resolves.toBe(false)
+    })
+
     it('registers the first user as owner and creates the default organization and workspace', async () => {
         const loggedInUser = await service.registerAccount({
             user: {
