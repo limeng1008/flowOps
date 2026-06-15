@@ -164,7 +164,16 @@ accountRouter.post('/confirm-email-change', async (req, res, next) => {
 accountRouter.post('/billing', (_req, res) => res.json({}))
 accountRouter.delete('/delete', (_req, res) => res.status(501).json({ message: 'Account deletion is not enabled' }))
 
-loginMethodRouter.get('/default', (_req, res) => res.json(passwordOnlyLoginMethods()))
+loginMethodRouter.get('/default', async (_req, res, next) => {
+    try {
+        res.json({
+            ...passwordOnlyLoginMethods(),
+            allowOpenRegistration: await service().isFirstAdminSetup()
+        })
+    } catch (error) {
+        next(error)
+    }
+})
 loginMethodRouter.get('/', checkPermission('sso:manage'), (_req, res) => res.json(passwordOnlyLoginMethods()))
 loginMethodRouter.put('/', checkPermission('sso:manage'), (_req, res) => res.json(passwordOnlyLoginMethods()))
 loginMethodRouter.post('/test', checkPermission('sso:manage'), (_req, res) => res.status(501).json({ message: 'SSO is not enabled' }))

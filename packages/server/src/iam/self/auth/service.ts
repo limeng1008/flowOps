@@ -136,6 +136,10 @@ export const verifySelfRefreshToken = (token: string): SelfAuthTokenPayload => {
 export class FlowOpsAuthService {
     constructor(private readonly dataSource: DataSource) {}
 
+    async isFirstAdminSetup(): Promise<boolean> {
+        return (await this.dataSource.getRepository(FlowOpsUser).count()) === 0
+    }
+
     async registerAccount(body: RegisterBody): Promise<FlowOpsLoggedInUser> {
         const email = normalizeEmail(body.user?.email)
         const password = getPasswordFromRegisterBody(body)
