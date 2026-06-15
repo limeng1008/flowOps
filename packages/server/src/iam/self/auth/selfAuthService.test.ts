@@ -1,7 +1,14 @@
-import { describe, expect, it, beforeEach, afterEach } from '@jest/globals'
+import { describe, expect, it, beforeEach, afterEach, jest } from '@jest/globals'
 import type { DataSource } from 'typeorm'
 import { FlowOpsLoginActivity, FlowOpsOrganization, FlowOpsRole, FlowOpsUser, FlowOpsWorkspace, FlowOpsWorkspaceMember } from '../entities'
 import { FlowOpsAuthService, createSelfAuthTokens, verifySelfAccessToken, verifySelfRefreshToken } from './service'
+
+// 仅替换 sendSelfMail(不真发信);保留真实 isSelfSmtpConfigured(按 env 判断)
+const mockSendSelfMail = jest.fn((..._args: unknown[]) => Promise.resolve())
+jest.mock('../email/mailer', () => {
+    const actual = jest.requireActual('../email/mailer') as Record<string, unknown>
+    return { __esModule: true, ...actual, sendSelfMail: (...args: unknown[]) => mockSendSelfMail(...args) }
+})
 
 const entities = [FlowOpsUser, FlowOpsOrganization, FlowOpsWorkspace, FlowOpsWorkspaceMember, FlowOpsRole, FlowOpsLoginActivity]
 
@@ -294,5 +301,65 @@ describe('FlowOpsAuthService', () => {
         await expect(service.login({ email: 'ada@example.com', password: 'NewPassword1!' })).resolves.toEqual(
             expect.objectContaining({ email: 'ada@example.com' })
         )
+    })
+})
+
+describe('FlowOpsAuthService 邮件发送(配置 SMTP 时)', () => {
+    const savedEnv = { ...process.env }
+    let dataSource: DataSource
+    let service: FlowOpsAuthService
+
+    beforeEach(async () => {
+        dataSource = makeInMemoryDataSource()
+        service = new FlowOpsAuthService(dataSource)
+        await seedRoles(dataSource)
+        mockSendSelfMail.mockReset()
+        process.env.SMTP_HOST = 'smtp.example.com'
+        process.env.SMTP_PORT = '465'
+        process.env.SMTP_USER = 'noreply@example.com'
+        process.env.SMTP_PASSWORD = 'app-secret'
+        process.env.SENDER_EMAIL = 'noreply@example.com'
+    })
+
+    afterEach(() => {
+        process.env = { ...savedEnv }
+    })
+
+    it('邀请:配置 SMTP 后发邀请邮件,emailSent=true(仍返回 inviteLink)', async () => {
+        const owner = await service.registerAccount({
+            user: { name: 'Ada Lovelace', email: 'ada@example.com', credential: 'Password1!' }
+        })
+
+        const invite = await service.inviteAccount(
+            { email: 'grace@example.com', roleName: 'member', workspaceId: owner.activeWorkspaceId },
+            owner
+        )
+
+        expect(invite.emailSent).toBe(true)
+        expect(mockSendSelfMail).toHaveBeenCalledTimes(1)
+        expect(invite.inviteLink).toContain(invite.tempToken)
+    })
+
+    it('找回密码:配置 SMTP 后发重置邮件,emailSent=true 且不回传 resetLink', async () => {
+        await service.registerAccount({
+            user: { name: 'Ada Lovelace', email: 'ada@example.com', credential: 'Password1!' }
+        })
+
+        const forgot = await service.forgotPassword({ user: { email: 'ada@example.com' } })
+
+        expect(forgot.emailSent).toBe(true)
+        expect(forgot.resetLink).toBeUndefined()
+        expect(mockSendSelfMail).toHaveBeenCalledTimes(1)
+    })
+
+    it('未知邮箱找回:不发邮件,emailSent=false', async () => {
+        await service.registerAccount({
+            user: { name: 'Ada Lovelace', email: 'ada@example.com', credential: 'Password1!' }
+        })
+
+        const forgot = await service.forgotPassword({ user: { email: 'nobody@example.com' } })
+
+        expect(forgot.emailSent).toBe(false)
+        expect(mockSendSelfMail).not.toHaveBeenCalled()
     })
 })
