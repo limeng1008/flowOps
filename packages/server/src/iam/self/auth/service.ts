@@ -7,6 +7,9 @@ import { SELF_ACCESS_TOKEN_COOKIE, SELF_REFRESH_TOKEN_COOKIE, getSelfJwtAuthToke
 import { parsePermissionJson } from '../rbac/permissions'
 import { getSelfEnterpriseFeatures } from '../features'
 import { FlowOpsAuthError, FlowOpsLoggedInUser } from './types'
+import logger from '../../../utils/logger'
+import { isSelfSmtpConfigured, sendSelfMail } from '../email/mailer'
+import { buildInviteEmail, buildResetPasswordEmail } from '../email/templates'
 
 export { FlowOpsAuthError }
 export type { FlowOpsLoggedInUser }
@@ -140,6 +143,22 @@ export class FlowOpsAuthService {
         return (await this.dataSource.getRepository(FlowOpsUser).count()) === 0
     }
 
+    /**
+     * 已配置 SMTP 时发送邮件并返回 true;未配置则返回 false(调用方回退到返回链接)。
+     * 发送失败不抛出(不让邀请/找回流程因发信失败而整体失败),仅告警。
+     */
+    private async deliverSelfEmail(to: string, build: () => { subject: string; text: string; html: string }): Promise<boolean> {
+        if (!isSelfSmtpConfigured()) return false
+        try {
+            const { subject, text, html } = build()
+            await sendSelfMail({ to, subject, text, html })
+            return true
+        } catch (error) {
+            logger.warn(`[FlowOps self IAM] 邮件发送失败 (${to}): ${error instanceof Error ? error.message : String(error)}`)
+            return false
+        }
+    }
+
     async registerAccount(body: RegisterBody): Promise<FlowOpsLoggedInUser> {
         const email = normalizeEmail(body.user?.email)
         const password = getPasswordFromRegisterBody(body)
@@ -207,7 +226,7 @@ export class FlowOpsAuthService {
     async inviteAccount(
         body: InviteBody,
         actor: FlowOpsLoggedInUser
-    ): Promise<{ tempToken: string; inviteLink: string; user: FlowOpsUser }> {
+    ): Promise<{ tempToken: string; inviteLink: string; user: FlowOpsUser; emailSent: boolean }> {
         if (!actor.isOrganizationAdmin && actor.role !== 'owner' && actor.role !== 'admin') {
             throw new FlowOpsAuthError(403, 'Forbidden')
         }
@@ -215,7 +234,7 @@ export class FlowOpsAuthService {
         const email = normalizeEmail(body.user?.email ?? body.email)
         if (!email) throw new FlowOpsAuthError(400, 'Email is required')
 
-        return await this.dataSource.transaction(async (manager) => {
+        const result = await this.dataSource.transaction(async (manager) => {
             const workspaceId = body.user?.workspaceId ?? body.workspaceId ?? body.workspace?.id ?? actor.activeWorkspaceId
             if (!workspaceId) throw new FlowOpsAuthError(400, 'Workspace is required')
 
@@ -258,9 +277,16 @@ export class FlowOpsAuthService {
             return {
                 tempToken,
                 inviteLink: authLink('/register', tempToken),
-                user
+                user,
+                workspaceName: workspace.name
             }
         })
+
+        const emailSent = await this.deliverSelfEmail(email, () =>
+            buildInviteEmail({ inviteLink: result.inviteLink, inviterName: actor.name, workspaceName: result.workspaceName })
+        )
+
+        return { tempToken: result.tempToken, inviteLink: result.inviteLink, user: result.user, emailSent }
     }
 
     async login(body: LoginBody): Promise<FlowOpsLoggedInUser> {
@@ -297,7 +323,7 @@ export class FlowOpsAuthService {
         }
     }
 
-    async forgotPassword(body: ForgotPasswordBody): Promise<{ tempToken: string; resetLink: string }> {
+    async forgotPassword(body: ForgotPasswordBody): Promise<{ success: true; emailSent: boolean; tempToken?: string; resetLink?: string }> {
         const email = normalizeEmail(body.user?.email)
         if (!email) throw new FlowOpsAuthError(400, 'Email is required')
 
@@ -310,10 +336,14 @@ export class FlowOpsAuthService {
             await userRepo.save(user)
         }
 
-        return {
-            tempToken,
-            resetLink: authLink('/reset-password', tempToken)
+        const resetLink = authLink('/reset-password', tempToken)
+        const emailSent = user ? await this.deliverSelfEmail(email, () => buildResetPasswordEmail({ resetLink })) : false
+
+        // 已发邮件:出于安全不再回传明文 resetLink;未配置 SMTP:回退返回链接供管理员手动转发
+        if (emailSent) {
+            return { success: true, emailSent: true }
         }
+        return { success: true, emailSent: false, tempToken, resetLink }
     }
 
     async resetPassword(body: ResetPasswordBody): Promise<{ success: true }> {
