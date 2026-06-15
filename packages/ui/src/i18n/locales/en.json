@@ -1057,6 +1057,12 @@
             "description": "Build single-agent systems, chatbots and simple LLM flows",
             "searchPlaceholder": "Search Name or Category",
             "embedApiTitle": "Embed in website or use as API",
+            "create": {
+                "blankChatflow": "Blank chatflow",
+                "blankChatflowDescription": "Start from an empty canvas",
+                "feishuHandoff": "Feishu human handoff",
+                "feishuHandoffDescription": "Start with a Tool Agent that can transfer chats to a Feishu bot"
+            },
             "share": {
                 "copyLink": "Copy Link",
                 "openNewTab": "Open New Tab",
@@ -1128,7 +1134,14 @@
                 "showOverrideConfig": "Show Override Config",
                 "overrideConfigHelp": "You can override existing input configuration of the chatflow with overrideConfig property.",
                 "read": "Read",
-                "streamingHelp": "on how to stream response back to application"
+                "streamingHelp": "on how to stream response back to application",
+                "tabs": {
+                    "embed": "Embed",
+                    "python": "Python",
+                    "javascript": "JavaScript",
+                    "curl": "cURL",
+                    "shareChatbot": "Share Chatbot"
+                }
             }
         },
         "chatMessage": {

@@ -119,6 +119,10 @@ const APICodeDialog = ({ show, dialogProps, onCancel }) => {
         if (isWebhookFlow || isScheduleFlow) return ['Python', 'JavaScript', 'cURL']
         return ['Embed', 'Python', 'JavaScript', 'cURL', 'Share Chatbot']
     }, [isWebhookFlow, isScheduleFlow])
+    const localizedDialogTitle =
+        !dialogProps.title || dialogProps.title === 'Embed in website or use as API'
+            ? t('pages.chatflows.embedApiTitle')
+            : dialogProps.title
     const [value, setValue] = useState(0)
     const [apiKeys, setAPIKeys] = useState([])
     const [chatflowApiKeyId, setChatflowApiKeyId] = useState('')
@@ -472,6 +476,15 @@ query({"question": "Hey, how are you?"}).then((response) => {
         return pythonSVG
     }
 
+    const getCodeLabel = (codeLang) => {
+        if (codeLang === 'Embed') return t('pages.chatflows.api.tabs.embed')
+        if (codeLang === 'Python') return t('pages.chatflows.api.tabs.python')
+        if (codeLang === 'JavaScript') return t('pages.chatflows.api.tabs.javascript')
+        if (codeLang === 'cURL') return t('pages.chatflows.api.tabs.curl')
+        if (codeLang === 'Share Chatbot') return t('pages.chatflows.api.tabs.shareChatbot')
+        return codeLang
+    }
+
     // ----------------------------CONFIG FORM DATA --------------------------//
 
     const getConfigCodeWithFormData = (codeLang, configData) => {
@@ -780,7 +793,7 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
             aria-describedby='alert-dialog-description'
         >
             <DialogTitle sx={{ fontSize: '1rem' }} id='alert-dialog-title'>
-                {dialogProps.title}
+                {localizedDialogTitle}
             </DialogTitle>
             <DialogContent>
                 {isScheduleFlow ? (
@@ -858,7 +871,7 @@ formData.append("openAIApiKey[openAIEmbeddings_0]", "sk-my-openai-2nd-key")`
                                             }
                                             iconPosition='start'
                                             key={index}
-                                            label={codeLang}
+                                            label={getCodeLabel(codeLang)}
                                             {...a11yProps(index)}
                                         ></Tab>
                                     ))}

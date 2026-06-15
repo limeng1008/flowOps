@@ -1057,6 +1057,12 @@
             "description": "构建单 Agent 系统、聊天机器人和简单的 LLM 流程",
             "searchPlaceholder": "搜索名称或分类",
             "embedApiTitle": "嵌入网站或作为 API 使用",
+            "create": {
+                "blankChatflow": "空白对话流",
+                "blankChatflowDescription": "从空画布开始搭建",
+                "feishuHandoff": "飞书转人工对话流",
+                "feishuHandoffDescription": "预置可转接飞书机器人的 Tool Agent"
+            },
             "share": {
                 "copyLink": "复制链接",
                 "openNewTab": "新标签页打开",
@@ -1128,7 +1134,14 @@
                 "showOverrideConfig": "显示覆盖配置",
                 "overrideConfigHelp": "你可以通过 overrideConfig 属性覆盖该对话流已有的输入配置。",
                 "read": "阅读",
-                "streamingHelp": "了解如何将流式响应返回到应用"
+                "streamingHelp": "了解如何将流式响应返回到应用",
+                "tabs": {
+                    "embed": "嵌入",
+                    "python": "Python",
+                    "javascript": "JavaScript",
+                    "curl": "cURL",
+                    "shareChatbot": "分享聊天机器人"
+                }
             }
         },
         "chatMessage": {
