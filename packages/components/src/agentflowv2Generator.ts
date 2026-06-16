@@ -151,8 +151,19 @@ interface OutputAnchor {
 export const generateAgentflowv2 = async (config: Record<string, any>, question: string, options: ICommonObject) => {
     try {
         const result = await generateNodesEdges(config, question, options)
+        // fail-fast:生成/解析失败(如模型输出不合 schema)直接返回明确错误,
+        // 不要继续处理 undefined 的 nodes/edges(否则真因被 "Cannot read length" 之类盖住)。
+        if (result && (result as any).error) {
+            return result
+        }
 
-        const { nodes, edges } = generateNodesData(result, config)
+        const nodesData = generateNodesData(result, config)
+        if ((nodesData as any)?.error || !Array.isArray((nodesData as any)?.nodes)) {
+            return (nodesData as any)?.error
+                ? nodesData
+                : { error: 'Failed to generate agentflow: no valid nodes were produced from the model response' }
+        }
+        const { nodes, edges } = nodesData as { nodes: Node[]; edges: Edge[] }
 
         const updatedNodes = await generateSelectedTools(nodes, config, question, options)
 
@@ -393,6 +404,14 @@ const generateNodesEdges = async (config: Record<string, any>, question: string,
             const jsonStr = jsonMatch[1] || jsonMatch[0]
             try {
                 const parsedJSON = JSON.parse(jsonStr)
+                // 模型常照搬 marketplace 示例里的 stickyNote(注释节点),但 schema 只认 'agentFlow'。
+                // 注释节点对生成的功能流无意义:先剔除非 agentFlow 的节点/边,避免整段解析失败。
+                if (parsedJSON && Array.isArray(parsedJSON.nodes)) {
+                    parsedJSON.nodes = parsedJSON.nodes.filter((node: any) => node?.type === 'agentFlow')
+                }
+                if (parsedJSON && Array.isArray(parsedJSON.edges)) {
+                    parsedJSON.edges = parsedJSON.edges.filter((edge: any) => edge?.type === 'agentFlow')
+                }
                 // Validate with our schema
                 return NodesEdgesType.parse(parsedJSON)
             } catch (parseError) {
