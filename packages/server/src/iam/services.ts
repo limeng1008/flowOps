@@ -1,5 +1,6 @@
 import type { QueryRunner } from 'typeorm'
 import { isSelfIamMode } from './provider'
+import { FlowOpsWorkspaceMember } from './self/entities'
 
 type EnterpriseConstructor<T> = new (...args: any[]) => T
 
@@ -46,8 +47,19 @@ export const WorkspaceService = class {
     }
 } as EnterpriseConstructor<WorkspaceServiceView>
 
+// self IAM:从 flowops_workspace_member 读用户的工作区成员关系(返回值会被 chatflows 鉴权使用,
+// 不能像 WorkspaceService 那样直接 no-op)。避免无条件 new enterprise WorkspaceUserService 去查
+// self 轨未注册的 enterprise `WorkspaceUsers` 实体(否则 No metadata 500 / 出货构建 require 崩)。
+class SelfWorkspaceUserService implements WorkspaceUserServiceView {
+    async readWorkspaceUserByUserId(userId: string, queryRunner: QueryRunner): Promise<WorkspaceUserView[]> {
+        const members = await queryRunner.manager.getRepository(FlowOpsWorkspaceMember).findBy({ userId })
+        return members.map((member) => ({ workspaceId: member.workspaceId }))
+    }
+}
+
 export const WorkspaceUserService = class {
     constructor(...args: any[]) {
+        if (isSelfIamMode()) return new SelfWorkspaceUserService()
         return new (loadEnterpriseWorkspaceUserService().WorkspaceUserService)(...args)
     }
 } as EnterpriseConstructor<WorkspaceUserServiceView>

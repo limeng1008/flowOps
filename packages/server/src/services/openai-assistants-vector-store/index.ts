@@ -2,6 +2,7 @@ import OpenAI from 'openai'
 import { StatusCodes } from 'http-status-codes'
 import { Credential } from '../../database/entities/Credential'
 import { WorkspaceShared } from '../../iam/entities'
+import { isSelfIamMode } from '../../iam/provider'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
@@ -25,7 +26,7 @@ const resolveCredentialForWorkspace = async (credentialId: string, workspaceId: 
         id: credentialId,
         workspaceId
     })
-    if (!credential) {
+    if (!credential && !isSelfIamMode()) {
         const share = await appServer.AppDataSource.getRepository(WorkspaceShared).findOneBy({
             workspaceId,
             sharedItemId: credentialId,
