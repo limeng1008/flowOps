@@ -21,6 +21,7 @@ FlowOps = Flowise 二开,要**售卖**(私有化 + cloud)。`packages/server/src
 
 -   仓库根;**Node 20**;从 **`main`** 切分支 **`codex/p4-enterprise-removal`**;不 push main,做完留人工 review。
 -   **分阶段提交**(每个 Phase 一个或多个 commit),不要一个巨型 commit。commit 结尾 `Co-Authored-By: Codex <noreply@openai.com>`。
+-   **🔧 实打实写,不留接缝桥(用户硬性要求)**:Phase B 的复用实现必须是**真实的 self 代码**(具体 self 实体 / 服务 / 直接 import),**严禁**沿用 lazy `require('../enterprise')` / 返回 `undefined` 兜底 / `as unknown as` 类型擦除 / no-op stub。这种桥不稳定、只在运行时暴雷(本项目连环 500 的根源)。**终态:`iam/` 里不存在任何接缝桥模式,self 完全自洽。**
 -   **铁律**:任何阶段结束都要保证 `FLOWOPS_IAM=self` 全新空库能起服、能注册首管、能登录、能建 chatflow;`npx tsc --noEmit` + `npx jest` 全过。跑不通就停,别继续删。
 -   参考:`docs/iam-seam-ledger.md`(接缝桥账本)、`scripts/build-ship.sh` / `verify-ship-dist.sh`(已实现的 dist 层删除逻辑,可作"该删什么"的清单依据)。
 
