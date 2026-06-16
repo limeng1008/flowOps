@@ -9,24 +9,21 @@ type InitializeJwtCookieMiddleware = (app: Application, identityManager: IFlowOp
 type ExpressMiddleware = (req: Request, res: Response, next: NextFunction) => void
 type InitAuthSecrets = () => Promise<void> | void
 
-const getEnterprisePassport = () => {
-    // P3 惰化:self 轨不加载 enterprise。
-    const enterprisePassport = require('../enterprise/middleware/passport') as Record<string, unknown>
-    return {
-        // 接缝类型擦除: enterprise 符号只在运行时调用,不参与 iam/ 对外类型推导。
-        initializeJwtCookieMiddleware: enterprisePassport.initializeJwtCookieMiddleware as unknown as InitializeJwtCookieMiddleware,
-        // 接缝类型擦除: enterprise 符号只在运行时调用,不参与 iam/ 对外类型推导。
-        verifyToken: enterprisePassport.verifyToken as unknown as ExpressMiddleware,
-        // 接缝类型擦除: enterprise 符号只在运行时调用,不参与 iam/ 对外类型推导。
-        verifyTokenForBullMQDashboard: enterprisePassport.verifyTokenForBullMQDashboard as unknown as ExpressMiddleware
-    }
+type EnterprisePassportModule = {
+    initializeJwtCookieMiddleware: InitializeJwtCookieMiddleware
+    verifyToken: ExpressMiddleware
+    verifyTokenForBullMQDashboard: ExpressMiddleware
 }
 
+type EnterpriseAuthSecretsModule = {
+    initAuthSecrets: InitAuthSecrets
+}
+
+const getEnterprisePassport = (): EnterprisePassportModule => require('../enterprise/middleware/passport') as EnterprisePassportModule
+
 const getEnterpriseAuthSecrets = (): InitAuthSecrets => {
-    // P3 惰化:self 轨不加载 enterprise。
-    const enterpriseAuthSecrets = require('../enterprise/utils/authSecrets') as Record<string, unknown>
-    // 接缝类型擦除: enterprise 符号只在运行时调用,不参与 iam/ 对外类型推导。
-    return enterpriseAuthSecrets.initAuthSecrets as unknown as InitAuthSecrets
+    const enterpriseAuthSecrets = require('../enterprise/utils/authSecrets') as EnterpriseAuthSecretsModule
+    return enterpriseAuthSecrets.initAuthSecrets
 }
 
 export const initializeJwtCookieMiddleware = async (app: Application, identityManager: IFlowOpsIdentity) => {

@@ -1,4 +1,5 @@
 import { isSelfIamMode } from './provider'
+import { getSelfSsoWhitelistUrls } from './self/sso'
 
 type SsoProvider = {
     LOGIN_URI: string
@@ -14,7 +15,6 @@ type SsoProviders = {
 }
 
 const loadEnterpriseSsoProviders = (): SsoProviders => {
-    // P3 惰化:self 轨不加载 enterprise。
     return {
         Auth0SSO: require('../enterprise/sso/Auth0SSO').default,
         AzureSSO: require('../enterprise/sso/AzureSSO').default,
@@ -24,7 +24,7 @@ const loadEnterpriseSsoProviders = (): SsoProviders => {
 }
 
 export const getSsoWhitelistUrls = (): string[] => {
-    if (isSelfIamMode()) return []
+    if (isSelfIamMode()) return getSelfSsoWhitelistUrls()
 
     const { Auth0SSO, AzureSSO, GithubSSO, GoogleSSO } = loadEnterpriseSsoProviders()
     return [
