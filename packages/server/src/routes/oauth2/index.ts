@@ -63,6 +63,7 @@ import { StatusCodes } from 'http-status-codes'
 import { Credential } from '../../database/entities/Credential'
 import { WorkspaceShared } from '../../iam/entities'
 import { getActiveWorkspaceIdForRequest } from '../../iam/query'
+import { isSelfIamMode } from '../../iam/provider'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { decryptCredentialData, encryptCredentialData } from '../../utils'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
@@ -85,7 +86,7 @@ router.post('/authorize/:credentialId', async (req: Request, res: Response, next
             workspaceId
         })
 
-        if (!credential) {
+        if (!credential && !isSelfIamMode()) {
             const share = await appServer.AppDataSource.getRepository(WorkspaceShared).findOneBy({
                 workspaceId,
                 sharedItemId: credentialId,
