@@ -1,4 +1,5 @@
 import type { QueryRunner } from 'typeorm'
+import { isSelfIamMode } from './provider'
 
 type EnterpriseConstructor<T> = new (...args: any[]) => T
 
@@ -28,8 +29,19 @@ const loadEnterpriseWorkspaceUserService = () => {
     }
 }
 
+// self IAM 是单组织,没有跨工作区共享。self 轨的 DataSource 不注册 enterprise 的 `WorkspaceShared`
+// 实体,旧代码无条件 new enterprise WorkspaceService,会让 credentials / marketplaces 调
+// getSharedItemsForWorkspace 时报 `No metadata for "WorkspaceShared"`(500);出货构建剪除 enterprise 后
+// 这里的 require 还会直接崩。self 模式改用本地 stub:无共享 → 返回空集,且不依赖 enterprise。
+class SelfWorkspaceService implements WorkspaceServiceView {
+    async getSharedItemsForWorkspace(): Promise<unknown[]> {
+        return []
+    }
+}
+
 export const WorkspaceService = class {
     constructor(...args: any[]) {
+        if (isSelfIamMode()) return new SelfWorkspaceService()
         return new (loadEnterpriseWorkspaceService())(...args)
     }
 } as EnterpriseConstructor<WorkspaceServiceView>
