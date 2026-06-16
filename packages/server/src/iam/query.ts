@@ -6,33 +6,37 @@ import {
     getWorkspaceSearchOptionsFromReq as selfGetWorkspaceSearchOptionsFromReq
 } from './self/workspace/query'
 
-type WorkspaceQuery = (workspaceId?: string) => Record<string, unknown>
-type WorkspaceReqQuery = (req: Request) => Record<string, unknown>
+export type WorkspaceSearchOptions = {
+    workspaceId?: string
+}
+
+type WorkspaceQuery = (workspaceId?: string) => WorkspaceSearchOptions
+type WorkspaceReqQuery = (req: Request) => WorkspaceSearchOptions
 type ActiveWorkspaceQuery = (req: Request) => string
-
-const getEnterpriseControllerServiceUtils = () => {
-    // P3 惰化:self 轨不加载 enterprise。
-    const enterpriseControllerServiceUtils = require('../enterprise/utils/ControllerServiceUtils') as Record<string, unknown>
-    return {
-        getWorkspaceSearchOptions: enterpriseControllerServiceUtils.getWorkspaceSearchOptions as WorkspaceQuery,
-        getWorkspaceSearchOptionsFromReq: enterpriseControllerServiceUtils.getWorkspaceSearchOptionsFromReq as WorkspaceReqQuery
-    }
+type EnterpriseControllerServiceUtilsModule = {
+    getWorkspaceSearchOptions: WorkspaceQuery
+    getWorkspaceSearchOptionsFromReq: WorkspaceReqQuery
+}
+type EnterpriseTenantRequestGuardsModule = {
+    getActiveWorkspaceIdForRequest: ActiveWorkspaceQuery
 }
 
-const getEnterpriseTenantRequestGuards = () => {
+const getEnterpriseControllerServiceUtils = (): EnterpriseControllerServiceUtilsModule => {
     // P3 惰化:self 轨不加载 enterprise。
-    const enterpriseTenantRequestGuards = require('../enterprise/utils/tenantRequestGuards') as Record<string, unknown>
-    return {
-        getActiveWorkspaceIdForRequest: enterpriseTenantRequestGuards.getActiveWorkspaceIdForRequest as ActiveWorkspaceQuery
-    }
+    return require('../enterprise/utils/ControllerServiceUtils') as EnterpriseControllerServiceUtilsModule
 }
 
-export const getWorkspaceSearchOptions = (workspaceId?: string): Record<string, unknown> => {
+const getEnterpriseTenantRequestGuards = (): EnterpriseTenantRequestGuardsModule => {
+    // P3 惰化:self 轨不加载 enterprise。
+    return require('../enterprise/utils/tenantRequestGuards') as EnterpriseTenantRequestGuardsModule
+}
+
+export const getWorkspaceSearchOptions = (workspaceId?: string): WorkspaceSearchOptions => {
     if (isSelfIamMode()) return selfGetWorkspaceSearchOptions(workspaceId)
     return getEnterpriseControllerServiceUtils().getWorkspaceSearchOptions(workspaceId)
 }
 
-export const getWorkspaceSearchOptionsFromReq = (req: Request): Record<string, unknown> => {
+export const getWorkspaceSearchOptionsFromReq = (req: Request): WorkspaceSearchOptions => {
     if (isSelfIamMode()) return selfGetWorkspaceSearchOptionsFromReq(req)
     return getEnterpriseControllerServiceUtils().getWorkspaceSearchOptionsFromReq(req)
 }

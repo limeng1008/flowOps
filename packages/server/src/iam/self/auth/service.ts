@@ -104,7 +104,7 @@ const asMinutes = (value: string | undefined, fallback: number): number => {
 
 const jwtExpiresInSeconds = (minutes: number): number => Math.floor(minutes * 60)
 
-export const createSelfAuthTokens = (user: Pick<FlowOpsLoggedInUser, 'id' | 'activeWorkspaceId'>) => {
+export const createSelfAuthTokens = (user: { id: string; activeWorkspaceId?: string }) => {
     const accessMinutes = asMinutes(process.env.JWT_TOKEN_EXPIRY_IN_MINUTES, 360)
     const refreshMinutes = asMinutes(process.env.JWT_REFRESH_TOKEN_EXPIRY_IN_MINUTES, 43200)
     const basePayload = {
@@ -413,16 +413,16 @@ export class FlowOpsAuthService {
         return {
             id: user.id,
             email: user.email,
-            name: user.name,
+            name: user.name ?? '',
             status: user.status,
-            role: activeRole?.name,
+            role: activeRole?.name ?? '',
             isSSO: false,
-            activeOrganizationId: activeWorkspace?.organizationId,
-            activeOrganizationSubscriptionId: null,
-            activeOrganizationCustomerId: null,
-            activeOrganizationProductId: null,
-            activeWorkspaceId: activeWorkspace?.id,
-            activeWorkspace: activeWorkspaceEntity?.name,
+            activeOrganizationId: activeWorkspace?.organizationId ?? '',
+            activeOrganizationSubscriptionId: '',
+            activeOrganizationCustomerId: '',
+            activeOrganizationProductId: '',
+            activeWorkspaceId: activeWorkspace?.id ?? '',
+            activeWorkspace: activeWorkspaceEntity?.name ?? '',
             lastLogin: user.lastLogin,
             isOrganizationAdmin: activeRole?.name === 'owner',
             assignedWorkspaces,

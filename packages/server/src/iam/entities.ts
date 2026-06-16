@@ -1,102 +1,133 @@
-/* eslint-disable no-redeclare -- P3 seam exports each legacy entity as both a type and a lazy runtime value. */
+/* eslint-disable no-redeclare -- IAM entity exports are available as both public types and runtime entity constructors. */
 import { isSelfIamMode } from './provider'
-import { FlowOpsOrganization, FlowOpsRole, FlowOpsUser, FlowOpsWorkspace, FlowOpsWorkspaceMember } from './self/entities'
+import {
+    FlowOpsLoginActivity,
+    FlowOpsOrganization,
+    FlowOpsRole,
+    FlowOpsUser,
+    FlowOpsWorkspace,
+    FlowOpsWorkspaceMember
+} from './self/entities'
 
-import type {
-    LoginActivity as LoginActivityEntity,
-    WorkspaceShared as WorkspaceSharedEntity,
-    WorkspaceUsers as WorkspaceUsersEntity
-} from '../enterprise/database/entities/EnterpriseEntities'
-import type { LoginMethod as LoginMethodEntity } from '../enterprise/database/entities/login-method.entity'
-import type { LoginSession as LoginSessionEntity } from '../enterprise/database/entities/login-session.entity'
-import type { Organization as OrganizationEntity } from '../enterprise/database/entities/organization.entity'
-import type { OrganizationUser as OrganizationUserEntity } from '../enterprise/database/entities/organization-user.entity'
-import type { Role as RoleEntity } from '../enterprise/database/entities/role.entity'
-import type { User as UserEntity } from '../enterprise/database/entities/user.entity'
-import type { Workspace as WorkspaceEntity } from '../enterprise/database/entities/workspace.entity'
-import type { WorkspaceUser as WorkspaceUserEntity } from '../enterprise/database/entities/workspace-user.entity'
-export type { ErrorMessage, LoggedInUser } from '../enterprise/Interface.Enterprise'
-
-export type LoginActivity = LoginActivityEntity
-export type WorkspaceShared = WorkspaceSharedEntity
-export type WorkspaceUsers = WorkspaceUsersEntity
-export type LoginMethod = LoginMethodEntity
-export type LoginSession = LoginSessionEntity
-export type Organization = OrganizationEntity
-export type OrganizationUser = OrganizationUserEntity
-export type Role = RoleEntity
-export type User = UserEntity
-export type Workspace = WorkspaceEntity
-export type WorkspaceUser = WorkspaceUserEntity
-
-type EntityConstructor<T> = new (...args: any[]) => T
-
-const loadEnterpriseValue = <T>(loader: () => T): T => {
-    if (isSelfIamMode()) return undefined as T
-    return loader()
+export enum ErrorMessage {
+    INVALID_MISSING_TOKEN = 'Invalid or Missing token',
+    TOKEN_EXPIRED = 'Token Expired',
+    REFRESH_TOKEN_EXPIRED = 'Refresh Token Expired'
 }
 
-export const LoginActivity: EntityConstructor<LoginActivityEntity> = loadEnterpriseValue(() => {
-    // P3 惰化:self 轨不加载 enterprise。
-    return require('../enterprise/database/entities/EnterpriseEntities').LoginActivity
-})
+export type LoggedInWorkspace = {
+    id: string
+    name: string
+    role: string
+    roleId?: string
+    organizationId: string
+}
 
-export const WorkspaceShared: EntityConstructor<WorkspaceSharedEntity> = loadEnterpriseValue(() => {
-    // P3 惰化:self 轨不加载 enterprise。
-    return require('../enterprise/database/entities/EnterpriseEntities').WorkspaceShared
-})
+export type LoggedInUser = {
+    id: string
+    email: string
+    name: string
+    status?: string
+    role?: string
+    roleId: string
+    isSSO?: boolean
+    ssoProvider?: string
+    ssoToken?: string
+    ssoRefreshToken?: string
+    activeOrganizationId: string
+    activeOrganizationSubscriptionId: string
+    activeOrganizationCustomerId: string
+    activeOrganizationProductId: string
+    isOrganizationAdmin: boolean
+    activeWorkspaceId: string
+    activeWorkspace: string
+    assignedWorkspaces: LoggedInWorkspace[]
+    permissions: string[]
+    features?: Record<string, string>
+    lastLogin?: Date | null
+    token?: string
+}
 
-export const WorkspaceUsers: EntityConstructor<WorkspaceUsersEntity> = loadEnterpriseValue(() => {
-    // P3 惰化:self 轨不加载 enterprise。
-    return require('../enterprise/database/entities/EnterpriseEntities').WorkspaceUsers
-})
+export type LoginActivity = FlowOpsLoginActivity
+export type WorkspaceUsers = FlowOpsWorkspaceMember
+export type Organization = FlowOpsOrganization & {
+    subscriptionId?: string
+    customerId?: string
+    productId?: string
+}
+export type OrganizationUser = FlowOpsWorkspaceMember & {
+    organizationId?: string
+}
+export type Role = FlowOpsRole
+export type User = FlowOpsUser & {
+    createdBy?: string
+    updatedBy?: string
+    role?: string
+    roleId?: string
+    loginMode?: string
+    activeWorkspaceId?: string
+    activeOrganizationId?: string
+    isSSO?: boolean
+    ssoProvider?: string
+}
+export type Workspace = FlowOpsWorkspace
+export type WorkspaceUser = FlowOpsWorkspaceMember
 
-export const LoginMethod: EntityConstructor<LoginMethodEntity> = loadEnterpriseValue(() => {
-    // P3 惰化:self 轨不加载 enterprise。
-    return require('../enterprise/database/entities/login-method.entity').LoginMethod
-})
+type EntityConstructor<T> = new (...args: any[]) => T
+type EnterpriseEntitiesModule = {
+    LoginActivity: EntityConstructor<LoginActivity>
+    WorkspaceUsers: EntityConstructor<WorkspaceUsers>
+}
+type EnterpriseOrganizationModule = { Organization: EntityConstructor<Organization> }
+type EnterpriseOrganizationUserModule = { OrganizationUser: EntityConstructor<OrganizationUser> }
+type EnterpriseRoleModule = { Role: EntityConstructor<Role> }
+type EnterpriseUserModule = { User: EntityConstructor<User> }
+type EnterpriseWorkspaceModule = { Workspace: EntityConstructor<Workspace> }
+type EnterpriseWorkspaceUserModule = { WorkspaceUser: EntityConstructor<WorkspaceUser> }
 
-export const LoginSession: EntityConstructor<LoginSessionEntity> = loadEnterpriseValue(() => {
-    // P3 惰化:self 轨不加载 enterprise。
-    return require('../enterprise/database/entities/login-session.entity').LoginSession
-})
+const getEnterpriseEntities = (): EnterpriseEntitiesModule => {
+    // Enterprise mode keeps the legacy entity set until Phase E removes the enterprise branch.
+    return require('../enterprise/database/entities/EnterpriseEntities') as EnterpriseEntitiesModule
+}
 
-export const Organization = (isSelfIamMode()
-    ? FlowOpsOrganization
-    : (() => {
-          // P3 惰化:self 轨不加载 enterprise。
-          return require('../enterprise/database/entities/organization.entity').Organization
-      })()) as unknown as EntityConstructor<OrganizationEntity> // 接缝类型擦除·entities self 映射,字段兼容已核对
+const getEnterpriseOrganization = (): EntityConstructor<Organization> => {
+    return (require('../enterprise/database/entities/organization.entity') as EnterpriseOrganizationModule).Organization
+}
 
-export const OrganizationUser: EntityConstructor<OrganizationUserEntity> = loadEnterpriseValue(() => {
-    // P3 惰化:self 轨不加载 enterprise。
-    return require('../enterprise/database/entities/organization-user.entity').OrganizationUser
-})
+const getEnterpriseOrganizationUser = (): EntityConstructor<OrganizationUser> => {
+    return (require('../enterprise/database/entities/organization-user.entity') as EnterpriseOrganizationUserModule).OrganizationUser
+}
 
-export const Role = (isSelfIamMode()
-    ? FlowOpsRole
-    : (() => {
-          // P3 惰化:self 轨不加载 enterprise。
-          return require('../enterprise/database/entities/role.entity').Role
-      })()) as unknown as EntityConstructor<RoleEntity> // 接缝类型擦除·entities self 映射,字段兼容已核对
+const getEnterpriseRole = (): EntityConstructor<Role> => {
+    return (require('../enterprise/database/entities/role.entity') as EnterpriseRoleModule).Role
+}
 
-export const User = (isSelfIamMode()
-    ? FlowOpsUser
-    : (() => {
-          // P3 惰化:self 轨不加载 enterprise。
-          return require('../enterprise/database/entities/user.entity').User
-      })()) as unknown as EntityConstructor<UserEntity> // 接缝类型擦除·entities self 映射,字段兼容已核对
+const getEnterpriseUser = (): EntityConstructor<User> => {
+    return (require('../enterprise/database/entities/user.entity') as EnterpriseUserModule).User
+}
 
-export const Workspace = (isSelfIamMode()
-    ? FlowOpsWorkspace
-    : (() => {
-          // P3 惰化:self 轨不加载 enterprise。
-          return require('../enterprise/database/entities/workspace.entity').Workspace
-      })()) as unknown as EntityConstructor<WorkspaceEntity> // 接缝类型擦除·entities self 映射,字段兼容已核对
+const getEnterpriseWorkspace = (): EntityConstructor<Workspace> => {
+    return (require('../enterprise/database/entities/workspace.entity') as EnterpriseWorkspaceModule).Workspace
+}
 
-export const WorkspaceUser = (isSelfIamMode()
-    ? FlowOpsWorkspaceMember
-    : (() => {
-          // P3 惰化:self 轨不加载 enterprise。
-          return require('../enterprise/database/entities/workspace-user.entity').WorkspaceUser
-      })()) as unknown as EntityConstructor<WorkspaceUserEntity> // 接缝类型擦除·entities self 映射,字段兼容已核对
+const getEnterpriseWorkspaceUser = (): EntityConstructor<WorkspaceUser> => {
+    return (require('../enterprise/database/entities/workspace-user.entity') as EnterpriseWorkspaceUserModule).WorkspaceUser
+}
+
+const selectIamEntity = <T>(selfEntity: EntityConstructor<T>, enterpriseEntity: () => EntityConstructor<T>): EntityConstructor<T> =>
+    isSelfIamMode() ? selfEntity : enterpriseEntity()
+
+export const LoginActivity: EntityConstructor<LoginActivity> = selectIamEntity(
+    FlowOpsLoginActivity,
+    () => getEnterpriseEntities().LoginActivity
+)
+export const WorkspaceUsers: EntityConstructor<WorkspaceUsers> = selectIamEntity(
+    FlowOpsWorkspaceMember,
+    () => getEnterpriseEntities().WorkspaceUsers
+)
+export const Organization: EntityConstructor<Organization> = selectIamEntity(FlowOpsOrganization, getEnterpriseOrganization)
+export const OrganizationUser: EntityConstructor<OrganizationUser> = selectIamEntity(FlowOpsWorkspaceMember, getEnterpriseOrganizationUser)
+export const Role: EntityConstructor<Role> = selectIamEntity(FlowOpsRole, getEnterpriseRole)
+export const User: EntityConstructor<User> = selectIamEntity(FlowOpsUser, getEnterpriseUser)
+export const Workspace: EntityConstructor<Workspace> = selectIamEntity(FlowOpsWorkspace, getEnterpriseWorkspace)
+export const WorkspaceUser: EntityConstructor<WorkspaceUser> = selectIamEntity(FlowOpsWorkspaceMember, getEnterpriseWorkspaceUser)

@@ -1,16 +1,16 @@
 export type FlowOpsLoggedInUser = {
     id: string
     email: string
-    name?: string | null
+    name: string
     status?: string
-    role?: string
+    role: string
     isSSO: boolean
-    activeOrganizationId?: string
-    activeOrganizationSubscriptionId?: string | null
-    activeOrganizationCustomerId?: string | null
-    activeOrganizationProductId?: string | null
-    activeWorkspaceId?: string
-    activeWorkspace?: string
+    activeOrganizationId: string
+    activeOrganizationSubscriptionId: string
+    activeOrganizationCustomerId: string
+    activeOrganizationProductId: string
+    activeWorkspaceId: string
+    activeWorkspace: string
     lastLogin?: Date | null
     isOrganizationAdmin: boolean
     assignedWorkspaces: Array<{

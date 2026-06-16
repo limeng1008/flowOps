@@ -10,10 +10,14 @@ describe('IAM boot seam', () => {
 
     it('calls the lazily loaded enterprise auth secret initializer', async () => {
         const enterpriseInitAuthSecrets = jest.fn()
+        const authSecretsPath = require.resolve('../enterprise/utils/authSecrets')
         process.env.FLOWOPS_IAM = 'enterprise'
 
         jest.resetModules()
-        jest.doMock('../enterprise/utils/authSecrets', () => ({
+        jest.doMock('./provider', () => ({
+            isSelfIamMode: () => false
+        }))
+        jest.doMock(authSecretsPath, () => ({
             initAuthSecrets: enterpriseInitAuthSecrets
         }))
 

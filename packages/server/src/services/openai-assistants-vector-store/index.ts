@@ -1,13 +1,25 @@
 import OpenAI from 'openai'
 import { StatusCodes } from 'http-status-codes'
 import { Credential } from '../../database/entities/Credential'
-import { WorkspaceShared } from '../../iam/entities'
 import { isSelfIamMode } from '../../iam/provider'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
 import { decryptCredentialData } from '../../utils'
 import { getFileFromUpload, removeSpecificFileFromUpload } from 'flowise-components'
+
+type EntityConstructor<T> = new (...args: any[]) => T
+type WorkspaceShared = {
+    workspaceId: string
+    sharedItemId: string
+    itemType: string
+}
+type EnterpriseEntitiesModule = {
+    WorkspaceShared: EntityConstructor<WorkspaceShared>
+}
+
+const getEnterpriseWorkspaceShared = (): EntityConstructor<WorkspaceShared> =>
+    (require('../../enterprise/database/entities/EnterpriseEntities') as EnterpriseEntitiesModule).WorkspaceShared
 
 const rethrowIfFlowiseError = (error: unknown): void => {
     if (error instanceof InternalFlowiseError) {
@@ -27,7 +39,7 @@ const resolveCredentialForWorkspace = async (credentialId: string, workspaceId: 
         workspaceId
     })
     if (!credential && !isSelfIamMode()) {
-        const share = await appServer.AppDataSource.getRepository(WorkspaceShared).findOneBy({
+        const share = await appServer.AppDataSource.getRepository(getEnterpriseWorkspaceShared()).findOneBy({
             workspaceId,
             sharedItemId: credentialId,
             itemType: 'credential'

@@ -61,7 +61,6 @@ import express, { NextFunction, Request, Response } from 'express'
 import { secureAxiosRequest } from 'flowise-components'
 import { StatusCodes } from 'http-status-codes'
 import { Credential } from '../../database/entities/Credential'
-import { WorkspaceShared } from '../../iam/entities'
 import { getActiveWorkspaceIdForRequest } from '../../iam/query'
 import { isSelfIamMode } from '../../iam/provider'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
@@ -71,6 +70,19 @@ import { extractOAuth2TokenFields, validateOAuth2Url } from '../../utils/oauth2S
 import { generateErrorPage, generateSuccessPage } from './templates'
 
 const router = express.Router()
+
+type EntityConstructor<T> = new (...args: any[]) => T
+type WorkspaceShared = {
+    workspaceId: string
+    sharedItemId: string
+    itemType: string
+}
+type EnterpriseEntitiesModule = {
+    WorkspaceShared: EntityConstructor<WorkspaceShared>
+}
+
+const getEnterpriseWorkspaceShared = (): EntityConstructor<WorkspaceShared> =>
+    (require('../../enterprise/database/entities/EnterpriseEntities') as EnterpriseEntitiesModule).WorkspaceShared
 
 // Initiate OAuth2 authorization flow
 router.post('/authorize/:credentialId', async (req: Request, res: Response, next: NextFunction) => {
@@ -87,7 +99,7 @@ router.post('/authorize/:credentialId', async (req: Request, res: Response, next
         })
 
         if (!credential && !isSelfIamMode()) {
-            const share = await appServer.AppDataSource.getRepository(WorkspaceShared).findOneBy({
+            const share = await appServer.AppDataSource.getRepository(getEnterpriseWorkspaceShared()).findOneBy({
                 workspaceId,
                 sharedItemId: credentialId,
                 itemType: 'credential'

@@ -4,16 +4,14 @@ import { isSelfIamMode } from './provider'
 
 type PermissionMiddleware = (req: Request, res: Response, next: NextFunction) => void
 type PermissionFactory = (permission: string) => PermissionMiddleware
+type EnterprisePermissionCheckModule = {
+    checkPermission: PermissionFactory
+    checkAnyPermission: PermissionFactory
+}
 
-const getEnterprisePermissionCheck = () => {
+const getEnterprisePermissionCheck = (): EnterprisePermissionCheckModule => {
     // P3 惰化:self 轨不加载 enterprise。
-    const enterprisePermissionCheck = require('../enterprise/rbac/PermissionCheck') as Record<string, unknown>
-    return {
-        // 接缝类型擦除: enterprise 符号只在运行时调用,不参与 iam/ 对外类型推导。
-        checkPermission: enterprisePermissionCheck.checkPermission as unknown as PermissionFactory,
-        // 接缝类型擦除: enterprise 符号只在运行时调用,不参与 iam/ 对外类型推导。
-        checkAnyPermission: enterprisePermissionCheck.checkAnyPermission as unknown as PermissionFactory
-    }
+    return require('../enterprise/rbac/PermissionCheck') as EnterprisePermissionCheckModule
 }
 
 export const checkPermission = (permission: string): PermissionMiddleware => {
