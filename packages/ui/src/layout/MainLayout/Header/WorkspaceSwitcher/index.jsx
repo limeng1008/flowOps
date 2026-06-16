@@ -29,9 +29,16 @@ import accountApi from '@/api/account.api'
 
 // hooks
 import useApi from '@/hooks/useApi'
+import { useAuth } from '@/hooks/useAuth'
 import { useConfig } from '@/store/context/ConfigContext'
 import { getLogoutRedirectPath } from '@/utils/logoutRedirect'
 import { getWorkspaceSwitchReloadPath } from '@/utils/workspaceNavigation'
+import {
+    getUserAssignedWorkspaceOptions,
+    hasWorkspaceFeature,
+    shouldRequestWorkspaceSwitcherWorkspaces,
+    sortWorkspaceOptions
+} from './workspaceSwitcherUtils'
 
 // store
 import { store } from '@/store'
@@ -84,6 +91,7 @@ const WorkspaceSwitcher = () => {
     const features = useSelector((state) => state.auth.features)
 
     const { isEnterpriseLicensed } = useConfig()
+    const { hasPermission } = useAuth()
 
     const [anchorEl, setAnchorEl] = useState(null)
     const open = Boolean(anchorEl)
@@ -100,12 +108,26 @@ const WorkspaceSwitcher = () => {
     const getWorkspacesByUserIdApi = useApi(userApi.getWorkspacesByUserId)
     const switchWorkspaceApi = useApi(workspaceApi.switchWorkspace)
     const logoutApi = useApi(accountApi.logout)
+    const canReadWorkspaceDirectory = hasPermission('workspace:view,users:manage,roles:manage')
+    const canRequestWorkspaceDirectory = shouldRequestWorkspaceSwitcherWorkspaces({ features, canReadWorkspaceDirectory })
+
+    const refreshWorkspacesFromUser = () => {
+        setAssignedWorkspaces(getUserAssignedWorkspaceOptions(user))
+    }
 
     const handleClick = (event) => {
         setAnchorEl(event.currentTarget)
 
         // Refresh workspace list when dropdown opens
-        getWorkspacesByOrganizationIdUserIdApi.request(user.activeOrganizationId, user.id)
+        if (canRequestWorkspaceDirectory) {
+            if (isEnterpriseLicensed) {
+                getWorkspacesByOrganizationIdUserIdApi.request(user.activeOrganizationId, user.id)
+            } else {
+                getWorkspacesByUserIdApi.request(user.id)
+            }
+        } else {
+            refreshWorkspacesFromUser()
+        }
     }
 
     const handleClose = () => {
@@ -127,21 +149,21 @@ const WorkspaceSwitcher = () => {
     useEffect(() => {
         // Fetch workspaces when component mounts
         if (isAuthenticated && user) {
-            const WORKSPACE_FLAG = 'feat:workspaces'
-            if (Object.hasOwnProperty.call(features, WORKSPACE_FLAG)) {
-                const flag = features[WORKSPACE_FLAG] === 'true' || features[WORKSPACE_FLAG] === true
-                if (flag) {
+            if (hasWorkspaceFeature(features)) {
+                if (canRequestWorkspaceDirectory) {
                     if (isEnterpriseLicensed) {
                         getWorkspacesByOrganizationIdUserIdApi.request(user.activeOrganizationId, user.id)
                     } else {
                         getWorkspacesByUserIdApi.request(user.id)
                     }
+                } else {
+                    refreshWorkspacesFromUser()
                 }
             }
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [isAuthenticated, user, features, isEnterpriseLicensed])
+    }, [isAuthenticated, user, features, isEnterpriseLicensed, canRequestWorkspaceDirectory])
 
     useEffect(() => {
         if (getWorkspacesByOrganizationIdUserIdApi.data) {
@@ -159,7 +181,7 @@ const WorkspaceSwitcher = () => {
                 }
             }, 500)
 
-            setAssignedWorkspaces(sortWorkspaces(sortedWorkspaces))
+            setAssignedWorkspaces(sortWorkspaceOptions(sortedWorkspaces))
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -181,7 +203,7 @@ const WorkspaceSwitcher = () => {
                 }
             }, 500)
 
-            setAssignedWorkspaces(sortWorkspaces(sortedWorkspaces))
+            setAssignedWorkspaces(sortWorkspaceOptions(sortedWorkspaces))
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -225,27 +247,6 @@ const WorkspaceSwitcher = () => {
 
         prevOpen.current = open
     }, [open, user])
-
-    const sortWorkspaces = (assignedWorkspaces) => {
-        // Sort workspaces alphabetically by name, with special characters last
-        const sortedWorkspaces = assignedWorkspaces
-            ? [...assignedWorkspaces].sort((a, b) => {
-                  const isSpecialA = /^[^a-zA-Z0-9]/.test(a.name)
-                  const isSpecialB = /^[^a-zA-Z0-9]/.test(b.name)
-
-                  // If one has special char and other doesn't, special char goes last
-                  if (isSpecialA && !isSpecialB) return 1
-                  if (!isSpecialA && isSpecialB) return -1
-
-                  // If both are special or both are not special, sort alphabetically
-                  return a.name.localeCompare(b.name, undefined, {
-                      numeric: true,
-                      sensitivity: 'base'
-                  })
-              })
-            : []
-        return sortedWorkspaces
-    }
 
     return (
         <>
