@@ -1,20 +1,18 @@
 import { Application, NextFunction, Request, Response } from 'express'
 import { Platform } from '../Interface'
-import type { IdentityManager } from '../IdentityManager'
 import { isSelfIamMode } from './provider'
 import { FlowOpsIdentity } from './self/identity'
-
-export type { IdentityManager } from '../IdentityManager'
 
 export type FlowOpsIdentityFeatureMap = Record<string, string>
 export type FlowOpsIdentityPermission = { key: string; value: string }
 export type FlowOpsPermissionMap = Record<string, FlowOpsIdentityPermission[]>
 export type FlowOpsPermissionGroup = { toJSON(): FlowOpsIdentityPermission[] }
 export type FlowOpsPermissionsContainer = Record<string, FlowOpsPermissionGroup> & { toJSON(): FlowOpsPermissionMap }
+export type FlowOpsStripeRegistration = { email: string; userPlan?: string; referral?: string }
+export type FlowOpsStripeSubscription = { customerId: string; subscriptionId: string }
+export type FlowOpsAdditionalSeatsQuantity = { quantity: number; includedSeats: number }
 
 export interface IFlowOpsIdentity {
-    // P3: remove this compatibility pad when the enterprise boundary is physically stripped.
-    [key: string]: any
     permissions: FlowOpsPermissionsContainer
     getPlatformType(): Platform
     isLicenseValid(): boolean
@@ -26,6 +24,18 @@ export interface IFlowOpsIdentity {
     getPermissions(): { toJSON(): FlowOpsPermissionMap }
     getPermissionsByType(type?: string): FlowOpsIdentityPermission[]
     initializeSSO(app?: Application): Promise<void> | void
+    initializeSsoProvider(app: Application, providerName: string, config: Record<string, unknown>): Promise<void> | void
+    createStripeUserAndSubscribe(data: FlowOpsStripeRegistration): Promise<FlowOpsStripeSubscription>
+    cancelSubscription(subscriptionId: string): Promise<unknown>
+    updateSubscriptionPlan(req: Request, subscriptionId: string, newPlanId: string, prorationDate: number): Promise<unknown>
+    updateAdditionalSeats(subscriptionId: string, quantity: number, prorationDate: number): Promise<unknown>
+    updateStripeCustomerEmail(customerId: string, email: string): Promise<void>
+    getAdditionalSeatsQuantity(subscriptionId: string): Promise<FlowOpsAdditionalSeatsQuantity>
+    getAdditionalSeatsProration(subscriptionId: string, quantity: number): Promise<unknown>
+    getPlanProration(subscriptionId: string, newPlanId: string): Promise<unknown>
+    getCustomerWithDefaultSource(customerId: string): Promise<unknown>
+    createStripeCustomerPortalSession(req: Request): Promise<{ url: string }>
+    getRefreshToken(ssoProvider?: string, refreshToken?: string): Promise<Record<string, unknown>>
 }
 
 type FlowOpsFeatureGateMiddleware = (req: Request, res: Response, next: NextFunction) => void
@@ -38,9 +48,7 @@ interface IFlowOpsIdentityConstructor {
 type EnterpriseIdentityModule = { IdentityManager: IFlowOpsIdentityConstructor }
 
 const getBridgedEnterpriseIdentityManager = (): IFlowOpsIdentityConstructor => {
-    // P3 惰化:self 轨不加载 enterprise。
-    const enterpriseIdentityModule = require('../IdentityManager') as unknown as EnterpriseIdentityModule
-    // 接缝类型擦除: enterprise 符号只在运行时调用,不参与 iam/ 对外类型推导。
+    const enterpriseIdentityModule = require('../IdentityManager') as EnterpriseIdentityModule
     return enterpriseIdentityModule.IdentityManager
 }
 
@@ -48,12 +56,6 @@ export const getIdentityManager = async (): Promise<IFlowOpsIdentity> => {
     if (isSelfIamMode()) return await FlowOpsIdentity.getInstance()
     return await getBridgedEnterpriseIdentityManager().getInstance()
 }
-
-// 接缝类型擦除·App 槽位: legacy App.identityManager keeps the historical IdentityManager view until P3.
-export const getIdentityManagerForApp = async (): Promise<IdentityManager> => (await getIdentityManager()) as unknown as IdentityManager
-
-// 接缝类型擦除·视图转换: legacy App.identityManager enters self-owned IAM contexts through this bridge only.
-export const toFlowOpsIdentityView = (im: IdentityManager): IFlowOpsIdentity => im as unknown as IFlowOpsIdentity
 
 export const checkFeatureByPlan = (feature: string): FlowOpsFeatureGateMiddleware => {
     return (req: Request, res: Response, next: NextFunction) => {

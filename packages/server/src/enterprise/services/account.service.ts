@@ -24,7 +24,7 @@ import { Tool } from '../../database/entities/Tool'
 import { UpsertHistory } from '../../database/entities/UpsertHistory'
 import { Variable } from '../../database/entities/Variable'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
-import { IdentityManager } from '../../IdentityManager'
+import type { IFlowOpsIdentity } from '../../iam/identity'
 import { Platform, UserPlan } from '../../Interface'
 import { GeneralErrorMessage } from '../../utils/constants'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
@@ -83,7 +83,7 @@ export class AccountService {
     private roleService: RoleService
     private organizationUserService: OrganizationUserService
     private workspaceUserService: WorkspaceUserService
-    private identityManager: IdentityManager
+    private identityManager: IFlowOpsIdentity
 
     constructor() {
         const appServer = getRunningExpressApp()

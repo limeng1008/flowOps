@@ -11,7 +11,6 @@
  */
 
 import { getRunningExpressApp } from '../utils/getRunningExpressApp'
-import { toFlowOpsIdentityView } from '../iam/identity'
 import { ScheduleRecord } from '../database/entities/ScheduleRecord'
 import { ScheduleQueue } from '../queue/ScheduleQueue'
 import { QueueManager } from '../queue/QueueManager'
@@ -231,7 +230,7 @@ export class ScheduleBeat {
             cachePool: appServer.cachePool,
             usageCacheManager: appServer.usageCacheManager,
             sseStreamer: appServer.sseStreamer,
-            identityManager: toFlowOpsIdentityView(appServer.identityManager)
+            identityManager: appServer.identityManager
         }
 
         await executeScheduleJob(ctx, scheduleRecordId, {
