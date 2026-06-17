@@ -20,7 +20,10 @@ import {
     Chip,
     Drawer,
     Typography,
-    CircularProgress
+    CircularProgress,
+    Switch,
+    Select,
+    MenuItem
 } from '@mui/material'
 
 // project imports
@@ -35,6 +38,8 @@ import { PermissionIconButton, StyledPermissionButton } from '@/ui-component/but
 
 // API
 import userApi from '@/api/user'
+import workspaceApi from '@/api/workspace'
+import roleApi from '@/api/role'
 
 // Hooks
 import useApi from '@/hooks/useApi'
@@ -71,27 +76,85 @@ function ShowUserRow(props) {
 
     const [open, setOpen] = useState(false)
     const [userRoles, setUserRoles] = useState([])
+    const [allWorkspaces, setAllWorkspaces] = useState([])
+    const [allRoles, setAllRoles] = useState([])
+    const [busyWorkspaceId, setBusyWorkspaceId] = useState(null)
 
     const theme = useTheme()
+    const dispatch = useDispatch()
+    const notify = (message, variant) =>
+        dispatch(enqueueSnackbarAction({ message, options: { key: new Date().getTime() + Math.random(), variant } }))
 
     const getWorkspacesByUserId = useApi(userApi.getWorkspacesByOrganizationIdUserId)
+    const getAllWorkspacesApi = useApi(workspaceApi.getAllWorkspacesByOrganizationId)
+    const getAllRolesApi = useApi(roleApi.getAllRolesByOrganizationId)
 
     const handleViewUserRoles = (userId, organizationId) => {
         setOpen(!open)
         getWorkspacesByUserId.request(organizationId, userId)
+        getAllWorkspacesApi.request(organizationId)
+        getAllRolesApi.request(organizationId)
+    }
+
+    const reloadMemberships = () => getWorkspacesByUserId.request(props.row.organizationId, props.row.userId)
+
+    // 该用户现有成员关系:workspaceId -> roleId
+    const membershipRoleByWorkspaceId = {}
+    userRoles.forEach((item) => {
+        if (item?.workspace?.id) membershipRoleByWorkspaceId[item.workspace.id] = item.role?.id ?? ''
+    })
+    // 切 ON 时默认给的角色:优先 member,其次任意非 owner,最后第一个
+    const defaultMemberRoleId =
+        allRoles.find((role) => role.name === 'member')?.id ?? allRoles.find((role) => role.name !== 'owner')?.id ?? allRoles[0]?.id
+
+    const assignWorkspace = (workspaceId, roleId) => workspaceApi.updateWorkspaceUserRole({ userId: props.row.userId, workspaceId, roleId })
+
+    const handleToggleWorkspace = async (workspaceId, checked) => {
+        try {
+            setBusyWorkspaceId(workspaceId)
+            if (checked) {
+                const roleId = membershipRoleByWorkspaceId[workspaceId] ?? defaultMemberRoleId
+                if (!roleId) throw new Error('No assignable role found')
+                await assignWorkspace(workspaceId, roleId)
+            } else {
+                await userApi.deleteWorkspaceUser(workspaceId, props.row.userId)
+            }
+            reloadMemberships()
+            notify(t('pages.users.save'), 'success')
+        } catch (error) {
+            notify(error?.response?.data?.message || error?.message || t('pages.users.deleteFailed', { message: '' }), 'error')
+        } finally {
+            setBusyWorkspaceId(null)
+        }
+    }
+
+    const handleChangeRole = async (workspaceId, roleId) => {
+        try {
+            setBusyWorkspaceId(workspaceId)
+            await assignWorkspace(workspaceId, roleId)
+            reloadMemberships()
+            notify(t('pages.users.save'), 'success')
+        } catch (error) {
+            notify(error?.response?.data?.message || error?.message || 'Error', 'error')
+        } finally {
+            setBusyWorkspaceId(null)
+        }
     }
 
     useEffect(() => {
-        if (getWorkspacesByUserId.data) {
-            setUserRoles(getWorkspacesByUserId.data)
-        }
+        if (getWorkspacesByUserId.data) setUserRoles(getWorkspacesByUserId.data)
     }, [getWorkspacesByUserId.data])
 
     useEffect(() => {
-        if (!open) {
-            setOpen(false)
-            setUserRoles([])
-        }
+        if (getAllWorkspacesApi.data) setAllWorkspaces(getAllWorkspacesApi.data)
+    }, [getAllWorkspacesApi.data])
+
+    useEffect(() => {
+        if (getAllRolesApi.data) setAllRoles(getAllRolesApi.data)
+    }, [getAllRolesApi.data])
+
+    useEffect(() => {
+        if (!open) setUserRoles([])
     }, [open])
 
     const currentUser = useSelector((state) => state.auth.user)
@@ -209,15 +272,14 @@ function ShowUserRow(props) {
             </StyledTableRow>
             <Drawer anchor='right' open={open} onClose={() => setOpen(false)} sx={{ minWidth: 320 }}>
                 <Box sx={{ p: 4, height: 'auto', width: 650 }}>
-                    <Typography sx={{ textAlign: 'left', mb: 2 }} variant='h2'>
-                        {t('pages.users.assignedRoles')}
+                    <Typography sx={{ textAlign: 'left', mb: 0.5 }} variant='h2'>
+                        {t('pages.users.workspaceAccess', '工作区访问')}
                     </Typography>
-                    <TableContainer
-                        style={{ display: 'flex', flexDirection: 'row' }}
-                        sx={{ border: 1, borderColor: theme.palette.grey[900] + 25, borderRadius: 2 }}
-                        component={Paper}
-                    >
-                        <Table aria-label='assigned roles table'>
+                    <Typography sx={{ textAlign: 'left', mb: 2, color: theme.palette.text.secondary }} variant='body2'>
+                        {props.row.user?.email} · {t('pages.users.workspaceAccessHint', '控制该用户能进入哪些工作区及其角色')}
+                    </Typography>
+                    <TableContainer sx={{ border: 1, borderColor: theme.palette.grey[900] + 25, borderRadius: 2 }} component={Paper}>
+                        <Table aria-label='workspace access table'>
                             <TableHead
                                 sx={{
                                     backgroundColor: customization.isDarkMode ? theme.palette.common.black : theme.palette.grey[100],
@@ -225,23 +287,64 @@ function ShowUserRow(props) {
                                 }}
                             >
                                 <TableRow>
-                                    <StyledTableCell sx={{ width: '50%' }}>{t('pages.users.role')}</StyledTableCell>
-                                    <StyledTableCell sx={{ width: '50%' }}>{t('permissions.categories.workspace')}</StyledTableCell>
+                                    <StyledTableCell sx={{ width: '45%' }}>{t('permissions.categories.workspace')}</StyledTableCell>
+                                    <StyledTableCell sx={{ width: '20%', textAlign: 'center' }}>
+                                        {t('pages.users.canAccess', '可访问')}
+                                    </StyledTableCell>
+                                    <StyledTableCell sx={{ width: '35%' }}>{t('pages.users.role')}</StyledTableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {userRoles.map((item, index) => (
-                                    <TableRow key={index}>
-                                        <StyledTableCell>{getFlowOpsRoleLabel(item.role.name, t)}</StyledTableCell>
-                                        <StyledTableCell>
-                                            {item.workspace.name}
-                                            {/* {assignment.active && <Chip color={'secondary'} label={'Active'} />} */}
-                                        </StyledTableCell>
-                                    </TableRow>
-                                ))}
+                                {allWorkspaces.map((ws) => {
+                                    const isMember = Object.prototype.hasOwnProperty.call(membershipRoleByWorkspaceId, ws.id)
+                                    const roleId = membershipRoleByWorkspaceId[ws.id] ?? ''
+                                    const locked = props.row.isOrgOwner
+                                    const busy = busyWorkspaceId === ws.id
+                                    return (
+                                        <TableRow key={ws.id}>
+                                            <StyledTableCell>{ws.name}</StyledTableCell>
+                                            <StyledTableCell sx={{ textAlign: 'center' }}>
+                                                {busy ? (
+                                                    <CircularProgress size={18} />
+                                                ) : (
+                                                    <Switch
+                                                        size='small'
+                                                        checked={isMember}
+                                                        disabled={locked}
+                                                        onChange={(e) => handleToggleWorkspace(ws.id, e.target.checked)}
+                                                    />
+                                                )}
+                                            </StyledTableCell>
+                                            <StyledTableCell>
+                                                <Select
+                                                    size='small'
+                                                    fullWidth
+                                                    displayEmpty
+                                                    value={isMember ? roleId : ''}
+                                                    disabled={!isMember || locked || busy}
+                                                    onChange={(e) => handleChangeRole(ws.id, e.target.value)}
+                                                >
+                                                    <MenuItem value='' disabled>
+                                                        —
+                                                    </MenuItem>
+                                                    {allRoles.map((role) => (
+                                                        <MenuItem key={role.id} value={role.id}>
+                                                            {getFlowOpsRoleLabel(role.name, t)}
+                                                        </MenuItem>
+                                                    ))}
+                                                </Select>
+                                            </StyledTableCell>
+                                        </TableRow>
+                                    )
+                                })}
                             </TableBody>
                         </Table>
                     </TableContainer>
+                    {props.row.isOrgOwner && (
+                        <Typography sx={{ mt: 1.5, display: 'block', color: theme.palette.text.secondary }} variant='caption'>
+                            {t('pages.users.ownerAllWorkspaces', '组织所有者默认拥有全部工作区,不可在此调整。')}
+                        </Typography>
+                    )}
                 </Box>
             </Drawer>
         </React.Fragment>
@@ -252,6 +355,7 @@ ShowUserRow.propTypes = {
     row: PropTypes.any,
     onDeleteClick: PropTypes.func,
     onEditClick: PropTypes.func,
+    onRefresh: PropTypes.func,
     open: PropTypes.bool,
     theme: PropTypes.any,
     deletingUserId: PropTypes.string
@@ -525,10 +629,15 @@ const Users = () => {
                                                         <>
                                                             {users.filter(filterUsers).map((item, index) => (
                                                                 <ShowUserRow
-                                                                    key={index}
+                                                                    key={item.userId}
                                                                     row={item}
                                                                     onDeleteClick={deleteUser}
                                                                     onEditClick={edit}
+                                                                    onRefresh={() =>
+                                                                        getAllUsersByOrganizationIdApi.request(
+                                                                            currentUser.activeOrganizationId
+                                                                        )
+                                                                    }
                                                                     deletingUserId={deletingUserId}
                                                                 />
                                                             ))}

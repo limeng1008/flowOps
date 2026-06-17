@@ -269,7 +269,27 @@ describe('FlowOpsAdminService', () => {
         const promotedMember = await authService.getLoggedInUser(member.id, owner.activeWorkspaceId)
         expect(promotedMember.role).toBe('admin')
 
+        // 护栏:member 当前只在一个工作区,删除其最后一个工作区应被拒
+        await expect(adminService.deleteWorkspaceUser(owner.activeWorkspaceId!, member.id)).rejects.toMatchObject({
+            statusCode: 400,
+            message: "Cannot remove the user's last workspace"
+        })
+
+        // upsert:updateWorkspaceUserRole 对不存在的成员应「新增」(把 member 加入第二个工作区)
+        const secondWorkspace = await adminService.createWorkspace({ name: 'Second', organizationId: owner.activeOrganizationId }, owner)
+        const memberRole = (await adminService.listRoles()).find((role) => role.name === 'member')!
+        await adminService.updateWorkspaceUserRole({ userId: member.id, workspaceId: secondWorkspace.id, roleId: memberRole.id })
+        await expect(adminService.listWorkspacesByUserId(member.id)).resolves.toHaveLength(2)
+
+        // 现在 member 有两个工作区,移除其中一个应成功
         await expect(adminService.deleteWorkspaceUser(owner.activeWorkspaceId!, member.id)).resolves.toMatchObject({ success: true })
         await expect(adminService.listWorkspaceUsers(owner.activeWorkspaceId!)).resolves.toHaveLength(1)
+        await expect(adminService.listWorkspacesByUserId(member.id)).resolves.toHaveLength(1)
+
+        // 护栏:组织 owner 不可被移出工作区
+        await expect(adminService.deleteWorkspaceUser(owner.activeWorkspaceId!, owner.id)).rejects.toMatchObject({
+            statusCode: 400,
+            message: 'Organization owner cannot be removed from a workspace'
+        })
     })
 })

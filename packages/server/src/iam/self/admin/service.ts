@@ -224,16 +224,33 @@ export class FlowOpsAdminService {
     async updateWorkspaceUserRole(body: WorkspaceMemberBody): Promise<FlowOpsWorkspaceMember> {
         if (!body.userId || !body.workspaceId || !body.roleId) throw new FlowOpsAuthError(400, 'User, workspace, and role are required')
         const repo = this.dataSource.getRepository(FlowOpsWorkspaceMember)
-        const membership = await repo.findOneBy({ userId: body.userId, workspaceId: body.workspaceId })
-        if (!membership) throw new FlowOpsAuthError(404, 'Workspace user not found')
         const role = await this.dataSource.getRepository(FlowOpsRole).findOneBy({ id: body.roleId })
         if (!role) throw new FlowOpsAuthError(404, 'Role not found')
+        const workspace = await this.dataSource.getRepository(FlowOpsWorkspace).findOneBy({ id: body.workspaceId })
+        if (!workspace) throw new FlowOpsAuthError(404, 'Workspace not found')
+        const user = await this.dataSource.getRepository(FlowOpsUser).findOneBy({ id: body.userId })
+        if (!user) throw new FlowOpsAuthError(404, 'User not found')
+        // upsert:成员不存在则把用户加入该工作区(赋角色),已存在则改角色。
+        // PUT 端点权限为 workspace:add-user,语义即"把用户加进/调整到某工作区"。
+        const membership =
+            (await repo.findOneBy({ userId: body.userId, workspaceId: body.workspaceId })) ??
+            repo.create({ userId: body.userId, workspaceId: body.workspaceId, roleId: role.id })
         membership.roleId = role.id
         return await repo.save(membership)
     }
 
     async deleteWorkspaceUser(workspaceId: string, userId: string): Promise<{ success: true }> {
-        const result = await this.dataSource.getRepository(FlowOpsWorkspaceMember).delete({ workspaceId, userId })
+        const memberRepo = this.dataSource.getRepository(FlowOpsWorkspaceMember)
+        // 护栏1:组织 owner 不可被移出工作区(与 deleteOrganizationUser 一致,防把管理员锁死)
+        const workspace = await this.dataSource.getRepository(FlowOpsWorkspace).findOneBy({ id: workspaceId })
+        const organization = workspace
+            ? await this.dataSource.getRepository(FlowOpsOrganization).findOneBy({ id: workspace.organizationId })
+            : null
+        if (organization?.ownerUserId === userId) throw new FlowOpsAuthError(400, 'Organization owner cannot be removed from a workspace')
+        // 护栏2:不可移除用户的最后一个工作区(否则登录后零工作区、无法使用;停用请走状态开关)
+        const membershipCount = await memberRepo.countBy({ userId })
+        if (membershipCount <= 1) throw new FlowOpsAuthError(400, "Cannot remove the user's last workspace")
+        const result = await memberRepo.delete({ workspaceId, userId })
         if (!result.affected) throw new FlowOpsAuthError(404, 'Workspace user not found')
         return { success: true }
     }
