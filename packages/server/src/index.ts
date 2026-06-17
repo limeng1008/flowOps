@@ -15,7 +15,7 @@ import { Workspace } from './iam/entities'
 import { LoggedInUser } from './iam/entities'
 import { initializeJwtCookieMiddleware, verifyToken, verifyTokenForBullMQDashboard } from './iam/boot'
 import { initAuthSecrets } from './iam/boot'
-import { getIdentityManager, type IFlowOpsIdentity } from './iam/identity'
+import { getFlowOpsIdentity, type IFlowOpsIdentity } from './iam/identity'
 import { MODE, Platform } from './Interface'
 import { IMetricsProvider } from './Interface.Metrics'
 import { OpenTelemetry } from './metrics/OpenTelemetry'
@@ -93,7 +93,7 @@ export class App {
             logger.info('🔄 [server]: Database migrations completed successfully')
 
             // Initialize Identity Manager
-            this.identityManager = await getIdentityManager()
+            this.identityManager = await getFlowOpsIdentity()
             logger.info('🔐 [server]: Identity Manager initialized successfully')
 
             // Initialize nodes pool

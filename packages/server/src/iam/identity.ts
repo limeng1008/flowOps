@@ -1,6 +1,5 @@
 import { Application, NextFunction, Request, Response } from 'express'
 import { Platform } from '../Interface'
-import { isSelfIamMode } from './provider'
 import { FlowOpsIdentity } from './self/identity'
 
 export type FlowOpsIdentityFeatureMap = Record<string, string>
@@ -40,26 +39,8 @@ export interface IFlowOpsIdentity {
 
 type FlowOpsFeatureGateMiddleware = (req: Request, res: Response, next: NextFunction) => void
 
-interface IFlowOpsIdentityConstructor {
-    getInstance(): Promise<IFlowOpsIdentity>
-    checkFeatureByPlan(feature: string): FlowOpsFeatureGateMiddleware
-}
-
-type EnterpriseIdentityModule = { IdentityManager: IFlowOpsIdentityConstructor }
-
-const getBridgedEnterpriseIdentityManager = (): IFlowOpsIdentityConstructor => {
-    const enterpriseIdentityModule = require('../IdentityManager') as EnterpriseIdentityModule
-    return enterpriseIdentityModule.IdentityManager
-}
-
-export const getIdentityManager = async (): Promise<IFlowOpsIdentity> => {
-    if (isSelfIamMode()) return await FlowOpsIdentity.getInstance()
-    return await getBridgedEnterpriseIdentityManager().getInstance()
-}
+export const getFlowOpsIdentity = async (): Promise<IFlowOpsIdentity> => await FlowOpsIdentity.getInstance()
 
 export const checkFeatureByPlan = (feature: string): FlowOpsFeatureGateMiddleware => {
-    return (req: Request, res: Response, next: NextFunction) => {
-        if (isSelfIamMode()) return next()
-        return getBridgedEnterpriseIdentityManager().checkFeatureByPlan(feature)(req, res, next)
-    }
+    return (req: Request, res: Response, next: NextFunction) => FlowOpsIdentity.checkFeatureByPlan(feature)(req, res, next)
 }

@@ -62,7 +62,6 @@ import { secureAxiosRequest } from 'flowise-components'
 import { StatusCodes } from 'http-status-codes'
 import { Credential } from '../../database/entities/Credential'
 import { getActiveWorkspaceIdForRequest } from '../../iam/query'
-import { isSelfIamMode } from '../../iam/provider'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { decryptCredentialData, encryptCredentialData } from '../../utils'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
@@ -70,19 +69,6 @@ import { extractOAuth2TokenFields, validateOAuth2Url } from '../../utils/oauth2S
 import { generateErrorPage, generateSuccessPage } from './templates'
 
 const router = express.Router()
-
-type EntityConstructor<T> = new (...args: any[]) => T
-type WorkspaceShared = {
-    workspaceId: string
-    sharedItemId: string
-    itemType: string
-}
-type EnterpriseEntitiesModule = {
-    WorkspaceShared: EntityConstructor<WorkspaceShared>
-}
-
-const getEnterpriseWorkspaceShared = (): EntityConstructor<WorkspaceShared> =>
-    (require('../../enterprise/database/entities/EnterpriseEntities') as EnterpriseEntitiesModule).WorkspaceShared
 
 // Initiate OAuth2 authorization flow
 router.post('/authorize/:credentialId', async (req: Request, res: Response, next: NextFunction) => {
@@ -93,21 +79,10 @@ router.post('/authorize/:credentialId', async (req: Request, res: Response, next
         const appServer = getRunningExpressApp()
         const credentialRepository = appServer.AppDataSource.getRepository(Credential)
 
-        let credential = await credentialRepository.findOneBy({
+        const credential = await credentialRepository.findOneBy({
             id: credentialId,
             workspaceId
         })
-
-        if (!credential && !isSelfIamMode()) {
-            const share = await appServer.AppDataSource.getRepository(getEnterpriseWorkspaceShared()).findOneBy({
-                workspaceId,
-                sharedItemId: credentialId,
-                itemType: 'credential'
-            })
-            if (share) {
-                credential = await credentialRepository.findOneBy({ id: credentialId })
-            }
-        }
 
         if (!credential) {
             return next(new InternalFlowiseError(StatusCodes.NOT_FOUND, 'Credential not found'))

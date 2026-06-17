@@ -31,7 +31,6 @@ import { BillingUsage } from '../../database/entities/BillingUsage'
 import { ChatFlow } from '../../database/entities/ChatFlow'
 import { Assistant } from '../../database/entities/Assistant'
 import { Workspace } from '../../iam/entities'
-import { OrganizationUser } from '../../iam/entities'
 import { FlowOpsWorkspaceMember } from '../../iam/self/entities'
 
 const makeRepo = (overrides: Record<string, unknown> = {}) => ({
@@ -89,7 +88,7 @@ describe('billing service', () => {
         const workspaceRepo = makeRepo({ findBy: jest.fn(async () => [{ id: 'ws-1' }, { id: 'ws-2' }]) })
         const chatFlowRepo = makeRepo({ countBy: jest.fn(async () => 2) })
         const assistantRepo = makeRepo({ countBy: jest.fn(async () => 1) })
-        const orgUserRepo = makeRepo({ countBy: jest.fn(async () => 2) })
+        const memberRepo = makeRepo({ countBy: jest.fn(async () => 2) })
 
         repos.set(BillingPlan, makeRepo())
         repos.set(BillingSubscription, billingSubscriptionRepo)
@@ -97,7 +96,7 @@ describe('billing service', () => {
         repos.set(Workspace, workspaceRepo)
         repos.set(ChatFlow, chatFlowRepo)
         repos.set(Assistant, assistantRepo)
-        repos.set(OrganizationUser, orgUserRepo)
+        repos.set(FlowOpsWorkspaceMember, memberRepo)
 
         const overview = await BillingService.getOrganizationOverview('org-1')
 
@@ -107,36 +106,26 @@ describe('billing service', () => {
         expect(overview.exceeded).toEqual({ tokens: false, bots: false, seats: false })
     })
 
-    it('counts self IAM seats through FlowOpsWorkspaceMember instead of the legacy WorkspaceUser bridge', async () => {
-        const originalFlowOpsIam = process.env.FLOWOPS_IAM
-        process.env.FLOWOPS_IAM = 'self'
+    it('counts seats through FlowOpsWorkspaceMember', async () => {
         const billingUsageRepo = makeRepo({ find: jest.fn(async () => []) })
         const workspaceRepo = makeRepo({ findBy: jest.fn(async () => [{ id: 'ws-1' }, { id: 'ws-2' }]) })
         const chatFlowRepo = makeRepo({ countBy: jest.fn(async () => 1) })
         const assistantRepo = makeRepo({ countBy: jest.fn(async () => 1) })
         const memberRepo = makeRepo({ countBy: jest.fn(async () => 4) })
-        const orgUserRepo = makeRepo({ countBy: jest.fn(async () => 99) })
 
         repos.set(BillingUsage, billingUsageRepo)
         repos.set(Workspace, workspaceRepo)
         repos.set(ChatFlow, chatFlowRepo)
         repos.set(Assistant, assistantRepo)
         repos.set(FlowOpsWorkspaceMember, memberRepo)
-        repos.set(OrganizationUser, orgUserRepo)
 
-        try {
-            await expect(BillingService.getCurrentUsage('org-1')).resolves.toEqual({ tokens: 0, bots: 2, seats: 4 })
-            expect(memberRepo.countBy).toHaveBeenCalledWith({ workspaceId: expect.any(Object) })
-            expect(orgUserRepo.countBy).not.toHaveBeenCalled()
-        } finally {
-            if (originalFlowOpsIam === undefined) delete process.env.FLOWOPS_IAM
-            else process.env.FLOWOPS_IAM = originalFlowOpsIam
-        }
+        await expect(BillingService.getCurrentUsage('org-1')).resolves.toEqual({ tokens: 0, bots: 2, seats: 4 })
+        expect(memberRepo.countBy).toHaveBeenCalledWith({ workspaceId: expect.any(Object) })
 
         const source = readFileSync(join(__dirname, 'index.ts'), 'utf8')
 
         expect(source).toContain('FlowOpsWorkspaceMember')
-        expect(source).not.toContain('getRepository(WorkspaceUser)')
+        expect(source).not.toContain('OrganizationUser')
     })
 
     it('records token usage once for the same dedupe key', async () => {

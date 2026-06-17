@@ -1,5 +1,4 @@
 /* eslint-disable no-redeclare -- IAM entity exports are available as both public types and runtime entity constructors. */
-import { isSelfIamMode } from './provider'
 import {
     FlowOpsLoginActivity,
     FlowOpsOrganization,
@@ -74,60 +73,12 @@ export type Workspace = FlowOpsWorkspace
 export type WorkspaceUser = FlowOpsWorkspaceMember
 
 type EntityConstructor<T> = new (...args: any[]) => T
-type EnterpriseEntitiesModule = {
-    LoginActivity: EntityConstructor<LoginActivity>
-    WorkspaceUsers: EntityConstructor<WorkspaceUsers>
-}
-type EnterpriseOrganizationModule = { Organization: EntityConstructor<Organization> }
-type EnterpriseOrganizationUserModule = { OrganizationUser: EntityConstructor<OrganizationUser> }
-type EnterpriseRoleModule = { Role: EntityConstructor<Role> }
-type EnterpriseUserModule = { User: EntityConstructor<User> }
-type EnterpriseWorkspaceModule = { Workspace: EntityConstructor<Workspace> }
-type EnterpriseWorkspaceUserModule = { WorkspaceUser: EntityConstructor<WorkspaceUser> }
 
-const getEnterpriseEntities = (): EnterpriseEntitiesModule => {
-    // Enterprise mode keeps the legacy entity set until Phase E removes the enterprise branch.
-    return require('../enterprise/database/entities/EnterpriseEntities') as EnterpriseEntitiesModule
-}
-
-const getEnterpriseOrganization = (): EntityConstructor<Organization> => {
-    return (require('../enterprise/database/entities/organization.entity') as EnterpriseOrganizationModule).Organization
-}
-
-const getEnterpriseOrganizationUser = (): EntityConstructor<OrganizationUser> => {
-    return (require('../enterprise/database/entities/organization-user.entity') as EnterpriseOrganizationUserModule).OrganizationUser
-}
-
-const getEnterpriseRole = (): EntityConstructor<Role> => {
-    return (require('../enterprise/database/entities/role.entity') as EnterpriseRoleModule).Role
-}
-
-const getEnterpriseUser = (): EntityConstructor<User> => {
-    return (require('../enterprise/database/entities/user.entity') as EnterpriseUserModule).User
-}
-
-const getEnterpriseWorkspace = (): EntityConstructor<Workspace> => {
-    return (require('../enterprise/database/entities/workspace.entity') as EnterpriseWorkspaceModule).Workspace
-}
-
-const getEnterpriseWorkspaceUser = (): EntityConstructor<WorkspaceUser> => {
-    return (require('../enterprise/database/entities/workspace-user.entity') as EnterpriseWorkspaceUserModule).WorkspaceUser
-}
-
-const selectIamEntity = <T>(selfEntity: EntityConstructor<T>, enterpriseEntity: () => EntityConstructor<T>): EntityConstructor<T> =>
-    isSelfIamMode() ? selfEntity : enterpriseEntity()
-
-export const LoginActivity: EntityConstructor<LoginActivity> = selectIamEntity(
-    FlowOpsLoginActivity,
-    () => getEnterpriseEntities().LoginActivity
-)
-export const WorkspaceUsers: EntityConstructor<WorkspaceUsers> = selectIamEntity(
-    FlowOpsWorkspaceMember,
-    () => getEnterpriseEntities().WorkspaceUsers
-)
-export const Organization: EntityConstructor<Organization> = selectIamEntity(FlowOpsOrganization, getEnterpriseOrganization)
-export const OrganizationUser: EntityConstructor<OrganizationUser> = selectIamEntity(FlowOpsWorkspaceMember, getEnterpriseOrganizationUser)
-export const Role: EntityConstructor<Role> = selectIamEntity(FlowOpsRole, getEnterpriseRole)
-export const User: EntityConstructor<User> = selectIamEntity(FlowOpsUser, getEnterpriseUser)
-export const Workspace: EntityConstructor<Workspace> = selectIamEntity(FlowOpsWorkspace, getEnterpriseWorkspace)
-export const WorkspaceUser: EntityConstructor<WorkspaceUser> = selectIamEntity(FlowOpsWorkspaceMember, getEnterpriseWorkspaceUser)
+export const LoginActivity: EntityConstructor<LoginActivity> = FlowOpsLoginActivity
+export const WorkspaceUsers: EntityConstructor<WorkspaceUsers> = FlowOpsWorkspaceMember
+export const Organization: EntityConstructor<Organization> = FlowOpsOrganization
+export const OrganizationUser: EntityConstructor<OrganizationUser> = FlowOpsWorkspaceMember
+export const Role: EntityConstructor<Role> = FlowOpsRole
+export const User: EntityConstructor<User> = FlowOpsUser
+export const Workspace: EntityConstructor<Workspace> = FlowOpsWorkspace
+export const WorkspaceUser: EntityConstructor<WorkspaceUser> = FlowOpsWorkspaceMember

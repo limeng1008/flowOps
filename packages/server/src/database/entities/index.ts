@@ -34,37 +34,8 @@ import {
     FlowOpsWorkspace,
     FlowOpsWorkspaceMember
 } from '../../iam/self/entities'
-import { isSelfIamMode } from '../../iam/provider'
 import { ScheduleRecord } from './ScheduleRecord'
 import { ScheduleTriggerLog } from './ScheduleTriggerLog'
-
-const legacyIamEntities = isSelfIamMode()
-    ? {}
-    : (() => {
-          // P3 惰化:self 轨不加载 enterprise。
-          const { LoginActivity, WorkspaceShared, WorkspaceUsers } = require('../../enterprise/database/entities/EnterpriseEntities')
-          const { LoginMethod } = require('../../enterprise/database/entities/login-method.entity')
-          const { LoginSession } = require('../../enterprise/database/entities/login-session.entity')
-          const { Organization } = require('../../enterprise/database/entities/organization.entity')
-          const { OrganizationUser } = require('../../enterprise/database/entities/organization-user.entity')
-          const { Role } = require('../../enterprise/database/entities/role.entity')
-          const { User } = require('../../enterprise/database/entities/user.entity')
-          const { Workspace } = require('../../enterprise/database/entities/workspace.entity')
-          const { WorkspaceUser } = require('../../enterprise/database/entities/workspace-user.entity')
-          return {
-              LoginActivity,
-              LoginMethod,
-              LoginSession,
-              Organization,
-              OrganizationUser,
-              Role,
-              User,
-              Workspace,
-              WorkspaceShared,
-              WorkspaceUser,
-              WorkspaceUsers
-          }
-      })()
 
 export const entities = {
     ChatFlow,
@@ -101,7 +72,6 @@ export const entities = {
     FlowOpsWorkspaceMember,
     FlowOpsRole,
     FlowOpsLoginActivity,
-    ...legacyIamEntities,
     ScheduleRecord,
     ScheduleTriggerLog
 }

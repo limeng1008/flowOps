@@ -1,7 +1,11 @@
 import { MigrationInterface, QueryRunner } from 'typeorm'
-import type { Role } from '../../../enterprise/database/entities/role.entity'
 import { hasColumn } from '../../../utils/database.util'
 import logger from '../../../utils/logger'
+
+type RolePermissionRow = {
+    id: string
+    permissions: string
+}
 
 export class AddApiKeyPermission1765360298674 implements MigrationInterface {
     public async up(queryRunner: QueryRunner): Promise<void> {
@@ -22,7 +26,7 @@ export class AddApiKeyPermission1765360298674 implements MigrationInterface {
         const apikey = 'apikeys:import'
         const itemsToRemove = [sso, apikey]
         if (await queryRunner.hasTable('role')) {
-            const roles: Role[] = await queryRunner.query(
+            const roles: RolePermissionRow[] = await queryRunner.query(
                 `SELECT * FROM "role" WHERE "${columnName}" LIKE '%${sso}%' OR "${columnName}" LIKE '%${apikey}%';`
             )
             if (roles.length > 0) {

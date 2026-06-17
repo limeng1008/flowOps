@@ -5,7 +5,6 @@ import { DataSource } from 'typeorm'
 import { getUserHome } from './utils'
 import { entities } from './database/entities'
 import logger from './utils/logger'
-import { isSelfIamMode } from './iam/provider'
 
 let appDataSource: DataSource
 
@@ -14,33 +13,13 @@ type MigrationList = Function[]
 export const getMigrations = (databaseType?: string): MigrationList => {
     switch (databaseType) {
         case 'mysql':
-            if (isSelfIamMode()) {
-                // P3 惰化:self 轨只加载 ship migration 集,不加载全集 index。
-                return require('./database/migrations/mysql/index.ship').mysqlMigrations
-            }
-            // P3 惰化:self 轨不加载 enterprise。
             return require('./database/migrations/mysql').mysqlMigrations
         case 'mariadb':
-            if (isSelfIamMode()) {
-                // P3 惰化:self 轨只加载 ship migration 集,不加载全集 index。
-                return require('./database/migrations/mariadb/index.ship').mariadbMigrations
-            }
-            // P3 惰化:self 轨不加载 enterprise。
             return require('./database/migrations/mariadb').mariadbMigrations
         case 'postgres':
-            if (isSelfIamMode()) {
-                // P3 惰化:self 轨只加载 ship migration 集,不加载全集 index。
-                return require('./database/migrations/postgres/index.ship').postgresMigrations
-            }
-            // P3 惰化:self 轨不加载 enterprise。
             return require('./database/migrations/postgres').postgresMigrations
         case 'sqlite':
         default:
-            if (isSelfIamMode()) {
-                // P3 惰化:self 轨只加载 ship migration 集,不加载全集 index。
-                return require('./database/migrations/sqlite/index.ship').sqliteMigrations
-            }
-            // P3 惰化:self 轨不加载 enterprise。
             return require('./database/migrations/sqlite').sqliteMigrations
     }
 }

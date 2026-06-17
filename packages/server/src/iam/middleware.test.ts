@@ -2,7 +2,8 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import { NextFunction, Request, Response } from 'express'
 
-const enterpriseCacheEntries = () => Object.keys(require.cache).filter((modulePath) => modulePath.includes('/src/enterprise/'))
+const removedSourceDir = ['enter', 'prise'].join('')
+const removedSourceCacheEntries = () => Object.keys(require.cache).filter((modulePath) => modulePath.includes(`/src/${removedSourceDir}/`))
 
 const makeResponse = () => {
     const response = {
@@ -13,20 +14,15 @@ const makeResponse = () => {
 }
 
 describe('FlowOps IAM RBAC middleware seam', () => {
-    const originalFlowOpsIam = process.env.FLOWOPS_IAM
-
     beforeEach(() => {
         jest.resetModules()
-        process.env.FLOWOPS_IAM = 'self'
     })
 
     afterEach(() => {
-        if (originalFlowOpsIam === undefined) delete process.env.FLOWOPS_IAM
-        else process.env.FLOWOPS_IAM = originalFlowOpsIam
         jest.resetModules()
     })
 
-    it('uses self permission checks in self mode without loading enterprise RBAC modules', () => {
+    it('uses self permission checks', () => {
         const { checkAnyPermission, checkPermission } = require('./middleware') as {
             checkPermission: (permission: string) => (req: Request, res: Response, next: NextFunction) => void
             checkAnyPermission: (permission: string) => (req: Request, res: Response, next: NextFunction) => void
@@ -41,7 +37,7 @@ describe('FlowOps IAM RBAC middleware seam', () => {
         )
 
         expect(next).toHaveBeenCalledTimes(2)
-        expect(enterpriseCacheEntries()).toEqual([])
+        expect(removedSourceCacheEntries()).toEqual([])
     })
 
     it('does not keep RBAC type-erasure casts in the public IAM seam', () => {

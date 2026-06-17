@@ -86,7 +86,7 @@ describe('FlowOpsIdentity', () => {
         expect(iamIdentitySource).not.toContain('getIdentityManagerForApp')
         expect(iamIdentitySource).not.toContain('toFlowOpsIdentityView')
         expect(appSource).toContain('identityManager: IFlowOpsIdentity')
-        expect(appSource).toContain("import { getIdentityManager, type IFlowOpsIdentity } from './iam/identity'")
+        expect(appSource).toContain("import { getFlowOpsIdentity, type IFlowOpsIdentity } from './iam/identity'")
         expect(appSource).not.toContain("from './IdentityManager'")
         expect(appSource).not.toContain('getIdentityManagerForApp')
         expect(appSource).not.toContain('toFlowOpsIdentityView')

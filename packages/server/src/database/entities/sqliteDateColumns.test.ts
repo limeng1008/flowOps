@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 
-const entityRoots = [path.resolve(__dirname), path.resolve(__dirname, '../../../enterprise/database/entities')]
+const entityRoots = [path.resolve(__dirname)]
 
 const readEntityFiles = (dir: string): Array<{ file: string; source: string }> => {
     if (!fs.existsSync(dir)) return []

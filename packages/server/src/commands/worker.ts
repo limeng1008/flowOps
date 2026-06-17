@@ -8,7 +8,7 @@ import { CachePool } from '../CachePool'
 import { QueueEvents, QueueEventsListener } from 'bullmq'
 import { AbortControllerPool } from '../AbortControllerPool'
 import { UsageCacheManager } from '../UsageCacheManager'
-import { getIdentityManager } from '../iam/identity'
+import { getFlowOpsIdentity } from '../iam/identity'
 
 interface CustomListener extends QueueEventsListener {
     abort: (args: { id: string }, id: string) => void
@@ -88,7 +88,7 @@ export default class Worker extends BaseCommand {
         const usageCacheManager = await UsageCacheManager.getInstance()
 
         // Initialize identity manager
-        const identityManager = await getIdentityManager()
+        const identityManager = await getFlowOpsIdentity()
 
         return {
             appDataSource,

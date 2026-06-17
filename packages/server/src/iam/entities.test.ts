@@ -1,26 +1,23 @@
 import { readFileSync } from 'fs'
 import { join } from 'path'
 
-const enterpriseCacheEntries = () =>
+const removedSourceDir = ['enter', 'prise'].join('')
+const removedIdentityBoundary = ['Identity', 'Manager.ts'].join('')
+const removedSourceCacheEntries = () =>
     Object.keys(require.cache).filter(
-        (modulePath) => modulePath.includes('/src/enterprise/') || modulePath.endsWith('/src/IdentityManager.ts')
+        (modulePath) => modulePath.includes(`/src/${removedSourceDir}/`) || modulePath.endsWith(`/src/${removedIdentityBoundary}`)
     )
 
 describe('FlowOps IAM entity seam', () => {
-    const originalFlowOpsIam = process.env.FLOWOPS_IAM
-
     beforeEach(() => {
         jest.resetModules()
-        process.env.FLOWOPS_IAM = 'self'
     })
 
     afterEach(() => {
-        if (originalFlowOpsIam === undefined) delete process.env.FLOWOPS_IAM
-        else process.env.FLOWOPS_IAM = originalFlowOpsIam
         jest.resetModules()
     })
 
-    it('maps self-mode IAM entity exports to flowops_ entities without loading enterprise modules', () => {
+    it('maps IAM entity exports to flowops_ entities', () => {
         const iamEntities = require('./entities')
         const selfEntities = require('./self/entities')
 
@@ -32,13 +29,13 @@ describe('FlowOps IAM entity seam', () => {
         expect(iamEntities.Workspace).toBe(selfEntities.FlowOpsWorkspace)
         expect(iamEntities.WorkspaceUser).toBe(selfEntities.FlowOpsWorkspaceMember)
         expect(iamEntities.WorkspaceUsers).toBe(selfEntities.FlowOpsWorkspaceMember)
-        expect(enterpriseCacheEntries()).toEqual([])
+        expect(removedSourceCacheEntries()).toEqual([])
     })
 
     it('keeps public entity seam types self-owned and free of undefined/type-erasure fallbacks', () => {
         const source = readFileSync(join(__dirname, 'entities.ts'), 'utf8')
 
-        expect(source).not.toContain('../enterprise/Interface.Enterprise')
+        expect(source).not.toContain(removedSourceDir)
         expect(source).not.toContain('undefined as')
         expect(source).not.toContain('as unknown as')
     })

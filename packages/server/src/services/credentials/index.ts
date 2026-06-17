@@ -4,24 +4,10 @@ import { ICredentialReturnResponse } from '../../Interface'
 import { Credential } from '../../database/entities/Credential'
 import { WorkspaceService } from '../../iam/services'
 import { getWorkspaceSearchOptions } from '../../iam/query'
-import { isSelfIamMode } from '../../iam/provider'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import { decryptCredentialData, transformToCredentialEntity, REDACTED_CREDENTIAL_VALUE } from '../../utils'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
-
-type EntityConstructor<T> = new (...args: any[]) => T
-type WorkspaceShared = {
-    workspaceId: string
-    sharedItemId: string
-    itemType: string
-}
-type EnterpriseEntitiesModule = {
-    WorkspaceShared: EntityConstructor<WorkspaceShared>
-}
-
-const getEnterpriseWorkspaceShared = (): EntityConstructor<WorkspaceShared> =>
-    (require('../../enterprise/database/entities/EnterpriseEntities') as EnterpriseEntitiesModule).WorkspaceShared
 
 const createCredential = async (requestBody: any) => {
     try {
@@ -158,18 +144,6 @@ const getCredentialById = async (credentialId: string, workspaceId: string): Pro
             plainDataObj: decryptedCredentialData
         }
         const dbResponse: any = omit(returnCredential, ['encryptedData'])
-        if (workspaceId && !isSelfIamMode()) {
-            const shared = await appServer.AppDataSource.getRepository(getEnterpriseWorkspaceShared()).count({
-                where: {
-                    workspaceId: workspaceId,
-                    sharedItemId: credentialId,
-                    itemType: 'credential'
-                }
-            })
-            if (shared > 0) {
-                dbResponse.shared = true
-            }
-        }
         return dbResponse
     } catch (error) {
         throw new InternalFlowiseError(
