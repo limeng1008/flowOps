@@ -75,14 +75,16 @@ describe('FlowOpsIdentity', () => {
         expect(identity.isLicenseValid()).toBe(true)
     })
 
-    it('enables every enterprise feature flag for the self track', async () => {
+    it('returns feature flags for the active private license tier', async () => {
+        setLicenseState(makeLicenseState('active', { tier: 'team' }))
         const identity = await FlowOpsIdentity.getInstance()
         const features = await identity.getFeaturesByPlan('self-managed')
 
         expect(Object.keys(features).sort()).toEqual([...SELF_ENTERPRISE_FEATURE_FLAGS].sort())
-        for (const feature of SELF_ENTERPRISE_FEATURE_FLAGS) {
-            expect(features[feature]).toBe('true')
-        }
+        expect(features['feat:datasets']).toBe('true')
+        expect(features['feat:roles']).toBe('true')
+        expect(features['feat:files']).toBe('false')
+        expect(features['feat:sso-config']).toBe('false')
     })
 
     it('keeps platform call sites satisfied without external product metadata', async () => {
@@ -148,7 +150,37 @@ describe('FlowOpsIdentity', () => {
         expect(scheduleBeatSource).not.toContain('toFlowOpsIdentityView')
     })
 
-    it('allows feature-gated routers to proceed in self mode', () => {
+    it('blocks feature-gated routers when the free tier does not include the feature', () => {
+        const next = jest.fn()
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        } as any as Response
+
+        FlowOpsIdentity.checkFeatureByPlan('feat:roles')({} as Request, res, next as NextFunction)
+
+        expect(next).not.toHaveBeenCalled()
+        expect(res.status).toHaveBeenCalledWith(StatusCodes.FORBIDDEN)
+        expect(res.json).toHaveBeenCalledWith({ message: '该功能需专业版' })
+    })
+
+    it('allows feature-gated routers when the active tier includes the feature', () => {
+        setLicenseState(makeLicenseState('active', { tier: 'team' }))
+        const next = jest.fn()
+        const res = {
+            status: jest.fn().mockReturnThis(),
+            json: jest.fn()
+        } as any as Response
+
+        FlowOpsIdentity.checkFeatureByPlan('feat:roles')({} as Request, res, next as NextFunction)
+
+        expect(next).toHaveBeenCalledTimes(1)
+        expect(res.status).not.toHaveBeenCalled()
+    })
+
+    it('keeps cloud mode feature gates open except self SSO config', () => {
+        process.env.FLOWOPS_EDITION = 'cloud'
+        setLicenseState(makeLicenseState('expired', { tier: 'free' }))
         const next = jest.fn()
         const res = {
             status: jest.fn().mockReturnThis(),

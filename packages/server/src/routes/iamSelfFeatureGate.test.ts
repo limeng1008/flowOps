@@ -5,7 +5,7 @@ describe('self IAM feature gates', () => {
     it('keeps role routes on the self feature gate adapter', () => {
         const source = fs.readFileSync(path.join(__dirname, 'index.ts'), 'utf8')
 
-        expect(source).toContain("router.use('/role', requireFeatureUnlessSelfIam('feat:roles'), roleRouter)")
+        expect(source).toContain("router.use('/role', requireFeature('feat:roles'), roleRouter)")
         expect(source).toContain('return checkFeatureByPlan(feature)(req, res, next)')
     })
 

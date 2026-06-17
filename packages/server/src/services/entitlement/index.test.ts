@@ -164,6 +164,19 @@ describe('FlowOps entitlement sources', () => {
         expect(ENTITLEMENT_TEMPLATES.enterprise.features).toContain(FLOWOPS_ENTITLEMENT_FEATURES.ssoAuditLogs)
     })
 
+    it('maps entitlement tiers to IAM feature gate flags', () => {
+        expect(ENTITLEMENT_TEMPLATES.free.features).not.toContain('feat:datasets')
+        expect(ENTITLEMENT_TEMPLATES.pro.features).toEqual(
+            expect.arrayContaining(['feat:datasets', 'feat:evaluations', 'feat:evaluators', 'feat:logs'])
+        )
+        expect(ENTITLEMENT_TEMPLATES.pro.features).not.toContain('feat:roles')
+        expect(ENTITLEMENT_TEMPLATES.team.features).toEqual(
+            expect.arrayContaining(['feat:users', 'feat:workspaces', 'feat:roles', 'feat:login-activity'])
+        )
+        expect(ENTITLEMENT_TEMPLATES.enterprise.features).toContain('feat:files')
+        expect(ENTITLEMENT_TEMPLATES.enterprise.features).not.toContain('feat:sso-config')
+    })
+
     it('maps an active private license to an entitlement before using the local commercial fallback', async () => {
         const licenseSource = {
             getActiveLicense: jest.fn().mockResolvedValue({
