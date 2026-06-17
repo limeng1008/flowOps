@@ -78,7 +78,7 @@ import { checkFeatureByPlan } from '../iam/identity'
 
 const router = express.Router()
 
-const requireFeatureUnlessSelfIam = (feature: string) => (req: Request, res: Response, next: NextFunction) => {
+const requireFeature = (feature: string) => (req: Request, res: Response, next: NextFunction) => {
     return checkFeatureByPlan(feature)(req, res, next)
 }
 
@@ -153,7 +153,7 @@ router.use('/auth', authRouter)
 router.use('/audit', checkFeatureByPlan('feat:login-activity'), auditRouter)
 router.use('/user', userRouter)
 router.use('/organization', organizationRouter)
-router.use('/role', requireFeatureUnlessSelfIam('feat:roles'), roleRouter)
+router.use('/role', requireFeature('feat:roles'), roleRouter)
 router.use('/organizationuser', organizationUserRoute)
 router.use('/workspace', workspaceRouter)
 router.use('/workspaceuser', workspaceUserRouter)

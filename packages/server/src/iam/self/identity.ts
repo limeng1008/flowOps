@@ -2,7 +2,9 @@ import { Application, NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { Platform } from '../../Interface'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
-import { SELF_ENTERPRISE_FEATURE_FLAGS } from './features'
+import { getFlowOpsEdition } from '../../services/edition'
+import { getLicenseState } from '../../services/license/state'
+import { getSelfEnterpriseFeatures, isSelfFeatureAllowed } from './features'
 import type {
     FlowOpsAdditionalSeatsQuantity,
     FlowOpsIdentityPermission,
@@ -16,6 +18,7 @@ import { ALL_SELF_PERMISSIONS, SELF_PERMISSION_GROUPS } from './rbac/permissions
 const FLOWOPS_PRIVATE_PRODUCT_ID = 'flowops-private'
 const PRIVATE_CLOUD_BILLING_UNAVAILABLE = 'FlowOps 私有版不提供云计费'
 const PRIVATE_SSO_REFRESH_UNAVAILABLE = 'FlowOps 私有版不提供 SSO 刷新'
+const PRIVATE_FEATURE_REQUIRED = '该功能需专业版'
 
 const throwPrivateCloudBillingUnavailable = (): never => {
     throw new InternalFlowiseError(StatusCodes.NOT_IMPLEMENTED, PRIVATE_CLOUD_BILLING_UNAVAILABLE)
@@ -41,8 +44,14 @@ export class FlowOpsIdentity implements IFlowOpsIdentity {
         return FlowOpsIdentity.instance
     }
 
-    static checkFeatureByPlan(_feature: string) {
-        return (_req: Request, _res: Response, next: NextFunction) => next()
+    static checkFeatureByPlan(feature: string) {
+        return (_req: Request, res: Response, next: NextFunction) => {
+            if (isSelfFeatureAllowed(feature)) {
+                next()
+                return
+            }
+            res.status(StatusCodes.FORBIDDEN).json({ message: PRIVATE_FEATURE_REQUIRED })
+        }
     }
 
     getPlatformType(): Platform {
@@ -50,7 +59,11 @@ export class FlowOpsIdentity implements IFlowOpsIdentity {
     }
 
     isLicenseValid(): boolean {
-        return true
+        if (getFlowOpsEdition() === 'cloud') return true
+
+        const licenseState = getLicenseState()
+        if (licenseState.status === 'missing') return true
+        return licenseState.status === 'active' || licenseState.status === 'grace'
     }
 
     isCloud(): boolean {
@@ -66,8 +79,8 @@ export class FlowOpsIdentity implements IFlowOpsIdentity {
     }
 
     async getFeaturesByPlan(_subscriptionId?: string): Promise<Record<string, string>> {
-        return SELF_ENTERPRISE_FEATURE_FLAGS.reduce((features, feature) => {
-            features[feature] = 'true'
+        return Object.entries(getSelfEnterpriseFeatures()).reduce((features, [feature, enabled]) => {
+            features[feature] = enabled ? 'true' : 'false'
             return features
         }, {} as Record<string, string>)
     }

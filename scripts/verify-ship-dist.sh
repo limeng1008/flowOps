@@ -24,7 +24,13 @@ if [ -n "$removed_source_paths" ]; then
     fail "removed IAM source artifacts remain under packages/server/dist"
 fi
 
-runtime_hits="$(grep -RIlE "src/enterprise|/enterprise/|IdentityManager" "$DIST" --include="*.js" || true)"
+offline_license_tool_paths="$(find "$DIST" -path "*/tools/flowops-license/*" -print)"
+if [ -n "$offline_license_tool_paths" ]; then
+    echo "$offline_license_tool_paths" >&2
+    fail "offline license issuer tools must not be shipped in packages/server/dist"
+fi
+
+runtime_hits="$(grep -RIlE "src/enterprise|/enterprise/|IdentityManager|tools/flowops-license" "$DIST" --include="*.js" || true)"
 if [ -n "$runtime_hits" ]; then
     while IFS= read -r hit; do
         [ -z "$hit" ] && continue

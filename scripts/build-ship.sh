@@ -18,5 +18,6 @@ Ship artifact policy:
 - Start from this repository after excluding .planning.
 - packages/server/src no longer contains the removed commercial IAM source or the legacy identity boundary.
 - packages/server/dist is verified to have no removed-source artifacts after build.
+- tools/flowops-license is an offline issuer-only helper and is verified to stay out of packages/server/dist.
 - Packaging format is intentionally left to the release pipeline; this script performs clean build and verification only.
 EOF

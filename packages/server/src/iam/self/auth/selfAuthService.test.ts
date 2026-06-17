@@ -106,6 +106,7 @@ describe('FlowOpsAuthService', () => {
         process.env.JWT_TOKEN_EXPIRY_IN_MINUTES = '15'
         process.env.JWT_REFRESH_TOKEN_EXPIRY_IN_MINUTES = '60'
         process.env.APP_URL = 'http://localhost:3000'
+        process.env.FLOWOPS_LOCAL_COMMERCIAL = 'true'
 
         dataSource = makeInMemoryDataSource()
         await seedRoles(dataSource)
@@ -118,6 +119,7 @@ describe('FlowOpsAuthService', () => {
         delete process.env.JWT_TOKEN_EXPIRY_IN_MINUTES
         delete process.env.JWT_REFRESH_TOKEN_EXPIRY_IN_MINUTES
         delete process.env.APP_URL
+        delete process.env.FLOWOPS_LOCAL_COMMERCIAL
     })
 
     it('reports whether the self track is ready for first admin bootstrap', async () => {
@@ -223,6 +225,72 @@ describe('FlowOpsAuthService', () => {
         ])
     })
 
+    it('keeps first admin registration available in free tier and blocks the second organization user invite', async () => {
+        delete process.env.FLOWOPS_LOCAL_COMMERCIAL
+
+        const owner = await service.registerAccount({
+            user: {
+                name: 'Ada Lovelace',
+                email: 'ada@example.com',
+                credential: 'Password1!'
+            }
+        })
+
+        await expect(
+            service.inviteAccount(
+                {
+                    email: 'grace@example.com',
+                    name: 'Grace Hopper',
+                    roleName: 'member',
+                    workspaceId: owner.activeWorkspaceId
+                },
+                owner
+            )
+        ).rejects.toMatchObject({
+            statusCode: 402,
+            message: '座位已满,需扩容授权'
+        })
+    })
+
+    it('rechecks seats when an invited user activates from an existing invite token', async () => {
+        delete process.env.FLOWOPS_LOCAL_COMMERCIAL
+
+        const owner = await service.registerAccount({
+            user: {
+                name: 'Ada Lovelace',
+                email: 'ada@example.com',
+                credential: 'Password1!'
+            }
+        })
+        const invited = await dataSource.getRepository(FlowOpsUser).save({
+            email: 'grace@example.com',
+            name: 'Grace Hopper',
+            status: 'invited',
+            tempToken: 'invite-token',
+            tokenExpiry: new Date(Date.now() + 60_000)
+        })
+        const memberRole = await dataSource.getRepository(FlowOpsRole).findOneBy({ name: 'member' })
+        await dataSource.getRepository(FlowOpsWorkspaceMember).save({
+            workspaceId: owner.activeWorkspaceId,
+            userId: invited.id,
+            roleId: memberRole!.id
+        })
+
+        await expect(
+            service.registerAccount({
+                user: {
+                    name: 'Grace Hopper',
+                    email: 'grace@example.com',
+                    credential: 'Password1!',
+                    tempToken: 'invite-token'
+                }
+            })
+        ).rejects.toMatchObject({
+            statusCode: 402,
+            message: '座位已满,需扩容授权'
+        })
+    })
+
     it('logs in with the right password and rejects the wrong password', async () => {
         await service.registerAccount({
             user: {
@@ -319,6 +387,7 @@ describe('FlowOpsAuthService 邮件发送(配置 SMTP 时)', () => {
         process.env.SMTP_USER = 'noreply@example.com'
         process.env.SMTP_PASSWORD = 'app-secret'
         process.env.SENDER_EMAIL = 'noreply@example.com'
+        process.env.FLOWOPS_LOCAL_COMMERCIAL = 'true'
     })
 
     afterEach(() => {

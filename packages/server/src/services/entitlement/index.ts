@@ -6,33 +6,30 @@ import { Entitlement } from '../../database/entities/Entitlement'
 import { EntitlementUsage } from '../../database/entities/EntitlementUsage'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
+import { FlowOpsEdition, getFlowOpsEdition } from '../edition'
 import LicenseService, { LicenseService as FlowOpsLicenseService, LicenseVerificationResult } from '../license'
+import {
+    ENTITLEMENT_TEMPLATES,
+    isLocalCommercialEnabled,
+    normalizeEntitlementTier,
+    type EntitlementTemplate,
+    type EntitlementTier
+} from './catalog'
 
-export type FlowOpsEdition = 'cloud' | 'private'
-export type EntitlementTier = 'free' | 'pro' | 'team' | 'enterprise'
+export { getFlowOpsEdition }
+export type { FlowOpsEdition }
+export {
+    ENTITLEMENT_TIERS,
+    ENTITLEMENT_TEMPLATES,
+    FLOWOPS_ENTITLEMENT_FEATURES,
+    inferEntitlementTierFromPlanCode,
+    isLocalCommercialEnabled,
+    isEntitlementTier,
+    normalizeEntitlementTier
+} from './catalog'
+export type { EntitlementTemplate, EntitlementTier } from './catalog'
 export type EntitlementSourceKind = 'local' | 'subscription'
 export type EntitlementLimitDimension = 'flows' | 'users' | 'credits' | 'predictions'
-
-export const ENTITLEMENT_TIERS: EntitlementTier[] = ['free', 'pro', 'team', 'enterprise']
-
-export const isEntitlementTier = (value: unknown): value is EntitlementTier => {
-    return ENTITLEMENT_TIERS.includes(`${value ?? ''}`.trim().toLowerCase() as EntitlementTier)
-}
-
-export const inferEntitlementTierFromPlanCode = (planCode?: string | null): EntitlementTier => {
-    const code = `${planCode ?? ''}`.trim().toLowerCase()
-    if (!code) return 'free'
-    if (code.startsWith('local_dev') || code.includes('enterprise')) return 'enterprise'
-    if (code.includes('team')) return 'team'
-    if (code === 'pro' || code.includes('_pro') || code.includes('-pro')) return 'pro'
-    if (code.includes('free')) return 'free'
-    return 'free'
-}
-
-export const normalizeEntitlementTier = (value: unknown, fallbackPlanCode?: string | null): EntitlementTier => {
-    const normalized = `${value ?? ''}`.trim().toLowerCase()
-    return isEntitlementTier(normalized) ? normalized : inferEntitlementTierFromPlanCode(fallbackPlanCode)
-}
 
 export interface EntitlementSnapshot {
     scopeId: string
@@ -48,15 +45,6 @@ export interface EntitlementSnapshot {
     licenseId?: string
     licenseCustomer?: string
     licenseStatus?: string
-}
-
-export interface EntitlementTemplate {
-    tier: EntitlementTier
-    seats: number
-    creditsTotal: number
-    creditsBalance: number
-    features: string[]
-    concurrency: number
 }
 
 export interface EntitlementSource {
@@ -113,77 +101,6 @@ export const ENTITLEMENT_ERROR_MESSAGES = {
     seatLimitExceeded: '席位数量已超出当前权益，请升级套餐'
 }
 
-export const FLOWOPS_ENTITLEMENT_FEATURES = {
-    basicWorkflow: 'basic-workflow',
-    chinaModels: 'china-models',
-    pptExcelExport: 'ppt-excel-export',
-    contentSafety: 'content-safety',
-    humanHandoff: 'human-handoff',
-    traceDebugging: 'trace-debugging',
-    chinaCloudVectorStores: 'china-cloud-vector-stores',
-    multiWorkspace: 'multi-workspace',
-    ssoAuditLogs: 'sso-audit-logs',
-    privateOfflineLicense: 'private-offline-license',
-    customBranding: 'custom-branding',
-    apiAccess: 'api-access'
-} as const
-
-const FREE_FEATURES = [
-    FLOWOPS_ENTITLEMENT_FEATURES.basicWorkflow,
-    FLOWOPS_ENTITLEMENT_FEATURES.chinaModels,
-    FLOWOPS_ENTITLEMENT_FEATURES.apiAccess
-]
-
-const PRO_FEATURES = [
-    ...FREE_FEATURES,
-    FLOWOPS_ENTITLEMENT_FEATURES.pptExcelExport,
-    FLOWOPS_ENTITLEMENT_FEATURES.contentSafety,
-    FLOWOPS_ENTITLEMENT_FEATURES.traceDebugging
-]
-
-const TEAM_FEATURES = [
-    ...PRO_FEATURES,
-    FLOWOPS_ENTITLEMENT_FEATURES.humanHandoff,
-    FLOWOPS_ENTITLEMENT_FEATURES.chinaCloudVectorStores,
-    FLOWOPS_ENTITLEMENT_FEATURES.multiWorkspace,
-    FLOWOPS_ENTITLEMENT_FEATURES.customBranding
-]
-
-export const ENTITLEMENT_TEMPLATES: Record<EntitlementTier, EntitlementTemplate> = {
-    free: {
-        tier: 'free',
-        seats: 1,
-        creditsTotal: 200,
-        creditsBalance: 200,
-        features: FREE_FEATURES,
-        concurrency: 1
-    },
-    pro: {
-        tier: 'pro',
-        seats: 5,
-        creditsTotal: 5000,
-        creditsBalance: 5000,
-        features: PRO_FEATURES,
-        concurrency: 3
-    },
-    team: {
-        tier: 'team',
-        seats: 20,
-        creditsTotal: 30000,
-        creditsBalance: 30000,
-        features: TEAM_FEATURES,
-        concurrency: 10
-    },
-    enterprise: {
-        tier: 'enterprise',
-        seats: -1,
-        creditsTotal: -1,
-        creditsBalance: -1,
-        features: Object.values(FLOWOPS_ENTITLEMENT_FEATURES),
-        concurrency: -1
-    }
-}
-
 const ENTITLEMENT_PLAN_META: Record<EntitlementTier, Pick<EntitlementPlanCatalogItem, 'spaces' | 'privateDeployment' | 'sourceOptions'>> = {
     free: {
         spaces: 1,
@@ -207,21 +124,11 @@ const ENTITLEMENT_PLAN_META: Record<EntitlementTier, Pick<EntitlementPlanCatalog
     }
 }
 
-export const getFlowOpsEdition = (env: NodeJS.ProcessEnv = process.env): FlowOpsEdition => {
-    const edition = `${env.FLOWOPS_EDITION ?? env.EDITION ?? ''}`.trim().toLowerCase()
-    return edition === 'cloud' ? 'cloud' : 'private'
-}
-
 export const getEntitlementPlanCatalog = (): EntitlementPlanCatalogItem[] =>
     (['free', 'pro', 'team', 'enterprise'] as EntitlementTier[]).map((tier) => ({
         ...ENTITLEMENT_TEMPLATES[tier],
         ...ENTITLEMENT_PLAN_META[tier]
     }))
-
-export const isLocalCommercialEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => {
-    const value = env.FLOWOPS_LOCAL_COMMERCIAL?.trim().toLowerCase()
-    return value === '1' || value === 'true' || value === 'yes' || value === 'on'
-}
 
 export const getPredictionCreditCost = (modelName?: string): number => {
     const defaultCredits = Number(process.env.FLOWOPS_DEFAULT_PREDICTION_CREDITS ?? 1)

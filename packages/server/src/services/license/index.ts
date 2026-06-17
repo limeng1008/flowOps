@@ -7,6 +7,7 @@ import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 
 export type LicenseStatus = 'missing' | 'active' | 'grace' | 'expired' | 'invalid'
 export type LicenseTier = 'free' | 'pro' | 'team' | 'enterprise'
+export type FlowOpsLicenseModel = 'perpetual' | 'subscription'
 
 export interface FlowOpsLicensePayload {
     customer: string
@@ -19,6 +20,7 @@ export interface FlowOpsLicensePayload {
     machineFingerprint: string[]
     licenseId: string
     tier?: LicenseTier
+    model?: FlowOpsLicenseModel
     creditsTotal?: number
     notes?: string
 }
@@ -30,6 +32,7 @@ export interface LicenseVerificationResult {
     reason?: string
     payload?: FlowOpsLicensePayload
     tier?: LicenseTier
+    model?: FlowOpsLicenseModel
     customer?: string
     licenseId?: string
     seats?: number
@@ -56,6 +59,9 @@ interface LicenseTokenHeader {
     typ?: string
 }
 
+// Placeholder/test fallback public key. Production deployments must provide the
+// product-owned Ed25519 public key through FLOWOPS_LICENSE_PUBLIC_KEY or a
+// reviewed build-time replacement; the matching private key must stay offline.
 const DEFAULT_LICENSE_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
 MCowBQYDK2VwAyEAR4jJvAfPv98aNRvqxV2MfHfAOHwC7cIQUVjCqOi2H/I=
 -----END PUBLIC KEY-----`
@@ -163,9 +169,11 @@ export class LicenseService {
         const now = this.getNow()
         const graceUntil = new Date(expireAt.getTime() + this.getGraceDays() * DAY_MS)
         const tier = normalizeTier(payload.tier || payload.edition)
+        const model = payload.model ?? 'subscription'
         const common = {
             payload,
             tier,
+            model,
             customer: payload.customer,
             licenseId: payload.licenseId,
             seats: payload.seats,
@@ -176,6 +184,15 @@ export class LicenseService {
             machineFingerprint: payload.machineFingerprint,
             currentFingerprint,
             graceUntil
+        }
+
+        if (model === 'perpetual') {
+            return {
+                ...common,
+                valid: true,
+                status: 'active',
+                readOnly: false
+            }
         }
 
         if (now.getTime() <= expireAt.getTime()) {
@@ -303,6 +320,9 @@ function normalizePayload(payload: Partial<FlowOpsLicensePayload>): FlowOpsLicen
         machineFingerprint,
         licenseId: payload.licenseId,
         tier: payload.tier,
+        // Licenses minted before P5 L1 did not carry a model; keep them
+        // subscription-shaped so their existing expireAt behavior is unchanged.
+        model: normalizeLicenseModel(payload.model),
         creditsTotal: typeof payload.creditsTotal === 'number' ? payload.creditsTotal : undefined,
         notes: typeof payload.notes === 'string' ? payload.notes : undefined
     }
@@ -311,6 +331,11 @@ function normalizePayload(payload: Partial<FlowOpsLicensePayload>): FlowOpsLicen
 function normalizeTier(value: string): LicenseTier {
     if (value === 'free' || value === 'pro' || value === 'team' || value === 'enterprise') return value
     return 'enterprise'
+}
+
+function normalizeLicenseModel(value: unknown): FlowOpsLicenseModel {
+    if (value === 'perpetual') return 'perpetual'
+    return 'subscription'
 }
 
 function isFingerprintAllowed(allowedFingerprints: string[], currentFingerprint: string): boolean {

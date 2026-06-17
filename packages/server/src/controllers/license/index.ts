@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import LicenseService from '../../services/license'
+import { setLicenseState } from '../../services/license/state'
 
 const getStatus = async (_req: Request, res: Response, next: NextFunction) => {
     try {
@@ -26,7 +27,9 @@ const importLicense = async (req: Request, res: Response, next: NextFunction) =>
             throw new InternalFlowiseError(StatusCodes.BAD_REQUEST, 'License is required')
         }
 
-        return res.status(StatusCodes.OK).json(await LicenseService.importLicense(license))
+        const result = await LicenseService.importLicense(license)
+        setLicenseState(result)
+        return res.status(StatusCodes.OK).json(result)
     } catch (error) {
         next(error)
     }

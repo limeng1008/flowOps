@@ -4,6 +4,7 @@ import { StatusCodes } from 'http-status-codes'
 const mockGetActiveLicense = jest.fn()
 const mockGetCurrentFingerprint = jest.fn()
 const mockImportLicense = jest.fn()
+const mockSetLicenseState = jest.fn()
 
 jest.mock('../../services/license', () => ({
     __esModule: true,
@@ -12,6 +13,10 @@ jest.mock('../../services/license', () => ({
         getCurrentFingerprint: (...args: any[]) => mockGetCurrentFingerprint(...args),
         importLicense: (...args: any[]) => mockImportLicense(...args)
     }
+}))
+
+jest.mock('../../services/license/state', () => ({
+    setLicenseState: (...args: any[]) => mockSetLicenseState(...args)
 }))
 
 import licenseController from '.'
@@ -66,6 +71,7 @@ describe('licenseController', () => {
         await licenseController.importLicense(mockReq({ body: { license: 'signed.license.token' } }), res, mockNext())
 
         expect(mockImportLicense).toHaveBeenCalledWith('signed.license.token')
+        expect(mockSetLicenseState).toHaveBeenCalledWith({ valid: true, status: 'active', licenseId: 'lic_test_001' })
         expect(res.status).toHaveBeenCalledWith(StatusCodes.OK)
         expect(res.json).toHaveBeenCalledWith({ valid: true, status: 'active', licenseId: 'lic_test_001' })
     })
