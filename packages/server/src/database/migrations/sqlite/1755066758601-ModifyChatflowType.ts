@@ -19,9 +19,8 @@ export class ModifyChatflowType1755066758601 implements MigrationInterface {
                 "category" TEXT, 
                 "speechToText" TEXT, 
                 "type" VARCHAR(20) NOT NULL DEFAULT '${EnumChatflowType.CHATFLOW}', 
-                "workspaceId" TEXT, 
-                "followUpPrompts" TEXT,
-                FOREIGN KEY ("workspaceId") REFERENCES "workspace"("id")
+                "workspaceId" TEXT,
+                "followUpPrompts" TEXT
             );
         `)
 
