@@ -2,6 +2,8 @@ import { Application, NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { Platform } from '../../Interface'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
+import { getFlowOpsEdition } from '../../services/edition'
+import { getLicenseState } from '../../services/license/state'
 import { SELF_ENTERPRISE_FEATURE_FLAGS } from './features'
 import type {
     FlowOpsAdditionalSeatsQuantity,
@@ -50,7 +52,11 @@ export class FlowOpsIdentity implements IFlowOpsIdentity {
     }
 
     isLicenseValid(): boolean {
-        return true
+        if (getFlowOpsEdition() === 'cloud') return true
+
+        const licenseState = getLicenseState()
+        if (licenseState.status === 'missing') return true
+        return licenseState.status === 'active' || licenseState.status === 'grace'
     }
 
     isCloud(): boolean {

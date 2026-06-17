@@ -63,9 +63,26 @@ describe('LicenseService Ed25519 verification', () => {
             customer: 'Acme Gov',
             licenseId: 'lic_test_001',
             seats: 50,
-            concurrency: 8
+            concurrency: 8,
+            model: 'subscription'
         })
         expect(result.features).toContain(FLOWOPS_ENTITLEMENT_FEATURES.ssoAuditLogs)
+    })
+
+    it('keeps perpetual licenses active after the maintenance period expires', async () => {
+        const license = createSignedLicense(payload({ model: 'perpetual', expireAt: '2026-05-01T00:00:00.000Z' }), keyPair.privateKey)
+
+        const result = await service().verify(license)
+
+        expect(result).toMatchObject({
+            valid: true,
+            status: 'active',
+            readOnly: false,
+            model: 'perpetual',
+            expireAt: new Date('2026-05-01T00:00:00.000Z')
+        })
+        expect(result.reason).toBeUndefined()
+        expect(result.graceDaysRemaining).toBeUndefined()
     })
 
     it('rejects a tampered license signature', async () => {

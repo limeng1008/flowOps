@@ -25,6 +25,8 @@ import { NodesPool } from './NodesPool'
 import { QueueManager } from './queue/QueueManager'
 import { ScheduleBeat } from './schedule/ScheduleBeat'
 import { RedisEventSubscriber } from './queue/RedisEventSubscriber'
+import type { LicenseVerificationResult } from './services/license'
+import { getLicenseState, refreshLicenseState, subscribeLicenseState } from './services/license/state'
 import { startPaymentReconciliationJob } from './services/payment/reconciliationJob'
 import { initWebhookListenerRegistry } from './services/webhook-listener'
 import flowiseApiV1Router from './routes'
@@ -38,6 +40,8 @@ import { SSEStreamer } from './utils/SSEStreamer'
 import { Telemetry } from './utils/telemetry'
 import { validateAPIKey } from './utils/validateKey'
 import { getCorsOptions, getIframeSecurityHeaders, sanitizeMiddleware, validateCorsConfig } from './utils/XSS'
+
+const LICENSE_STATE_REFRESH_INTERVAL_MS = 60 * 60 * 1000
 
 declare global {
     namespace Express {
@@ -77,9 +81,16 @@ export class App {
     redisSubscriber: RedisEventSubscriber
     usageCacheManager: UsageCacheManager
     sessionStore: any
+    licenseState: LicenseVerificationResult
+    private licenseRefreshTimer?: NodeJS.Timeout
+    private unsubscribeLicenseState?: () => void
 
     constructor() {
         this.app = express()
+        this.licenseState = getLicenseState()
+        this.unsubscribeLicenseState = subscribeLicenseState((state) => {
+            this.licenseState = state
+        })
     }
 
     async initDatabase() {
@@ -91,6 +102,10 @@ export class App {
             // Run Migrations Scripts
             await this.AppDataSource.runMigrations({ transaction: 'each' })
             logger.info('🔄 [server]: Database migrations completed successfully')
+
+            await this.refreshLicenseState()
+            this.startLicenseStateRefresh()
+            logger.info('🔏 [server]: License state initialized successfully')
 
             // Initialize Identity Manager
             this.identityManager = await getFlowOpsIdentity()
@@ -171,6 +186,19 @@ export class App {
         } catch (error) {
             logger.error('❌ [server]: Error during Data Source initialization:', error)
         }
+    }
+
+    async refreshLicenseState(): Promise<LicenseVerificationResult> {
+        this.licenseState = await refreshLicenseState()
+        return this.licenseState
+    }
+
+    private startLicenseStateRefresh() {
+        if (this.licenseRefreshTimer) clearInterval(this.licenseRefreshTimer)
+        this.licenseRefreshTimer = setInterval(() => {
+            this.refreshLicenseState().catch((error) => logger.warn(`[server]: License state refresh failed: ${error}`))
+        }, LICENSE_STATE_REFRESH_INTERVAL_MS)
+        this.licenseRefreshTimer.unref?.()
     }
 
     async config() {
@@ -371,6 +399,8 @@ export class App {
 
     async stopApp() {
         try {
+            if (this.licenseRefreshTimer) clearInterval(this.licenseRefreshTimer)
+            this.unsubscribeLicenseState?.()
             this.sseStreamer.stopHeartbeat()
             const removePromises: any[] = []
             removePromises.push(this.telemetry.flush())

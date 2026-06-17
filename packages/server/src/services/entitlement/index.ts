@@ -6,9 +6,11 @@ import { Entitlement } from '../../database/entities/Entitlement'
 import { EntitlementUsage } from '../../database/entities/EntitlementUsage'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
+import { FlowOpsEdition, getFlowOpsEdition } from '../edition'
 import LicenseService, { LicenseService as FlowOpsLicenseService, LicenseVerificationResult } from '../license'
 
-export type FlowOpsEdition = 'cloud' | 'private'
+export { getFlowOpsEdition }
+export type { FlowOpsEdition }
 export type EntitlementTier = 'free' | 'pro' | 'team' | 'enterprise'
 export type EntitlementSourceKind = 'local' | 'subscription'
 export type EntitlementLimitDimension = 'flows' | 'users' | 'credits' | 'predictions'
@@ -205,11 +207,6 @@ const ENTITLEMENT_PLAN_META: Record<EntitlementTier, Pick<EntitlementPlanCatalog
         privateDeployment: 'available',
         sourceOptions: ['license']
     }
-}
-
-export const getFlowOpsEdition = (env: NodeJS.ProcessEnv = process.env): FlowOpsEdition => {
-    const edition = `${env.FLOWOPS_EDITION ?? env.EDITION ?? ''}`.trim().toLowerCase()
-    return edition === 'cloud' ? 'cloud' : 'private'
 }
 
 export const getEntitlementPlanCatalog = (): EntitlementPlanCatalogItem[] =>

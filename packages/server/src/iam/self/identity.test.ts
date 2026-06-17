@@ -4,10 +4,41 @@ import { NextFunction, Request, Response } from 'express'
 import { StatusCodes } from 'http-status-codes'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { Platform } from '../../Interface'
+import { LicenseVerificationResult } from '../../services/license'
+import { setLicenseState } from '../../services/license/state'
 import { SELF_ENTERPRISE_FEATURE_FLAGS } from './features'
 import { FlowOpsIdentity } from './identity'
 
+const makeLicenseState = (
+    status: LicenseVerificationResult['status'],
+    overrides: Partial<LicenseVerificationResult> = {}
+): LicenseVerificationResult => ({
+    valid: status === 'active' || status === 'grace',
+    status,
+    readOnly: status === 'grace' || status === 'expired',
+    features: [],
+    machineFingerprint: [],
+    currentFingerprint: 'fp-test',
+    ...overrides
+})
+
 describe('FlowOpsIdentity', () => {
+    const originalFlowOpsEdition = process.env.FLOWOPS_EDITION
+    const originalEdition = process.env.EDITION
+
+    beforeEach(() => {
+        delete process.env.FLOWOPS_EDITION
+        delete process.env.EDITION
+        setLicenseState(makeLicenseState('missing', { valid: false, readOnly: false, reason: 'LICENSE_NOT_IMPORTED' }))
+    })
+
+    afterAll(() => {
+        if (originalFlowOpsEdition === undefined) delete process.env.FLOWOPS_EDITION
+        else process.env.FLOWOPS_EDITION = originalFlowOpsEdition
+        if (originalEdition === undefined) delete process.env.EDITION
+        else process.env.EDITION = originalEdition
+    })
+
     it('reports an enterprise-compatible platform with valid self-managed licensing', async () => {
         const identity = await FlowOpsIdentity.getInstance()
 
@@ -18,6 +49,30 @@ describe('FlowOpsIdentity', () => {
         expect(identity.isEnterprise()).toBe(true)
         await expect(identity.initializeSSO({} as any)).resolves.toBeUndefined()
         await expect(identity.initializeSsoProvider({} as any, 'auth0', {})).resolves.toBeUndefined()
+    })
+
+    it.each([
+        ['missing', true],
+        ['active', true],
+        ['grace', true],
+        ['expired', false],
+        ['invalid', false]
+    ] as Array<[LicenseVerificationResult['status'], boolean]>)(
+        'resolves private license status %s to isLicenseValid=%s',
+        async (status, expected) => {
+            setLicenseState(makeLicenseState(status))
+            const identity = await FlowOpsIdentity.getInstance()
+
+            expect(identity.isLicenseValid()).toBe(expected)
+        }
+    )
+
+    it('keeps cloud edition license enforcement disabled', async () => {
+        process.env.FLOWOPS_EDITION = 'cloud'
+        setLicenseState(makeLicenseState('expired'))
+        const identity = await FlowOpsIdentity.getInstance()
+
+        expect(identity.isLicenseValid()).toBe(true)
     })
 
     it('enables every enterprise feature flag for the self track', async () => {
