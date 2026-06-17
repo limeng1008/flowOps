@@ -106,9 +106,10 @@ scripts/build-ship.sh
 
 流程:
 
-1. 运行仓库级 `pnpm build`。
-2. 删除 server dist 中的编译测试产物 `*.test.js*`。
-3. 调用 `scripts/verify-ship-dist.sh` 做 removed-source 门禁。
+1. 运行仓库级 `pnpm build-force`,清空 build 输出并跳过 turbo cache。
+2. 重新生成全部构建产物。
+3. 删除 server dist 中的编译测试产物 `*.test.js*`。
+4. 调用 `scripts/verify-ship-dist.sh` 做 removed-source 门禁。
 
 校验项:
 
