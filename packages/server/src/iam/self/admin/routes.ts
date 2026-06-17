@@ -95,7 +95,9 @@ workspaceRouter.delete('/:id', checkPermission('workspace:delete'), async (req, 
         sendError(error, res, next)
     }
 })
-workspaceRouter.post('/switch', checkPermission('workspace:view'), async (req, res, next) => {
+// 切换到「自己已是成员」的工作区无需 workspace:view(那是管理员权限);
+// 授权由 switchWorkspace 内部的成员关系校验负责(非成员 → 403)。任何登录用户都能在自己的工作区间切换。
+workspaceRouter.post('/switch', async (req, res, next) => {
     try {
         const loggedInUser = await service().switchWorkspace(req.query.id as string, req.user as any as FlowOpsLoggedInUser)
         const tokens = issueCookies(res, loggedInUser)
