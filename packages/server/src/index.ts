@@ -26,6 +26,7 @@ import { QueueManager } from './queue/QueueManager'
 import { ScheduleBeat } from './schedule/ScheduleBeat'
 import { RedisEventSubscriber } from './queue/RedisEventSubscriber'
 import type { LicenseVerificationResult } from './services/license'
+import { createLicenseEnforcementMiddleware } from './services/license/enforcement'
 import { getLicenseState, refreshLicenseState, subscribeLicenseState } from './services/license/state'
 import { startPaymentReconciliationJob } from './services/payment/reconciliationJob'
 import { initWebhookListenerRegistry } from './services/webhook-listener'
@@ -252,6 +253,8 @@ export class App {
         const whitelistURLs = WHITELIST_URLS.filter((url) => !denylistURLs.includes(url))
         const URL_CASE_INSENSITIVE_REGEX: RegExp = /\/api\/v1\//i
         const URL_CASE_SENSITIVE_REGEX: RegExp = /\/api\/v1\//
+
+        this.app.use(createLicenseEnforcementMiddleware(() => this.licenseState))
 
         await initializeJwtCookieMiddleware(this.app, this.identityManager)
 
