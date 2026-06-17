@@ -59,6 +59,9 @@ interface LicenseTokenHeader {
     typ?: string
 }
 
+// Placeholder/test fallback public key. Production deployments must provide the
+// product-owned Ed25519 public key through FLOWOPS_LICENSE_PUBLIC_KEY or a
+// reviewed build-time replacement; the matching private key must stay offline.
 const DEFAULT_LICENSE_PUBLIC_KEY = `-----BEGIN PUBLIC KEY-----
 MCowBQYDK2VwAyEAR4jJvAfPv98aNRvqxV2MfHfAOHwC7cIQUVjCqOi2H/I=
 -----END PUBLIC KEY-----`
