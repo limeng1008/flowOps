@@ -2184,7 +2184,11 @@
             "updateFailed": "更新用户失败：{{message}}",
             "statusActive": "已激活",
             "statusInactive": "未激活",
-            "statusInvited": "已邀请"
+            "statusInvited": "已邀请",
+            "workspaceAccess": "工作区访问",
+            "workspaceAccessHint": "控制该用户能进入哪些工作区及其角色",
+            "canAccess": "可访问",
+            "ownerAllWorkspaces": "组织所有者默认拥有全部工作区,不可在此调整。"
         },
         "logs": {
             "title": "日志",

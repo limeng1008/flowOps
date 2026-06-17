@@ -2184,7 +2184,11 @@
             "updateFailed": "Failed to update User: {{message}}",
             "statusActive": "Active",
             "statusInactive": "Inactive",
-            "statusInvited": "Invited"
+            "statusInvited": "Invited",
+            "workspaceAccess": "Workspace access",
+            "workspaceAccessHint": "Control which workspaces this user can access and their role",
+            "canAccess": "Has access",
+            "ownerAllWorkspaces": "The organization owner has access to all workspaces and cannot be changed here."
         },
         "logs": {
             "title": "Logs",
