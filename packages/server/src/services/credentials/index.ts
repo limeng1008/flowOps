@@ -2,10 +2,8 @@ import { StatusCodes } from 'http-status-codes'
 import { omit } from 'lodash'
 import { ICredentialReturnResponse } from '../../Interface'
 import { Credential } from '../../database/entities/Credential'
-import { WorkspaceShared } from '../../iam/entities'
 import { WorkspaceService } from '../../iam/services'
 import { getWorkspaceSearchOptions } from '../../iam/query'
-import { isSelfIamMode } from '../../iam/provider'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getErrorMessage } from '../../errors/utils'
 import { decryptCredentialData, transformToCredentialEntity, REDACTED_CREDENTIAL_VALUE } from '../../utils'
@@ -146,18 +144,6 @@ const getCredentialById = async (credentialId: string, workspaceId: string): Pro
             plainDataObj: decryptedCredentialData
         }
         const dbResponse: any = omit(returnCredential, ['encryptedData'])
-        if (workspaceId && !isSelfIamMode()) {
-            const shared = await appServer.AppDataSource.getRepository(WorkspaceShared).count({
-                where: {
-                    workspaceId: workspaceId,
-                    sharedItemId: credentialId,
-                    itemType: 'credential'
-                }
-            })
-            if (shared > 0) {
-                dbResponse.shared = true
-            }
-        }
         return dbResponse
     } catch (error) {
         throw new InternalFlowiseError(

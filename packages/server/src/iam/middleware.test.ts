@@ -1,0 +1,48 @@
+import { readFileSync } from 'fs'
+import { join } from 'path'
+import { NextFunction, Request, Response } from 'express'
+
+const removedSourceDir = ['enter', 'prise'].join('')
+const removedSourceCacheEntries = () => Object.keys(require.cache).filter((modulePath) => modulePath.includes(`/src/${removedSourceDir}/`))
+
+const makeResponse = () => {
+    const response = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn().mockReturnThis()
+    }
+    return response as Response & { status: jest.Mock; json: jest.Mock }
+}
+
+describe('FlowOps IAM RBAC middleware seam', () => {
+    beforeEach(() => {
+        jest.resetModules()
+    })
+
+    afterEach(() => {
+        jest.resetModules()
+    })
+
+    it('uses self permission checks', () => {
+        const { checkAnyPermission, checkPermission } = require('./middleware') as {
+            checkPermission: (permission: string) => (req: Request, res: Response, next: NextFunction) => void
+            checkAnyPermission: (permission: string) => (req: Request, res: Response, next: NextFunction) => void
+        }
+        const next = jest.fn() as NextFunction
+
+        checkPermission('users:manage')({ user: { permissions: ['users:manage'] } } as Request, makeResponse(), next)
+        checkAnyPermission('chatflows:delete, chatflows:update')(
+            { user: { permissions: ['chatflows:update'] } } as Request,
+            makeResponse(),
+            next
+        )
+
+        expect(next).toHaveBeenCalledTimes(2)
+        expect(removedSourceCacheEntries()).toEqual([])
+    })
+
+    it('does not keep RBAC type-erasure casts in the public IAM seam', () => {
+        const source = readFileSync(join(__dirname, 'middleware.ts'), 'utf8')
+
+        expect(source).not.toContain('as unknown as')
+    })
+})

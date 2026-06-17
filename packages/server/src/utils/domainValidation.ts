@@ -16,7 +16,7 @@ const TTS_GENERATE_PATH = '/api/v1/text-to-speech/generate'
  * Validates if the origin is allowed for a specific chatflow
  * @param chatflowId - The chatflow ID to validate against
  * @param origin - The origin URL to validate
- * @param workspaceId - Optional workspace ID for enterprise features
+ * @param workspaceId - Optional workspace ID for scoped feature checks
  * @returns Promise<boolean> - True if domain is allowed, false otherwise
  */
 async function validateChatflowDomain(chatflowId: string, origin: string, workspaceId?: string): Promise<boolean> {

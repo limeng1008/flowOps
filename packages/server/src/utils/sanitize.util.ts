@@ -1,4 +1,3 @@
-import { User } from '../iam/entities'
 import { isIPv4, isIPv6, isValidIPAddress } from './ipValidation'
 
 export function sanitizeNullBytes(obj: any): any {
@@ -34,10 +33,10 @@ export function sanitizeNullBytes(obj: any): any {
     return obj
 }
 
-export function sanitizeUser(user: Partial<User>) {
-    delete user.credential
-    delete user.tempToken
-    delete user.tokenExpiry
+export function sanitizeUser<T extends object>(user: T): T {
+    delete (user as { credential?: unknown }).credential
+    delete (user as { tempToken?: unknown }).tempToken
+    delete (user as { tokenExpiry?: unknown }).tokenExpiry
 
     return user
 }

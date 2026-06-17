@@ -15,8 +15,7 @@ import { Workspace } from './iam/entities'
 import { LoggedInUser } from './iam/entities'
 import { initializeJwtCookieMiddleware, verifyToken, verifyTokenForBullMQDashboard } from './iam/boot'
 import { initAuthSecrets } from './iam/boot'
-import { getIdentityManagerForApp, toFlowOpsIdentityView } from './iam/identity'
-import type { IdentityManager } from './iam/identity'
+import { getFlowOpsIdentity, type IFlowOpsIdentity } from './iam/identity'
 import { MODE, Platform } from './Interface'
 import { IMetricsProvider } from './Interface.Metrics'
 import { OpenTelemetry } from './metrics/OpenTelemetry'
@@ -72,7 +71,7 @@ export class App {
     rateLimiterManager: RateLimiterManager
     AppDataSource: DataSource = getDataSource()
     sseStreamer: SSEStreamer
-    identityManager: IdentityManager
+    identityManager: IFlowOpsIdentity
     metricsProvider: IMetricsProvider
     queueManager: QueueManager
     redisSubscriber: RedisEventSubscriber
@@ -94,7 +93,7 @@ export class App {
             logger.info('🔄 [server]: Database migrations completed successfully')
 
             // Initialize Identity Manager
-            this.identityManager = await getIdentityManagerForApp()
+            this.identityManager = await getFlowOpsIdentity()
             logger.info('🔐 [server]: Identity Manager initialized successfully')
 
             // Initialize nodes pool
@@ -148,7 +147,7 @@ export class App {
                     appDataSource: this.AppDataSource,
                     abortControllerPool: this.abortControllerPool,
                     usageCacheManager: this.usageCacheManager,
-                    identityManager: toFlowOpsIdentityView(this.identityManager),
+                    identityManager: this.identityManager,
                     serverAdapter
                 })
                 logger.info('✅ [Queue]: All queues setup successfully')
@@ -226,7 +225,7 @@ export class App {
         const URL_CASE_INSENSITIVE_REGEX: RegExp = /\/api\/v1\//i
         const URL_CASE_SENSITIVE_REGEX: RegExp = /\/api\/v1\//
 
-        await initializeJwtCookieMiddleware(this.app, toFlowOpsIdentityView(this.identityManager))
+        await initializeJwtCookieMiddleware(this.app, this.identityManager)
 
         this.app.use(async (req, res, next) => {
             // Step 1: Check if the req path contains /api/v1 regardless of case

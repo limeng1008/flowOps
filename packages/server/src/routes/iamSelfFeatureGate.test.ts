@@ -2,35 +2,26 @@ import fs from 'fs'
 import path from 'path'
 
 describe('self IAM feature gates', () => {
-    it('does not put the self role router behind the enterprise role feature gate', () => {
+    it('keeps role routes on the self feature gate adapter', () => {
         const source = fs.readFileSync(path.join(__dirname, 'index.ts'), 'utf8')
 
         expect(source).toContain("router.use('/role', requireFeatureUnlessSelfIam('feat:roles'), roleRouter)")
         expect(source).toContain('return checkFeatureByPlan(feature)(req, res, next)')
-        expect(source).not.toContain('IdentityManager.checkFeatureByPlan')
     })
 
-    it('switches platform IAM routers to self implementations when FLOWOPS_IAM=self', () => {
+    it('uses only self platform IAM routers', () => {
         const source = fs.readFileSync(path.join(__dirname, '../iam/routes.ts'), 'utf8')
 
-        expect(source).toContain('auditRouter = isSelfIamMode() ? selfAuditRouter : loadEnterpriseRouter')
-        expect(source).toContain('organizationRouter = isSelfIamMode()')
-        expect(source).toContain('loginMethodRouter = isSelfIamMode()')
-        expect(source).toContain("loadEnterpriseRouter('../enterprise/routes/audit')")
-        expect(source).toContain("loadEnterpriseRouter('../enterprise/routes/organization.route')")
-        expect(source).toContain("loadEnterpriseRouter('../enterprise/routes/login-method.route')")
-        expect(source).not.toContain('import enterpriseAuditRouter')
-        expect(source).not.toContain('import enterpriseOrganizationRouter')
-        expect(source).not.toContain('import enterpriseLoginMethodRouter')
+        expect(source).toContain("from './self/auth/routes'")
+        expect(source).toContain("from './self/admin/routes'")
+        expect(source).not.toContain('load')
+        expect(source).not.toContain(['enter', 'prise'].join(''))
     })
 
-    it('keeps identity provider selection behind the T4.1 factory seam', () => {
+    it('keeps identity provider selection behind the self factory seam', () => {
         const source = fs.readFileSync(path.join(__dirname, '../iam/identity.ts'), 'utf8')
 
-        expect(source).toContain('export const getIdentityManager')
+        expect(source).toContain('export const getFlowOpsIdentity')
         expect(source).toContain('export const checkFeatureByPlan')
-        expect(source).not.toContain('FlowOpsIdentityManager')
-        expect(source).not.toContain('export { IdentityManager }')
-        expect(source).not.toContain('export const IdentityManager')
     })
 })

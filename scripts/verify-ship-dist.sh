@@ -18,54 +18,30 @@ if [ ! -d "$DIST" ]; then
     fail "packages/server/dist does not exist; run pnpm build first"
 fi
 
-enterprise_paths="$(find "$DIST" -path "*enterprise*" -print)"
-if [ -n "$enterprise_paths" ]; then
-    echo "$enterprise_paths" >&2
-    fail "enterprise paths remain under packages/server/dist"
+removed_source_paths="$(find "$DIST" \( -path "*/enterprise/*" -o -name "IdentityManager.*" \) -print)"
+if [ -n "$removed_source_paths" ]; then
+    echo "$removed_source_paths" >&2
+    fail "removed IAM source artifacts remain under packages/server/dist"
 fi
 
-identity_paths="$(find "$DIST" -maxdepth 1 -name "IdentityManager.*" -print)"
-if [ -n "$identity_paths" ]; then
-    echo "$identity_paths" >&2
-    fail "IdentityManager dist artifacts remain"
-fi
-
-runtime_hits="$(grep -RIlE "src/enterprise|/enterprise/" "$DIST" --include="*.js" || true)"
-bad_runtime_hits=()
-while IFS= read -r hit; do
-    [ -z "$hit" ] && continue
-    rel="$(relative_to_root "$hit")"
-    case "$rel" in
-        packages/server/dist/iam/boot.js | \
-        packages/server/dist/iam/entities.js | \
-        packages/server/dist/iam/identity.js | \
-        packages/server/dist/iam/middleware.js | \
-        packages/server/dist/iam/query.js | \
-        packages/server/dist/iam/routes.js | \
-        packages/server/dist/iam/security.js | \
-        packages/server/dist/iam/services.js | \
-        packages/server/dist/iam/sso.js)
-            ;;
-        *)
-            bad_runtime_hits+=("$rel")
-            ;;
-    esac
-done <<< "$runtime_hits"
-
-if [ "${#bad_runtime_hits[@]}" -gt 0 ]; then
-    printf '%s\n' "${bad_runtime_hits[@]}" >&2
-    fail "non-seam JS files reference enterprise paths"
+runtime_hits="$(grep -RIlE "src/enterprise|/enterprise/|IdentityManager" "$DIST" --include="*.js" || true)"
+if [ -n "$runtime_hits" ]; then
+    while IFS= read -r hit; do
+        [ -z "$hit" ] && continue
+        relative_to_root "$hit"
+    done <<< "$runtime_hits" >&2
+    fail "dist JS references removed IAM source paths"
 fi
 
 for driver in postgres mysql mariadb sqlite; do
-    ship_index="$DIST/database/migrations/$driver/index.ship.js"
-    if [ ! -f "$ship_index" ]; then
-        fail "missing ship migration index: packages/server/dist/database/migrations/$driver/index.ship.js"
-    fi
+    for index_name in index.js index.ship.js; do
+        migration_index="$DIST/database/migrations/$driver/$index_name"
+        [ -f "$migration_index" ] || continue
 
-    if grep -qE "enterprise|AddAuthTables|AddWorkspaceShared|AddWorkspaceIdToCustomTemplate|AddOrganization1727798417345|LinkWorkspaceId|LinkOrganizationId|AddSSOColumns|AddPersonalWorkspace|RefactorEnterpriseDatabase|ExecutionLinkWorkspaceId" "$ship_index"; then
-        fail "ship migration index contains enterprise migration residue: packages/server/dist/database/migrations/$driver/index.ship.js"
-    fi
+        if grep -qE "AddAuthTables|AddWorkspaceShared|AddWorkspaceIdToCustomTemplate|AddOrganization1727798417345|LinkWorkspaceId|LinkOrganizationId|AddSSOColumns|AddPersonalWorkspace|RefactorEnterpriseDatabase|ExecutionLinkWorkspaceId" "$migration_index"; then
+            fail "migration index contains removed IAM migration residue: packages/server/dist/database/migrations/$driver/$index_name"
+        fi
+    done
 done
 
 echo "✅ ship dist verification passed"

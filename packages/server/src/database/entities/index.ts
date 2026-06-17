@@ -34,41 +34,8 @@ import {
     FlowOpsWorkspace,
     FlowOpsWorkspaceMember
 } from '../../iam/self/entities'
-import { isSelfIamMode } from '../../iam/provider'
 import { ScheduleRecord } from './ScheduleRecord'
 import { ScheduleTriggerLog } from './ScheduleTriggerLog'
-
-const legacyIamEntities = isSelfIamMode()
-    ? {}
-    : (() => {
-          // P3 惰化:self 轨不加载 enterprise。
-          const {
-              LoginActivity,
-              LoginMethod,
-              LoginSession,
-              Organization,
-              OrganizationUser,
-              Role,
-              User,
-              Workspace,
-              WorkspaceShared,
-              WorkspaceUser,
-              WorkspaceUsers
-          } = require('../../iam/entities')
-          return {
-              LoginActivity,
-              LoginMethod,
-              LoginSession,
-              Organization,
-              OrganizationUser,
-              Role,
-              User,
-              Workspace,
-              WorkspaceShared,
-              WorkspaceUser,
-              WorkspaceUsers
-          }
-      })()
 
 export const entities = {
     ChatFlow,
@@ -105,7 +72,6 @@ export const entities = {
     FlowOpsWorkspaceMember,
     FlowOpsRole,
     FlowOpsLoginActivity,
-    ...legacyIamEntities,
     ScheduleRecord,
     ScheduleTriggerLog
 }

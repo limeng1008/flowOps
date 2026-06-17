@@ -52,7 +52,6 @@ jest.mock(
 jest.mock('../utils/telemetry', () => ({ Telemetry: class Telemetry {} }))
 jest.mock('../CachePool', () => ({ CachePool: class CachePool {} }))
 jest.mock('../UsageCacheManager', () => ({ UsageCacheManager: class UsageCacheManager {} }))
-jest.mock('../IdentityManager', () => ({ IdentityManager: class IdentityManager {} }))
 jest.mock('../utils/quotaUsage', () => ({
     checkPredictions: jest.fn(),
     updatePredictionsUsage: jest.fn()
@@ -111,8 +110,8 @@ beforeEach(() => {
     mockAppDataSource = {
         getRepository: jest.fn().mockImplementation((Entity: any) => {
             const name = Entity?.name ?? ''
-            if (name === 'Workspace') return { findOneBy: mockWorkspaceFindOneBy }
-            if (name === 'Organization') return { findOneBy: mockOrgFindOneBy }
+            if (name === 'Workspace' || name === 'FlowOpsWorkspace') return { findOneBy: mockWorkspaceFindOneBy }
+            if (name === 'Organization' || name === 'FlowOpsOrganization') return { findOneBy: mockOrgFindOneBy }
             return { findOneBy: mockFindOneBy }
         })
     }

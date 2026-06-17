@@ -1,12 +1,27 @@
 import { Application, NextFunction, Request, Response } from 'express'
+import { StatusCodes } from 'http-status-codes'
 import { Platform } from '../../Interface'
+import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { SELF_ENTERPRISE_FEATURE_FLAGS } from './features'
-import type { FlowOpsIdentityPermission, FlowOpsPermissionsContainer, IFlowOpsIdentity } from '../identity'
+import type {
+    FlowOpsAdditionalSeatsQuantity,
+    FlowOpsIdentityPermission,
+    FlowOpsPermissionsContainer,
+    FlowOpsStripeRegistration,
+    FlowOpsStripeSubscription,
+    IFlowOpsIdentity
+} from '../identity'
 import { ALL_SELF_PERMISSIONS, SELF_PERMISSION_GROUPS } from './rbac/permissions'
 
-export class FlowOpsIdentity implements IFlowOpsIdentity {
-    [key: string]: any
+const FLOWOPS_PRIVATE_PRODUCT_ID = 'flowops-private'
+const PRIVATE_CLOUD_BILLING_UNAVAILABLE = 'FlowOps 私有版不提供云计费'
+const PRIVATE_SSO_REFRESH_UNAVAILABLE = 'FlowOps 私有版不提供 SSO 刷新'
 
+const throwPrivateCloudBillingUnavailable = (): never => {
+    throw new InternalFlowiseError(StatusCodes.NOT_IMPLEMENTED, PRIVATE_CLOUD_BILLING_UNAVAILABLE)
+}
+
+export class FlowOpsIdentity implements IFlowOpsIdentity {
     private static instance: FlowOpsIdentity
     private readonly permissionMap: Record<string, FlowOpsIdentityPermission[]> = Object.fromEntries(
         Object.entries(SELF_PERMISSION_GROUPS).map(([group, permissions]) => [
@@ -58,7 +73,7 @@ export class FlowOpsIdentity implements IFlowOpsIdentity {
     }
 
     async getProductIdFromSubscription(_subscriptionId?: string): Promise<string> {
-        return ''
+        return FLOWOPS_PRIVATE_PRODUCT_ID
     }
 
     getPermissionsByType(type?: string): FlowOpsIdentityPermission[] {
@@ -72,5 +87,53 @@ export class FlowOpsIdentity implements IFlowOpsIdentity {
 
     async initializeSSO(_app?: Application): Promise<void> {
         return undefined
+    }
+
+    async initializeSsoProvider(_app: Application, _providerName: string, _config: Record<string, unknown>): Promise<void> {
+        return undefined
+    }
+
+    async createStripeUserAndSubscribe(_data: FlowOpsStripeRegistration): Promise<FlowOpsStripeSubscription> {
+        return throwPrivateCloudBillingUnavailable()
+    }
+
+    async cancelSubscription(_subscriptionId: string): Promise<unknown> {
+        return throwPrivateCloudBillingUnavailable()
+    }
+
+    async updateSubscriptionPlan(_req: Request, _subscriptionId: string, _newPlanId: string, _prorationDate: number): Promise<unknown> {
+        return throwPrivateCloudBillingUnavailable()
+    }
+
+    async updateAdditionalSeats(_subscriptionId: string, _quantity: number, _prorationDate: number): Promise<unknown> {
+        return throwPrivateCloudBillingUnavailable()
+    }
+
+    async updateStripeCustomerEmail(_customerId: string, _email: string): Promise<void> {
+        return throwPrivateCloudBillingUnavailable()
+    }
+
+    async getAdditionalSeatsQuantity(_subscriptionId: string): Promise<FlowOpsAdditionalSeatsQuantity> {
+        return throwPrivateCloudBillingUnavailable()
+    }
+
+    async getAdditionalSeatsProration(_subscriptionId: string, _quantity: number): Promise<unknown> {
+        return throwPrivateCloudBillingUnavailable()
+    }
+
+    async getPlanProration(_subscriptionId: string, _newPlanId: string): Promise<unknown> {
+        return throwPrivateCloudBillingUnavailable()
+    }
+
+    async getCustomerWithDefaultSource(_customerId: string): Promise<unknown> {
+        return throwPrivateCloudBillingUnavailable()
+    }
+
+    async createStripeCustomerPortalSession(_req: Request): Promise<{ url: string }> {
+        return throwPrivateCloudBillingUnavailable()
+    }
+
+    async getRefreshToken(_ssoProvider?: string, _refreshToken?: string): Promise<Record<string, unknown>> {
+        throw new InternalFlowiseError(StatusCodes.NOT_IMPLEMENTED, PRIVATE_SSO_REFRESH_UNAVAILABLE)
     }
 }

@@ -61,9 +61,7 @@ import express, { NextFunction, Request, Response } from 'express'
 import { secureAxiosRequest } from 'flowise-components'
 import { StatusCodes } from 'http-status-codes'
 import { Credential } from '../../database/entities/Credential'
-import { WorkspaceShared } from '../../iam/entities'
 import { getActiveWorkspaceIdForRequest } from '../../iam/query'
-import { isSelfIamMode } from '../../iam/provider'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { decryptCredentialData, encryptCredentialData } from '../../utils'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
@@ -81,21 +79,10 @@ router.post('/authorize/:credentialId', async (req: Request, res: Response, next
         const appServer = getRunningExpressApp()
         const credentialRepository = appServer.AppDataSource.getRepository(Credential)
 
-        let credential = await credentialRepository.findOneBy({
+        const credential = await credentialRepository.findOneBy({
             id: credentialId,
             workspaceId
         })
-
-        if (!credential && !isSelfIamMode()) {
-            const share = await appServer.AppDataSource.getRepository(WorkspaceShared).findOneBy({
-                workspaceId,
-                sharedItemId: credentialId,
-                itemType: 'credential'
-            })
-            if (share) {
-                credential = await credentialRepository.findOneBy({ id: credentialId })
-            }
-        }
 
         if (!credential) {
             return next(new InternalFlowiseError(StatusCodes.NOT_FOUND, 'Credential not found'))

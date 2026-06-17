@@ -3,8 +3,8 @@ import nodemailer from 'nodemailer'
 /**
  * FlowOps 自建 IAM(self 轨)的邮件发送工具。
  *
- * 完全自包含,**不依赖 `packages/server/src/enterprise/**`**——出货构建会物理剪除 enterprise,
- * self 轨必须自带 mailer。仅在 SMTP 配置齐全时发送;未配置时由调用方回退到"返回链接"。
+ * 完全自包含,不依赖已删除的商业 IAM 源码;self 轨必须自带 mailer。
+ * 仅在 SMTP 配置齐全时发送;未配置时由调用方回退到"返回链接"。
  *
  * 读取的环境变量与 enterprise 同名,配置体验一致:
  * SMTP_HOST / SMTP_PORT / SMTP_USER / SMTP_PASSWORD / SMTP_SECURE / SENDER_EMAIL

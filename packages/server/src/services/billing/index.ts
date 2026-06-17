@@ -6,10 +6,8 @@ import { BillingSubscription, BillingSubscriptionStatus } from '../../database/e
 import { BillingUsage } from '../../database/entities/BillingUsage'
 import { ChatFlow } from '../../database/entities/ChatFlow'
 import { Organization } from '../../iam/entities'
-import { OrganizationUser } from '../../iam/entities'
 import { Workspace } from '../../iam/entities'
-import { WorkspaceUser } from '../../iam/entities'
-import { isSelfIamMode } from '../../iam/provider'
+import { FlowOpsWorkspaceMember } from '../../iam/self/entities'
 import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
 import { EntitlementTier, inferEntitlementTierFromPlanCode, isEntitlementTier, normalizeEntitlementTier } from '../entitlement'
@@ -194,13 +192,10 @@ export class BillingService {
         const workspaces = await workspaceRepo.findBy({ organizationId })
         const workspaceIds = workspaces.map((workspace: Workspace) => workspace.id)
         const botWhere = workspaceIds.length ? { workspaceId: In(workspaceIds) } : { workspaceId: In(['__none__']) }
-        const seatsPromise = isSelfIamMode()
-            ? appServer.AppDataSource.getRepository(WorkspaceUser).countBy(botWhere)
-            : appServer.AppDataSource.getRepository(OrganizationUser).countBy({ organizationId })
         const [chatflows, assistants, seats] = await Promise.all([
             chatFlowRepo.countBy(botWhere),
             assistantRepo.countBy(botWhere),
-            seatsPromise
+            appServer.AppDataSource.getRepository(FlowOpsWorkspaceMember).countBy(botWhere)
         ])
 
         return {

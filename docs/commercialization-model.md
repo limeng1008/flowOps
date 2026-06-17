@@ -12,7 +12,7 @@ flowchart LR
     Env["Environment"] --> IAM["Platform authorization / IAM"]
     Env --> Entitlement["Plan quotas / entitlement"]
 
-    IAM --> Identity["IdentityManager or FlowOpsIdentity"]
+    IAM --> Identity["FlowOpsIdentity"]
     Identity --> Auth["Auth, users, workspaces, permissions, platform feature flags"]
 
     Entitlement --> Source["EntitlementSource"]
@@ -22,18 +22,16 @@ flowchart LR
 
 Platform authorization and entitlement are related, but they are not the same contract.
 
-Platform authorization answers: can this runtime boot the enterprise-compatible platform surface, authenticate users, expose workspace/admin routes, and satisfy legacy feature-flag call sites?
+Platform authorization answers: can this runtime boot the private platform surface, authenticate users, expose workspace/admin routes, and satisfy feature-flag call sites?
 
 Entitlement answers: what commercial tier and usage limits does an organization currently have?
 
 ## Environment semantics
 
-| Environment variable          | Plane                         | Meaning                                                                                                                                                                               |
-| ----------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `FLOWOPS_IAM`                 | Platform authorization        | Selects the IAM implementation. `self` uses FlowOps self IAM. `enterprise` uses the legacy enterprise provider when available. Ship builds without enterprise dist force self IAM.    |
-| `FLOWOPS_EDITION` / `EDITION` | Entitlement and product shape | `cloud` selects subscription-backed entitlement and exposes cloud-only billing/payment surfaces. Any other value is treated as `private`.                                             |
-| `FLOWOPS_LOCAL_COMMERCIAL`    | Dual entry                    | Legacy platform authorization still reads this inside `IdentityManager.ts`. Entitlement reads it only through `isLocalCommercialEnabled()` and only on the private/local source path. |
-| `FLOWOPS_LOCAL_PRODUCT_ID`    | Legacy platform metadata      | Used by legacy commercial authorization metadata. It does not define entitlement quotas.                                                                                              |
+| Environment variable          | Plane                         | Meaning                                                                                                                                             |
+| ----------------------------- | ----------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `FLOWOPS_EDITION` / `EDITION` | Entitlement and product shape | `cloud` selects subscription-backed entitlement and exposes cloud-only billing/payment surfaces. Any other value is treated as `private`.           |
+| `FLOWOPS_LOCAL_COMMERCIAL`    | Entitlement fallback          | Private/local fallback that grants enterprise-level quotas only when no license-backed entitlement is available. It does not select an IAM runtime. |
 
 ## Entitlement source selection
 
@@ -48,20 +46,15 @@ Entitlement-side parsing of `FLOWOPS_LOCAL_COMMERCIAL` must stay behind `isLocal
 
 ## Expected combinations
 
-| `FLOWOPS_IAM` | Edition         | `FLOWOPS_LOCAL_COMMERCIAL` | License/subscription state | Platform expectation                                  | Entitlement expectation                                                 |
-| ------------- | --------------- | -------------------------- | -------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------- |
-| `self`        | private/default | unset/false                | no license                 | Self IAM boots enterprise-compatible private runtime. | `local/free`.                                                           |
-| `self`        | private/default | true/1/yes/on              | no license                 | Self IAM boots enterprise-compatible private runtime. | `local/enterprise` for local commercial/dev use only.                   |
-| `self`        | private/default | any                        | active private license     | Self IAM boots enterprise-compatible private runtime. | License-derived tier, seats, credits, features, and expiry.             |
-| `self`        | `cloud`         | any                        | no active subscription     | Cloud product shape with self IAM.                    | `subscription/free`.                                                    |
-| `self`        | `cloud`         | any                        | active subscription        | Cloud product shape with self IAM.                    | Subscription-derived tier and quotas from `BillingPlan`.                |
-| `enterprise`  | private/default | legacy-managed             | legacy platform state      | Legacy `IdentityManager.ts` behavior is preserved.    | Entitlement still follows private/local source unless edition is cloud. |
-| `enterprise`  | `cloud`         | legacy-managed             | active subscription        | Legacy platform authorization remains separate.       | Subscription-derived tier and quotas from `BillingPlan`.                |
+| Edition         | `FLOWOPS_LOCAL_COMMERCIAL` | License/subscription state | Platform expectation               | Entitlement expectation                                     |
+| --------------- | -------------------------- | -------------------------- | ---------------------------------- | ----------------------------------------------------------- |
+| private/default | unset/false                | no license                 | Self IAM boots private runtime.    | `local/free`.                                               |
+| private/default | true/1/yes/on              | no license                 | Self IAM boots private runtime.    | `local/enterprise` for local commercial/dev use only.       |
+| private/default | any                        | active private license     | Self IAM boots private runtime.    | License-derived tier, seats, credits, features, and expiry. |
+| `cloud`         | any                        | no active subscription     | Cloud product shape with self IAM. | `subscription/free`.                                        |
+| `cloud`         | any                        | active subscription        | Cloud product shape with self IAM. | Subscription-derived tier and quotas from `BillingPlan`.    |
 
-`FLOWOPS_LOCAL_COMMERCIAL` is intentionally a dual entry today because legacy platform authorization and the new entitlement model evolved separately. Treat the two reads as separate contracts:
-
--   In `IdentityManager.ts`, it is a legacy platform authorization override and must not be changed in this workstream.
--   In entitlement, it is a private/local fallback that grants enterprise-level quotas only when no license-backed entitlement is available.
+`FLOWOPS_LOCAL_COMMERCIAL` is intentionally entitlement-only after P4. It must stay behind `isLocalCommercialEnabled(env)` and must not be used to reintroduce an IAM runtime switch.
 
 ## Plan and quota ownership
 
@@ -81,7 +74,7 @@ Private/self-managed entitlement ownership lives in local license state:
 
 Self IAM does not implement SSO provider configuration. The user-facing self login payload therefore uses `getSelfEnterpriseFeatures()`, where `feat:sso-config` is false.
 
-`FlowOpsIdentity.getFeaturesByPlan()` is an enterprise-compatible platform adapter. It returns string feature flags to satisfy legacy call sites that expect an identity manager. Current disabled-feature permission filtering for `feat:sso-config` is guarded by Cloud platform checks, so it is not the self IAM user-facing source of truth.
+`FlowOpsIdentity.getFeaturesByPlan()` is a private-platform adapter. It returns string feature flags for call sites that still expect plan-shaped platform features. Current disabled-feature permission filtering for `feat:sso-config` is guarded by Cloud platform checks, so it is not the self IAM user-facing source of truth.
 
 Rule for new self-track code:
 
@@ -91,7 +84,6 @@ Rule for new self-track code:
 
 ## Non-goals
 
--   Do not modify `IdentityManager.ts` in this workstream.
 -   Do not move platform feature authorization into entitlement.
--   Do not use entitlement tiers to decide which IAM implementation boots.
+-   Do not use entitlement tiers to decide which IAM implementation boots; self IAM is the only runtime.
 -   Do not add storage as an entitlement dimension unless product explicitly approves T3.
