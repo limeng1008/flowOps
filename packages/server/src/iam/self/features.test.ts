@@ -24,10 +24,12 @@ const makeLicenseState = (
 describe('FlowOps self license feature mapping', () => {
     const originalFlowOpsEdition = process.env.FLOWOPS_EDITION
     const originalEdition = process.env.EDITION
+    const originalLocalCommercial = process.env.FLOWOPS_LOCAL_COMMERCIAL
 
     beforeEach(() => {
         delete process.env.FLOWOPS_EDITION
         delete process.env.EDITION
+        delete process.env.FLOWOPS_LOCAL_COMMERCIAL
         setLicenseState(makeLicenseState('missing', { valid: false, readOnly: false, reason: 'LICENSE_NOT_IMPORTED' }))
     })
 
@@ -36,6 +38,8 @@ describe('FlowOps self license feature mapping', () => {
         else process.env.FLOWOPS_EDITION = originalFlowOpsEdition
         if (originalEdition === undefined) delete process.env.EDITION
         else process.env.EDITION = originalEdition
+        if (originalLocalCommercial === undefined) delete process.env.FLOWOPS_LOCAL_COMMERCIAL
+        else process.env.FLOWOPS_LOCAL_COMMERCIAL = originalLocalCommercial
     })
 
     it('treats missing licenses as the free tier with no advanced IAM features', () => {
@@ -80,5 +84,14 @@ describe('FlowOps self license feature mapping', () => {
         for (const feature of SELF_ENTERPRISE_FEATURE_FLAGS) {
             expect(isSelfFeatureAllowed(feature)).toBe(feature !== 'feat:sso-config')
         }
+    })
+
+    it('treats local commercial deployments as the enterprise tier', () => {
+        process.env.FLOWOPS_LOCAL_COMMERCIAL = 'true'
+        setLicenseState(makeLicenseState('missing', { valid: false, readOnly: false, reason: 'LICENSE_NOT_IMPORTED' }))
+
+        expect(getSelfFeatureTier()).toBe('enterprise')
+        expect(isSelfFeatureAllowed('feat:files')).toBe(true)
+        expect(isSelfFeatureAllowed('feat:sso-config')).toBe(false)
     })
 })

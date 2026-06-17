@@ -1,6 +1,11 @@
 import { getFlowOpsEdition } from '../../services/edition'
 import { getLicenseState } from '../../services/license/state'
-import { getIamFeaturesForEntitlementTier, normalizeEntitlementTier, type EntitlementTier } from '../../services/entitlement/catalog'
+import {
+    getIamFeaturesForEntitlementTier,
+    isLocalCommercialEnabled,
+    normalizeEntitlementTier,
+    type EntitlementTier
+} from '../../services/entitlement/catalog'
 
 export type FlowOpsFeatureMap = Record<string, boolean>
 
@@ -19,6 +24,7 @@ export const SELF_ENTERPRISE_FEATURE_FLAGS = [
 
 export const getSelfFeatureTier = (): EntitlementTier => {
     if (getFlowOpsEdition() === 'cloud') return 'enterprise'
+    if (isLocalCommercialEnabled()) return 'enterprise'
 
     const licenseState = getLicenseState()
     if (licenseState.status === 'missing') return 'free'

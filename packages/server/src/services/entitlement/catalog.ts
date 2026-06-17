@@ -30,6 +30,11 @@ export const normalizeEntitlementTier = (value: unknown, fallbackPlanCode?: stri
     return isEntitlementTier(normalized) ? normalized : inferEntitlementTierFromPlanCode(fallbackPlanCode)
 }
 
+export const isLocalCommercialEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => {
+    const value = env.FLOWOPS_LOCAL_COMMERCIAL?.trim().toLowerCase()
+    return value === '1' || value === 'true' || value === 'yes' || value === 'on'
+}
+
 export const FLOWOPS_ENTITLEMENT_FEATURES = {
     basicWorkflow: 'basic-workflow',
     chinaModels: 'china-models',

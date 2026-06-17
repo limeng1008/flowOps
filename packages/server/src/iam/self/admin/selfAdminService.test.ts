@@ -1,4 +1,4 @@
-import { describe, expect, it, beforeEach } from '@jest/globals'
+import { describe, expect, it, beforeEach, afterEach } from '@jest/globals'
 import type { DataSource } from 'typeorm'
 import { ChatFlow } from '../../../database/entities/ChatFlow'
 import { FlowOpsLoginActivity, FlowOpsOrganization, FlowOpsRole, FlowOpsUser, FlowOpsWorkspace, FlowOpsWorkspaceMember } from '../entities'
@@ -137,10 +137,17 @@ describe('FlowOpsAdminService', () => {
     beforeEach(async () => {
         process.env.JWT_AUTH_TOKEN_SECRET = 'test-access-secret'
         process.env.JWT_REFRESH_TOKEN_SECRET = 'test-refresh-secret'
+        process.env.FLOWOPS_LOCAL_COMMERCIAL = 'true'
         dataSource = makeInMemoryDataSource()
         await seedRoles(dataSource)
         authService = new FlowOpsAuthService(dataSource)
         adminService = new FlowOpsAdminService(dataSource)
+    })
+
+    afterEach(() => {
+        delete process.env.JWT_AUTH_TOKEN_SECRET
+        delete process.env.JWT_REFRESH_TOKEN_SECRET
+        delete process.env.FLOWOPS_LOCAL_COMMERCIAL
     })
 
     it('returns builtin role permissions for owner, admin, and member sessions', async () => {
@@ -290,6 +297,99 @@ describe('FlowOpsAdminService', () => {
         await expect(adminService.deleteWorkspaceUser(owner.activeWorkspaceId!, owner.id)).rejects.toMatchObject({
             statusCode: 400,
             message: 'Organization owner cannot be removed from a workspace'
+        })
+    })
+
+    it('reports the real organization user usage and free tier seat limit', async () => {
+        delete process.env.FLOWOPS_LOCAL_COMMERCIAL
+        const owner = await authService.registerAccount({
+            user: { name: 'Owner', email: 'owner@example.com', credential: 'Password1!' }
+        })
+
+        await expect(adminService.getCurrentUsage(owner.activeOrganizationId)).resolves.toMatchObject({
+            users: { usage: 1, limit: 1 }
+        })
+        await expect(adminService.getAdditionalSeatsQuantity(owner.activeOrganizationId)).resolves.toMatchObject({
+            includedSeats: 1,
+            quantity: 0,
+            totalOrgUsers: 1
+        })
+    })
+
+    it('blocks adding a new organization user above the free tier seat limit', async () => {
+        delete process.env.FLOWOPS_LOCAL_COMMERCIAL
+        const owner = await authService.registerAccount({
+            user: { name: 'Owner', email: 'owner@example.com', credential: 'Password1!' }
+        })
+        const workspace = await dataSource.getRepository(FlowOpsWorkspace).save({
+            name: 'Unassigned',
+            organizationId: owner.activeOrganizationId
+        })
+        const memberRole = (await adminService.listRoles()).find((role) => role.name === 'member')!
+        const externalUser = await dataSource.getRepository(FlowOpsUser).save({
+            email: 'external@example.com',
+            name: 'External',
+            status: 'active'
+        })
+
+        await expect(
+            adminService.updateWorkspaceUserRole({
+                userId: externalUser.id,
+                workspaceId: workspace.id,
+                roleId: memberRole.id
+            })
+        ).rejects.toMatchObject({
+            statusCode: 402,
+            message: '座位已满,需扩容授权'
+        })
+    })
+
+    it('allows an existing organization user to join another workspace without consuming another seat', async () => {
+        delete process.env.FLOWOPS_LOCAL_COMMERCIAL
+        const owner = await authService.registerAccount({
+            user: { name: 'Owner', email: 'owner@example.com', credential: 'Password1!' }
+        })
+        const workspace = await dataSource.getRepository(FlowOpsWorkspace).save({
+            name: 'Unassigned',
+            organizationId: owner.activeOrganizationId
+        })
+        const ownerRole = (await adminService.listRoles()).find((role) => role.name === 'owner')!
+
+        await expect(
+            adminService.updateWorkspaceUserRole({
+                userId: owner.id,
+                workspaceId: workspace.id,
+                roleId: ownerRole.id
+            })
+        ).resolves.toMatchObject({
+            userId: owner.id,
+            workspaceId: workspace.id,
+            roleId: ownerRole.id
+        })
+        await expect(adminService.getCurrentUsage(owner.activeOrganizationId)).resolves.toMatchObject({
+            users: { usage: 1, limit: 1 }
+        })
+    })
+
+    it('treats local commercial deployments as unlimited seats', async () => {
+        const owner = await authService.registerAccount({
+            user: { name: 'Owner', email: 'owner@example.com', credential: 'Password1!' }
+        })
+        const memberInvite = await authService.inviteAccount(
+            { email: 'member@example.com', roleName: 'member', workspaceId: owner.activeWorkspaceId },
+            owner
+        )
+        await authService.registerAccount({
+            user: { name: 'Member', email: 'member@example.com', credential: 'Password1!', tempToken: memberInvite.tempToken }
+        })
+
+        await expect(adminService.getCurrentUsage(owner.activeOrganizationId)).resolves.toMatchObject({
+            users: { usage: 2, limit: -1 }
+        })
+        await expect(adminService.getAdditionalSeatsQuantity(owner.activeOrganizationId)).resolves.toMatchObject({
+            includedSeats: -1,
+            quantity: 0,
+            totalOrgUsers: 2
         })
     })
 })

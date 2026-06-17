@@ -10,6 +10,7 @@ import { FlowOpsAuthError, FlowOpsLoggedInUser } from './types'
 import logger from '../../../utils/logger'
 import { isSelfSmtpConfigured, sendSelfMail } from '../email/mailer'
 import { buildInviteEmail, buildResetPasswordEmail } from '../email/templates'
+import { assertCanAddOrganizationUser, assertUserOrganizationsWithinSeatLimit, isOrganizationUser } from '../seats'
 
 export { FlowOpsAuthError }
 export type { FlowOpsLoggedInUser }
@@ -211,6 +212,7 @@ export class FlowOpsAuthService {
             if (invitedUser.tokenExpiry && invitedUser.tokenExpiry.getTime() < Date.now()) {
                 throw new FlowOpsAuthError(403, 'Invite token expired')
             }
+            await assertUserOrganizationsWithinSeatLimit(manager, invitedUser.id)
 
             invitedUser.name = body.user?.name ?? invitedUser.name
             invitedUser.credential = await bcrypt.hash(password, 10)
@@ -250,6 +252,9 @@ export class FlowOpsAuthService {
 
             const userRepo = manager.getRepository(FlowOpsUser)
             const existing = await userRepo.findOneBy({ email })
+            if (!existing || !(await isOrganizationUser(manager, workspace.organizationId, existing.id))) {
+                await assertCanAddOrganizationUser(manager, workspace.organizationId)
+            }
             const tempToken = makeToken()
             const user = await userRepo.save(
                 userRepo.create({

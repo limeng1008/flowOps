@@ -192,9 +192,9 @@ organizationRouter.get('/', checkPermission('users:manage'), async (req, res, ne
         sendError(error, res, next)
     }
 })
-organizationRouter.get('/additional-seats-quantity', checkPermission('users:manage'), async (_req, res, next) => {
+organizationRouter.get('/additional-seats-quantity', checkPermission('users:manage'), async (req, res, next) => {
     try {
-        res.json(await service().getAdditionalSeatsQuantity())
+        res.json(await service().getAdditionalSeatsQuantity((req.user as any as FlowOpsLoggedInUser)?.activeOrganizationId))
     } catch (error) {
         sendError(error, res, next)
     }
@@ -214,9 +214,9 @@ organizationRouter.get('/plan-proration', checkPermission('users:manage'), (_req
 organizationRouter.post('/update-subscription-plan', checkPermission('users:manage'), (_req, res) => {
     res.json({ success: true })
 })
-organizationRouter.get('/get-current-usage', checkPermission('users:manage'), async (_req, res, next) => {
+organizationRouter.get('/get-current-usage', checkPermission('users:manage'), async (req, res, next) => {
     try {
-        res.json(await service().getCurrentUsage())
+        res.json(await service().getCurrentUsage((req.user as any as FlowOpsLoggedInUser)?.activeOrganizationId))
     } catch (error) {
         sendError(error, res, next)
     }

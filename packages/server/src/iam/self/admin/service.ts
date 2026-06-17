@@ -3,6 +3,7 @@ import { ChatFlow } from '../../../database/entities/ChatFlow'
 import { FlowOpsLoginActivity, FlowOpsOrganization, FlowOpsRole, FlowOpsUser, FlowOpsWorkspace, FlowOpsWorkspaceMember } from '../entities'
 import { FlowOpsAuthError, FlowOpsLoggedInUser } from '../auth/types'
 import { normalizePermissionJson } from '../rbac/permissions'
+import { assertCanAddOrganizationUser, getOrganizationUserCount, getSelfSeatLimit, isOrganizationUser } from '../seats'
 
 type RepositorySource = DataSource | EntityManager
 
@@ -232,9 +233,11 @@ export class FlowOpsAdminService {
         if (!user) throw new FlowOpsAuthError(404, 'User not found')
         // upsert:成员不存在则把用户加入该工作区(赋角色),已存在则改角色。
         // PUT 端点权限为 workspace:add-user,语义即"把用户加进/调整到某工作区"。
-        const membership =
-            (await repo.findOneBy({ userId: body.userId, workspaceId: body.workspaceId })) ??
-            repo.create({ userId: body.userId, workspaceId: body.workspaceId, roleId: role.id })
+        const existingMembership = await repo.findOneBy({ userId: body.userId, workspaceId: body.workspaceId })
+        if (!existingMembership && !(await isOrganizationUser(this.dataSource, workspace.organizationId, user.id))) {
+            await assertCanAddOrganizationUser(this.dataSource, workspace.organizationId)
+        }
+        const membership = existingMembership ?? repo.create({ userId: body.userId, workspaceId: body.workspaceId, roleId: role.id })
         membership.roleId = role.id
         return await repo.save(membership)
     }
@@ -410,24 +413,41 @@ export class FlowOpsAdminService {
         ]
     }
 
-    async getAdditionalSeatsQuantity() {
-        const totalOrgUsers = await this.dataSource.getRepository(FlowOpsUser).count()
+    async getAdditionalSeatsQuantity(organizationId?: string) {
+        const totalOrgUsers = await this.getOrganizationUserCountForUsage(organizationId)
         return {
-            includedSeats: Math.max(totalOrgUsers, 1),
+            includedSeats: getSelfSeatLimit(),
             quantity: 0,
             totalOrgUsers
         }
     }
 
-    async getCurrentUsage() {
-        const userCount = await this.dataSource.getRepository(FlowOpsUser).count()
-        const workspaceCount = await this.dataSource.getRepository(FlowOpsWorkspace).count()
+    async getCurrentUsage(organizationId?: string) {
+        const resolvedOrganizationId = await this.resolveOrganizationId(organizationId)
+        const userCount = resolvedOrganizationId
+            ? await getOrganizationUserCount(this.dataSource, resolvedOrganizationId)
+            : await this.dataSource.getRepository(FlowOpsUser).count()
+        const workspaceCount = resolvedOrganizationId
+            ? await this.dataSource.getRepository(FlowOpsWorkspace).countBy({ organizationId: resolvedOrganizationId })
+            : await this.dataSource.getRepository(FlowOpsWorkspace).count()
         return {
-            users: { usage: userCount, limit: -1 },
+            users: { usage: userCount, limit: getSelfSeatLimit() },
             workspaces: { usage: workspaceCount, limit: -1 },
             predictions: { usage: 0, limit: -1 },
             storage: { usage: 0, limit: -1 }
         }
+    }
+
+    private async resolveOrganizationId(organizationId?: string): Promise<string | undefined> {
+        if (organizationId) return organizationId
+        const organizations = await this.dataSource.getRepository(FlowOpsOrganization).find()
+        return organizations[0]?.id
+    }
+
+    private async getOrganizationUserCountForUsage(organizationId?: string): Promise<number> {
+        const resolvedOrganizationId = await this.resolveOrganizationId(organizationId)
+        if (!resolvedOrganizationId) return await this.dataSource.getRepository(FlowOpsUser).count()
+        return await getOrganizationUserCount(this.dataSource, resolvedOrganizationId)
     }
 
     private async hydrateMemberships(members: FlowOpsWorkspaceMember[], ownerUserId?: string | null) {

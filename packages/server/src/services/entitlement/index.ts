@@ -8,7 +8,13 @@ import { InternalFlowiseError } from '../../errors/internalFlowiseError'
 import { getRunningExpressApp } from '../../utils/getRunningExpressApp'
 import { FlowOpsEdition, getFlowOpsEdition } from '../edition'
 import LicenseService, { LicenseService as FlowOpsLicenseService, LicenseVerificationResult } from '../license'
-import { ENTITLEMENT_TEMPLATES, normalizeEntitlementTier, type EntitlementTemplate, type EntitlementTier } from './catalog'
+import {
+    ENTITLEMENT_TEMPLATES,
+    isLocalCommercialEnabled,
+    normalizeEntitlementTier,
+    type EntitlementTemplate,
+    type EntitlementTier
+} from './catalog'
 
 export { getFlowOpsEdition }
 export type { FlowOpsEdition }
@@ -17,6 +23,7 @@ export {
     ENTITLEMENT_TEMPLATES,
     FLOWOPS_ENTITLEMENT_FEATURES,
     inferEntitlementTierFromPlanCode,
+    isLocalCommercialEnabled,
     isEntitlementTier,
     normalizeEntitlementTier
 } from './catalog'
@@ -122,11 +129,6 @@ export const getEntitlementPlanCatalog = (): EntitlementPlanCatalogItem[] =>
         ...ENTITLEMENT_TEMPLATES[tier],
         ...ENTITLEMENT_PLAN_META[tier]
     }))
-
-export const isLocalCommercialEnabled = (env: NodeJS.ProcessEnv = process.env): boolean => {
-    const value = env.FLOWOPS_LOCAL_COMMERCIAL?.trim().toLowerCase()
-    return value === '1' || value === 'true' || value === 'yes' || value === 'on'
-}
 
 export const getPredictionCreditCost = (modelName?: string): number => {
     const defaultCredits = Number(process.env.FLOWOPS_DEFAULT_PREDICTION_CREDITS ?? 1)
