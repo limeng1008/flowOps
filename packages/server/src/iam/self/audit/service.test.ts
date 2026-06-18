@@ -240,4 +240,62 @@ describe('FlowOpsAuditService', () => {
         expect(rows[1].metadata).toEqual({ version: 1 })
         expect(rows.every((row) => row.organizationId === 'org-1')).toBe(true)
     })
+
+    it('filters action prefixes in the database for compatibility queries', async () => {
+        await sqlite.getRepository(auditSchema).save([
+            {
+                id: '00000000-0000-4000-8000-000000000010',
+                createdDate: new Date('2026-01-05T00:00:00.000Z'),
+                action: 'auth.login',
+                targetType: 'user',
+                organizationId: 'org-1',
+                status: 'success',
+                metadata: '{}'
+            },
+            {
+                id: '00000000-0000-4000-8000-000000000011',
+                createdDate: new Date('2026-01-06T00:00:00.000Z'),
+                action: 'role.update',
+                targetType: 'role',
+                organizationId: 'org-1',
+                status: 'success',
+                metadata: '{}'
+            }
+        ])
+
+        const rows = await service.exportAuditLogs({ organizationId: 'org-1', actionPrefix: 'auth.' })
+
+        expect(rows.map((row) => row.action)).toEqual(['auth.login'])
+    })
+
+    it('filters legacy activity codes in the database', async () => {
+        await sqlite.getRepository(auditSchema).save([
+            {
+                id: '00000000-0000-4000-8000-000000000020',
+                createdDate: new Date('2026-01-05T00:00:00.000Z'),
+                action: 'auth.loginFailed',
+                targetType: 'user',
+                organizationId: 'org-1',
+                status: 'failure',
+                metadata: JSON.stringify({ legacyActivityCode: '-1' })
+            },
+            {
+                id: '00000000-0000-4000-8000-000000000021',
+                createdDate: new Date('2026-01-06T00:00:00.000Z'),
+                action: 'auth.loginFailed',
+                targetType: 'user',
+                organizationId: 'org-1',
+                status: 'failure',
+                metadata: JSON.stringify({ legacyActivityCode: '-2' })
+            }
+        ])
+
+        const rows = await service.exportAuditLogs({
+            organizationId: 'org-1',
+            actionPrefix: 'auth.',
+            legacyActivityCodes: ['-2']
+        })
+
+        expect(rows.map((row) => (row.metadata as Record<string, unknown>).legacyActivityCode)).toEqual(['-2'])
+    })
 })

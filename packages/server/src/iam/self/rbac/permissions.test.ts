@@ -23,6 +23,7 @@ const UI_DERIVED_PERMISSIONS = [
     'apikeys:delete',
     'apikeys:update',
     'apikeys:view',
+    'auditLogs:view',
     'assistants:create',
     'assistants:delete',
     'assistants:update',
@@ -104,11 +105,12 @@ const makeResponse = () => {
 describe('FlowOps self permissions', () => {
     it('keeps the permission universe equal to the UI-derived permission ids', () => {
         expect(ALL_SELF_PERMISSIONS).toEqual(UI_DERIVED_PERMISSIONS)
-        expect(new Set(ALL_SELF_PERMISSIONS).size).toBe(81)
+        expect(new Set(ALL_SELF_PERMISSIONS).size).toBe(82)
         expect(Object.keys(SELF_PERMISSION_GROUPS).sort()).toEqual([
             'agentflows',
             'apikeys',
             'assistants',
+            'auditLogs',
             'chatflows',
             'credentials',
             'datasets',
@@ -134,6 +136,7 @@ describe('FlowOps self permissions', () => {
         expect(ADMIN_SELF_PERMISSIONS).toContain('users:manage')
         expect(ADMIN_SELF_PERMISSIONS).toContain('workspace:create')
         expect(ADMIN_SELF_PERMISSIONS).toContain('roles:manage')
+        expect(ADMIN_SELF_PERMISSIONS).toContain('auditLogs:view')
         expect(ADMIN_SELF_PERMISSIONS).not.toContain('sso:manage')
         expect(ADMIN_SELF_PERMISSIONS).not.toContain('logs:view')
 
@@ -142,6 +145,7 @@ describe('FlowOps self permissions', () => {
         expect(MEMBER_SELF_PERMISSIONS).toContain('agentflows:update')
         expect(MEMBER_SELF_PERMISSIONS).not.toContain('users:manage')
         expect(MEMBER_SELF_PERMISSIONS).not.toContain('roles:manage')
+        expect(MEMBER_SELF_PERMISSIONS).not.toContain('auditLogs:view')
         expect(MEMBER_SELF_PERMISSIONS).not.toContain('workspace:create')
         expect(MEMBER_SELF_PERMISSIONS).not.toContain('chatflows:delete')
     })

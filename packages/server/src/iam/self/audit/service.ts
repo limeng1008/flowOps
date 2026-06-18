@@ -24,6 +24,8 @@ export type AuditLogFilters = {
     organizationId: string
     actorUserId?: string
     action?: string
+    actionPrefix?: string
+    legacyActivityCodes?: string[]
     targetType?: string
     dateFrom?: Date | string
     dateTo?: Date | string
@@ -166,6 +168,15 @@ export class FlowOpsAuditService {
 
         if (filters.actorUserId) query.andWhere('audit.actorUserId = :actorUserId', { actorUserId: filters.actorUserId })
         if (filters.action) query.andWhere('audit.action = :action', { action: filters.action })
+        if (filters.actionPrefix) query.andWhere('audit.action LIKE :actionPrefix', { actionPrefix: `${filters.actionPrefix}%` })
+        if (filters.legacyActivityCodes?.length) {
+            const activityCodes = [...new Set(filters.legacyActivityCodes)]
+            const parameters = Object.fromEntries(
+                activityCodes.map((activityCode, index) => [`legacyActivityCode${index}`, `%"legacyActivityCode":"${activityCode}"%`])
+            )
+            const conditions = activityCodes.map((_activityCode, index) => `audit.metadata LIKE :legacyActivityCode${index}`).join(' OR ')
+            query.andWhere(`(${conditions})`, parameters)
+        }
         if (filters.targetType) query.andWhere('audit.targetType = :targetType', { targetType: filters.targetType })
         if (filters.workspaceId) query.andWhere('audit.workspaceId = :workspaceId', { workspaceId: filters.workspaceId })
 

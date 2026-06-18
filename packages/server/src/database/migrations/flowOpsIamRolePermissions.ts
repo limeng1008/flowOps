@@ -12,6 +12,7 @@ export const FLOWOPS_OWNER_ROLE_PERMISSIONS = [
     'apikeys:delete',
     'apikeys:update',
     'apikeys:view',
+    'auditLogs:view',
     'assistants:create',
     'assistants:delete',
     'assistants:update',

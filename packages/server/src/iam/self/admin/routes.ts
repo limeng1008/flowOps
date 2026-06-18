@@ -12,7 +12,6 @@ const workspaceRouter = Router()
 const workspaceUserRouter = Router()
 const userRouter = Router()
 const organizationUserRoute = Router()
-const auditRouter = Router()
 const organizationRouter = Router()
 
 const cookieOptions = (maxAge: number) => ({
@@ -187,14 +186,6 @@ organizationUserRoute.delete('/', checkPermission('users:manage'), async (req, r
     }
 })
 
-auditRouter.post('/login-activity', checkPermission('loginActivity:view'), async (req, res, next) => {
-    try {
-        res.json(await service().listLoginActivity(req.body))
-    } catch (error) {
-        sendError(error, res, next)
-    }
-})
-
 organizationRouter.get('/', checkPermission('users:manage'), async (req, res, next) => {
     try {
         res.json(await service().listOrganizations(req.user as any as FlowOpsLoggedInUser))
@@ -247,4 +238,4 @@ userRouter.put('/', checkPermission('users:manage'), async (req, res, next) => {
     }
 })
 
-export { auditRouter, organizationRouter, organizationUserRoute, roleRouter, userRouter, workspaceRouter, workspaceUserRouter }
+export { organizationRouter, organizationUserRoute, roleRouter, userRouter, workspaceRouter, workspaceUserRouter }

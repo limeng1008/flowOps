@@ -61,7 +61,8 @@ export const IAM_FEATURES_BY_TIER: Record<EntitlementTier, string[]> = {
         'feat:users',
         'feat:workspaces',
         'feat:roles',
-        'feat:login-activity'
+        'feat:login-activity',
+        'feat:audit'
     ],
     enterprise: [
         'feat:datasets',
@@ -72,6 +73,7 @@ export const IAM_FEATURES_BY_TIER: Record<EntitlementTier, string[]> = {
         'feat:workspaces',
         'feat:roles',
         'feat:login-activity',
+        'feat:audit',
         'feat:files'
     ]
 }

@@ -2,13 +2,13 @@ import express from 'express'
 import { NextFunction, Response } from 'express'
 import request from 'supertest'
 import type { DataSource } from 'typeorm'
-import { FlowOpsLoginActivity, FlowOpsOrganization, FlowOpsRole, FlowOpsUser, FlowOpsWorkspace, FlowOpsWorkspaceMember } from '../entities'
+import { FlowOpsOrganization, FlowOpsRole, FlowOpsUser, FlowOpsWorkspace, FlowOpsWorkspaceMember } from '../entities'
 import { FlowOpsLoggedInUser } from '../auth/types'
 import { BUILTIN_SELF_ROLE_PERMISSIONS } from '../rbac/permissions'
 import { checkPermission } from '../middleware'
 import { FlowOpsAdminService } from './service'
 
-const entities = [FlowOpsUser, FlowOpsOrganization, FlowOpsWorkspace, FlowOpsWorkspaceMember, FlowOpsRole, FlowOpsLoginActivity]
+const entities = [FlowOpsUser, FlowOpsOrganization, FlowOpsWorkspace, FlowOpsWorkspaceMember, FlowOpsRole]
 
 const makeInMemoryDataSource = (): DataSource => {
     const tables = new Map<unknown, any[]>()
@@ -121,13 +121,6 @@ const buildApp = (dataSource: DataSource, users: Record<string, FlowOpsLoggedInU
         if (key && users[key]) req.user = users[key] as any
         next()
     })
-    app.post('/audit/login-activity', checkPermission('loginActivity:view'), async (req, res, next) => {
-        try {
-            res.json(await service().listLoginActivity(req.body))
-        } catch (error) {
-            sendError(error, res, next)
-        }
-    })
     app.get('/organization', checkPermission('users:manage'), async (req, res, next) => {
         try {
             res.json(await service().listOrganizations((req as any).user as FlowOpsLoggedInUser))
@@ -214,39 +207,12 @@ describe('self IAM platform routes', () => {
             features: {}
         }
 
-        await dataSource.getRepository(FlowOpsLoginActivity).save({
-            userId: owner.id,
-            activityCode: '0',
-            message: 'Login Successful',
-            createdDate: new Date('2026-06-11T00:00:00.000Z')
-        })
         app = buildApp(dataSource, { owner, member })
     })
 
     afterEach(() => {
         delete process.env.JWT_AUTH_TOKEN_SECRET
         delete process.env.JWT_REFRESH_TOKEN_SECRET
-    })
-
-    it('serves audit login activity to authorized users and rejects members', async () => {
-        const ok = await request(app).post('/audit/login-activity').set('x-test-user', 'owner').send({ pageNo: 1 })
-
-        expect(ok.status).toBe(200)
-        expect(ok.body).toMatchObject({
-            count: 1,
-            currentPage: 1,
-            pageSize: 50
-        })
-        expect(ok.body.data).toEqual([
-            expect.objectContaining({
-                activityCode: 0,
-                username: 'owner@example.com',
-                message: 'Login Successful'
-            })
-        ])
-
-        const forbidden = await request(app).post('/audit/login-activity').set('x-test-user', 'member').send({ pageNo: 1 })
-        expect(forbidden.status).toBe(403)
     })
 
     it('serves the single organization view to authorized users and rejects members', async () => {

@@ -47,6 +47,7 @@ function validatePermissions(user: LoggedInUser, requestedPermissions: string[],
         }
 
         const featureToPermissionMap: { [key: string]: string[] } = {
+            'feat:audit': ['auditLogs:'],
             'feat:login-activity': ['loginActivity:'],
             'feat:logs': ['logs:'],
             'feat:roles': ['roles:'],

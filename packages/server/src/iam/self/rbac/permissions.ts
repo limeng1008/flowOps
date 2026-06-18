@@ -28,6 +28,7 @@ export const SELF_PERMISSION_GROUPS = {
         'agentflows:view'
     ]),
     apikeys: definePermissions(['apikeys:create', 'apikeys:delete', 'apikeys:update', 'apikeys:view']),
+    auditLogs: definePermissions(['auditLogs:view']),
     assistants: definePermissions(['assistants:create', 'assistants:delete', 'assistants:update', 'assistants:view']),
     chatflows: definePermissions([
         'chatflows:config',

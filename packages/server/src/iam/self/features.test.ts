@@ -66,6 +66,7 @@ describe('FlowOps self license feature mapping', () => {
         expect(isSelfFeatureAllowed('feat:users')).toBe(true)
         expect(isSelfFeatureAllowed('feat:workspaces')).toBe(true)
         expect(isSelfFeatureAllowed('feat:login-activity')).toBe(true)
+        expect(isSelfFeatureAllowed('feat:audit')).toBe(true)
         expect(isSelfFeatureAllowed('feat:files')).toBe(false)
         expect(isSelfFeatureAllowed('feat:sso-config')).toBe(false)
     })
@@ -74,6 +75,7 @@ describe('FlowOps self license feature mapping', () => {
         setLicenseState(makeLicenseState('active', { tier: 'enterprise' }))
 
         expect(isSelfFeatureAllowed('feat:files')).toBe(true)
+        expect(isSelfFeatureAllowed('feat:audit')).toBe(true)
         expect(isSelfFeatureAllowed('feat:sso-config')).toBe(false)
     })
 
