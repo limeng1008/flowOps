@@ -18,7 +18,7 @@
         "roles": "角色",
         "users": "用户",
         "workspaces": "工作区",
-        "login-activity": "登录活动",
+        "audit": "审计日志",
         "billing": "计费管理",
         "license": "授权管理",
         "support-tickets": "支持工单",
@@ -1955,23 +1955,54 @@
             "rowSaveFailed": "保存数据集行失败：{{message}}",
             "uploadItemsTitle": "向数据集「{{name}}」上传条目"
         },
-        "loginActivity": {
-            "title": "登录活动",
-            "from": "从：",
-            "to": "至：",
-            "filterBy": "筛选",
-            "showingRecords": "显示 {{start}}-{{end}}，共 {{total}} 条记录",
-            "activity": "活动",
-            "method": "方式",
-            "message": "消息",
-            "emailPassword": "邮箱/密码",
-            "loginSuccess": "登录成功",
-            "logoutSuccess": "退出成功",
-            "unknownUser": "未知用户",
-            "incorrectCredential": "凭证不正确",
-            "userDisabled": "用户已禁用",
-            "noAssignedWorkspace": "未分配工作区",
-            "unknownActivity": "未知活动"
+        "audit": {
+            "title": "审计日志",
+            "exportCsv": "导出 CSV",
+            "filters": {
+                "actorUserId": "操作人用户 ID",
+                "action": "动作",
+                "targetType": "对象类型",
+                "workspaceId": "工作区 ID",
+                "dateFrom": "开始时间",
+                "dateTo": "结束时间",
+                "apply": "应用筛选",
+                "clear": "清除筛选",
+                "all": "全部"
+            },
+            "columns": {
+                "time": "时间",
+                "actor": "操作人",
+                "action": "动作",
+                "target": "对象",
+                "status": "状态",
+                "details": "详情"
+            },
+            "details": {
+                "before": "变更前",
+                "after": "变更后",
+                "metadata": "元数据",
+                "ip": "IP 地址",
+                "userAgent": "用户代理"
+            },
+            "status": {
+                "success": "成功",
+                "failure": "失败"
+            },
+            "actionGroups": {
+                "authentication": "认证与邀请",
+                "roles": "角色",
+                "workspaces": "工作区",
+                "workspaceUsers": "工作区成员",
+                "organizationUsers": "组织用户"
+            },
+            "targetTypes": {
+                "user": "用户",
+                "role": "角色",
+                "workspace": "工作区",
+                "workspaceUser": "工作区成员",
+                "organizationUser": "组织用户"
+            },
+            "noResults": "当前筛选条件下没有审计日志。"
         },
         "ssoConfig": {
             "title": "SSO 配置",

@@ -1,7 +1,10 @@
 import client from './client'
 
-const fetchLoginActivity = (body) => client.post(`/audit/login-activity`, body)
+export const getAuditLogs = (params) => client.get('/audit', { params })
+
+export const exportAuditLogs = (params) => client.get('/audit/export', { params, responseType: 'blob' })
 
 export default {
-    fetchLoginActivity
+    getAuditLogs,
+    exportAuditLogs
 }

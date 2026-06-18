@@ -8,8 +8,8 @@ import Executions from '@/views/agentexecutions'
 import Agentflows from '@/views/agentflows'
 import APIKey from '@/views/apikey'
 import Assistants from '@/views/assistants'
+import AuditPage from '@/views/audit'
 import Login from '@/views/auth/login'
-import LoginActivityPage from '@/views/auth/loginActivity'
 import SSOConfig from '@/views/auth/ssoConfig'
 import Unauthorized from '@/views/auth/unauthorized'
 import Chatflows from '@/views/chatflows'
@@ -57,7 +57,7 @@ export const DefaultRedirect = () => {
         { component: RolesPage, permission: 'roles:manage', display: 'feat:roles' },
         { component: UsersPage, permission: 'users:manage', display: 'feat:users' },
         { component: Workspaces, permission: 'workspace:view', display: 'feat:workspaces' },
-        { component: LoginActivityPage, permission: 'loginActivity:view', display: 'feat:login-activity' },
+        { component: AuditPage, permission: 'auditLogs:view', display: 'feat:audit' },
         // Other routes
         { component: Logs, permission: 'logs:view', display: 'feat:logs' },
         { component: Account, display: 'feat:account' }
