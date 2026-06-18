@@ -11,6 +11,12 @@ type AuditServiceFactory = () => AuditService
 const queryString = (value: unknown): string | undefined => (typeof value === 'string' && value.length > 0 ? value : undefined)
 const LEGACY_ACTIVITY_CODES = new Set(['0', '1', '-1', '-2', '-3', '-4', '-99'])
 
+const actionFilters = (value: unknown): Pick<AuditLogFilters, 'action' | 'actionPrefix'> => {
+    const action = queryString(value)
+    if (!action) return {}
+    return action.endsWith('.*') ? { actionPrefix: action.slice(0, -1) } : { action }
+}
+
 const requestedLegacyActivityCodes = (value: unknown): string[] | undefined => {
     if (!Array.isArray(value)) return undefined
     const activityCodes = value.map(String).filter((activityCode) => LEGACY_ACTIVITY_CODES.has(activityCode))
@@ -23,7 +29,7 @@ const scopedFilters = (req: Request): AuditLogFilters | null => {
     return {
         organizationId: actor.activeOrganizationId,
         ...(queryString(req.query.actorUserId) ? { actorUserId: queryString(req.query.actorUserId) } : {}),
-        ...(queryString(req.query.action) ? { action: queryString(req.query.action) } : {}),
+        ...actionFilters(req.query.action),
         ...(queryString(req.query.targetType) ? { targetType: queryString(req.query.targetType) } : {}),
         ...(queryString(req.query.workspaceId) ? { workspaceId: queryString(req.query.workspaceId) } : {}),
         ...(queryString(req.query.dateFrom) ? { dateFrom: queryString(req.query.dateFrom) } : {}),

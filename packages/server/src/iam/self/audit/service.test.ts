@@ -241,7 +241,7 @@ describe('FlowOpsAuditService', () => {
         expect(rows.every((row) => row.organizationId === 'org-1')).toBe(true)
     })
 
-    it('filters action prefixes in the database for compatibility queries', async () => {
+    it('filters action prefixes and exact actions without crossing organizations', async () => {
         await sqlite.getRepository(auditSchema).save([
             {
                 id: '00000000-0000-4000-8000-000000000010',
@@ -255,17 +255,58 @@ describe('FlowOpsAuditService', () => {
             {
                 id: '00000000-0000-4000-8000-000000000011',
                 createdDate: new Date('2026-01-06T00:00:00.000Z'),
+                action: 'auth.logout',
+                targetType: 'user',
+                organizationId: 'org-1',
+                status: 'success',
+                metadata: '{}'
+            },
+            {
+                id: '00000000-0000-4000-8000-000000000012',
+                createdDate: new Date('2026-01-07T00:00:00.000Z'),
+                action: 'auth.loginFailed',
+                targetType: 'user',
+                organizationId: 'org-1',
+                status: 'failure',
+                metadata: '{}'
+            },
+            {
+                id: '00000000-0000-4000-8000-000000000013',
+                createdDate: new Date('2026-01-08T00:00:00.000Z'),
+                action: 'role.create',
+                targetType: 'role',
+                organizationId: 'org-1',
+                status: 'success',
+                metadata: '{}'
+            },
+            {
+                id: '00000000-0000-4000-8000-000000000014',
+                createdDate: new Date('2026-01-09T00:00:00.000Z'),
                 action: 'role.update',
                 targetType: 'role',
                 organizationId: 'org-1',
                 status: 'success',
                 metadata: '{}'
+            },
+            {
+                id: '00000000-0000-4000-8000-000000000015',
+                createdDate: new Date('2026-01-10T00:00:00.000Z'),
+                action: 'auth.login',
+                targetType: 'user',
+                organizationId: 'org-2',
+                status: 'success',
+                metadata: '{}'
             }
         ])
 
-        const rows = await service.exportAuditLogs({ organizationId: 'org-1', actionPrefix: 'auth.' })
+        const authRows = await service.exportAuditLogs({ organizationId: 'org-1', actionPrefix: 'auth.' })
+        const roleRows = await service.exportAuditLogs({ organizationId: 'org-1', actionPrefix: 'role.' })
+        const exactRows = await service.exportAuditLogs({ organizationId: 'org-1', action: 'role.create' })
 
-        expect(rows.map((row) => row.action)).toEqual(['auth.login'])
+        expect(authRows.map((row) => row.action)).toEqual(['auth.loginFailed', 'auth.logout', 'auth.login'])
+        expect(roleRows.map((row) => row.action)).toEqual(['role.update', 'role.create'])
+        expect(exactRows.map((row) => row.action)).toEqual(['role.create'])
+        expect(authRows.every((row) => row.organizationId === 'org-1')).toBe(true)
     })
 
     it('filters legacy activity codes in the database', async () => {

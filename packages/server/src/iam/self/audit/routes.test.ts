@@ -125,6 +125,32 @@ describe('FlowOps audit routes', () => {
         )
     })
 
+    it.each([
+        ['auth.*', 'auth.'],
+        ['role.*', 'role.']
+    ])('translates the %s action wildcard into the %s prefix within the authenticated organization', async (action, actionPrefix) => {
+        setLicenseState(makeLicenseState('active', { tier: 'team' }))
+        const app = buildApp()
+
+        const response = await request(app).get('/audit').set('x-test-user', 'allowed').query({ action, organizationId: 'org-attacker' })
+
+        expect(response.status).toBe(200)
+        expect(queryAuditLogs).toHaveBeenCalledWith({ organizationId: 'org-1', actionPrefix }, { pageNo: undefined, pageSize: undefined })
+    })
+
+    it('keeps non-wildcard actions as exact matches', async () => {
+        setLicenseState(makeLicenseState('active', { tier: 'team' }))
+        const app = buildApp()
+
+        const response = await request(app).get('/audit').set('x-test-user', 'allowed').query({ action: 'role.create' })
+
+        expect(response.status).toBe(200)
+        expect(queryAuditLogs).toHaveBeenCalledWith(
+            { organizationId: 'org-1', action: 'role.create' },
+            { pageNo: undefined, pageSize: undefined }
+        )
+    })
+
     it('exports CSV while neutralizing spreadsheet formulas', async () => {
         setLicenseState(makeLicenseState('active', { tier: 'enterprise' }))
         exportAuditLogs.mockResolvedValue([
