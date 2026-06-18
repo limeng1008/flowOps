@@ -54,6 +54,7 @@ import { BackfillFlowOpsRolePermissions1778000100000 } from './1778000100000-Bac
 import { DecoupleWorkspaceFkFromBusinessTables1778000200000 } from './1778000200000-DecoupleWorkspaceFkFromBusinessTables'
 import { AddWorkspaceIdColumnsToBusinessTables1778000300000 } from './1778000300000-AddWorkspaceIdColumnsToBusinessTables'
 import { AddBillingPlanEntitlementTier1779000000000 } from './1779000000000-AddBillingPlanEntitlementTier'
+import { AddFlowOpsAuditLog1779100000000 } from './1779100000000-AddFlowOpsAuditLog'
 
 export const sqliteMigrations = [
     Init1693835579790,
@@ -111,5 +112,6 @@ export const sqliteMigrations = [
     BackfillFlowOpsRolePermissions1778000100000,
     DecoupleWorkspaceFkFromBusinessTables1778000200000,
     AddWorkspaceIdColumnsToBusinessTables1778000300000,
-    AddBillingPlanEntitlementTier1779000000000
+    AddBillingPlanEntitlementTier1779000000000,
+    AddFlowOpsAuditLog1779100000000
 ]
