@@ -1,11 +1,11 @@
-import { DataSource, EntityManager } from 'typeorm'
+import { DataSource } from 'typeorm'
 import { ChatFlow } from '../../../database/entities/ChatFlow'
 import { FlowOpsLoginActivity, FlowOpsOrganization, FlowOpsRole, FlowOpsUser, FlowOpsWorkspace, FlowOpsWorkspaceMember } from '../entities'
 import { FlowOpsAuthError, FlowOpsLoggedInUser } from '../auth/types'
-import { normalizePermissionJson } from '../rbac/permissions'
+import { normalizePermissionJson, parsePermissionJson } from '../rbac/permissions'
 import { assertCanAddOrganizationUser, getOrganizationUserCount, getSelfSeatLimit, isOrganizationUser } from '../seats'
-
-type RepositorySource = DataSource | EntityManager
+import { FlowOpsAuditService } from '../audit/service'
+import type { FlowOpsAuthenticatedAuditActor } from '../audit/context'
 
 type RoleBody = {
     id?: string
@@ -61,8 +61,25 @@ const getFlowOpsAuthService = () =>
         }
     }
 
+const roleSnapshot = (role: FlowOpsRole) => ({
+    name: role.name,
+    description: role.description ?? null,
+    permissions: [...parsePermissionJson(role.permissions)].sort(),
+    isBuiltin: role.isBuiltin
+})
+
+const workspaceSnapshot = (workspace: FlowOpsWorkspace, userCount?: number) => ({
+    name: workspace.name,
+    description: workspace.description ?? null,
+    ...(userCount === undefined ? {} : { userCount })
+})
+
 export class FlowOpsAdminService {
-    constructor(private readonly dataSource: DataSource) {}
+    private readonly auditService: FlowOpsAuditService
+
+    constructor(private readonly dataSource: DataSource) {
+        this.auditService = new FlowOpsAuditService(dataSource)
+    }
 
     async listRoles(): Promise<Array<FlowOpsRole & { userCount: number }>> {
         const roles = await this.dataSource.getRepository(FlowOpsRole).find()
@@ -85,7 +102,7 @@ export class FlowOpsAdminService {
         return role
     }
 
-    async createRole(body: RoleBody): Promise<FlowOpsRole> {
+    async createRole(body: RoleBody, actor: FlowOpsAuthenticatedAuditActor): Promise<FlowOpsRole> {
         const name = body.name?.trim()
         if (!name) throw new FlowOpsAuthError(400, 'Role name is required')
         const existing = await this.dataSource.getRepository(FlowOpsRole).findOneBy({ name })
@@ -97,15 +114,28 @@ export class FlowOpsAdminService {
             permissions: normalizePermissionJson(body.permissions ?? []),
             isBuiltin: false
         })
-        return await this.dataSource.getRepository(FlowOpsRole).save(role)
+        const saved = await this.dataSource.getRepository(FlowOpsRole).save(role)
+        await this.auditService.recordAuditEvent({
+            ...actor,
+            action: 'role.create',
+            targetType: 'role',
+            targetId: saved.id,
+            targetName: saved.name,
+            organizationId: actor.activeOrganizationId,
+            workspaceId: actor.activeWorkspaceId,
+            status: 'success',
+            metadata: { after: roleSnapshot(saved) }
+        })
+        return saved
     }
 
-    async updateRole(body: RoleBody): Promise<FlowOpsRole> {
+    async updateRole(body: RoleBody, actor: FlowOpsAuthenticatedAuditActor): Promise<FlowOpsRole> {
         if (!body.id) throw new FlowOpsAuthError(400, 'Role id is required')
         const repo = this.dataSource.getRepository(FlowOpsRole)
         const role = await repo.findOneBy({ id: body.id })
         if (!role) throw new FlowOpsAuthError(404, 'Role not found')
 
+        const before = roleSnapshot(role)
         const nextName = body.name?.trim() || role.name
         if (role.isBuiltin && nextName !== role.name) throw new FlowOpsAuthError(400, 'Built-in role names cannot be changed')
         if (!role.isBuiltin && nextName !== role.name) {
@@ -116,15 +146,45 @@ export class FlowOpsAdminService {
         role.name = nextName
         role.description = body.description ?? role.description
         if (body.permissions !== undefined) role.permissions = normalizePermissionJson(body.permissions)
-        return await repo.save(role)
+        const saved = await repo.save(role)
+        const after = roleSnapshot(saved)
+        await this.auditService.recordAuditEvent({
+            ...actor,
+            action: 'role.update',
+            targetType: 'role',
+            targetId: saved.id,
+            targetName: saved.name,
+            organizationId: actor.activeOrganizationId,
+            workspaceId: actor.activeWorkspaceId,
+            status: 'success',
+            metadata: {
+                before,
+                after,
+                permissionsAdded: after.permissions.filter((permission) => !before.permissions.includes(permission)),
+                permissionsRemoved: before.permissions.filter((permission) => !after.permissions.includes(permission))
+            }
+        })
+        return saved
     }
 
-    async deleteRole(id: string): Promise<{ success: true }> {
+    async deleteRole(id: string, actor: FlowOpsAuthenticatedAuditActor): Promise<{ success: true }> {
         const role = await this.getRoleById(id)
         if (role.isBuiltin) throw new FlowOpsAuthError(400, 'Built-in roles cannot be deleted')
         const assigned = await this.dataSource.getRepository(FlowOpsWorkspaceMember).countBy({ roleId: id })
         if (assigned > 0) throw new FlowOpsAuthError(400, 'Role is assigned to users')
+        const before = roleSnapshot(role)
         await this.dataSource.getRepository(FlowOpsRole).delete({ id })
+        await this.auditService.recordAuditEvent({
+            ...actor,
+            action: 'role.delete',
+            targetType: 'role',
+            targetId: role.id,
+            targetName: role.name,
+            organizationId: actor.activeOrganizationId,
+            workspaceId: actor.activeWorkspaceId,
+            status: 'success',
+            metadata: { before, after: null }
+        })
         return { success: true }
     }
 
@@ -146,13 +206,13 @@ export class FlowOpsAdminService {
         return { ...workspace, userCount, isOrgDefault: workspace.name === 'Default Workspace' }
     }
 
-    async createWorkspace(body: WorkspaceBody, actor: FlowOpsLoggedInUser): Promise<FlowOpsWorkspace> {
+    async createWorkspace(body: WorkspaceBody, actor: FlowOpsAuthenticatedAuditActor): Promise<FlowOpsWorkspace> {
         const name = body.name?.trim()
-        const organizationId = body.organizationId ?? actor.activeOrganizationId
+        const organizationId = actor.activeOrganizationId
         if (!name) throw new FlowOpsAuthError(400, 'Workspace name is required')
         if (!organizationId) throw new FlowOpsAuthError(400, 'Organization is required')
 
-        return await this.dataSource.transaction(async (manager) => {
+        const workspace = await this.dataSource.transaction(async (manager) => {
             const workspace = await manager.getRepository(FlowOpsWorkspace).save(
                 manager.getRepository(FlowOpsWorkspace).create({
                     name,
@@ -178,27 +238,64 @@ export class FlowOpsAdminService {
             )
             return workspace
         })
+        await this.auditService.recordAuditEvent({
+            ...actor,
+            action: 'workspace.create',
+            targetType: 'workspace',
+            targetId: workspace.id,
+            targetName: workspace.name,
+            organizationId: workspace.organizationId,
+            workspaceId: workspace.id,
+            status: 'success',
+            metadata: { after: workspaceSnapshot(workspace) }
+        })
+        return workspace
     }
 
-    async updateWorkspace(body: WorkspaceBody): Promise<FlowOpsWorkspace> {
+    async updateWorkspace(body: WorkspaceBody, actor: FlowOpsAuthenticatedAuditActor): Promise<FlowOpsWorkspace> {
         if (!body.id) throw new FlowOpsAuthError(400, 'Workspace id is required')
         const repo = this.dataSource.getRepository(FlowOpsWorkspace)
         const workspace = await repo.findOneBy({ id: body.id })
         if (!workspace) throw new FlowOpsAuthError(404, 'Workspace not found')
+        const before = workspaceSnapshot(workspace)
         workspace.name = body.name?.trim() || workspace.name
         workspace.description = body.description ?? workspace.description
-        return await repo.save(workspace)
+        const saved = await repo.save(workspace)
+        await this.auditService.recordAuditEvent({
+            ...actor,
+            action: 'workspace.update',
+            targetType: 'workspace',
+            targetId: saved.id,
+            targetName: saved.name,
+            organizationId: saved.organizationId,
+            workspaceId: saved.id,
+            status: 'success',
+            metadata: { before, after: workspaceSnapshot(saved) }
+        })
+        return saved
     }
 
-    async deleteWorkspace(id: string): Promise<{ success: true }> {
+    async deleteWorkspace(id: string, actor: FlowOpsAuthenticatedAuditActor): Promise<{ success: true }> {
         const workspace = await this.dataSource.getRepository(FlowOpsWorkspace).findOneBy({ id })
         if (!workspace) throw new FlowOpsAuthError(404, 'Workspace not found')
         if (workspace.name === 'Default Workspace') throw new FlowOpsAuthError(400, 'Default Workspace cannot be deleted')
         const userCount = await this.dataSource.getRepository(FlowOpsWorkspaceMember).countBy({ workspaceId: id })
         if (userCount > 1) throw new FlowOpsAuthError(400, 'Workspace still has assigned users')
+        const before = workspaceSnapshot(workspace, userCount)
         await this.dataSource.getRepository(ChatFlow).delete({ workspaceId: id })
         await this.dataSource.getRepository(FlowOpsWorkspaceMember).delete({ workspaceId: id })
         await this.dataSource.getRepository(FlowOpsWorkspace).delete({ id })
+        await this.auditService.recordAuditEvent({
+            ...actor,
+            action: 'workspace.delete',
+            targetType: 'workspace',
+            targetId: workspace.id,
+            targetName: workspace.name,
+            organizationId: workspace.organizationId,
+            workspaceId: workspace.id,
+            status: 'success',
+            metadata: { before, after: null }
+        })
         return { success: true }
     }
 
@@ -222,7 +319,7 @@ export class FlowOpsAdminService {
         return await this.hydrateMemberships(members)
     }
 
-    async updateWorkspaceUserRole(body: WorkspaceMemberBody): Promise<FlowOpsWorkspaceMember> {
+    async updateWorkspaceUserRole(body: WorkspaceMemberBody, actor: FlowOpsAuthenticatedAuditActor): Promise<FlowOpsWorkspaceMember> {
         if (!body.userId || !body.workspaceId || !body.roleId) throw new FlowOpsAuthError(400, 'User, workspace, and role are required')
         const repo = this.dataSource.getRepository(FlowOpsWorkspaceMember)
         const role = await this.dataSource.getRepository(FlowOpsRole).findOneBy({ id: body.roleId })
@@ -237,24 +334,70 @@ export class FlowOpsAdminService {
         if (!existingMembership && !(await isOrganizationUser(this.dataSource, workspace.organizationId, user.id))) {
             await assertCanAddOrganizationUser(this.dataSource, workspace.organizationId)
         }
+        const previousRole = existingMembership
+            ? await this.dataSource.getRepository(FlowOpsRole).findOneBy({ id: existingMembership.roleId })
+            : null
+        const before = existingMembership
+            ? { roleId: existingMembership.roleId, roleName: previousRole?.name ?? null, workspaceName: workspace.name }
+            : null
         const membership = existingMembership ?? repo.create({ userId: body.userId, workspaceId: body.workspaceId, roleId: role.id })
         membership.roleId = role.id
-        return await repo.save(membership)
+        const saved = await repo.save(membership)
+        await this.auditService.recordAuditEvent({
+            ...actor,
+            action: existingMembership ? 'workspaceUser.roleChange' : 'workspaceUser.add',
+            targetType: 'workspaceUser',
+            targetId: saved.id,
+            targetName: user.email,
+            organizationId: workspace.organizationId,
+            workspaceId: workspace.id,
+            status: 'success',
+            metadata: {
+                before,
+                after: { roleId: role.id, roleName: role.name, workspaceName: workspace.name, userName: user.name ?? null }
+            }
+        })
+        return saved
     }
 
-    async deleteWorkspaceUser(workspaceId: string, userId: string): Promise<{ success: true }> {
+    async deleteWorkspaceUser(workspaceId: string, userId: string, actor: FlowOpsAuthenticatedAuditActor): Promise<{ success: true }> {
         const memberRepo = this.dataSource.getRepository(FlowOpsWorkspaceMember)
         // 护栏1:组织 owner 不可被移出工作区(与 deleteOrganizationUser 一致,防把管理员锁死)
         const workspace = await this.dataSource.getRepository(FlowOpsWorkspace).findOneBy({ id: workspaceId })
+        if (!workspace) throw new FlowOpsAuthError(404, 'Workspace not found')
         const organization = workspace
             ? await this.dataSource.getRepository(FlowOpsOrganization).findOneBy({ id: workspace.organizationId })
             : null
         if (organization?.ownerUserId === userId) throw new FlowOpsAuthError(400, 'Organization owner cannot be removed from a workspace')
+        const membership = await memberRepo.findOneBy({ workspaceId, userId })
+        if (!membership) throw new FlowOpsAuthError(404, 'Workspace user not found')
+        const user = await this.dataSource.getRepository(FlowOpsUser).findOneBy({ id: userId })
+        if (!user) throw new FlowOpsAuthError(404, 'User not found')
+        const role = await this.dataSource.getRepository(FlowOpsRole).findOneBy({ id: membership.roleId })
         // 护栏2:不可移除用户的最后一个工作区(否则登录后零工作区、无法使用;停用请走状态开关)
         const membershipCount = await memberRepo.countBy({ userId })
         if (membershipCount <= 1) throw new FlowOpsAuthError(400, "Cannot remove the user's last workspace")
         const result = await memberRepo.delete({ workspaceId, userId })
         if (!result.affected) throw new FlowOpsAuthError(404, 'Workspace user not found')
+        await this.auditService.recordAuditEvent({
+            ...actor,
+            action: 'workspaceUser.delete',
+            targetType: 'workspaceUser',
+            targetId: membership.id,
+            targetName: user.email,
+            organizationId: workspace.organizationId,
+            workspaceId: workspace.id,
+            status: 'success',
+            metadata: {
+                before: {
+                    roleId: membership.roleId,
+                    roleName: role?.name ?? null,
+                    workspaceName: workspace.name,
+                    userName: user.name ?? null
+                },
+                after: null
+            }
+        })
         return { success: true }
     }
 
@@ -296,22 +439,62 @@ export class FlowOpsAdminService {
         return user
     }
 
-    async updateOrganizationUser(body: OrganizationUserBody): Promise<FlowOpsUser> {
+    async updateOrganizationUser(body: OrganizationUserBody, actor: FlowOpsAuthenticatedAuditActor): Promise<FlowOpsUser> {
         if (!body.userId) throw new FlowOpsAuthError(400, 'User id is required')
         const user = await this.dataSource.getRepository(FlowOpsUser).findOneBy({ id: body.userId })
         if (!user) throw new FlowOpsAuthError(404, 'User not found')
+        if (!(await isOrganizationUser(this.dataSource, actor.activeOrganizationId, user.id)))
+            throw new FlowOpsAuthError(404, 'User not found')
+        const before = { status: user.status }
         const status = lowerStatus(body.status)
         if (status) user.status = status
-        return await this.dataSource.getRepository(FlowOpsUser).save(user)
+        const saved = await this.dataSource.getRepository(FlowOpsUser).save(user)
+        await this.auditService.recordAuditEvent({
+            ...actor,
+            action: 'organizationUser.update',
+            targetType: 'organizationUser',
+            targetId: saved.id,
+            targetName: saved.email,
+            organizationId: actor.activeOrganizationId,
+            workspaceId: actor.activeWorkspaceId,
+            status: 'success',
+            metadata: { before, after: { status: saved.status } }
+        })
+        return saved
     }
 
-    async deleteOrganizationUser(organizationId: string, userId: string): Promise<{ success: true }> {
+    async deleteOrganizationUser(
+        organizationId: string,
+        userId: string,
+        actor: FlowOpsAuthenticatedAuditActor
+    ): Promise<{ success: true }> {
+        if (organizationId !== actor.activeOrganizationId) throw new FlowOpsAuthError(403, 'Forbidden')
         const organization = await this.dataSource.getRepository(FlowOpsOrganization).findOneBy({ id: organizationId })
+        if (!organization) throw new FlowOpsAuthError(404, 'Organization not found')
         if (organization?.ownerUserId === userId) throw new FlowOpsAuthError(400, 'Organization owner cannot be removed')
+        const user = await this.dataSource.getRepository(FlowOpsUser).findOneBy({ id: userId })
+        if (!user) throw new FlowOpsAuthError(404, 'User not found')
         const workspaces = await this.dataSource.getRepository(FlowOpsWorkspace).findBy({ organizationId })
+        const workspaceIds: string[] = []
+        for (const workspace of workspaces) {
+            const membership = await this.dataSource.getRepository(FlowOpsWorkspaceMember).findOneBy({ workspaceId: workspace.id, userId })
+            if (membership) workspaceIds.push(workspace.id)
+        }
+        if (workspaceIds.length === 0) throw new FlowOpsAuthError(404, 'User not found')
         for (const workspace of workspaces)
             await this.dataSource.getRepository(FlowOpsWorkspaceMember).delete({ workspaceId: workspace.id, userId })
         await this.dataSource.getRepository(FlowOpsUser).delete({ id: userId })
+        await this.auditService.recordAuditEvent({
+            ...actor,
+            action: 'organizationUser.delete',
+            targetType: 'organizationUser',
+            targetId: user.id,
+            targetName: user.email,
+            organizationId,
+            workspaceId: actor.activeWorkspaceId,
+            status: 'success',
+            metadata: { before: { name: user.name ?? null, status: user.status, workspaceIds }, after: null }
+        })
         return { success: true }
     }
 

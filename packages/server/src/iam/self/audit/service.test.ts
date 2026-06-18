@@ -143,7 +143,12 @@ describe('FlowOpsAuditService', () => {
             userAgent: 'jest',
             metadata: {
                 before: { name: 'viewer', password: 'must-not-persist' },
-                after: { name: 'analyst', tempToken: 'must-not-persist' },
+                after: {
+                    name: 'analyst',
+                    tempToken: 'must-not-persist',
+                    inviteLink: 'must-not-persist',
+                    resetLink: 'must-not-persist'
+                },
                 authorization: 'Bearer secret',
                 jwt: 'must-not-persist'
             }

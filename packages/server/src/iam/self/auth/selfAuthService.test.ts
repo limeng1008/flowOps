@@ -1,7 +1,15 @@
 import { describe, expect, it, beforeEach, afterEach, jest } from '@jest/globals'
 import type { DataSource } from 'typeorm'
-import { FlowOpsLoginActivity, FlowOpsOrganization, FlowOpsRole, FlowOpsUser, FlowOpsWorkspace, FlowOpsWorkspaceMember } from '../entities'
-import { FlowOpsAuthService, createSelfAuthTokens, verifySelfAccessToken, verifySelfRefreshToken } from './service'
+import {
+    FlowOpsAuditLog,
+    FlowOpsLoginActivity,
+    FlowOpsOrganization,
+    FlowOpsRole,
+    FlowOpsUser,
+    FlowOpsWorkspace,
+    FlowOpsWorkspaceMember
+} from '../entities'
+import { FlowOpsAuthService, FlowOpsLoggedInUser, createSelfAuthTokens, verifySelfAccessToken, verifySelfRefreshToken } from './service'
 
 // 仅替换 sendSelfMail(不真发信);保留真实 isSelfSmtpConfigured(按 env 判断)
 const mockSendSelfMail = jest.fn((..._args: unknown[]) => Promise.resolve())
@@ -10,7 +18,44 @@ jest.mock('../email/mailer', () => {
     return { __esModule: true, ...actual, sendSelfMail: (...args: unknown[]) => mockSendSelfMail(...args) }
 })
 
-const entities = [FlowOpsUser, FlowOpsOrganization, FlowOpsWorkspace, FlowOpsWorkspaceMember, FlowOpsRole, FlowOpsLoginActivity]
+const anonymousRequestContext = {
+    actorUserId: null,
+    actorEmail: null,
+    ip: '203.0.113.8',
+    userAgent: 'FlowOps auth test'
+}
+
+const withAuditContext = <T extends { id: string; email: string }>(actor: T) => ({
+    ...actor,
+    actorUserId: actor.id,
+    actorEmail: actor.email,
+    ip: anonymousRequestContext.ip,
+    userAgent: anonymousRequestContext.userAgent
+})
+
+const registerAccount = (
+    service: FlowOpsAuthService,
+    body: Parameters<FlowOpsAuthService['registerAccount']>[0],
+    context = anonymousRequestContext
+) => service['registerAccount'](body, context)
+
+const inviteAccount = (
+    service: FlowOpsAuthService,
+    body: Parameters<FlowOpsAuthService['inviteAccount']>[0],
+    actor: FlowOpsLoggedInUser | ReturnType<typeof withAuditContext<FlowOpsLoggedInUser>>
+) => service['inviteAccount'](body, 'actorUserId' in actor ? actor : withAuditContext(actor))
+
+const loginAccount = (service: FlowOpsAuthService, body: Parameters<FlowOpsAuthService['login']>[0], context = anonymousRequestContext) =>
+    service['login'](body, context)
+
+const resetPasswordAccount = (
+    service: FlowOpsAuthService,
+    body: Parameters<FlowOpsAuthService['resetPassword']>[0],
+    context = anonymousRequestContext
+) => service['resetPassword'](body, context)
+
+const logoutAccount = (service: FlowOpsAuthService, userId: string | undefined, context = anonymousRequestContext) =>
+    service['logout'](userId, context)
 
 const makeInMemoryDataSource = (): DataSource => {
     const tables = new Map<unknown, any[]>()
@@ -50,6 +95,7 @@ const makeInMemoryDataSource = (): DataSource => {
     const makeRepo = (entity: unknown) => ({
         count: jest.fn(async () => getTable(entity).length),
         create: jest.fn((value: unknown = {}) => ({ ...(value as object) })),
+        find: jest.fn(async () => [...getTable(entity)]),
         findOneBy: jest.fn(
             async (criteria: Record<string, unknown>) => getTable(entity).find((record) => matches(record, criteria)) ?? null
         ),
@@ -125,7 +171,7 @@ describe('FlowOpsAuthService', () => {
     it('reports whether the self track is ready for first admin bootstrap', async () => {
         await expect(service.isFirstAdminSetup()).resolves.toBe(true)
 
-        await service.registerAccount({
+        await registerAccount(service, {
             user: {
                 name: 'Ada Lovelace',
                 email: 'ada@example.com',
@@ -137,7 +183,7 @@ describe('FlowOpsAuthService', () => {
     })
 
     it('registers the first user as owner and creates the default organization and workspace', async () => {
-        const loggedInUser = await service.registerAccount({
+        const loggedInUser = await registerAccount(service, {
             user: {
                 name: 'Ada Lovelace',
                 email: 'ada@example.com',
@@ -163,7 +209,7 @@ describe('FlowOpsAuthService', () => {
     })
 
     it('rejects the second registration without an invite token', async () => {
-        await service.registerAccount({
+        await registerAccount(service, {
             user: {
                 name: 'Ada Lovelace',
                 email: 'ada@example.com',
@@ -172,7 +218,7 @@ describe('FlowOpsAuthService', () => {
         })
 
         await expect(
-            service.registerAccount({
+            registerAccount(service, {
                 user: {
                     name: 'Grace Hopper',
                     email: 'grace@example.com',
@@ -186,7 +232,7 @@ describe('FlowOpsAuthService', () => {
     })
 
     it('allows owner invite registration and assigns the invited workspace role', async () => {
-        const owner = await service.registerAccount({
+        const owner = await registerAccount(service, {
             user: {
                 name: 'Ada Lovelace',
                 email: 'ada@example.com',
@@ -194,7 +240,8 @@ describe('FlowOpsAuthService', () => {
             }
         })
 
-        const invite = await service.inviteAccount(
+        const invite = await inviteAccount(
+            service,
             {
                 email: 'grace@example.com',
                 name: 'Grace Hopper',
@@ -206,7 +253,7 @@ describe('FlowOpsAuthService', () => {
 
         expect(invite.inviteLink).toContain(invite.tempToken)
 
-        const invitedUser = await service.registerAccount({
+        const invitedUser = await registerAccount(service, {
             user: {
                 name: 'Grace Hopper',
                 email: 'grace@example.com',
@@ -228,7 +275,7 @@ describe('FlowOpsAuthService', () => {
     it('keeps first admin registration available in free tier and blocks the second organization user invite', async () => {
         delete process.env.FLOWOPS_LOCAL_COMMERCIAL
 
-        const owner = await service.registerAccount({
+        const owner = await registerAccount(service, {
             user: {
                 name: 'Ada Lovelace',
                 email: 'ada@example.com',
@@ -237,7 +284,8 @@ describe('FlowOpsAuthService', () => {
         })
 
         await expect(
-            service.inviteAccount(
+            inviteAccount(
+                service,
                 {
                     email: 'grace@example.com',
                     name: 'Grace Hopper',
@@ -255,7 +303,7 @@ describe('FlowOpsAuthService', () => {
     it('rechecks seats when an invited user activates from an existing invite token', async () => {
         delete process.env.FLOWOPS_LOCAL_COMMERCIAL
 
-        const owner = await service.registerAccount({
+        const owner = await registerAccount(service, {
             user: {
                 name: 'Ada Lovelace',
                 email: 'ada@example.com',
@@ -277,7 +325,7 @@ describe('FlowOpsAuthService', () => {
         })
 
         await expect(
-            service.registerAccount({
+            registerAccount(service, {
                 user: {
                     name: 'Grace Hopper',
                     email: 'grace@example.com',
@@ -292,7 +340,7 @@ describe('FlowOpsAuthService', () => {
     })
 
     it('logs in with the right password and rejects the wrong password', async () => {
-        await service.registerAccount({
+        await registerAccount(service, {
             user: {
                 name: 'Ada Lovelace',
                 email: 'ada@example.com',
@@ -300,20 +348,20 @@ describe('FlowOpsAuthService', () => {
             }
         })
 
-        await expect(service.login({ email: 'ada@example.com', password: 'wrong' })).rejects.toMatchObject({
+        await expect(loginAccount(service, { email: 'ada@example.com', password: 'wrong' })).rejects.toMatchObject({
             statusCode: 401,
             message: 'Incorrect Email or Password'
         })
 
-        const loggedInUser = await service.login({ email: 'ada@example.com', password: 'Password1!' })
+        const loggedInUser = await loginAccount(service, { email: 'ada@example.com', password: 'Password1!' })
 
         expect(loggedInUser.email).toBe('ada@example.com')
         expect(loggedInUser.activeWorkspaceId).toBeTruthy()
-        await expect(dataSource.getRepository(FlowOpsLoginActivity).count()).resolves.toBe(2)
+        await expect(dataSource.getRepository(FlowOpsLoginActivity).count()).resolves.toBe(0)
     })
 
     it('creates and verifies access and refresh JWTs for the self track', async () => {
-        const loggedInUser = await service.registerAccount({
+        const loggedInUser = await registerAccount(service, {
             user: {
                 name: 'Ada Lovelace',
                 email: 'ada@example.com',
@@ -340,7 +388,7 @@ describe('FlowOpsAuthService', () => {
     })
 
     it('runs the forgot and reset password flow', async () => {
-        await service.registerAccount({
+        await registerAccount(service, {
             user: {
                 name: 'Ada Lovelace',
                 email: 'ada@example.com',
@@ -355,7 +403,7 @@ describe('FlowOpsAuthService', () => {
         })
         expect(forgot.resetLink).toContain(forgot.tempToken)
 
-        await service.resetPassword({
+        await resetPasswordAccount(service, {
             user: {
                 email: 'ada@example.com',
                 tempToken: forgot.tempToken,
@@ -363,12 +411,181 @@ describe('FlowOpsAuthService', () => {
             }
         })
 
-        await expect(service.login({ email: 'ada@example.com', password: 'Password1!' })).rejects.toMatchObject({
+        await expect(loginAccount(service, { email: 'ada@example.com', password: 'Password1!' })).rejects.toMatchObject({
             statusCode: 401
         })
-        await expect(service.login({ email: 'ada@example.com', password: 'NewPassword1!' })).resolves.toEqual(
+        await expect(loginAccount(service, { email: 'ada@example.com', password: 'NewPassword1!' })).resolves.toEqual(
             expect.objectContaining({ email: 'ada@example.com' })
         )
+    })
+
+    it('audits registration and invitation after successful transactions without sensitive tokens', async () => {
+        const owner = await registerAccount(
+            service,
+            { user: { name: 'Ada Lovelace', email: 'ada@example.com', credential: 'Password1!' } },
+            anonymousRequestContext
+        )
+        const invite = await inviteAccount(
+            service,
+            { email: 'grace@example.com', name: 'Grace Hopper', roleName: 'member', workspaceId: owner.activeWorkspaceId },
+            withAuditContext(owner)
+        )
+        const member = await registerAccount(
+            service,
+            {
+                user: {
+                    name: 'Grace Hopper',
+                    email: 'grace@example.com',
+                    credential: 'Password1!',
+                    tempToken: invite.tempToken
+                }
+            },
+            anonymousRequestContext
+        )
+
+        const rows = await dataSource.getRepository(FlowOpsAuditLog).findBy({ status: 'success' })
+        expect(rows.map((row) => row.action)).toEqual(['auth.register', 'user.invite', 'auth.register'])
+        expect(rows).toEqual(
+            expect.arrayContaining([
+                expect.objectContaining({
+                    action: 'auth.register',
+                    actorUserId: owner.id,
+                    actorEmail: owner.email,
+                    targetId: owner.id,
+                    targetName: owner.email,
+                    organizationId: owner.activeOrganizationId,
+                    workspaceId: owner.activeWorkspaceId,
+                    ip: anonymousRequestContext.ip,
+                    userAgent: anonymousRequestContext.userAgent
+                }),
+                expect.objectContaining({
+                    action: 'user.invite',
+                    actorUserId: owner.id,
+                    targetId: member.id,
+                    targetName: member.email,
+                    organizationId: owner.activeOrganizationId,
+                    workspaceId: owner.activeWorkspaceId
+                })
+            ])
+        )
+        const serialized = rows.map((row) => row.metadata).join(' ')
+        expect(serialized).not.toContain('Password1!')
+        expect(serialized).not.toContain(invite.tempToken)
+        expect(serialized).not.toContain('inviteLink')
+    })
+
+    it('maps every login outcome to semantic audit actions and keeps the legacy table unwritten', async () => {
+        const owner = await registerAccount(
+            service,
+            { user: { name: 'Ada Lovelace', email: 'ada@example.com', credential: 'Password1!' } },
+            anonymousRequestContext
+        )
+        const ownerEntity = await dataSource.getRepository(FlowOpsUser).findOneBy({ id: owner.id })
+        await dataSource.getRepository(FlowOpsUser).save({
+            id: 'disabled-user',
+            email: 'disabled@example.com',
+            name: 'Disabled',
+            credential: ownerEntity!.credential,
+            status: 'disabled'
+        })
+        await dataSource.getRepository(FlowOpsUser).save({
+            id: 'unassigned-user',
+            email: 'unassigned@example.com',
+            name: 'Unassigned',
+            credential: ownerEntity!.credential,
+            status: 'active'
+        })
+
+        await expect(
+            loginAccount(service, { email: 'unknown@example.com', password: 'Password1!' }, anonymousRequestContext)
+        ).rejects.toMatchObject({
+            statusCode: 401
+        })
+        await expect(loginAccount(service, { email: owner.email, password: 'wrong' }, anonymousRequestContext)).rejects.toMatchObject({
+            statusCode: 401
+        })
+        await expect(
+            loginAccount(service, { email: 'disabled@example.com', password: 'Password1!' }, anonymousRequestContext)
+        ).rejects.toMatchObject({ statusCode: 401 })
+        await expect(
+            loginAccount(service, { email: 'unassigned@example.com', password: 'Password1!' }, anonymousRequestContext)
+        ).rejects.toMatchObject({ statusCode: 401 })
+        await expect(loginAccount(service, { email: owner.email, password: 'Password1!' }, anonymousRequestContext)).resolves.toMatchObject(
+            { id: owner.id }
+        )
+
+        const rows = await dataSource.getRepository(FlowOpsAuditLog).findBy({ targetType: 'user' })
+        const loginRows = rows.filter((row) => row.action === 'auth.login' || row.action === 'auth.loginFailed')
+        expect(loginRows.map((row) => [row.action, row.status, JSON.parse(row.metadata).reason ?? null])).toEqual([
+            ['auth.loginFailed', 'failure', 'UNKNOWN_USER'],
+            ['auth.loginFailed', 'failure', 'INVALID_CREDENTIAL'],
+            ['auth.loginFailed', 'failure', 'USER_DISABLED'],
+            ['auth.loginFailed', 'failure', 'NO_ASSIGNED_WORKSPACE'],
+            ['auth.login', 'success', null]
+        ])
+        expect(loginRows[0]).toEqual(
+            expect.objectContaining({
+                actorUserId: null,
+                targetId: null,
+                targetName: 'unknown@example.com',
+                ip: anonymousRequestContext.ip,
+                userAgent: anonymousRequestContext.userAgent
+            })
+        )
+        await expect(dataSource.getRepository(FlowOpsLoginActivity).count()).resolves.toBe(0)
+    })
+
+    it('audits logout and password reset success/failure without exposing reset credentials', async () => {
+        const owner = await registerAccount(
+            service,
+            { user: { name: 'Ada Lovelace', email: 'ada@example.com', credential: 'Password1!' } },
+            anonymousRequestContext
+        )
+        const forgot = await service.forgotPassword({ user: { email: owner.email } })
+        await resetPasswordAccount(
+            service,
+            { user: { email: owner.email, tempToken: forgot.tempToken, password: 'NewPassword1!' } },
+            anonymousRequestContext
+        )
+        await expect(
+            resetPasswordAccount(
+                service,
+                { user: { email: owner.email, tempToken: 'invalid-token', password: 'AnotherPassword1!' } },
+                anonymousRequestContext
+            )
+        ).rejects.toMatchObject({ statusCode: 403, message: 'Invalid reset token' })
+        await logoutAccount(service, owner.id, anonymousRequestContext)
+
+        const rows = await dataSource.getRepository(FlowOpsAuditLog).findBy({ targetId: owner.id })
+        expect(rows.filter((row) => row.action === 'auth.passwordReset' || row.action === 'auth.logout')).toEqual([
+            expect.objectContaining({ action: 'auth.passwordReset', status: 'success', actorUserId: owner.id, targetName: owner.email }),
+            expect.objectContaining({ action: 'auth.logout', status: 'success', actorUserId: owner.id, targetName: owner.email })
+        ])
+        const resetFailure = (await dataSource.getRepository(FlowOpsAuditLog).findBy({ action: 'auth.passwordReset' })).find(
+            (row) => row.status === 'failure'
+        )
+        expect(resetFailure).toEqual(
+            expect.objectContaining({ actorUserId: null, targetId: null, targetName: owner.email, status: 'failure' })
+        )
+        expect(JSON.parse(resetFailure!.metadata)).toEqual({ reason: 'INVALID_OR_EXPIRED_TOKEN' })
+        const serialized = (await dataSource.getRepository(FlowOpsAuditLog).find()).map((row) => row.metadata).join(' ')
+        expect(serialized).not.toContain('NewPassword1!')
+        expect(serialized).not.toContain('AnotherPassword1!')
+        expect(serialized).not.toContain('invalid-token')
+        expect(serialized).not.toContain(forgot.tempToken)
+    })
+
+    it('keeps registration successful when audit persistence fails', async () => {
+        dataSource.getRepository(FlowOpsAuditLog).save = jest.fn(() => Promise.reject(new Error('audit unavailable'))) as any
+
+        const owner = await registerAccount(
+            service,
+            { user: { name: 'Ada Lovelace', email: 'ada@example.com', credential: 'Password1!' } },
+            anonymousRequestContext
+        )
+
+        expect(owner).toEqual(expect.objectContaining({ email: 'ada@example.com', role: 'owner' }))
+        await expect(dataSource.getRepository(FlowOpsUser).count()).resolves.toBe(1)
     })
 })
 
@@ -395,11 +612,12 @@ describe('FlowOpsAuthService 邮件发送(配置 SMTP 时)', () => {
     })
 
     it('邀请:配置 SMTP 后发邀请邮件,emailSent=true(仍返回 inviteLink)', async () => {
-        const owner = await service.registerAccount({
+        const owner = await registerAccount(service, {
             user: { name: 'Ada Lovelace', email: 'ada@example.com', credential: 'Password1!' }
         })
 
-        const invite = await service.inviteAccount(
+        const invite = await inviteAccount(
+            service,
             { email: 'grace@example.com', roleName: 'member', workspaceId: owner.activeWorkspaceId },
             owner
         )
@@ -410,7 +628,7 @@ describe('FlowOpsAuthService 邮件发送(配置 SMTP 时)', () => {
     })
 
     it('找回密码:配置 SMTP 后发重置邮件,emailSent=true 且不回传 resetLink', async () => {
-        await service.registerAccount({
+        await registerAccount(service, {
             user: { name: 'Ada Lovelace', email: 'ada@example.com', credential: 'Password1!' }
         })
 
@@ -422,7 +640,7 @@ describe('FlowOpsAuthService 邮件发送(配置 SMTP 时)', () => {
     })
 
     it('未知邮箱找回:不发邮件,emailSent=false', async () => {
-        await service.registerAccount({
+        await registerAccount(service, {
             user: { name: 'Ada Lovelace', email: 'ada@example.com', credential: 'Password1!' }
         })
 

@@ -5,6 +5,7 @@ import { createSelfAuthTokens } from '../auth/service'
 import { FlowOpsAuthError, FlowOpsLoggedInUser } from '../auth/types'
 import { SELF_ACCESS_TOKEN_COOKIE, SELF_REFRESH_TOKEN_COOKIE } from '../secrets'
 import { FlowOpsAdminService } from './service'
+import { FlowOpsAuthenticatedAuditActor, toAuthenticatedAuditActor } from '../audit/context'
 
 const roleRouter = Router()
 const workspaceRouter = Router()
@@ -23,6 +24,12 @@ const cookieOptions = (maxAge: number) => ({
 })
 
 const service = () => new FlowOpsAdminService(getDataSource())
+
+const requireAuditActor = (req: Parameters<typeof toAuthenticatedAuditActor>[0]): FlowOpsAuthenticatedAuditActor => {
+    const actor = toAuthenticatedAuditActor(req)
+    if (!actor) throw new FlowOpsAuthError(401, 'Unauthorized')
+    return actor
+}
 
 const sendError = (error: unknown, res: Response, next: NextFunction) => {
     if (error instanceof FlowOpsAuthError) return res.status(error.statusCode).json({ message: error.message })
@@ -45,21 +52,21 @@ roleRouter.get('/', checkPermission('roles:manage'), async (req, res, next) => {
 })
 roleRouter.post('/', checkPermission('roles:manage'), async (req, res, next) => {
     try {
-        res.json(await service().createRole(req.body))
+        res.json(await service().createRole(req.body, requireAuditActor(req)))
     } catch (error) {
         sendError(error, res, next)
     }
 })
 roleRouter.put('/', checkPermission('roles:manage'), async (req, res, next) => {
     try {
-        res.json(await service().updateRole(req.body))
+        res.json(await service().updateRole(req.body, requireAuditActor(req)))
     } catch (error) {
         sendError(error, res, next)
     }
 })
 roleRouter.delete('/', checkPermission('roles:manage'), async (req, res, next) => {
     try {
-        res.json(await service().deleteRole(req.query.id as string))
+        res.json(await service().deleteRole(req.query.id as string, requireAuditActor(req)))
     } catch (error) {
         sendError(error, res, next)
     }
@@ -76,21 +83,21 @@ workspaceRouter.get('/', checkPermission('workspace:view'), async (req, res, nex
 })
 workspaceRouter.post('/', checkPermission('workspace:create'), async (req, res, next) => {
     try {
-        res.json(await service().createWorkspace(req.body, req.user as any as FlowOpsLoggedInUser))
+        res.json(await service().createWorkspace(req.body, requireAuditActor(req)))
     } catch (error) {
         sendError(error, res, next)
     }
 })
 workspaceRouter.put('/', checkPermission('workspace:update'), async (req, res, next) => {
     try {
-        res.json(await service().updateWorkspace(req.body))
+        res.json(await service().updateWorkspace(req.body, requireAuditActor(req)))
     } catch (error) {
         sendError(error, res, next)
     }
 })
 workspaceRouter.delete('/:id', checkPermission('workspace:delete'), async (req, res, next) => {
     try {
-        res.json(await service().deleteWorkspace(req.params.id))
+        res.json(await service().deleteWorkspace(req.params.id, requireAuditActor(req)))
     } catch (error) {
         sendError(error, res, next)
     }
@@ -112,7 +119,8 @@ workspaceRouter.post('/link-users/:id', checkPermission('workspace:add-user'), a
 workspaceRouter.post('/unlink-users/:id', checkPermission('workspace:unlink-user'), async (req, res, next) => {
     try {
         const userIds = (req.body?.userIds ?? req.body?.users ?? []) as string[]
-        for (const userId of userIds) await service().deleteWorkspaceUser(req.params.id, userId)
+        const actor = requireAuditActor(req)
+        for (const userId of userIds) await service().deleteWorkspaceUser(req.params.id, userId, actor)
         res.json({ success: true })
     } catch (error) {
         sendError(error, res, next)
@@ -137,14 +145,14 @@ workspaceUserRouter.get('/', checkAnyPermission('workspace:view,users:manage,rol
 })
 workspaceUserRouter.put('/', checkPermission('workspace:add-user'), async (req, res, next) => {
     try {
-        res.json(await service().updateWorkspaceUserRole(req.body))
+        res.json(await service().updateWorkspaceUserRole(req.body, requireAuditActor(req)))
     } catch (error) {
         sendError(error, res, next)
     }
 })
 workspaceUserRouter.delete('/', checkPermission('workspace:unlink-user'), async (req, res, next) => {
     try {
-        res.json(await service().deleteWorkspaceUser(req.query.workspaceId as string, req.query.userId as string))
+        res.json(await service().deleteWorkspaceUser(req.query.workspaceId as string, req.query.userId as string, requireAuditActor(req)))
     } catch (error) {
         sendError(error, res, next)
     }
@@ -164,14 +172,16 @@ organizationUserRoute.get('/', checkPermission('users:manage'), async (req, res,
 })
 organizationUserRoute.put('/', checkPermission('users:manage'), async (req, res, next) => {
     try {
-        res.json(await service().updateOrganizationUser(req.body))
+        res.json(await service().updateOrganizationUser(req.body, requireAuditActor(req)))
     } catch (error) {
         sendError(error, res, next)
     }
 })
 organizationUserRoute.delete('/', checkPermission('users:manage'), async (req, res, next) => {
     try {
-        res.json(await service().deleteOrganizationUser(req.query.organizationId as string, req.query.userId as string))
+        res.json(
+            await service().deleteOrganizationUser(req.query.organizationId as string, req.query.userId as string, requireAuditActor(req))
+        )
     } catch (error) {
         sendError(error, res, next)
     }

@@ -5,6 +5,7 @@ import { SELF_ACCESS_TOKEN_COOKIE, SELF_REFRESH_TOKEN_COOKIE } from '../secrets'
 import { configureSelfLocalStrategy } from './passport'
 import { SELF_PERMISSION_GROUPS } from '../rbac/permissions'
 import { checkPermission } from '../middleware'
+import { toAuditRequestContext, toAuthenticatedAuditActor } from '../audit/context'
 
 const authRouter = Router()
 const accountRouter = Router()
@@ -54,7 +55,7 @@ authRouter.post('/login', async (req, res, next) => {
     })(req, res, next)
 })
 
-authRouter.post('/refreshToken', async (req, res, next) => {
+authRouter.post('/refreshToken', async (req, res, _next) => {
     try {
         const refreshToken = req.cookies?.[SELF_REFRESH_TOKEN_COOKIE]
         if (!refreshToken) throw new FlowOpsAuthError(401, 'Refresh Token Expired')
@@ -85,7 +86,7 @@ authRouter.get('/sso-success', (_req, res) => res.status(501).json({ message: 'S
 
 accountRouter.post('/register', async (req, res, next) => {
     try {
-        const loggedInUser = await service().registerAccount(req.body)
+        const loggedInUser = await service().registerAccount(req.body, toAuditRequestContext(req))
         res.json(loggedInUser)
     } catch (error) {
         sendError(error, res, next)
@@ -94,8 +95,8 @@ accountRouter.post('/register', async (req, res, next) => {
 
 accountRouter.post('/invite', async (req, res, next) => {
     try {
-        const loggedInUser = req.user as any
-        if (!loggedInUser?.id) throw new FlowOpsAuthError(401, 'Unauthorized')
+        const loggedInUser = toAuthenticatedAuditActor(req)
+        if (!loggedInUser) throw new FlowOpsAuthError(401, 'Unauthorized')
         res.json(await service().inviteAccount(req.body, loggedInUser))
     } catch (error) {
         sendError(error, res, next)
@@ -113,7 +114,7 @@ accountRouter.post('/logout', async (req, res, next) => {
                 userId = undefined
             }
         }
-        await service().logout(userId)
+        await service().logout(userId, toAuditRequestContext(req))
         clearCookies(res)
         res.json({ message: 'Logout Successful' })
     } catch (error) {
@@ -131,7 +132,7 @@ accountRouter.post('/forgot-password', async (req, res, next) => {
 
 accountRouter.post('/reset-password', async (req, res, next) => {
     try {
-        res.json(await service().resetPassword(req.body))
+        res.json(await service().resetPassword(req.body, toAuditRequestContext(req)))
     } catch (error) {
         sendError(error, res, next)
     }

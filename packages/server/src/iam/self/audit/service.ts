@@ -1,6 +1,7 @@
 import type { DataSource, SelectQueryBuilder } from 'typeorm'
 import logger from '../../../utils/logger'
 import { FlowOpsAuditLog } from '../entities'
+export type { AuditActorContext, AuthenticatedAuditActorContext } from './types'
 
 export type AuditEventStatus = 'success' | 'failure'
 
@@ -44,9 +45,11 @@ const SENSITIVE_METADATA_KEYS = new Set([
     'cookie',
     'credential',
     'credentialhash',
+    'invitelink',
     'jwt',
     'password',
     'refreshtoken',
+    'resetlink',
     'setcookie',
     'temptoken',
     'token'
@@ -110,7 +113,17 @@ export class FlowOpsAuditService {
             const repository = this.dataSource.getRepository(FlowOpsAuditLog)
             await repository.save(
                 repository.create({
-                    ...input,
+                    actorUserId: input.actorUserId ?? null,
+                    actorEmail: input.actorEmail ?? null,
+                    action: input.action,
+                    targetType: input.targetType,
+                    targetId: input.targetId ?? null,
+                    targetName: input.targetName ?? null,
+                    organizationId: input.organizationId ?? null,
+                    workspaceId: input.workspaceId ?? null,
+                    status: input.status,
+                    ip: input.ip ?? null,
+                    userAgent: input.userAgent ?? null,
                     metadata: serializeMetadata(input.metadata)
                 })
             )

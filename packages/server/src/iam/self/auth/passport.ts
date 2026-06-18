@@ -1,6 +1,7 @@
 import passport from 'passport'
 import { Strategy as LocalStrategy } from 'passport-local'
 import { FlowOpsAuthError, FlowOpsAuthService } from './service'
+import { toAuditRequestContext } from '../audit/context'
 
 let configured = false
 
@@ -18,11 +19,15 @@ export const configureSelfLocalStrategy = () => {
             {
                 usernameField: 'email',
                 passwordField: 'password',
-                session: false
+                session: false,
+                passReqToCallback: true
             },
-            async (email, password, done) => {
+            async (req, email, password, done) => {
                 try {
-                    const loggedInUser = await new FlowOpsAuthService(getSelfDataSource()).login({ email, password })
+                    const loggedInUser = await new FlowOpsAuthService(getSelfDataSource()).login(
+                        { email, password },
+                        toAuditRequestContext(req)
+                    )
                     done(null, loggedInUser as any)
                 } catch (error) {
                     if (error instanceof FlowOpsAuthError) return done(null, false, { message: error.message })
