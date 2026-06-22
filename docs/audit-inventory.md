@@ -129,3 +129,29 @@ A3 在 `IAM_FEATURES_BY_TIER.team/enterprise` 和 `SELF_ENTERPRISE_FEATURE_FLAGS
 -   `feat:audit` 归 team/enterprise；free/pro 关闭，owner/admin 有 `auditLogs:view`，member 无。
 -   两项后续实现风险必须在 A1/A2 明确测试：审计失败绝不能回滚主业务；查询必须强制组织隔离，不能复刻当前全库登录活动查询。
 -   本轮未修改任何运行代码；等待 A0 人工评审后再进入 A1。
+
+## 9. A1-A5 落地结论
+
+截至 2026-06-22，审计日志 A1-A5 已按阶段落地并完成终验：
+
+| 阶段 | 落地结论                                                                                                                                                                                                                                                                                                                    |
+| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| A1   | 新增 `flowops_audit_log` 实体、四库 full/ship 迁移和 fail-safe `FlowOpsAuditService`。历史登录数据迁移改为分别读取活动与用户，再用 TypeScript `Map(String(id), email)` 回填邮箱，避免 PostgreSQL `uuid = text` 比较。                                                                                                       |
+| A2   | admin/auth 动作使用显式 actor/request context 写入审计；角色、工作区、工作区成员、组织用户、邀请、注册、登录/失败、登出和密码重置均进入新表。旧 `flowops_login_activity` 停止运行时写入；审计写失败只告警，不影响主操作。                                                                                                   |
+| A3   | 新增 `auditLogs:view` 和 `feat:audit`；owner/admin 有权限，member 无权限，feature 归 team/enterprise。查询、前缀/精确过滤、分页和 CSV 导出均强制使用认证用户的组织作用域；CSV 单元格具备公式注入防护。四库版本化迁移为老库 owner/admin 幂等补权。                                                                           |
+| A4   | 新 `/audit` 页面提供 actor/action/target/workspace/时间筛选、分页、详情和 CSV 导出；菜单与路由同时受权限和 feature 控制。旧 `/login-activity` 重定向到 `/audit?action=auth.*`，旧页面及前端 API 已退役，zh/en 文案和 UI 回归测试已覆盖。                                                                                    |
+| A5   | server `tsc --noEmit`、server Jest 81 suites/1112 tests、UI Jest 46 suites/1753 tests 全过。PostgreSQL 16 与 SQLite 全新库完成全部迁移并成功起服；PostgreSQL 记录 60 条、SQLite 记录 58 条迁移，审计建表和补权迁移均各执行一次。MySQL/MariaDB 本机无可用服务，以四库 full/ship 注册测试及无跨类型 JOIN 的共享 helper 覆盖。 |
+
+### 9.1 A5 真机矩阵
+
+-   在 `FLOWOPS_IAM=self`、本机 commercial 满血、全新 SQLite 库上，通过真实 HTTP/cookie 会话完成角色、工作区和成员的建/改/删，以及邀请、注册、登录失败、登录、登出、组织用户更新/删除。调用方组织共得到 22 条审计记录，覆盖 16 个 action；admin 动作的 actor、target、before/after、status、IP 和 User-Agent 均与请求及数据库实体一致。
+-   `role.*` 返回 3 条角色事件，`auth.*` 返回 9 条认证事件，`role.create` 精确过滤只返回一条；actor、时间范围和分页过滤通过。CSV 导出把以 `=` 开头的角色名称加前缀转义。
+-   member 调用 `/api/v1/audit` 返回 403；free 模式下 `feat:audit=false`、API 返回 403“该功能需专业版”，全新浏览器侧栏不显示审计入口且直接访问 `/audit` 进入未授权页；本机 commercial/enterprise 模式下入口与页面可见。
+-   第二组织 owner 即使传入第一组织的 `organizationId`，也只能查询第二组织记录；第一组织查询同样不包含第二组织数据，证明 query 参数不能覆盖认证组织作用域。
+-   旧 `/login-activity` 浏览器路由跳转到 `/audit?action=auth.*`，页面实际展示 `auth.login/auth.logout/auth.loginFailed/auth.register`；兼容接口读取新表，返回 9 条，与同组织 `auth.*` 查询计数一致。
+
+### 9.2 升级 fixture
+
+-   PostgreSQL 真实 fixture 使用 `flowops_user.id uuid` 与 `flowops_login_activity.userId text`：4 条旧记录迁移后得到 4 条审计记录，code 映射保持不变；已知用户回填邮箱，未知用户和空 userId 的邮箱为 null，旧表保留。
+-   老库角色 fixture 初始 owner/admin/member 均无 `auditLogs:view`。执行 `GrantAuditLogsPermission1779200000000` 后 owner/admin 各补一个 key、member 不变；重复执行结果完全一致，验证幂等。
+-   `flowops_login_activity` 继续作为回滚兼容物理表保留，但运行时不再读写；是否物理删除留给后续独立清理迁移，不在本计划内隐式丢弃历史数据。
