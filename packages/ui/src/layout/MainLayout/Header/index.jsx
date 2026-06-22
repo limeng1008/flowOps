@@ -89,14 +89,20 @@ const MaterialUISwitch = styled(Switch)(({ theme }) => ({
     }
 }))
 
-const GitHubStarButton = ({ starCount, isDark }) => {
+// 由品牌仓库 URL 推导 GitHub API 地址;非 github 仓库返回空(不显示/不请求星标)
+const toGithubApiRepo = (url) => {
+    const m = /github\.com\/([^/]+)\/([^/]+?)(?:\.git)?\/?$/.exec(url || '')
+    return m ? `https://api.github.com/repos/${m[1]}/${m[2]}` : ''
+}
+
+const GitHubStarButton = ({ starCount, isDark, repoUrl }) => {
     const theme = useTheme()
     const { t } = useTranslation()
 
     const formattedStarCount = starCount.toLocaleString()
 
     return (
-        <Link href='https://github.com/FlowiseAI/Flowise' target='_blank' underline='none' sx={{ display: 'inline-flex' }}>
+        <Link href={repoUrl} target='_blank' underline='none' sx={{ display: 'inline-flex' }}>
             <Box
                 sx={{
                     display: 'flex',
@@ -160,7 +166,8 @@ const GitHubStarButton = ({ starCount, isDark }) => {
 
 GitHubStarButton.propTypes = {
     starCount: PropTypes.number.isRequired,
-    isDark: PropTypes.bool.isRequired
+    isDark: PropTypes.bool.isRequired,
+    repoUrl: PropTypes.string
 }
 
 const Header = ({ handleLeftDrawerToggle }) => {
@@ -173,7 +180,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
 
     const [isDark, setIsDark] = useState(customization.isDarkMode)
     const dispatch = useDispatch()
-    const { isEnterpriseLicensed, isCloud, isOpenSource } = useConfig()
+    const { isEnterpriseLicensed, isCloud, isOpenSource, brand } = useConfig()
     const currentUser = useSelector((state) => state.auth.user)
     const isAuthenticated = useSelector((state) => state.auth.isAuthenticated)
     const [isPricingOpen, setIsPricingOpen] = useState(false)
@@ -219,10 +226,12 @@ const Header = ({ handleLeftDrawerToggle }) => {
     }, [logoutApi.data])
 
     useEffect(() => {
-        if (isCloud || isOpenSource) {
+        const apiRepo = toGithubApiRepo(brand?.repoUrl)
+        // 白标:仅当部署方配置了品牌仓库时才拉取星标,默认不向上游公共仓库请求
+        if ((isCloud || isOpenSource) && apiRepo) {
             const fetchStarCount = async () => {
                 try {
-                    const response = await fetch('https://api.github.com/repos/FlowiseAI/Flowise')
+                    const response = await fetch(apiRepo)
                     const data = await response.json()
                     if (data.stargazers_count) {
                         setStarCount(data.stargazers_count)
@@ -234,7 +243,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
 
             fetchStarCount()
         }
-    }, [isCloud, isOpenSource])
+    }, [isCloud, isOpenSource, brand])
 
     return (
         <>
@@ -270,7 +279,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
                     </ButtonBase>
                 )}
             </Box>
-            {isCloud || isOpenSource ? (
+            {(isCloud || isOpenSource) && brand?.repoUrl ? (
                 <Box
                     sx={{
                         flexGrow: 1,
@@ -283,7 +292,7 @@ const Header = ({ handleLeftDrawerToggle }) => {
                         }
                     }}
                 >
-                    <GitHubStarButton starCount={starCount} isDark={isDark} />
+                    <GitHubStarButton starCount={starCount} isDark={isDark} repoUrl={brand?.repoUrl} />
                 </Box>
             ) : (
                 <Box sx={{ flexGrow: 1 }} />

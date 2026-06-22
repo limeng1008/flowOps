@@ -6,30 +6,40 @@ import moment from 'moment'
 import axios from 'axios'
 import { baseURL } from '@/store/constant'
 import { useTranslation } from 'react-i18next'
+import { useConfig } from '@/store/context/ConfigContext'
+
+// 由品牌仓库 URL 推导 GitHub API 地址;非 github 仓库返回空(不检查最新版本)
+const toGithubApiRepo = (url) => {
+    const m = /github\.com\/([^/]+)\/([^/]+?)(?:\.git)?\/?$/.exec(url || '')
+    return m ? `https://api.github.com/repos/${m[1]}/${m[2]}` : ''
+}
 
 const AboutDialog = ({ show, onCancel }) => {
     const { t, i18n } = useTranslation()
+    const { brand } = useConfig()
     const portalElement = document.getElementById('portal')
     const currentLang = i18n.resolvedLanguage || i18n.language
     const momentLocale = currentLang?.startsWith('zh') ? 'zh-cn' : 'en'
 
     const [data, setData] = useState({})
+    const hasLatest = Boolean(data?.name)
 
     useEffect(() => {
         if (show) {
-            const latestReleaseReq = axios.get('https://api.github.com/repos/FlowiseAI/Flowise/releases/latest')
             const currentVersionReq = axios.get(`${baseURL}/api/v1/version`, {
                 withCredentials: true,
                 headers: { 'Content-type': 'application/json', 'x-request-from': 'internal' }
             })
+            // 白标:仅当部署方配置了品牌仓库时才检查最新版本,默认不向上游公共仓库请求
+            const apiRepo = toGithubApiRepo(brand?.repoUrl)
+            const latestReleaseReq = apiRepo ? axios.get(`${apiRepo}/releases/latest`) : Promise.resolve({ data: {} })
 
             Promise.all([latestReleaseReq, currentVersionReq])
                 .then(([latestReleaseData, currentVersionData]) => {
-                    const finalData = {
+                    setData({
                         ...latestReleaseData.data,
                         currentVersion: currentVersionData.data.version
-                    }
-                    setData(finalData)
+                    })
                 })
                 .catch((error) => {
                     console.error('Error fetching data:', error)
@@ -58,8 +68,12 @@ const AboutDialog = ({ show, onCancel }) => {
                             <TableHead>
                                 <TableRow>
                                     <TableCell>{t('profile.currentVersion')}</TableCell>
-                                    <TableCell>{t('profile.latestVersion')}</TableCell>
-                                    <TableCell>{t('profile.publishedAt')}</TableCell>
+                                    {hasLatest && (
+                                        <>
+                                            <TableCell>{t('profile.latestVersion')}</TableCell>
+                                            <TableCell>{t('profile.publishedAt')}</TableCell>
+                                        </>
+                                    )}
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -67,12 +81,16 @@ const AboutDialog = ({ show, onCancel }) => {
                                     <TableCell component='th' scope='row'>
                                         {data.currentVersion}
                                     </TableCell>
-                                    <TableCell component='th' scope='row'>
-                                        <a target='_blank' rel='noreferrer' href={data.html_url}>
-                                            {data.name}
-                                        </a>
-                                    </TableCell>
-                                    <TableCell>{moment(data.published_at).locale(momentLocale).fromNow()}</TableCell>
+                                    {hasLatest && (
+                                        <>
+                                            <TableCell component='th' scope='row'>
+                                                <a target='_blank' rel='noreferrer' href={data.html_url}>
+                                                    {data.name}
+                                                </a>
+                                            </TableCell>
+                                            <TableCell>{moment(data.published_at).locale(momentLocale).fromNow()}</TableCell>
+                                        </>
+                                    )}
                                 </TableRow>
                             </TableBody>
                         </Table>

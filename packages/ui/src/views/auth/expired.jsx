@@ -3,11 +3,13 @@ import { Box, Stack, Typography } from '@mui/material'
 import contactSupport from '@/assets/images/contact_support.svg'
 import { StyledButton } from '@/ui-component/button/StyledButton'
 import { useTranslation } from 'react-i18next'
+import { useConfig } from '@/store/context/ConfigContext'
 
 // ==============================|| License Expired Page ||============================== //
 
 const LicenseExpired = () => {
     const { t } = useTranslation()
+    const { brand } = useConfig()
 
     return (
         <>
@@ -36,9 +38,11 @@ const LicenseExpired = () => {
                         <Typography variant='body1' component='div' sx={{ mb: 2 }}>
                             {t('auth.licenseExpiredDesc')}
                         </Typography>
-                        <a href='mailto:support@flowiseai.com'>
-                            <StyledButton sx={{ px: 2, py: 1 }}>{t('auth.contactSupport')}</StyledButton>
-                        </a>
+                        {brand?.supportEmail ? (
+                            <a href={`mailto:${brand.supportEmail}`}>
+                                <StyledButton sx={{ px: 2, py: 1 }}>{t('auth.contactSupport')}</StyledButton>
+                            </a>
+                        ) : null}
                     </Stack>
                 </Box>
             </MainCard>

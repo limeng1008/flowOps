@@ -4,6 +4,9 @@ import { createContext, useContext, useEffect, useState } from 'react'
 
 const ConfigContext = createContext()
 
+// 内置默认品牌(与后端 DEFAULT_FLOWOPS_BRAND 对齐)。空串=中性,UI 据此隐藏入口/显示「联系管理员」。
+export const DEFAULT_FLOWOPS_BRAND = { name: 'FlowOps', supportEmail: '', repoUrl: '', primaryColor: '', logoUrl: '' }
+
 export const ConfigProvider = ({ children }) => {
     const [config, setConfig] = useState({})
     const [loading, setLoading] = useState(true)
@@ -11,6 +14,7 @@ export const ConfigProvider = ({ children }) => {
     const [isCloud, setCloudLicensed] = useState(false)
     const [isOpenSource, setOpenSource] = useState(false)
     const [flowOpsEdition, setFlowOpsEdition] = useState('private')
+    const [brand, setBrand] = useState(DEFAULT_FLOWOPS_BRAND)
 
     useEffect(() => {
         const userSettings = platformsettingsApi.getSettings()
@@ -22,6 +26,7 @@ export const ConfigProvider = ({ children }) => {
                 const edition =
                     finalData.FLOWOPS_EDITION || finalData.EDITION || (finalData.PLATFORM_TYPE === 'cloud' ? 'cloud' : 'private')
                 setConfig(finalData)
+                setBrand({ ...DEFAULT_FLOWOPS_BRAND, ...(finalData.BRAND || {}) })
                 setFlowOpsEdition(edition === 'cloud' ? 'cloud' : 'private')
                 if (finalData.PLATFORM_TYPE) {
                     if (finalData.PLATFORM_TYPE === 'enterprise') {
@@ -48,7 +53,7 @@ export const ConfigProvider = ({ children }) => {
     }, [])
 
     return (
-        <ConfigContext.Provider value={{ config, loading, isEnterpriseLicensed, isCloud, isOpenSource, flowOpsEdition }}>
+        <ConfigContext.Provider value={{ config, loading, isEnterpriseLicensed, isCloud, isOpenSource, flowOpsEdition, brand }}>
             {children}
         </ConfigContext.Provider>
     )
