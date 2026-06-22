@@ -17,6 +17,7 @@ import { baseURL } from '@/store/constant'
 import { flowContext } from '@/store/context/ReactFlowContext'
 import { getAvailableNodesForVariable } from '@/utils/genericHelper'
 import { translateNodeLabel, translateNodeDescription } from '@/i18n/nodeI18n'
+import { findMatchingOptions, getAsyncDropdownSelectionValue, resolveAsyncDropdownValue } from './asyncDropdownUtils'
 
 const StyledPopper = styled(Popper)({
     boxShadow: '0px 8px 10px -5px rgb(0 0 0 / 20%), 0px 16px 24px 2px rgb(0 0 0 / 14%), 0px 6px 30px 5px rgb(0 0 0 / 12%)',
@@ -29,8 +30,6 @@ const StyledPopper = styled(Popper)({
         }
     }
 })
-
-const isChooseOptionValue = (candidate, chooseOptionLabel) => candidate === 'choose an option' || candidate === chooseOptionLabel
 
 const fetchList = async ({ name, nodeData, previousNodes, currentNode }) => {
     const selectedParam = nodeData.inputParams.find((param) => param.name === name)
@@ -92,20 +91,6 @@ export const AsyncDropdown = ({
     const [open, setOpen] = useState(false)
     const [options, setOptions] = useState([])
     const [loading, setLoading] = useState(false)
-    const findMatchingOptions = (options = [], value) => {
-        if (multiple) {
-            let values = []
-            if (!isChooseOptionValue(value, chooseOptionLabel) && value && typeof value === 'string') {
-                values = JSON.parse(value)
-            } else {
-                values = value
-            }
-            if (!Array.isArray(values)) return []
-            return options.filter((option) => values.includes(option.name))
-        }
-        return options.find((option) => option.name === value)
-    }
-    const getDefaultOptionValue = () => (multiple ? [] : '')
     const addNewOption = [{ label: t('common.createNewOption'), name: '-create-' }]
     let [internalValue, setInternalValue] = useState(value ?? 'choose an option')
     const getTranslatedOptionLabel = (option) => {
@@ -211,7 +196,7 @@ export const AsyncDropdown = ({
                     setOpen(false)
                 }}
                 options={options}
-                value={findMatchingOptions(options, internalValue) || getDefaultOptionValue()}
+                value={resolveAsyncDropdownValue({ options, value: internalValue, multiple, freeSolo, chooseOptionLabel })}
                 getOptionLabel={getTranslatedOptionLabel}
                 onChange={(e, selection) => {
                     if (multiple) {
@@ -223,7 +208,7 @@ export const AsyncDropdown = ({
                         setInternalValue(value)
                         onSelect(value)
                     } else {
-                        const value = selection ? selection.name : ''
+                        const value = getAsyncDropdownSelectionValue(selection)
                         if (isCreateNewOption && value === '-create-') {
                             onCreateNew()
                         } else {
@@ -236,8 +221,8 @@ export const AsyncDropdown = ({
                 loading={loading}
                 renderInput={(params) => {
                     const matchingOptions = multiple
-                        ? findMatchingOptions(options, internalValue)
-                        : [findMatchingOptions(options, internalValue)].filter(Boolean)
+                        ? findMatchingOptions(options, internalValue, multiple, chooseOptionLabel)
+                        : [findMatchingOptions(options, internalValue, multiple, chooseOptionLabel)].filter(Boolean)
 
                     const textField = (
                         <TextField

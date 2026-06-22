@@ -1745,6 +1745,14 @@
             "name": "deepseek",
             "models": [
                 {
+                    "label": "deepseek-v4-flash",
+                    "name": "deepseek-v4-flash"
+                },
+                {
+                    "label": "deepseek-v4-pro",
+                    "name": "deepseek-v4-pro"
+                },
+                {
                     "label": "deepseek-chat",
                     "name": "deepseek-chat",
                     "input_cost": 0.00027,
