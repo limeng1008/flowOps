@@ -11,6 +11,11 @@ type LegacyLoginActivityRow = {
     actorEmail?: string | null
 }
 
+type LegacyUserRow = {
+    id: string
+    email: string
+}
+
 export type MigratedAuditLogRow = {
     id: string
     createdDate: Date | string
@@ -65,12 +70,23 @@ export const migrateLegacyLoginActivities = async (queryRunner: QueryRunner, ide
             activity.${quote('ip')} AS ${quote('ip')},
             activity.${quote('message')} AS ${quote('message')},
             activity.${quote('createdDate')} AS ${quote('createdDate')},
-            activity.${quote('updatedDate')} AS ${quote('updatedDate')},
-            actor.${quote('email')} AS ${quote('actorEmail')}
+            activity.${quote('updatedDate')} AS ${quote('updatedDate')}
         FROM ${quote('flowops_login_activity')} activity
-        LEFT JOIN ${quote('flowops_user')} actor ON actor.${quote('id')} = activity.${quote('userId')}
     `)) as LegacyLoginActivityRow[]
 
     if (rows.length === 0) return
-    await queryRunner.manager.createQueryBuilder().insert().into('flowops_audit_log').values(rows.map(mapLegacyLoginActivity)).execute()
+    const users = (await queryRunner.query(`
+        SELECT
+            ${quote('id')} AS ${quote('id')},
+            ${quote('email')} AS ${quote('email')}
+        FROM ${quote('flowops_user')}
+    `)) as LegacyUserRow[]
+    const emailByUserId = new Map(users.map((user) => [String(user.id), user.email]))
+    const auditRows = rows.map((row) =>
+        mapLegacyLoginActivity({
+            ...row,
+            actorEmail: row.userId === null || row.userId === undefined ? null : emailByUserId.get(String(row.userId)) ?? null
+        })
+    )
+    await queryRunner.manager.createQueryBuilder().insert().into('flowops_audit_log').values(auditRows).execute()
 }
