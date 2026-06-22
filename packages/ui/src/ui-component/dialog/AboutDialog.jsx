@@ -59,7 +59,7 @@ const AboutDialog = ({ show, onCancel }) => {
             aria-describedby='alert-dialog-description'
         >
             <DialogTitle sx={{ fontSize: '1rem' }} id='alert-dialog-title'>
-                FlowOps {t('profile.version')}
+                {brand?.name || 'FlowOps'} {t('profile.version')}
             </DialogTitle>
             <DialogContent>
                 {data && (

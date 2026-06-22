@@ -27,6 +27,11 @@ export const ConfigProvider = ({ children }) => {
                     finalData.FLOWOPS_EDITION || finalData.EDITION || (finalData.PLATFORM_TYPE === 'cloud' ? 'cloud' : 'private')
                 setConfig(finalData)
                 setBrand({ ...DEFAULT_FLOWOPS_BRAND, ...(finalData.BRAND || {}) })
+                // 白标:品牌名非默认时,把标签页标题里的 FlowOps 替换为品牌名(保留副标题)
+                const brandName = finalData.BRAND?.name || DEFAULT_FLOWOPS_BRAND.name
+                if (brandName && brandName !== DEFAULT_FLOWOPS_BRAND.name) {
+                    document.title = document.title.replace(/FlowOps/g, brandName)
+                }
                 setFlowOpsEdition(edition === 'cloud' ? 'cloud' : 'private')
                 if (finalData.PLATFORM_TYPE) {
                     if (finalData.PLATFORM_TYPE === 'enterprise') {
