@@ -10,6 +10,7 @@ import { getErrorMessage } from '../../errors/utils'
 import { OMIT_QUEUE_JOB_DATA } from '../../utils/constants'
 import { executeCustomNodeFunction } from '../../utils/executeCustomNodeFunction'
 import { filterNodeByClient } from './filterNodeByClient'
+import { isNodeAllowedByEntitlement } from './entitlementGate'
 
 export { filterNodeByClient }
 
@@ -19,6 +20,7 @@ const getAllNodes = async (client?: ClientType) => {
         const appServer = getRunningExpressApp()
         const dbResponse = []
         for (const nodeName in appServer.nodesPool.componentNodes) {
+            if (!isNodeAllowedByEntitlement(nodeName)) continue // 档位未授权的高级节点不下发到调色板
             const clonedNode = cloneDeep(appServer.nodesPool.componentNodes[nodeName])
             dbResponse.push(filterNodeByClient(clonedNode, client))
         }
@@ -34,6 +36,7 @@ const getAllNodesForCategory = async (category: string, client?: ClientType) => 
         const appServer = getRunningExpressApp()
         const dbResponse = []
         for (const nodeName in appServer.nodesPool.componentNodes) {
+            if (!isNodeAllowedByEntitlement(nodeName)) continue // 档位未授权的高级节点不下发到调色板
             const componentNode = appServer.nodesPool.componentNodes[nodeName]
             if (componentNode.category === category) {
                 const clonedNode = cloneDeep(componentNode)
