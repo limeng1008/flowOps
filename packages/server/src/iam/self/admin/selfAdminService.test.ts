@@ -407,6 +407,22 @@ describe('FlowOpsAdminService', () => {
         })
     })
 
+    it('限制非 multi-workspace 档位每组织仅 1 个工作区(团队版及以上放开)', async () => {
+        delete process.env.FLOWOPS_LOCAL_COMMERCIAL // free 档
+        const owner = await registerAccount({
+            user: { name: 'Owner', email: 'owner@example.com', credential: 'Password1!' }
+        })
+        // 注册已建默认工作区(第 1 个);free 档再建第 2 个应被拒 + 提示升级
+        await expect(createWorkspace({ name: 'Second', organizationId: owner.activeOrganizationId }, owner)).rejects.toMatchObject({
+            statusCode: 403
+        })
+
+        // 切 enterprise(满血)后可建多个
+        process.env.FLOWOPS_LOCAL_COMMERCIAL = 'true'
+        const second = await createWorkspace({ name: 'Second', organizationId: owner.activeOrganizationId }, owner)
+        expect(second.name).toBe('Second')
+    })
+
     it('reports the real organization user usage and free tier seat limit', async () => {
         delete process.env.FLOWOPS_LOCAL_COMMERCIAL
         const owner = await registerAccount({

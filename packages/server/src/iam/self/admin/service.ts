@@ -6,6 +6,8 @@ import { normalizePermissionJson, parsePermissionJson } from '../rbac/permission
 import { assertCanAddOrganizationUser, getOrganizationUserCount, getSelfSeatLimit, isOrganizationUser } from '../seats'
 import { FlowOpsAuditService } from '../audit/service'
 import type { FlowOpsAuthenticatedAuditActor } from '../audit/context'
+import { isSelfFeatureAllowed } from '../features'
+import { FLOWOPS_ENTITLEMENT_FEATURES } from '../../../services/entitlement/catalog'
 
 type RoleBody = {
     id?: string
@@ -192,6 +194,14 @@ export class FlowOpsAdminService {
         const organizationId = actor.activeOrganizationId
         if (!name) throw new FlowOpsAuthError(400, 'Workspace name is required')
         if (!organizationId) throw new FlowOpsAuthError(400, 'Organization is required')
+
+        // 多工作区配额:未授权 multi-workspace 的档位(free/pro)每组织限 1 个工作区
+        if (!isSelfFeatureAllowed(FLOWOPS_ENTITLEMENT_FEATURES.multiWorkspace)) {
+            const existingWorkspaces = await this.dataSource.getRepository(FlowOpsWorkspace).countBy({ organizationId })
+            if (existingWorkspaces >= 1) {
+                throw new FlowOpsAuthError(403, '当前版本仅支持 1 个工作区,升级到团队版及以上可创建多个工作区')
+            }
+        }
 
         const workspace = await this.dataSource.transaction(async (manager) => {
             const workspace = await manager.getRepository(FlowOpsWorkspace).save(
