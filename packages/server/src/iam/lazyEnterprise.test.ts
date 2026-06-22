@@ -81,12 +81,13 @@ describe('IAM removed-source guard', () => {
     it('resolves platform IAM routers to self implementations', () => {
         const routes = require('./routes')
         const selfAuthRoutes = require('./self/auth/routes')
+        const selfAuditRoutes = require('./self/audit/routes')
         const selfAdminRoutes = require('./self/admin/routes')
 
         expect(routes.accountRouter).toBe(selfAuthRoutes.accountRouter)
         expect(routes.authRouter).toBe(selfAuthRoutes.authRouter)
         expect(routes.loginMethodRouter).toBe(selfAuthRoutes.loginMethodRouter)
-        expect(routes.auditRouter).toBe(selfAdminRoutes.auditRouter)
+        expect(routes.auditRouter).toBe(selfAuditRoutes.auditRouter)
         expect(routes.organizationUserRoute).toBe(selfAdminRoutes.organizationUserRoute)
         expect(routes.organizationRouter).toBe(selfAdminRoutes.organizationRouter)
         expect(routes.roleRouter).toBe(selfAdminRoutes.roleRouter)

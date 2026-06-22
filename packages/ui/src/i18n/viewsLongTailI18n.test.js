@@ -371,21 +371,23 @@ const requiredKeys = [
     'auth.validation.passwordsDontMatch',
     'auth.registerOrganizationFailed',
     'auth.registerAccountFailed',
-    'pages.loginActivity.from',
-    'pages.loginActivity.to',
-    'pages.loginActivity.filterBy',
-    'pages.loginActivity.showingRecords',
-    'pages.loginActivity.activity',
-    'pages.loginActivity.method',
-    'pages.loginActivity.message',
-    'pages.loginActivity.emailPassword',
-    'pages.loginActivity.loginSuccess',
-    'pages.loginActivity.logoutSuccess',
-    'pages.loginActivity.unknownUser',
-    'pages.loginActivity.incorrectCredential',
-    'pages.loginActivity.userDisabled',
-    'pages.loginActivity.noAssignedWorkspace',
-    'pages.loginActivity.unknownActivity',
+    'pages.audit.title',
+    'pages.audit.exportCsv',
+    'pages.audit.filters.actorUserId',
+    'pages.audit.filters.action',
+    'pages.audit.filters.targetType',
+    'pages.audit.filters.workspaceId',
+    'pages.audit.filters.dateFrom',
+    'pages.audit.filters.dateTo',
+    'pages.audit.filters.apply',
+    'pages.audit.filters.clear',
+    'pages.audit.columns.time',
+    'pages.audit.columns.actor',
+    'pages.audit.columns.action',
+    'pages.audit.columns.target',
+    'pages.audit.columns.status',
+    'pages.audit.columns.details',
+    'pages.audit.noResults',
     'pages.ssoConfig.enableSsoLogin',
     'pages.ssoConfig.copyCallbackUrl',
     'pages.ssoConfig.tenantId',
@@ -823,7 +825,7 @@ describe('views long-tail i18n coverage', () => {
         expect(workspaceSource).toContain('const { t, i18n } = useTranslation()')
         expect(workspaceSource).toContain("label={t('pages.workspaces.active')}")
         expect(workspaceSource).toContain("t('pages.workspaces.role')")
-        expect(workspaceSource).toContain("t('pages.workspaces.organizationOwner')")
+        expect(workspaceSource).toContain("getFlowOpsRoleLabel('owner', t)")
         expect(workspaceSource).toContain("t('pages.workspaces.personalWorkspace')")
         expect(workspaceSource).toContain("searchPlaceholder={t('pages.workspaces.searchPlaceholder')}")
         expect(workspaceSource).toContain("t('pages.workspaces.noWorkspaces')")
@@ -1264,7 +1266,7 @@ describe('views long-tail i18n coverage', () => {
 
     it('localizes B6 admin residual pages: auth, users, roles, files, logs, and SSO', () => {
         const unauthorizedSource = read('views/auth/unauthorized.jsx')
-        const loginActivitySource = read('views/auth/loginActivity.jsx')
+        const auditSource = read('views/audit/index.jsx')
         const ssoSource = read('views/auth/ssoConfig.jsx')
         const organizationSource = read('views/organization/index.jsx')
         const usersSource = read('views/users/index.jsx')
@@ -1280,21 +1282,19 @@ describe('views long-tail i18n coverage', () => {
         expect(unauthorizedSource).not.toContain('You do not have permission to access this page.')
         expect(unauthorizedSource).not.toContain('Back to Home')
 
-        expect(loginActivitySource).toContain('activityTypes')
-        expect(loginActivitySource).toContain('getActivityDescription(t, item.activityCode)')
-        expect(loginActivitySource).toContain("t('pages.loginActivity.from')")
-        expect(loginActivitySource).toContain("t('pages.loginActivity.to')")
-        expect(loginActivitySource).toContain("t('pages.loginActivity.filterBy')")
-        expect(loginActivitySource).toContain("t('pages.loginActivity.showingRecords'")
-        expect(loginActivitySource).toContain("t('pages.loginActivity.activity')")
-        expect(loginActivitySource).toContain("t('pages.loginActivity.method')")
-        expect(loginActivitySource).toContain("t('pages.loginActivity.message')")
-        expect(loginActivitySource).toContain("t('pages.loginActivity.emailPassword')")
-        expect(loginActivitySource).not.toContain('Login Success')
-        expect(loginActivitySource).not.toContain('Filter By')
-        expect(loginActivitySource).not.toContain('Showing {Math.min')
-        expect(loginActivitySource).not.toContain('<StyledTableCell>Activity</StyledTableCell>')
-        expect(loginActivitySource).not.toContain('Email/Password')
+        expect(auditSource).toContain("t('pages.audit.title')")
+        expect(auditSource).toContain("t('pages.audit.exportCsv')")
+        expect(auditSource).toContain("t('pages.audit.filters.actorUserId')")
+        expect(auditSource).toContain("t('pages.audit.filters.action')")
+        expect(auditSource).toContain("t('pages.audit.filters.targetType')")
+        expect(auditSource).toContain("t('pages.audit.filters.dateFrom')")
+        expect(auditSource).toContain("t('pages.audit.filters.dateTo')")
+        expect(auditSource).toContain("t('pages.audit.columns.time')")
+        expect(auditSource).toContain("t('pages.audit.columns.actor')")
+        expect(auditSource).toContain("t('pages.audit.columns.action')")
+        expect(auditSource).toContain("t('pages.audit.columns.target')")
+        expect(auditSource).toContain("t('pages.audit.columns.status')")
+        expect(auditSource).not.toContain('pages.loginActivity')
 
         expect(ssoSource).toContain("t('pages.ssoConfig.enableSsoLogin')")
         expect(ssoSource).toContain("t('pages.ssoConfig.copyCallbackUrl')")
@@ -1353,7 +1353,7 @@ describe('views long-tail i18n coverage', () => {
         expect(usersSource).toContain("t('pages.users.status')")
         expect(usersSource).toContain("t('pages.users.lastLogin')")
         expect(usersSource).toContain("t('pages.users.never')")
-        expect(usersSource).toContain("t('pages.users.organizationOwner')")
+        expect(usersSource).toContain("getFlowOpsRoleLabel('owner', t)")
         expect(usersSource).toContain("t('pages.users.role')")
         expect(usersSource).toContain('getUserStatusLabel')
         expect(usersSource).not.toContain('Invite User')
@@ -1379,14 +1379,15 @@ describe('views long-tail i18n coverage', () => {
         expect(editUserSource).not.toContain('Account Status')
         expect(editUserSource).not.toContain('Cannot change status of the organization owner!')
 
-        expect(rolesSource).toContain("t('pages.roles.addRole')")
+        expect(rolesSource).toContain("t('pages.roles.searchPlaceholder')")
+        expect(rolesSource).toContain("t('pages.roles.simplifiedDescription')")
         expect(rolesSource).toContain("t('pages.roles.noRoles')")
         expect(rolesSource).toContain("t('pages.roles.assignedUsers')")
-        expect(rolesSource).toContain("t('pages.roles.deleteDisabledTooltip')")
+        expect(rolesSource).toContain('getFlowOpsRoleLabel')
+        expect(rolesSource).toContain('getFlowOpsRoleDescription')
         expect(rolesSource).not.toContain('Add Role')
         expect(rolesSource).not.toContain('No Roles Yet')
         expect(rolesSource).not.toContain('Assigned Users')
-        expect(rolesSource).not.toContain('Remove users with the role from Workspace first')
 
         expect(filesSource).toContain("t('pages.files.deleteTitle')")
         expect(filesSource).toContain("t('pages.files.deleteConfirm'")

@@ -15,6 +15,7 @@ export const SELF_ENTERPRISE_FEATURE_FLAGS = [
     'feat:evaluators',
     'feat:files',
     'feat:login-activity',
+    'feat:audit',
     'feat:users',
     'feat:workspaces',
     'feat:logs',

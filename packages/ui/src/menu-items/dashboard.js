@@ -245,14 +245,14 @@ const dashboard = {
                     permission: 'workspace:view'
                 },
                 {
-                    id: 'login-activity',
-                    title: 'Login Activity',
+                    id: 'audit',
+                    title: 'Audit Logs',
                     type: 'item',
-                    url: '/login-activity',
+                    url: '/audit',
                     icon: icons.IconClipboardList,
                     breadcrumbs: true,
-                    display: 'feat:login-activity',
-                    permission: 'loginActivity:view'
+                    display: 'feat:audit',
+                    permission: 'auditLogs:view'
                 },
                 {
                     id: 'billing',

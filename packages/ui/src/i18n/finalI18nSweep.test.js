@@ -66,10 +66,10 @@ const requiredKeys = [
     'pages.documentStores.deleteStoreLoadersWithVectorConfirm',
     'pages.documentStores.retrievalPlaygroundDescription',
     'pages.documentStores.enterQuery',
-    'pages.roles.invite',
-    'pages.roles.deleteTitle',
-    'pages.roles.deleteConfirm',
-    'pages.roles.deleted',
+    'pages.roles.searchPlaceholder',
+    'pages.roles.simplifiedDescription',
+    'pages.roles.noRoles',
+    'pages.roles.assignedUsers',
     'pages.chatMessage.defaultGreeting',
     'pages.chatMessage.messageStopped',
     'pages.chatMessage.clearHistoryConfirm',
@@ -173,8 +173,12 @@ describe('final i18n sweep coverage', () => {
         expect(agentflowCanvasSource).toContain("title={t('canvas.toggleSnapping')}")
         expect(agentflowNodeSource).toContain("title={t('common.info')}")
         expect(iterationNodeSource).toContain("title={t('common.info')}")
-        expect(rolesSource).toContain("confirmButtonName: t('pages.roles.invite')")
-        expect(rolesSource).toContain("t('pages.roles.deleteConfirm'")
+        expect(rolesSource).toContain("searchPlaceholder={t('pages.roles.searchPlaceholder')}")
+        expect(rolesSource).toContain("description={t('pages.roles.simplifiedDescription')}")
+        expect(rolesSource).toContain("t('pages.roles.noRoles')")
+        expect(rolesSource).toContain("t('pages.roles.assignedUsers')")
+        expect(rolesSource).toContain('getFlowOpsRoleLabel')
+        expect(rolesSource).toContain('getFlowOpsRoleDescription')
         expect(agentflowsSource).toContain("label={t('common.new')}")
         expect(analyticsSource).toContain("t('common.on')")
         expect(marketplaceSource).not.toContain("'Add New Tool'")

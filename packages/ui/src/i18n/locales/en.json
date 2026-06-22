@@ -18,7 +18,7 @@
         "roles": "Roles",
         "users": "Users",
         "workspaces": "Workspaces",
-        "login-activity": "Login Activity",
+        "audit": "Audit Logs",
         "billing": "Billing Management",
         "license": "License Management",
         "support-tickets": "Support Tickets",
@@ -1955,23 +1955,54 @@
             "rowSaveFailed": "Failed to save dataset row: {{message}}",
             "uploadItemsTitle": "Upload Items to [{{name}}] Dataset"
         },
-        "loginActivity": {
-            "title": "Login Activity",
-            "from": "From:",
-            "to": "To:",
-            "filterBy": "Filter By",
-            "showingRecords": "Showing {{start}}-{{end}} of {{total}} Records",
-            "activity": "Activity",
-            "method": "Method",
-            "message": "Message",
-            "emailPassword": "Email/Password",
-            "loginSuccess": "Login Success",
-            "logoutSuccess": "Logout Success",
-            "unknownUser": "Unknown User",
-            "incorrectCredential": "Incorrect Credential",
-            "userDisabled": "User Disabled",
-            "noAssignedWorkspace": "No Assigned Workspace",
-            "unknownActivity": "Unknown Activity"
+        "audit": {
+            "title": "Audit Logs",
+            "exportCsv": "Export CSV",
+            "filters": {
+                "actorUserId": "Actor user ID",
+                "action": "Action",
+                "targetType": "Target type",
+                "workspaceId": "Workspace ID",
+                "dateFrom": "From",
+                "dateTo": "To",
+                "apply": "Apply filters",
+                "clear": "Clear filters",
+                "all": "All"
+            },
+            "columns": {
+                "time": "Time",
+                "actor": "Actor",
+                "action": "Action",
+                "target": "Target",
+                "status": "Status",
+                "details": "Details"
+            },
+            "details": {
+                "before": "Before",
+                "after": "After",
+                "metadata": "Metadata",
+                "ip": "IP address",
+                "userAgent": "User agent"
+            },
+            "status": {
+                "success": "Success",
+                "failure": "Failure"
+            },
+            "actionGroups": {
+                "authentication": "Authentication and invitations",
+                "roles": "Roles",
+                "workspaces": "Workspaces",
+                "workspaceUsers": "Workspace members",
+                "organizationUsers": "Organization users"
+            },
+            "targetTypes": {
+                "user": "User",
+                "role": "Role",
+                "workspace": "Workspace",
+                "workspaceUser": "Workspace member",
+                "organizationUser": "Organization user"
+            },
+            "noResults": "No audit logs match the current filters."
         },
         "ssoConfig": {
             "title": "Configure SSO",

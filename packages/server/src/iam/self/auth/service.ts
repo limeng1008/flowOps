@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs'
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import { randomBytes } from 'crypto'
 import { DataSource, EntityManager } from 'typeorm'
-import { FlowOpsLoginActivity, FlowOpsOrganization, FlowOpsRole, FlowOpsUser, FlowOpsWorkspace, FlowOpsWorkspaceMember } from '../entities'
+import { FlowOpsOrganization, FlowOpsRole, FlowOpsUser, FlowOpsWorkspace, FlowOpsWorkspaceMember } from '../entities'
 import { SELF_ACCESS_TOKEN_COOKIE, SELF_REFRESH_TOKEN_COOKIE, getSelfJwtAuthTokenSecret, getSelfJwtRefreshTokenSecret } from '../secrets'
 import { parsePermissionJson } from '../rbac/permissions'
 import { getSelfEnterpriseFeatures } from '../features'
@@ -11,6 +11,9 @@ import logger from '../../../utils/logger'
 import { isSelfSmtpConfigured, sendSelfMail } from '../email/mailer'
 import { buildInviteEmail, buildResetPasswordEmail } from '../email/templates'
 import { assertCanAddOrganizationUser, assertUserOrganizationsWithinSeatLimit, isOrganizationUser } from '../seats'
+import { FlowOpsAuditService } from '../audit/service'
+import type { AuditActorContext } from '../audit/types'
+import type { FlowOpsAuthenticatedAuditActor } from '../audit/context'
 
 export { FlowOpsAuthError }
 export type { FlowOpsLoggedInUser }
@@ -138,7 +141,11 @@ export const verifySelfRefreshToken = (token: string): SelfAuthTokenPayload => {
 }
 
 export class FlowOpsAuthService {
-    constructor(private readonly dataSource: DataSource) {}
+    private readonly auditService: FlowOpsAuditService
+
+    constructor(private readonly dataSource: DataSource) {
+        this.auditService = new FlowOpsAuditService(dataSource)
+    }
 
     async isFirstAdminSetup(): Promise<boolean> {
         return (await this.dataSource.getRepository(FlowOpsUser).count()) === 0
@@ -160,13 +167,13 @@ export class FlowOpsAuthService {
         }
     }
 
-    async registerAccount(body: RegisterBody): Promise<FlowOpsLoggedInUser> {
+    async registerAccount(body: RegisterBody, requestContext: AuditActorContext): Promise<FlowOpsLoggedInUser> {
         const email = normalizeEmail(body.user?.email)
         const password = getPasswordFromRegisterBody(body)
         if (!email) throw new FlowOpsAuthError(400, 'Email is required')
         if (!password) throw new FlowOpsAuthError(400, 'Password is required')
 
-        return await this.dataSource.transaction(async (manager) => {
+        const registration = await this.dataSource.transaction(async (manager) => {
             const userRepo = manager.getRepository(FlowOpsUser)
             const userCount = await userRepo.count()
 
@@ -199,7 +206,10 @@ export class FlowOpsAuthService {
                         roleId: ownerRole.id
                     })
                 )
-                return await this.getLoggedInUser(savedUser.id, workspace.id, manager)
+                return {
+                    loggedInUser: await this.getLoggedInUser(savedUser.id, workspace.id, manager),
+                    before: null
+                }
             }
 
             const tempToken = body.user?.tempToken?.trim()
@@ -214,6 +224,7 @@ export class FlowOpsAuthService {
             }
             await assertUserOrganizationsWithinSeatLimit(manager, invitedUser.id)
 
+            const before = { name: invitedUser.name ?? null, status: invitedUser.status }
             invitedUser.name = body.user?.name ?? invitedUser.name
             invitedUser.credential = await bcrypt.hash(password, 10)
             invitedUser.status = 'active'
@@ -221,13 +232,34 @@ export class FlowOpsAuthService {
             invitedUser.tokenExpiry = null
             await userRepo.save(invitedUser)
 
-            return await this.getLoggedInUser(invitedUser.id, undefined, manager)
+            return {
+                loggedInUser: await this.getLoggedInUser(invitedUser.id, undefined, manager),
+                before
+            }
         })
+        const user = registration.loggedInUser
+        await this.auditService.recordAuditEvent({
+            ...requestContext,
+            actorUserId: user.id,
+            actorEmail: user.email,
+            action: 'auth.register',
+            targetType: 'user',
+            targetId: user.id,
+            targetName: user.email,
+            organizationId: user.activeOrganizationId,
+            workspaceId: user.activeWorkspaceId,
+            status: 'success',
+            metadata: {
+                before: registration.before,
+                after: { name: user.name, status: user.status ?? 'active' }
+            }
+        })
+        return user
     }
 
     async inviteAccount(
         body: InviteBody,
-        actor: FlowOpsLoggedInUser
+        actor: FlowOpsAuthenticatedAuditActor
     ): Promise<{ tempToken: string; inviteLink: string; user: FlowOpsUser; emailSent: boolean }> {
         if (!actor.isOrganizationAdmin && actor.role !== 'owner' && actor.role !== 'admin') {
             throw new FlowOpsAuthError(403, 'Forbidden')
@@ -283,7 +315,13 @@ export class FlowOpsAuthService {
                 tempToken,
                 inviteLink: authLink('/register', tempToken),
                 user,
-                workspaceName: workspace.name
+                workspaceId: workspace.id,
+                workspaceName: workspace.name,
+                organizationId: workspace.organizationId,
+                roleId: role.id,
+                roleName: role.name,
+                existingUser: Boolean(existing),
+                existingMembership: Boolean(existingMember)
             }
         })
 
@@ -291,36 +329,77 @@ export class FlowOpsAuthService {
             buildInviteEmail({ inviteLink: result.inviteLink, inviterName: actor.name, workspaceName: result.workspaceName })
         )
 
+        await this.auditService.recordAuditEvent({
+            ...actor,
+            action: 'user.invite',
+            targetType: 'user',
+            targetId: result.user.id,
+            targetName: result.user.email,
+            organizationId: result.organizationId,
+            workspaceId: result.workspaceId,
+            status: 'success',
+            metadata: {
+                before: {
+                    existingUser: result.existingUser,
+                    existingMembership: result.existingMembership
+                },
+                after: {
+                    status: result.user.status,
+                    roleId: result.roleId,
+                    roleName: result.roleName,
+                    workspaceName: result.workspaceName,
+                    emailSent
+                }
+            }
+        })
+
         return { tempToken: result.tempToken, inviteLink: result.inviteLink, user: result.user, emailSent }
     }
 
-    async login(body: LoginBody): Promise<FlowOpsLoggedInUser> {
+    async login(body: LoginBody, requestContext: AuditActorContext): Promise<FlowOpsLoggedInUser> {
         const email = normalizeEmail(body.email)
         const password = body.password ?? ''
         const userRepo = this.dataSource.getRepository(FlowOpsUser)
         const user = email ? await userRepo.findOneBy({ email }) : null
         if (!user) {
-            await this.recordLoginActivity(null, '-1', undefined, 'Unknown user')
+            await this.recordLoginEvent(requestContext, null, email, '-1', 'UNKNOWN_USER')
             throw new FlowOpsAuthError(401, 'Incorrect Email or Password')
         }
         if (user.status === 'disabled' || user.status === 'inactive') {
-            await this.recordLoginActivity(user.id, '-3', undefined, 'User disabled')
+            await this.recordLoginEvent(requestContext, user, user.email, '-3', 'USER_DISABLED')
             throw new FlowOpsAuthError(401, 'User disabled')
         }
         if (!user.credential || !(await bcrypt.compare(password, user.credential))) {
-            await this.recordLoginActivity(user.id, '-2', undefined, 'Incorrect credential')
+            await this.recordLoginEvent(requestContext, user, user.email, '-2', 'INVALID_CREDENTIAL')
             throw new FlowOpsAuthError(401, 'Incorrect Email or Password')
         }
 
         const loggedInUser = await this.getLoggedInUser(user.id)
         if (!loggedInUser.activeWorkspaceId) {
-            await this.recordLoginActivity(user.id, '-4', undefined, 'No assigned workspace')
+            await this.recordLoginEvent(requestContext, user, user.email, '-4', 'NO_ASSIGNED_WORKSPACE')
             throw new FlowOpsAuthError(401, 'No Workspace Assigned')
         }
 
+        const previousLastLogin = user.lastLogin ?? null
         user.lastLogin = new Date()
         await userRepo.save(user)
-        await this.recordLoginActivity(user.id, '0', undefined, 'Login Successful')
+        await this.auditService.recordAuditEvent({
+            ...requestContext,
+            actorUserId: user.id,
+            actorEmail: user.email,
+            action: 'auth.login',
+            targetType: 'user',
+            targetId: user.id,
+            targetName: user.email,
+            organizationId: loggedInUser.activeOrganizationId,
+            workspaceId: loggedInUser.activeWorkspaceId,
+            status: 'success',
+            metadata: {
+                legacyActivityCode: '0',
+                before: { lastLogin: previousLastLogin },
+                after: { lastLogin: user.lastLogin }
+            }
+        })
 
         return {
             ...loggedInUser,
@@ -351,7 +430,7 @@ export class FlowOpsAuthService {
         return { success: true, emailSent: false, tempToken, resetLink }
     }
 
-    async resetPassword(body: ResetPasswordBody): Promise<{ success: true }> {
+    async resetPassword(body: ResetPasswordBody, requestContext: AuditActorContext): Promise<{ success: true }> {
         const email = normalizeEmail(body.user?.email)
         const tempToken = body.user?.tempToken?.trim()
         const password = body.user?.password ?? ''
@@ -362,14 +441,42 @@ export class FlowOpsAuthService {
         const userRepo = this.dataSource.getRepository(FlowOpsUser)
         const user = await userRepo.findOneBy({ email, tempToken })
         if (!user || (user.tokenExpiry && user.tokenExpiry.getTime() < Date.now())) {
+            await this.auditService.recordAuditEvent({
+                ...requestContext,
+                actorUserId: null,
+                actorEmail: null,
+                action: 'auth.passwordReset',
+                targetType: 'user',
+                targetId: null,
+                targetName: email,
+                organizationId: null,
+                workspaceId: null,
+                status: 'failure',
+                metadata: { reason: 'INVALID_OR_EXPIRED_TOKEN' }
+            })
             throw new FlowOpsAuthError(403, 'Invalid reset token')
         }
 
+        const before = { status: user.status }
         user.credential = await bcrypt.hash(password, 10)
         user.tempToken = null
         user.tokenExpiry = null
         if (user.status === 'invited') user.status = 'active'
         await userRepo.save(user)
+        const scope = await this.getUserAuditScope(user.id)
+        await this.auditService.recordAuditEvent({
+            ...requestContext,
+            actorUserId: user.id,
+            actorEmail: user.email,
+            action: 'auth.passwordReset',
+            targetType: 'user',
+            targetId: user.id,
+            targetName: user.email,
+            organizationId: scope.organizationId,
+            workspaceId: scope.workspaceId,
+            status: 'success',
+            metadata: { before, after: { status: user.status, resetTokenConsumed: true } }
+        })
         return { success: true }
     }
 
@@ -382,8 +489,26 @@ export class FlowOpsAuthService {
         return { success: true, enabled: false }
     }
 
-    async logout(userId?: string): Promise<{ success: true }> {
-        if (userId) await this.recordLoginActivity(userId, '1', undefined, 'Logout Successful')
+    async logout(userId: string | undefined, requestContext: AuditActorContext): Promise<{ success: true }> {
+        if (userId) {
+            const user = await this.dataSource.getRepository(FlowOpsUser).findOneBy({ id: userId })
+            if (user) {
+                const scope = await this.getUserAuditScope(user.id)
+                await this.auditService.recordAuditEvent({
+                    ...requestContext,
+                    actorUserId: user.id,
+                    actorEmail: user.email,
+                    action: 'auth.logout',
+                    targetType: 'user',
+                    targetId: user.id,
+                    targetName: user.email,
+                    organizationId: scope.organizationId,
+                    workspaceId: scope.workspaceId,
+                    status: 'success',
+                    metadata: { legacyActivityCode: '1' }
+                })
+            }
+        }
         return { success: true }
     }
 
@@ -442,15 +567,34 @@ export class FlowOpsAuthService {
         return role
     }
 
-    private async recordLoginActivity(userId: string | null, activityCode: string, ip?: string, message?: string): Promise<void> {
-        const repo = this.dataSource.getRepository(FlowOpsLoginActivity)
-        await repo.save(
-            repo.create({
-                userId,
-                activityCode,
-                ip,
-                message
-            })
-        )
+    private async recordLoginEvent(
+        requestContext: AuditActorContext,
+        user: FlowOpsUser | null,
+        attemptedEmail: string,
+        legacyActivityCode: '-1' | '-2' | '-3' | '-4',
+        reason: 'UNKNOWN_USER' | 'INVALID_CREDENTIAL' | 'USER_DISABLED' | 'NO_ASSIGNED_WORKSPACE'
+    ): Promise<void> {
+        const scope = user ? await this.getUserAuditScope(user.id) : {}
+        await this.auditService.recordAuditEvent({
+            ...requestContext,
+            actorUserId: user?.id ?? null,
+            actorEmail: user?.email ?? null,
+            action: 'auth.loginFailed',
+            targetType: 'user',
+            targetId: user?.id ?? null,
+            targetName: attemptedEmail,
+            organizationId: scope.organizationId ?? null,
+            workspaceId: scope.workspaceId ?? null,
+            status: 'failure',
+            metadata: { legacyActivityCode, reason }
+        })
+    }
+
+    private async getUserAuditScope(userId: string): Promise<{ organizationId?: string; workspaceId?: string }> {
+        const membership = (await this.dataSource.getRepository(FlowOpsWorkspaceMember).findBy({ userId }))[0]
+        if (!membership) return {}
+        const workspace = await this.dataSource.getRepository(FlowOpsWorkspace).findOneBy({ id: membership.workspaceId })
+        if (!workspace) return {}
+        return { organizationId: workspace.organizationId, workspaceId: workspace.id }
     }
 }

@@ -27,6 +27,7 @@ import { SupportTicket } from './SupportTicket'
 import { Entitlement } from './Entitlement'
 import { EntitlementUsage } from './EntitlementUsage'
 import {
+    FlowOpsAuditLog,
     FlowOpsLoginActivity,
     FlowOpsOrganization,
     FlowOpsRole,
@@ -66,6 +67,7 @@ export const entities = {
     SupportTicket,
     Entitlement,
     EntitlementUsage,
+    FlowOpsAuditLog,
     FlowOpsUser,
     FlowOpsOrganization,
     FlowOpsWorkspace,

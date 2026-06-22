@@ -1,13 +1,32 @@
 import { describe, expect, it, beforeEach, afterEach } from '@jest/globals'
 import type { DataSource } from 'typeorm'
 import { ChatFlow } from '../../../database/entities/ChatFlow'
-import { FlowOpsLoginActivity, FlowOpsOrganization, FlowOpsRole, FlowOpsUser, FlowOpsWorkspace, FlowOpsWorkspaceMember } from '../entities'
+import {
+    FlowOpsAuditLog,
+    FlowOpsLoginActivity,
+    FlowOpsOrganization,
+    FlowOpsRole,
+    FlowOpsUser,
+    FlowOpsWorkspace,
+    FlowOpsWorkspaceMember
+} from '../entities'
 import { FlowOpsAuthService } from '../auth/service'
+import { FlowOpsLoggedInUser } from '../auth/types'
+import { FlowOpsAuthenticatedAuditActor } from '../audit/context'
 import { FlowOpsAdminService } from './service'
 import { ALL_SELF_PERMISSIONS, BUILTIN_SELF_ROLE_PERMISSIONS, MEMBER_SELF_PERMISSIONS } from '../rbac/permissions'
 import { getWorkspaceSearchOptions } from '../workspace/query'
 
-const entities = [FlowOpsUser, FlowOpsOrganization, FlowOpsWorkspace, FlowOpsWorkspaceMember, FlowOpsRole, FlowOpsLoginActivity, ChatFlow]
+const entities = [
+    FlowOpsUser,
+    FlowOpsOrganization,
+    FlowOpsWorkspace,
+    FlowOpsWorkspaceMember,
+    FlowOpsRole,
+    FlowOpsLoginActivity,
+    FlowOpsAuditLog,
+    ChatFlow
+]
 
 const makeInMemoryDataSource = (): DataSource => {
     const tables = new Map<unknown, any[]>()
@@ -134,6 +153,93 @@ describe('FlowOpsAdminService', () => {
     let authService: FlowOpsAuthService
     let adminService: FlowOpsAdminService
 
+    const requestContext = {
+        actorUserId: 'owner-user',
+        actorEmail: 'owner@example.com',
+        ip: '10.0.0.8',
+        userAgent: 'FlowOps admin test'
+    }
+
+    const withAuditContext = <T extends FlowOpsLoggedInUser>(actor: T): FlowOpsAuthenticatedAuditActor => ({
+        ...actor,
+        actorUserId: actor.id,
+        actorEmail: actor.email,
+        ip: requestContext.ip,
+        userAgent: requestContext.userAgent
+    })
+
+    const defaultActor: FlowOpsAuthenticatedAuditActor = withAuditContext({
+        id: requestContext.actorUserId,
+        email: requestContext.actorEmail,
+        name: 'Owner',
+        status: 'active',
+        role: 'owner',
+        isSSO: false,
+        activeOrganizationId: 'organization-1',
+        activeOrganizationSubscriptionId: '',
+        activeOrganizationCustomerId: '',
+        activeOrganizationProductId: '',
+        activeWorkspaceId: 'workspace-1',
+        activeWorkspace: 'Default Workspace',
+        isOrganizationAdmin: true,
+        assignedWorkspaces: [],
+        permissions: ['*'],
+        features: {}
+    })
+
+    const auditActor = (actor: FlowOpsLoggedInUser | FlowOpsAuthenticatedAuditActor = defaultActor): FlowOpsAuthenticatedAuditActor =>
+        'actorUserId' in actor ? actor : withAuditContext(actor)
+
+    const registerAccount = (body: Parameters<FlowOpsAuthService['registerAccount']>[0], context = requestContext) =>
+        authService['registerAccount'](body, context)
+    const inviteAccount = (
+        body: Parameters<FlowOpsAuthService['inviteAccount']>[0],
+        actor: FlowOpsLoggedInUser | FlowOpsAuthenticatedAuditActor
+    ) => authService['inviteAccount'](body, auditActor(actor))
+    const createRole = (
+        body: Parameters<FlowOpsAdminService['createRole']>[0],
+        actor: FlowOpsLoggedInUser | FlowOpsAuthenticatedAuditActor = defaultActor
+    ) => adminService['createRole'](body, auditActor(actor))
+    const updateRole = (
+        body: Parameters<FlowOpsAdminService['updateRole']>[0],
+        actor: FlowOpsLoggedInUser | FlowOpsAuthenticatedAuditActor = defaultActor
+    ) => adminService['updateRole'](body, auditActor(actor))
+    const deleteRole = (id: string, actor: FlowOpsLoggedInUser | FlowOpsAuthenticatedAuditActor = defaultActor) =>
+        adminService['deleteRole'](id, auditActor(actor))
+    const createWorkspace = (
+        body: Parameters<FlowOpsAdminService['createWorkspace']>[0],
+        actor: FlowOpsLoggedInUser | FlowOpsAuthenticatedAuditActor = defaultActor
+    ) => adminService['createWorkspace'](body, auditActor(actor))
+    const updateWorkspace = (
+        body: Parameters<FlowOpsAdminService['updateWorkspace']>[0],
+        actor: FlowOpsLoggedInUser | FlowOpsAuthenticatedAuditActor = defaultActor
+    ) => adminService['updateWorkspace'](body, auditActor(actor))
+    const deleteWorkspace = (id: string, actor: FlowOpsLoggedInUser | FlowOpsAuthenticatedAuditActor = defaultActor) =>
+        adminService['deleteWorkspace'](id, auditActor(actor))
+    const updateWorkspaceUserRole = (
+        body: Parameters<FlowOpsAdminService['updateWorkspaceUserRole']>[0],
+        actor: FlowOpsLoggedInUser | FlowOpsAuthenticatedAuditActor = defaultActor
+    ) => adminService['updateWorkspaceUserRole'](body, auditActor(actor))
+    const deleteWorkspaceUser = (
+        workspaceId: string,
+        userId: string,
+        actor: FlowOpsLoggedInUser | FlowOpsAuthenticatedAuditActor = defaultActor
+    ) => adminService['deleteWorkspaceUser'](workspaceId, userId, auditActor(actor))
+    const updateOrganizationUser = (
+        body: Parameters<FlowOpsAdminService['updateOrganizationUser']>[0],
+        actor: FlowOpsLoggedInUser | FlowOpsAuthenticatedAuditActor = defaultActor
+    ) => adminService['updateOrganizationUser'](body, auditActor(actor))
+    const deleteOrganizationUser = (
+        organizationId: string,
+        userId: string,
+        actor: FlowOpsLoggedInUser | FlowOpsAuthenticatedAuditActor = defaultActor
+    ) => adminService['deleteOrganizationUser'](organizationId, userId, auditActor(actor))
+
+    const auditRows = async () => {
+        const rows = await dataSource.getRepository(FlowOpsAuditLog).find()
+        return rows.map((row) => ({ ...row, metadata: JSON.parse(row.metadata) }))
+    }
+
     beforeEach(async () => {
         process.env.JWT_AUTH_TOKEN_SECRET = 'test-access-secret'
         process.env.JWT_REFRESH_TOKEN_SECRET = 'test-refresh-secret'
@@ -151,17 +257,17 @@ describe('FlowOpsAdminService', () => {
     })
 
     it('returns builtin role permissions for owner, admin, and member sessions', async () => {
-        const owner = await authService.registerAccount({
+        const owner = await registerAccount({
             user: { name: 'Owner', email: 'owner@example.com', credential: 'Password1!' }
         })
         expect(owner.permissions).toEqual(ALL_SELF_PERMISSIONS)
         expect(owner.isOrganizationAdmin).toBe(true)
 
-        const adminInvite = await authService.inviteAccount(
+        const adminInvite = await inviteAccount(
             { email: 'admin@example.com', roleName: 'admin', workspaceId: owner.activeWorkspaceId },
             owner
         )
-        const admin = await authService.registerAccount({
+        const admin = await registerAccount({
             user: { name: 'Admin', email: 'admin@example.com', credential: 'Password1!', tempToken: adminInvite.tempToken }
         })
         expect(admin.role).toBe('admin')
@@ -170,11 +276,11 @@ describe('FlowOpsAdminService', () => {
         expect(admin.permissions).toContain('workspace:create')
         expect(admin.permissions).not.toContain('sso:manage')
 
-        const memberInvite = await authService.inviteAccount(
+        const memberInvite = await inviteAccount(
             { email: 'member@example.com', roleName: 'member', workspaceId: owner.activeWorkspaceId },
             owner
         )
-        const member = await authService.registerAccount({
+        const member = await registerAccount({
             user: { name: 'Member', email: 'member@example.com', credential: 'Password1!', tempToken: memberInvite.tempToken }
         })
         expect(member.role).toBe('member')
@@ -183,7 +289,7 @@ describe('FlowOpsAdminService', () => {
     })
 
     it('protects builtin role names and supports custom role CRUD', async () => {
-        const custom = await adminService.createRole({
+        const custom = await createRole({
             name: 'analyst',
             description: 'Can inspect chatflows',
             permissions: JSON.stringify(['chatflows:view'])
@@ -193,26 +299,26 @@ describe('FlowOpsAdminService', () => {
         const roles = await adminService.listRoles()
         const ownerRole = roles.find((role) => role.name === 'owner')!
 
-        await expect(adminService.updateRole({ id: ownerRole.id, name: 'renamed-owner' })).rejects.toMatchObject({
+        await expect(updateRole({ id: ownerRole.id, name: 'renamed-owner' })).rejects.toMatchObject({
             statusCode: 400,
             message: 'Built-in role names cannot be changed'
         })
-        await expect(adminService.deleteRole(ownerRole.id)).rejects.toMatchObject({
+        await expect(deleteRole(ownerRole.id)).rejects.toMatchObject({
             statusCode: 400,
             message: 'Built-in roles cannot be deleted'
         })
 
-        const updated = await adminService.updateRole({ id: custom.id, name: 'analyst', permissions: JSON.stringify(['chatflows:view']) })
+        const updated = await updateRole({ id: custom.id, name: 'analyst', permissions: JSON.stringify(['chatflows:view']) })
         expect(updated.permissions).toBe(JSON.stringify(['chatflows:view']))
-        await expect(adminService.deleteRole(custom.id)).resolves.toMatchObject({ success: true })
+        await expect(deleteRole(custom.id)).resolves.toMatchObject({ success: true })
     })
 
     it('switches workspaces, scopes workspace queries, and rejects unassigned workspaces', async () => {
-        const owner = await authService.registerAccount({
+        const owner = await registerAccount({
             user: { name: 'Owner', email: 'owner@example.com', credential: 'Password1!' }
         })
         const defaultWorkspaceId = owner.activeWorkspaceId!
-        const researchWorkspace = await adminService.createWorkspace(
+        const researchWorkspace = await createWorkspace(
             {
                 name: 'Research',
                 description: 'Private research workspace',
@@ -234,11 +340,11 @@ describe('FlowOpsAdminService', () => {
             expect.objectContaining({ id: 'chatflow-b' })
         ])
 
-        const memberInvite = await authService.inviteAccount(
+        const memberInvite = await inviteAccount(
             { email: 'member@example.com', roleName: 'member', workspaceId: defaultWorkspaceId },
             owner
         )
-        const member = await authService.registerAccount({
+        const member = await registerAccount({
             user: { name: 'Member', email: 'member@example.com', credential: 'Password1!', tempToken: memberInvite.tempToken }
         })
         await expect(adminService.switchWorkspace(researchWorkspace.id, member)).rejects.toMatchObject({
@@ -248,14 +354,14 @@ describe('FlowOpsAdminService', () => {
     })
 
     it('lists organization users and updates workspace roles', async () => {
-        const owner = await authService.registerAccount({
+        const owner = await registerAccount({
             user: { name: 'Owner', email: 'owner@example.com', credential: 'Password1!' }
         })
-        const memberInvite = await authService.inviteAccount(
+        const memberInvite = await inviteAccount(
             { email: 'member@example.com', roleName: 'member', workspaceId: owner.activeWorkspaceId },
             owner
         )
-        const member = await authService.registerAccount({
+        const member = await registerAccount({
             user: { name: 'Member', email: 'member@example.com', credential: 'Password1!', tempToken: memberInvite.tempToken }
         })
         const adminRole = (await adminService.listRoles()).find((role) => role.name === 'admin')!
@@ -268,7 +374,7 @@ describe('FlowOpsAdminService', () => {
             ])
         )
 
-        await adminService.updateWorkspaceUserRole({
+        await updateWorkspaceUserRole({
             userId: member.id,
             workspaceId: owner.activeWorkspaceId,
             roleId: adminRole.id
@@ -277,24 +383,24 @@ describe('FlowOpsAdminService', () => {
         expect(promotedMember.role).toBe('admin')
 
         // 护栏:member 当前只在一个工作区,删除其最后一个工作区应被拒
-        await expect(adminService.deleteWorkspaceUser(owner.activeWorkspaceId!, member.id)).rejects.toMatchObject({
+        await expect(deleteWorkspaceUser(owner.activeWorkspaceId!, member.id)).rejects.toMatchObject({
             statusCode: 400,
             message: "Cannot remove the user's last workspace"
         })
 
         // upsert:updateWorkspaceUserRole 对不存在的成员应「新增」(把 member 加入第二个工作区)
-        const secondWorkspace = await adminService.createWorkspace({ name: 'Second', organizationId: owner.activeOrganizationId }, owner)
+        const secondWorkspace = await createWorkspace({ name: 'Second', organizationId: owner.activeOrganizationId }, owner)
         const memberRole = (await adminService.listRoles()).find((role) => role.name === 'member')!
-        await adminService.updateWorkspaceUserRole({ userId: member.id, workspaceId: secondWorkspace.id, roleId: memberRole.id })
+        await updateWorkspaceUserRole({ userId: member.id, workspaceId: secondWorkspace.id, roleId: memberRole.id })
         await expect(adminService.listWorkspacesByUserId(member.id)).resolves.toHaveLength(2)
 
         // 现在 member 有两个工作区,移除其中一个应成功
-        await expect(adminService.deleteWorkspaceUser(owner.activeWorkspaceId!, member.id)).resolves.toMatchObject({ success: true })
+        await expect(deleteWorkspaceUser(owner.activeWorkspaceId!, member.id)).resolves.toMatchObject({ success: true })
         await expect(adminService.listWorkspaceUsers(owner.activeWorkspaceId!)).resolves.toHaveLength(1)
         await expect(adminService.listWorkspacesByUserId(member.id)).resolves.toHaveLength(1)
 
         // 护栏:组织 owner 不可被移出工作区
-        await expect(adminService.deleteWorkspaceUser(owner.activeWorkspaceId!, owner.id)).rejects.toMatchObject({
+        await expect(deleteWorkspaceUser(owner.activeWorkspaceId!, owner.id)).rejects.toMatchObject({
             statusCode: 400,
             message: 'Organization owner cannot be removed from a workspace'
         })
@@ -302,7 +408,7 @@ describe('FlowOpsAdminService', () => {
 
     it('reports the real organization user usage and free tier seat limit', async () => {
         delete process.env.FLOWOPS_LOCAL_COMMERCIAL
-        const owner = await authService.registerAccount({
+        const owner = await registerAccount({
             user: { name: 'Owner', email: 'owner@example.com', credential: 'Password1!' }
         })
 
@@ -318,7 +424,7 @@ describe('FlowOpsAdminService', () => {
 
     it('blocks adding a new organization user above the free tier seat limit', async () => {
         delete process.env.FLOWOPS_LOCAL_COMMERCIAL
-        const owner = await authService.registerAccount({
+        const owner = await registerAccount({
             user: { name: 'Owner', email: 'owner@example.com', credential: 'Password1!' }
         })
         const workspace = await dataSource.getRepository(FlowOpsWorkspace).save({
@@ -333,7 +439,7 @@ describe('FlowOpsAdminService', () => {
         })
 
         await expect(
-            adminService.updateWorkspaceUserRole({
+            updateWorkspaceUserRole({
                 userId: externalUser.id,
                 workspaceId: workspace.id,
                 roleId: memberRole.id
@@ -346,7 +452,7 @@ describe('FlowOpsAdminService', () => {
 
     it('allows an existing organization user to join another workspace without consuming another seat', async () => {
         delete process.env.FLOWOPS_LOCAL_COMMERCIAL
-        const owner = await authService.registerAccount({
+        const owner = await registerAccount({
             user: { name: 'Owner', email: 'owner@example.com', credential: 'Password1!' }
         })
         const workspace = await dataSource.getRepository(FlowOpsWorkspace).save({
@@ -356,7 +462,7 @@ describe('FlowOpsAdminService', () => {
         const ownerRole = (await adminService.listRoles()).find((role) => role.name === 'owner')!
 
         await expect(
-            adminService.updateWorkspaceUserRole({
+            updateWorkspaceUserRole({
                 userId: owner.id,
                 workspaceId: workspace.id,
                 roleId: ownerRole.id
@@ -372,14 +478,14 @@ describe('FlowOpsAdminService', () => {
     })
 
     it('treats local commercial deployments as unlimited seats', async () => {
-        const owner = await authService.registerAccount({
+        const owner = await registerAccount({
             user: { name: 'Owner', email: 'owner@example.com', credential: 'Password1!' }
         })
-        const memberInvite = await authService.inviteAccount(
+        const memberInvite = await inviteAccount(
             { email: 'member@example.com', roleName: 'member', workspaceId: owner.activeWorkspaceId },
             owner
         )
-        await authService.registerAccount({
+        await registerAccount({
             user: { name: 'Member', email: 'member@example.com', credential: 'Password1!', tempToken: memberInvite.tempToken }
         })
 
@@ -391,5 +497,173 @@ describe('FlowOpsAdminService', () => {
             quantity: 0,
             totalOrgUsers: 2
         })
+    })
+
+    it('audits role create, update, and delete with actor and before/after differences', async () => {
+        const owner = withAuditContext(
+            await registerAccount({ user: { name: 'Owner', email: 'owner@example.com', credential: 'Password1!' } }, requestContext)
+        )
+        const created = await createRole({ name: 'analyst', description: 'Read flows', permissions: ['chatflows:view'] }, owner)
+        await updateRole(
+            { id: created.id, name: 'reviewer', description: 'Review flows', permissions: ['chatflows:view', 'chatflows:update'] },
+            owner
+        )
+        await deleteRole(created.id, owner)
+
+        expect((await auditRows()).filter((row) => row.action.startsWith('role.'))).toEqual([
+            expect.objectContaining({
+                action: 'role.create',
+                actorUserId: owner.id,
+                actorEmail: owner.email,
+                targetId: created.id,
+                targetName: 'analyst',
+                organizationId: owner.activeOrganizationId,
+                status: 'success',
+                ip: requestContext.ip,
+                userAgent: requestContext.userAgent,
+                metadata: expect.objectContaining({ after: expect.objectContaining({ name: 'analyst' }) })
+            }),
+            expect.objectContaining({
+                action: 'role.update',
+                targetName: 'reviewer',
+                metadata: expect.objectContaining({
+                    before: expect.objectContaining({ name: 'analyst', permissions: ['chatflows:view'] }),
+                    after: expect.objectContaining({ name: 'reviewer', permissions: ['chatflows:update', 'chatflows:view'] }),
+                    permissionsAdded: ['chatflows:update'],
+                    permissionsRemoved: []
+                })
+            }),
+            expect.objectContaining({
+                action: 'role.delete',
+                targetName: 'reviewer',
+                metadata: expect.objectContaining({ before: expect.objectContaining({ name: 'reviewer' }), after: null })
+            })
+        ])
+    })
+
+    it('audits workspace create, update, and delete from database-backed targets', async () => {
+        const owner = withAuditContext(
+            await registerAccount({ user: { name: 'Owner', email: 'owner@example.com', credential: 'Password1!' } }, requestContext)
+        )
+        const workspace = await createWorkspace({ name: 'Research', description: 'Initial', organizationId: 'body-must-not-win' }, owner)
+        await updateWorkspace({ id: workspace.id, name: 'Research Lab', description: 'Updated' }, owner)
+        await deleteWorkspace(workspace.id, owner)
+
+        const rows = (await auditRows()).filter((row) => row.action.startsWith('workspace.'))
+        expect(rows).toEqual([
+            expect.objectContaining({
+                action: 'workspace.create',
+                targetId: workspace.id,
+                targetName: 'Research',
+                organizationId: owner.activeOrganizationId,
+                workspaceId: workspace.id
+            }),
+            expect.objectContaining({
+                action: 'workspace.update',
+                targetName: 'Research Lab',
+                metadata: expect.objectContaining({
+                    before: expect.objectContaining({ name: 'Research', description: 'Initial' }),
+                    after: expect.objectContaining({ name: 'Research Lab', description: 'Updated' })
+                })
+            }),
+            expect.objectContaining({
+                action: 'workspace.delete',
+                targetName: 'Research Lab',
+                metadata: expect.objectContaining({ before: expect.objectContaining({ userCount: 1 }), after: null })
+            })
+        ])
+    })
+
+    it('distinguishes workspace member add and role change, then audits deletion', async () => {
+        const owner = withAuditContext(
+            await registerAccount({ user: { name: 'Owner', email: 'owner@example.com', credential: 'Password1!' } }, requestContext)
+        )
+        const invite = await inviteAccount({ email: 'member@example.com', roleName: 'member', workspaceId: owner.activeWorkspaceId }, owner)
+        const member = await registerAccount(
+            { user: { name: 'Member', email: 'member@example.com', credential: 'Password1!', tempToken: invite.tempToken } },
+            requestContext
+        )
+        const secondWorkspace = await createWorkspace({ name: 'Second' }, owner)
+        const memberRole = (await adminService.listRoles()).find((role) => role.name === 'member')!
+        const adminRole = (await adminService.listRoles()).find((role) => role.name === 'admin')!
+
+        const membership = await updateWorkspaceUserRole(
+            { userId: member.id, workspaceId: secondWorkspace.id, roleId: memberRole.id },
+            owner
+        )
+        await updateWorkspaceUserRole({ userId: member.id, workspaceId: secondWorkspace.id, roleId: adminRole.id }, owner)
+        await deleteWorkspaceUser(secondWorkspace.id, member.id, owner)
+
+        expect((await auditRows()).filter((row) => row.action.startsWith('workspaceUser.'))).toEqual([
+            expect.objectContaining({
+                action: 'workspaceUser.add',
+                targetId: membership.id,
+                targetName: member.email,
+                organizationId: owner.activeOrganizationId,
+                workspaceId: secondWorkspace.id,
+                metadata: expect.objectContaining({ before: null, after: expect.objectContaining({ roleName: 'member' }) })
+            }),
+            expect.objectContaining({
+                action: 'workspaceUser.roleChange',
+                targetId: membership.id,
+                metadata: expect.objectContaining({
+                    before: expect.objectContaining({ roleName: 'member' }),
+                    after: expect.objectContaining({ roleName: 'admin' })
+                })
+            }),
+            expect.objectContaining({
+                action: 'workspaceUser.delete',
+                targetId: membership.id,
+                targetName: member.email,
+                metadata: expect.objectContaining({ before: expect.objectContaining({ roleName: 'admin' }), after: null })
+            })
+        ])
+    })
+
+    it('audits organization user status updates and deletion without trusting the body for organization scope', async () => {
+        const owner = withAuditContext(
+            await registerAccount({ user: { name: 'Owner', email: 'owner@example.com', credential: 'Password1!' } }, requestContext)
+        )
+        const invite = await inviteAccount({ email: 'member@example.com', roleName: 'member', workspaceId: owner.activeWorkspaceId }, owner)
+        const member = await registerAccount(
+            { user: { name: 'Member', email: 'member@example.com', credential: 'Password1!', tempToken: invite.tempToken } },
+            requestContext
+        )
+
+        await updateOrganizationUser({ userId: member.id, status: 'disabled' }, owner)
+        await deleteOrganizationUser(owner.activeOrganizationId, member.id, owner)
+
+        expect((await auditRows()).filter((row) => row.action.startsWith('organizationUser.'))).toEqual([
+            expect.objectContaining({
+                action: 'organizationUser.update',
+                targetId: member.id,
+                targetName: member.email,
+                organizationId: owner.activeOrganizationId,
+                metadata: expect.objectContaining({ before: { status: 'active' }, after: { status: 'disabled' } })
+            }),
+            expect.objectContaining({
+                action: 'organizationUser.delete',
+                targetId: member.id,
+                targetName: member.email,
+                organizationId: owner.activeOrganizationId,
+                metadata: expect.objectContaining({
+                    before: expect.objectContaining({ status: 'disabled', workspaceIds: [owner.activeWorkspaceId] }),
+                    after: null
+                })
+            })
+        ])
+    })
+
+    it('does not record success for rejected guards and keeps the main write successful when audit persistence fails', async () => {
+        const owner = withAuditContext(
+            await registerAccount({ user: { name: 'Owner', email: 'owner@example.com', credential: 'Password1!' } }, requestContext)
+        )
+        const builtin = (await adminService.listRoles()).find((role) => role.name === 'owner')!
+        await expect(deleteRole(builtin.id, owner)).rejects.toMatchObject({ statusCode: 400 })
+        expect((await auditRows()).some((row) => row.action === 'role.delete' && row.targetId === builtin.id)).toBe(false)
+
+        dataSource.getRepository(FlowOpsAuditLog).save = jest.fn(() => Promise.reject(new Error('audit unavailable'))) as any
+        await expect(createRole({ name: 'operator' }, owner)).resolves.toMatchObject({ name: 'operator' })
+        await expect(adminService.getRoleByName('operator')).resolves.toMatchObject({ name: 'operator' })
     })
 })

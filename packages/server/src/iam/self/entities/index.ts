@@ -1,3 +1,4 @@
+export { FlowOpsAuditLog } from './FlowOpsAuditLog'
 export { FlowOpsLoginActivity } from './FlowOpsLoginActivity'
 export { FlowOpsOrganization } from './FlowOpsOrganization'
 export { FlowOpsRole } from './FlowOpsRole'

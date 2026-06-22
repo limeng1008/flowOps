@@ -1,4 +1,5 @@
 import { lazy } from 'react'
+import { Navigate } from 'react-router-dom'
 
 // project imports
 import MainLayout from '@/layout/MainLayout'
@@ -73,7 +74,7 @@ const Executions = Loadable(lazy(() => import('@/views/agentexecutions')))
 // enterprise features
 const UsersPage = Loadable(lazy(() => import('@/views/users')))
 const RolesPage = Loadable(lazy(() => import('@/views/roles')))
-const LoginActivityPage = Loadable(lazy(() => import('@/views/auth/loginActivity')))
+const AuditPage = Loadable(lazy(() => import('@/views/audit')))
 const Workspaces = Loadable(lazy(() => import('@/views/workspace')))
 const WorkspaceDetails = Loadable(lazy(() => import('@/views/workspace/WorkspaceUsers')))
 const SSOConfig = Loadable(lazy(() => import('@/views/auth/ssoConfig')))
@@ -342,12 +343,16 @@ const MainRoutes = {
             )
         },
         {
-            path: '/login-activity',
+            path: '/audit',
             element: (
-                <RequireAuth permission={'loginActivity:view'} display={'feat:login-activity'}>
-                    <LoginActivityPage />
+                <RequireAuth permission={'auditLogs:view'} display={'feat:audit'}>
+                    <AuditPage />
                 </RequireAuth>
             )
+        },
+        {
+            path: '/login-activity',
+            element: <Navigate to='/audit?action=auth.*' replace />
         },
         {
             path: '/workspaces',

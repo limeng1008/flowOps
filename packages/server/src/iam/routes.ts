@@ -1,6 +1,6 @@
 import { accountRouter, authRouter, loginMethodRouter } from './self/auth/routes'
+import { auditRouter } from './self/audit/routes'
 import {
-    auditRouter,
     organizationRouter,
     organizationUserRoute,
     roleRouter,

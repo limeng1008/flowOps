@@ -150,7 +150,7 @@ router.use('/mcp-server', mcpServerRouter)
 router.use('/mcp', mcpEndpointRouter)
 
 router.use('/auth', authRouter)
-router.use('/audit', checkFeatureByPlan('feat:login-activity'), auditRouter)
+router.use('/audit', auditRouter)
 router.use('/user', userRouter)
 router.use('/organization', organizationRouter)
 router.use('/role', requireFeature('feat:roles'), roleRouter)
