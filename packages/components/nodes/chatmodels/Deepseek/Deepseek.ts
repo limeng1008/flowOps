@@ -2,6 +2,7 @@ import { BaseCache } from '@langchain/core/caches'
 import { ChatDeepSeek, ChatDeepSeekInput } from '@langchain/deepseek'
 import { ICommonObject, INode, INodeData, INodeOptionsValue, INodeParams } from '../../../src/Interface'
 import { getModels, MODEL_TYPE } from '../../../src/modelLoader'
+import { fetchDeepseekChatModelOptions } from '../../../src/model-providers/deepseek'
 import { getBaseClasses, getCredentialData, getCredentialParam } from '../../../src/utils'
 
 class Deepseek_ChatModels implements INode {
@@ -43,7 +44,8 @@ class Deepseek_ChatModels implements INode {
                 name: 'modelName',
                 type: 'asyncOptions',
                 loadMethod: 'listModels',
-                default: 'deepseek-chat'
+                default: 'deepseek-v4-flash',
+                freeSolo: true
             },
             {
                 label: 'Temperature',
@@ -133,8 +135,22 @@ class Deepseek_ChatModels implements INode {
 
     //@ts-ignore
     loadMethods = {
-        async listModels(): Promise<INodeOptionsValue[]> {
-            return await getModels(MODEL_TYPE.CHAT, 'deepseek')
+        async listModels(nodeData: INodeData, options: ICommonObject): Promise<INodeOptionsValue[]> {
+            const fallbackModels = async () => getModels(MODEL_TYPE.CHAT, 'deepseek')
+
+            if (!nodeData.credential) return await fallbackModels()
+
+            try {
+                const credentialData = await getCredentialData(nodeData.credential, options)
+                const deepseekApiKey = getCredentialParam('deepseekApiKey', credentialData, nodeData)
+
+                if (!deepseekApiKey) return await fallbackModels()
+
+                const liveModels = await fetchDeepseekChatModelOptions(deepseekApiKey)
+                return liveModels.length ? liveModels : await fallbackModels()
+            } catch (error) {
+                return await fallbackModels()
+            }
         }
     }
 

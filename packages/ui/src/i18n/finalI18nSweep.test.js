@@ -198,6 +198,7 @@ describe('final i18n sweep coverage', () => {
         const dropdownSource = fs.readFileSync(path.join(__dirname, '../ui-component/dropdown/Dropdown.jsx'), 'utf8')
         const multiDropdownSource = fs.readFileSync(path.join(__dirname, '../ui-component/dropdown/MultiDropdown.jsx'), 'utf8')
         const asyncDropdownSource = fs.readFileSync(path.join(__dirname, '../ui-component/dropdown/AsyncDropdown.jsx'), 'utf8')
+        const asyncDropdownUtilsSource = fs.readFileSync(path.join(__dirname, '../ui-component/dropdown/asyncDropdownUtils.js'), 'utf8')
 
         expect(dropdownSource).toContain('translateNodeLabel(option.label, currentLang)')
         expect(dropdownSource).toContain('translateNodeDescription(option.description, currentLang)')
@@ -212,7 +213,7 @@ describe('final i18n sweep coverage', () => {
         expect(asyncDropdownSource).toContain("t('common.chooseOption')")
         expect(asyncDropdownSource).toContain("label: t('common.createNewOption')")
         expect(multiDropdownSource).toContain('isChooseOptionValue')
-        expect(asyncDropdownSource).toContain('isChooseOptionValue')
+        expect(asyncDropdownUtilsSource).toContain('isChooseOptionValue')
         expect(asyncDropdownSource).not.toContain("label: '- Create New -'")
         expect(multiDropdownSource).not.toContain('{option.label}')
         expect(asyncDropdownSource).not.toContain('{option.label}')
