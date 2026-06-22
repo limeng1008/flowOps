@@ -184,7 +184,8 @@ describe('FlowOpsAdminService', () => {
         isOrganizationAdmin: true,
         assignedWorkspaces: [],
         permissions: ['*'],
-        features: {}
+        features: {},
+        tier: 'enterprise'
     })
 
     const auditActor = (actor: FlowOpsLoggedInUser | FlowOpsAuthenticatedAuditActor = defaultActor): FlowOpsAuthenticatedAuditActor =>

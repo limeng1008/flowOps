@@ -5,6 +5,7 @@ export const useAuth = () => {
     const { isOpenSource, isCloud } = useConfig()
     const permissions = useSelector((state) => state.auth.permissions)
     const features = useSelector((state) => state.auth.features)
+    const tier = useSelector((state) => state.auth.tier)
     const isGlobal = useSelector((state) => state.auth.isGlobal)
     const currentUser = useSelector((state) => state.auth.user)
 
@@ -58,5 +59,8 @@ export const useAuth = () => {
         return false
     }
 
-    return { hasPermission, hasAssignedWorkspace, hasDisplay }
+    // 按 tier 解锁的功能位门控（与 hasDisplay 同一套后端 features，命名更贴近「功能授权」语义）
+    const hasFeature = (feature) => hasDisplay(feature)
+
+    return { hasPermission, hasAssignedWorkspace, hasDisplay, hasFeature, tier }
 }

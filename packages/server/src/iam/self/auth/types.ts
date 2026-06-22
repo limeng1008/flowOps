@@ -22,6 +22,7 @@ export type FlowOpsLoggedInUser = {
     }>
     permissions: string[]
     features: Record<string, boolean>
+    tier: string
     token?: string
 }
 

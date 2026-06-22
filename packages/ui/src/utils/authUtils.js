@@ -22,6 +22,7 @@ const _removeFromStorage = () => {
     localStorage.removeItem('user')
     localStorage.removeItem('permissions')
     localStorage.removeItem('features')
+    localStorage.removeItem('tier')
     localStorage.removeItem('isSSO')
 }
 
@@ -60,6 +61,7 @@ const updateStateAndLocalStorage = (state, payload) => {
     state.token = payload.token
     state.permissions = payload.permissions
     state.features = payload.features
+    state.tier = payload.tier || 'free'
     state.isAuthenticated = true
     state.isGlobal = user.isOrganizationAdmin
     localStorage.setItem('isAuthenticated', 'true')
@@ -68,6 +70,7 @@ const updateStateAndLocalStorage = (state, payload) => {
     localStorage.setItem('user', JSON.stringify(user))
     localStorage.setItem('permissions', JSON.stringify(payload.permissions))
     localStorage.setItem('features', JSON.stringify(payload.features))
+    localStorage.setItem('tier', payload.tier || 'free')
 }
 
 const AuthUtils = {

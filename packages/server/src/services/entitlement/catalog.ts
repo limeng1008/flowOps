@@ -144,3 +144,12 @@ export const ENTITLEMENT_TEMPLATES: Record<EntitlementTier, EntitlementTemplate>
 }
 
 export const getIamFeaturesForEntitlementTier = (tier: EntitlementTier): string[] => IAM_FEATURES_BY_TIER[tier] ?? []
+
+// 某档位解锁的「完整」功能集（含 china-models / content-safety 等商业化位 + feat:* IAM 位），
+// 而非只有 IAM 位。门禁解析与 UI 透传都应以此为准。
+export const getEntitlementFeaturesForTier = (tier: EntitlementTier): string[] => ENTITLEMENT_TEMPLATES[tier]?.features ?? []
+
+// 全部可能的功能位字典（所有档位的并集），供 UI 枚举「我这档解锁了哪些」。
+export const ALL_ENTITLEMENT_FEATURES: string[] = Array.from(
+    new Set(ENTITLEMENT_TIERS.flatMap((tier) => ENTITLEMENT_TEMPLATES[tier].features))
+)

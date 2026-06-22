@@ -1,7 +1,8 @@
 import { getFlowOpsEdition } from '../../services/edition'
 import { getLicenseState } from '../../services/license/state'
 import {
-    getIamFeaturesForEntitlementTier,
+    ALL_ENTITLEMENT_FEATURES,
+    getEntitlementFeaturesForTier,
     isLocalCommercialEnabled,
     normalizeEntitlementTier,
     type EntitlementTier
@@ -32,12 +33,17 @@ export const getSelfFeatureTier = (): EntitlementTier => {
     return normalizeEntitlementTier(licenseState.tier ?? licenseState.payload?.tier)
 }
 
-export const getLicensedSelfFeatureSet = (): Set<string> => new Set(getIamFeaturesForEntitlementTier(getSelfFeatureTier()))
+export const getLicensedSelfFeatureSet = (): Set<string> => new Set(getEntitlementFeaturesForTier(getSelfFeatureTier()))
 
 export const isSelfFeatureAllowed = (feature: string): boolean => getLicensedSelfFeatureSet().has(feature)
 
-export const getSelfEnterpriseFeatures = (): FlowOpsFeatureMap =>
-    SELF_ENTERPRISE_FEATURE_FLAGS.reduce((features, feature) => {
-        features[feature] = isSelfFeatureAllowed(feature)
+// 透传给 UI 的完整功能位字典 = 所有档位功能并集 ∪ IAM 标志（保留 feat:sso-config 等恒 false 的位，UI 据此隐藏入口）
+export const ALL_SELF_FEATURE_CODES: string[] = Array.from(new Set([...SELF_ENTERPRISE_FEATURE_FLAGS, ...ALL_ENTITLEMENT_FEATURES]))
+
+export const getSelfEnterpriseFeatures = (): FlowOpsFeatureMap => {
+    const licensed = getLicensedSelfFeatureSet()
+    return ALL_SELF_FEATURE_CODES.reduce((features, feature) => {
+        features[feature] = licensed.has(feature)
         return features
     }, {} as FlowOpsFeatureMap)
+}

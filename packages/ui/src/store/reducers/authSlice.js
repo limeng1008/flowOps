@@ -14,7 +14,8 @@ const initialState = {
     features:
         localStorage.getItem('features') && localStorage.getItem('features') !== 'undefined'
             ? JSON.parse(localStorage.getItem('features'))
-            : null
+            : null,
+    tier: localStorage.getItem('tier') && localStorage.getItem('tier') !== 'undefined' ? localStorage.getItem('tier') : 'free'
 }
 
 const authSlice = createSlice({
@@ -29,6 +30,7 @@ const authSlice = createSlice({
             state.token = null
             state.permissions = null
             state.features = null
+            state.tier = 'free'
             state.isAuthenticated = false
             state.isGlobal = false
             AuthUtils.removeCurrentUser()

@@ -5,7 +5,7 @@ import { DataSource, EntityManager } from 'typeorm'
 import { FlowOpsOrganization, FlowOpsRole, FlowOpsUser, FlowOpsWorkspace, FlowOpsWorkspaceMember } from '../entities'
 import { SELF_ACCESS_TOKEN_COOKIE, SELF_REFRESH_TOKEN_COOKIE, getSelfJwtAuthTokenSecret, getSelfJwtRefreshTokenSecret } from '../secrets'
 import { parsePermissionJson } from '../rbac/permissions'
-import { getSelfEnterpriseFeatures } from '../features'
+import { getSelfEnterpriseFeatures, getSelfFeatureTier } from '../features'
 import { FlowOpsAuthError, FlowOpsLoggedInUser } from './types'
 import logger from '../../../utils/logger'
 import { isSelfSmtpConfigured, sendSelfMail } from '../email/mailer'
@@ -557,7 +557,8 @@ export class FlowOpsAuthService {
             isOrganizationAdmin: activeRole?.name === 'owner',
             assignedWorkspaces,
             permissions: parsePermissions(activeRole),
-            features: getSelfEnterpriseFeatures()
+            features: getSelfEnterpriseFeatures(),
+            tier: getSelfFeatureTier()
         }
     }
 

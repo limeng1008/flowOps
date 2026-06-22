@@ -80,11 +80,17 @@ describe('FlowOpsIdentity', () => {
         const identity = await FlowOpsIdentity.getInstance()
         const features = await identity.getFeaturesByPlan('self-managed')
 
-        expect(Object.keys(features).sort()).toEqual([...SELF_ENTERPRISE_FEATURE_FLAGS].sort())
+        // 既含全部 IAM feat:* 位，也含 catalog 商业化位（china-models 等）
+        for (const flag of SELF_ENTERPRISE_FEATURE_FLAGS) {
+            expect(Object.prototype.hasOwnProperty.call(features, flag)).toBe(true)
+        }
+        expect(Object.keys(features)).toEqual(expect.arrayContaining(['china-models', 'content-safety', 'human-handoff']))
         expect(features['feat:datasets']).toBe('true')
         expect(features['feat:roles']).toBe('true')
         expect(features['feat:files']).toBe('false')
         expect(features['feat:sso-config']).toBe('false')
+        expect(features['china-models']).toBe('true')
+        expect(features['human-handoff']).toBe('true')
     })
 
     it('keeps platform call sites satisfied without external product metadata', async () => {

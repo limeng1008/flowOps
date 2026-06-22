@@ -42,10 +42,46 @@ describe('FlowOps self license feature mapping', () => {
         else process.env.FLOWOPS_LOCAL_COMMERCIAL = originalLocalCommercial
     })
 
-    it('treats missing licenses as the free tier with no advanced IAM features', () => {
+    it('treats missing licenses as the free tier (only the free entitlement features unlocked)', () => {
         expect(getSelfFeatureTier()).toBe('free')
-        expect(getLicensedSelfFeatureSet()).toEqual(new Set())
-        expect(getSelfEnterpriseFeatures()).toEqual(Object.fromEntries(SELF_ENTERPRISE_FEATURE_FLAGS.map((feature) => [feature, false])))
+        // free 档解锁的是基础工作流 + 国产模型 + API，而非空集
+        expect(getLicensedSelfFeatureSet()).toEqual(new Set(['basic-workflow', 'china-models', 'api-access']))
+
+        const features = getSelfEnterpriseFeatures()
+        expect(features['china-models']).toBe(true)
+        expect(features['api-access']).toBe(true)
+        expect(features['basic-workflow']).toBe(true)
+        // 高档位才有的功能全部关闭
+        expect(features['content-safety']).toBe(false)
+        expect(features['human-handoff']).toBe(false)
+        expect(features['custom-branding']).toBe(false)
+        expect(features['feat:datasets']).toBe(false)
+        expect(features['feat:audit']).toBe(false)
+        expect(features['feat:sso-config']).toBe(false)
+    })
+
+    it('gates FlowOps commercial features by tier (china / content-safety / handoff / branding)', () => {
+        // pro：内容安全 + PPT/Excel 导出 + trace，但人工接管/白标仍关
+        setLicenseState(makeLicenseState('active', { tier: 'pro' }))
+        expect(isSelfFeatureAllowed('content-safety')).toBe(true)
+        expect(isSelfFeatureAllowed('ppt-excel-export')).toBe(true)
+        expect(isSelfFeatureAllowed('trace-debugging')).toBe(true)
+        expect(isSelfFeatureAllowed('human-handoff')).toBe(false)
+        expect(isSelfFeatureAllowed('custom-branding')).toBe(false)
+
+        // team：人工接管 + 国产云向量 + 多工作区 + 白标
+        setLicenseState(makeLicenseState('active', { tier: 'team' }))
+        expect(isSelfFeatureAllowed('human-handoff')).toBe(true)
+        expect(isSelfFeatureAllowed('china-cloud-vector-stores')).toBe(true)
+        expect(isSelfFeatureAllowed('multi-workspace')).toBe(true)
+        expect(isSelfFeatureAllowed('custom-branding')).toBe(true)
+
+        // enterprise：全部商业化位解锁
+        setLicenseState(makeLicenseState('active', { tier: 'enterprise' }))
+        expect(isSelfFeatureAllowed('content-safety')).toBe(true)
+        expect(isSelfFeatureAllowed('human-handoff')).toBe(true)
+        expect(isSelfFeatureAllowed('custom-branding')).toBe(true)
+        expect(isSelfFeatureAllowed('private-offline-license')).toBe(true)
     })
 
     it('opens evaluation and log features for pro while keeping team administration closed', () => {

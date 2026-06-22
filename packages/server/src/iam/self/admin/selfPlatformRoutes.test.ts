@@ -184,7 +184,8 @@ describe('self IAM platform routes', () => {
                 { id: 'workspace-1', name: 'Default Workspace', roleId: ownerRole!.id, role: 'owner', organizationId: 'organization-1' }
             ],
             permissions: BUILTIN_SELF_ROLE_PERMISSIONS.owner,
-            features: {}
+            features: {},
+            tier: 'enterprise'
         }
         member = {
             id: 'member-user',
@@ -204,7 +205,8 @@ describe('self IAM platform routes', () => {
                 { id: 'workspace-1', name: 'Default Workspace', roleId: memberRole!.id, role: 'member', organizationId: 'organization-1' }
             ],
             permissions: BUILTIN_SELF_ROLE_PERMISSIONS.member,
-            features: {}
+            features: {},
+            tier: 'enterprise'
         }
 
         app = buildApp(dataSource, { owner, member })
