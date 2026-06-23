@@ -48,4 +48,18 @@ describe('节点级 tier 门控', () => {
         expect(isNodeAllowedByEntitlement('pptxExportAgentflow')).toBe(true)
         expect(isNodeAllowedByEntitlement('spreadsheetExportAgentflow')).toBe(true)
     })
+
+    it('转人工节点 humanHandoff 归 team+(pro 不含)', () => {
+        // free 隐藏
+        expect(isNodeAllowedByEntitlement('humanHandoff')).toBe(false)
+        // pro 仍隐藏(human-handoff 是 team+,非 pro)
+        setLicenseState(makeLicenseState('active', { tier: 'pro' }))
+        expect(isNodeAllowedByEntitlement('humanHandoff')).toBe(false)
+        // team 放开
+        setLicenseState(makeLicenseState('active', { tier: 'team' }))
+        expect(isNodeAllowedByEntitlement('humanHandoff')).toBe(true)
+        // enterprise 放开
+        process.env.FLOWOPS_LOCAL_COMMERCIAL = 'true'
+        expect(isNodeAllowedByEntitlement('humanHandoff')).toBe(true)
+    })
 })

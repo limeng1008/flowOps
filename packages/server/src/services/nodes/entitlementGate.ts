@@ -5,7 +5,8 @@ import { isSelfFeatureAllowed } from '../../iam/self/features'
 // 该机制可复用:后续 content-safety / human-handoff 等高级节点同样在此登记。
 export const NODE_FEATURE_GATES: Record<string, string> = {
     pptxExportAgentflow: FLOWOPS_ENTITLEMENT_FEATURES.pptExcelExport,
-    spreadsheetExportAgentflow: FLOWOPS_ENTITLEMENT_FEATURES.pptExcelExport
+    spreadsheetExportAgentflow: FLOWOPS_ENTITLEMENT_FEATURES.pptExcelExport,
+    humanHandoff: FLOWOPS_ENTITLEMENT_FEATURES.humanHandoff
 }
 
 // 节点是否被当前部署档位授权(未登记门控的节点恒 true)。
